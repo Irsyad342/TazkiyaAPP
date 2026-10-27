@@ -214,3 +214,21 @@ Work Log:
 Stage Summary:
 - Proyek terverifikasi siap deploy: lint/tsc/build bersih, GitHub sinkron, preview sandbox tetap hidup.
 - Panduan lengkap + nilai env vars diserahkan ke pengguna untuk wizard Vercel.
+
+---
+Task ID: 13
+Agent: Main agent (Z.ai)
+Task: "Buat aplikasi lebih ringan di HP" — optimasi performa menyeluruh pasca-deploy Vercel (https://tazkiyaapp.vercel.app), tanpa mengubah susunan UI/fitur.
+
+Work Log:
+- Audit: chunk JS awal ±930KB min (framer-motion penuh 304KB eager, recharts 404KB lazy ✓, react-dom 220KB); backdrop-filter blur 22-30px di puluhan kartu; 4 animasi infinite (aurora/hero-flow/quran-veil/beam-runner/liquid-sheen) + orb blur 150px raksasa berjalan terus di GPU HP; font Sora 5 berkas weight statis; list 114 surah tanpa optimasi paint.
+- Bundle: page.tsx → LazyMotion domAnimation strict (motion→m di page + TasbihSheet + TargetSheet + QuranReader); QuranReader jadi next/dynamic (ssr:false) — chunk 304KB hilang dari bundle awal, chunk terbesar non-framework kini 172KB (-130KB min / ±-45KB gzip); layout.tsx → Sora variabel 1 berkas (5→1) + display swap eksplisit semua font.
+- CSS (globals.css): blok @media ≤640px — blur glass 22→12px, strong 30→18px, violet 22→12px, liquid disesuaikan; animasi infinite dihentikan (statis di fasa terang) + will-change dilepas di HP; utilitas .tz-list-cv (content-visibility:auto + contain-intrinsic-size 88px) untuk list surah/juz; @media prefers-reduced-transparency → blur off. Orb splash/latar dibuat responsif (340-440px/blur 70-90px di HP; 560px/150px hanya md+).
+- Verifikasi: eslint 0, tsc 0, next build SUKSES; agent-browser 420x860 — Beranda visual identik, getAnimations 8+→2 (hanya tz-fade-up sekali-jalan), blur .glass computed 12px, lazy QuranReader terunduh saat buka Al-Fatihah (Arab Amiri + terjemahan render), Statistik lazy recharts render, Tasbih buka+hitung 2x = "2 dari 100 target", tema terang utuh; 1440x900 — tz-hero-flow MASIH beranimasi (5 animasi aktif), orb 150px ada; 0 error console/page selama sesi.
+- Kendala uji (bukan bug app): HMR Fast Refresh + snapshot a11y Playwright menyembunyikan elemen opacity-0 membuat sekuens klik tampak gagal; diselesaikan dengan reload + probe computed-style.
+- Push a76b375 ke origin/main → Vercel auto-redeploy; data uji localStorage dibersihkan.
+
+Stage Summary:
+- HP (≤640px): nol animasi kontinu, blur GPU dikurangi ±50%, bundle awal -130KB min, font -4 berkas, list Qur'an hemat paint — sumber "berat" utama (blur + animasi + parse JS) semuanya ditekan; visual & fitur tidak berubah.
+- Desktop: seluruh animasi & orb besar dipertahankan persis seperti sebelumnya.
+- Saklar "Animasi transisi" & Liquid Glass tetap berfungsi di semua mode.
