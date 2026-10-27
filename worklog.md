@@ -199,3 +199,18 @@ Stage Summary:
 - Aplikasi Tazkiya BERJALAN di port 3000 dan terverifikasi interaktif end-to-end; preview: https://preview-chat-ad782f6f-0393-4cdb-b46d-fa60af6aeb2b.space-z.ai/
 - Kredensial Supabase terpasang di .env (runtime pooler + direct migration URL); app belum memakai DB — data masih localStorage, siap disinkronkan bila diminta.
 - Catatan keamanan: token GitHub & password DB dibagikan di chat — disarankan rotasi token setelah selesai.
+
+---
+Task ID: 12
+Agent: Main agent (Z.ai)
+Task: Persiapan deploy Tazkiya ke Vercel (pengguna mengisi wizard deploy Vercel, minta pendampingan).
+
+Work Log:
+- Pre-deploy check: eslint 0 error; tsc --noEmit 0 error.
+- Sinkronisasi GitHub: commit lokal (allowedDevOrigins + worklog Task 11) diamend dengan pesan bermakna & dipush ke origin/main (1d8c3d9..097d0d5) — repo GitHub kini identik dengan sandbox.
+- Simulasi build Vercel: dev server dihentikan, .next dibersihkan, `bun run build` SUKSES (compile 11,1s, TypeScript lolos karena ignoreBuildErrors:false, 5 halaman statis; output standalone + cp artefak sukses). Dev server di-restart, GET / 200.
+- Kesimpulan konfigurasi deploy: Root Directory "./", Framework Preset Next.js, build settings default (tanpa override); env vars DATABASE_URL (pooler 6543) + DIRECT_URL (direct 5432) diisi di dashboard Vercel; sarankan Function Region Singapore (sin1) dekat Supabase ap-southeast-1; sb_secret tidak diperlukan.
+
+Stage Summary:
+- Proyek terverifikasi siap deploy: lint/tsc/build bersih, GitHub sinkron, preview sandbox tetap hidup.
+- Panduan lengkap + nilai env vars diserahkan ke pengguna untuk wizard Vercel.
