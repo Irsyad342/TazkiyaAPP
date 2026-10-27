@@ -180,3 +180,22 @@ Work Log:
 
 Stage Summary:
 - Dialog konfirmasi reset tasbih kini tampil utuh di tengah layar (gelap & terang), tombol tidak terpotong lagi; Batal/Reset berfungsi benar; pagar CSS mencegah bug "dialog terpotong oleh glass" terulang pada dialog mana pun.
+
+---
+Task ID: 11
+Agent: Main agent (Z.ai)
+Task: Clone repo GitHub Irsyad342/TazkiyaAPP + jalankan aplikasi dengan kredensial Supabase ("Jalankan").
+
+Work Log:
+- Clone repo via token akses ke /home/z/my-project/TazkiyaAPP, lalu seluruh isi dipindahkan ke root /home/z/my-project agar menjadi project utama workspace (deteksi dev server sistem).
+- Inspeksi: Next.js 16.1.3 (App Router, Turbopack, output standalone), TypeScript, Tailwind 4, Zustand persist; git log 2 commit (snapshot awal + PWA manifest/ikon).
+- Audit integrasi database: 0 import prisma/@supabase di src/, dependensi pruned sejak Task 5 — aplikasi 100% localStorage (tazkiya-store-v1); prisma/schema.prisma hanya template scaffold (User/Post).
+- .env dibuat dari kredensial Supabase pengguna: DATABASE_URL = pooler 6543 (pgbouncer=true&connection_limit=1), DIRECT_URL = db direct 5432 — siap dipakai bila Prisma diaktifkan kembali / deploy Vercel. File .env TIDAK ter-track git (aman).
+- bun install: 432 paket sukses; dev server start port 3000, GET / 200.
+- Verifikasi agent-browser 420x860: Beranda render utuh (dark purple glassmorphism), 0 error console/page; alur catat salat Subuh: sheet 3-status → Sudah dilaksanakan → Berjamaah → Simpan → toast "Masya Allah! Salat Subuh tercatat berjamaah", progres 11% 1/9, chip 1/5, localStorage tertulis; tab Statistik lazy-load recharts render penuh (chart, kalender); data uji dibersihkan (localStorage clear) agar pengguna mulai kosong.
+- next.config.ts: allowedDevOrigins ditambahkan untuk domain preview sandbox (hilangkan warning cross-origin Next.js); server restart bersih, GET / 200.
+
+Stage Summary:
+- Aplikasi Tazkiya BERJALAN di port 3000 dan terverifikasi interaktif end-to-end; preview: https://preview-chat-ad782f6f-0393-4cdb-b46d-fa60af6aeb2b.space-z.ai/
+- Kredensial Supabase terpasang di .env (runtime pooler + direct migration URL); app belum memakai DB — data masih localStorage, siap disinkronkan bila diminta.
+- Catatan keamanan: token GitHub & password DB dibagikan di chat — disarankan rotasi token setelah selesai.

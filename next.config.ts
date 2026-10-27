@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   reactStrictMode: false,
+  /* Izinkan domain preview sandbox memuat aset dev (hilangkan warning cross-origin). */
+  allowedDevOrigins: ["preview-chat-ad782f6f-0393-4cdb-b46d-fa60af6aeb2b.space-z.ai"],
 };
 
 export default nextConfig;
