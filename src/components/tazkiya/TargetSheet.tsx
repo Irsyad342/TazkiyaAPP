@@ -12,7 +12,7 @@
 import { useState, type ReactNode } from "react";
 import { BookOpen, ChevronLeft, CircleDot, MoonStar, Save, Target } from "lucide-react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { EXTRAS, type ExtraId, type QuranTargetType } from "@/lib/tazkiya/types";
@@ -117,7 +117,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
     "tap flex min-h-[42px] shrink-0 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-tz-purple to-tz-violet px-4 text-[12.5px] font-semibold text-white shadow-[0_4px_14px_-4px_rgba(156,114,239,0.8)]";
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 24 }}
@@ -314,7 +314,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
           </p>
         </SectionCard>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

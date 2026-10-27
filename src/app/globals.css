@@ -887,3 +887,84 @@ html[data-anim="off"] .glass-strong::after {
   direction: rtl;
   font-family: var(--font-amiri), "Amiri Quran", Amiri, serif;
 }
+
+/* ---------- Mode ringan HP (layar ≤640px) ----------
+   Visual TIDAK berubah — kaca tetap kaca, glow tetap ada. Yang dikurangi
+   hanya biaya GPU: (1) radius backdrop-filter diperkecil (biaya blur naik
+   kuadratik terhadap radius dan dihitung ulang tiap frame saat konten di
+   baliknya bergulir), (2) animasi dekoratif tanpa batas waktu dihentikan
+   agar kompositor HP tidak bekerja terus-menerus, (3) will-change dilepas
+   agar lapisan GPU berlebih tidak menggantung. Desktop tidak terpengaruh. */
+@media (max-width: 640px) {
+  .glass {
+    -webkit-backdrop-filter: blur(12px) saturate(1.2);
+    backdrop-filter: blur(12px) saturate(1.2);
+  }
+  .glass-strong {
+    -webkit-backdrop-filter: blur(18px) saturate(1.25);
+    backdrop-filter: blur(18px) saturate(1.25);
+  }
+  .glass-violet {
+    -webkit-backdrop-filter: blur(12px) saturate(1.2);
+    backdrop-filter: blur(12px) saturate(1.2);
+  }
+  html[data-glass="liquid"] .glass {
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(14px) saturate(1.4);
+  }
+  html[data-glass="liquid"] .glass-strong {
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    backdrop-filter: blur(20px) saturate(1.5);
+  }
+  html[data-theme="light"][data-glass="liquid"] .glass {
+    -webkit-backdrop-filter: blur(12px) saturate(1.2);
+    backdrop-filter: blur(12px) saturate(1.2);
+  }
+
+  html .animate-tz-aurora,
+  html .animate-tz-spin-slow,
+  html .tz-hero-glow > .tz-hero-flow,
+  html .tz-quran-glow > .tz-quran-veil,
+  html .tz-beam-runner,
+  html .glass-hero::after,
+  html .glass-strong::after {
+    animation: none !important;
+  }
+  /* Posisi diam yang menyerupai fasa animasi paling terang */
+  html .tz-hero-glow > .tz-hero-flow {
+    opacity: 0.9;
+    transform: translate(0);
+    will-change: auto;
+  }
+  html .tz-quran-glow > .tz-quran-veil {
+    opacity: 0.85;
+    transform: translate(0);
+    will-change: auto;
+  }
+  html .tz-beam-runner {
+    will-change: auto;
+    opacity: 0.9;
+  }
+}
+
+/* ---------- Hemat paint daftar panjang ----------
+   114 baris surah / 30 baris juz: baris di luar viewport tidak dilayout &
+   tidak dirender sampai mendekat (scroll tetap mulus, tab Al-Qur'an ringan). */
+.tz-list-cv > * {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 88px;
+}
+
+/* ---------- Hormati preferensi transparansi OS ----------
+   Perangkat yang meminta transparansi minim (mode hemat daya / penglihatan)
+   melewatkan blur sepenuhnya — latar gradien kaca tetap terbaca. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-strong,
+  .glass-violet,
+  html[data-glass="liquid"] .glass,
+  html[data-glass="liquid"] .glass-strong {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}

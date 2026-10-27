@@ -269,7 +269,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
             ))}
           </div>
           {listMode === "surah" ? (
-            <ul className="mt-1 divide-y divide-tz-line-soft">
+            <ul className="tz-list-cv mt-1 divide-y divide-tz-line-soft">
               {filtered.map((s) => (
                 <SurahRow
                   key={s.number}
@@ -285,7 +285,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
               ) : null}
             </ul>
           ) : (
-            <ul className="mt-1 divide-y divide-tz-line-soft">
+            <ul className="tz-list-cv mt-1 divide-y divide-tz-line-soft">
               {JUZ_RANGES.map((j) => {
                 const start = getSurah(j.startSurah);
                 const end = getSurah(j.endSurah);

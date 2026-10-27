@@ -5,18 +5,24 @@ import "./globals.css";
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
   subsets: ["latin"],
+  display: "swap",
 });
 
+/*
+ * Sora dimuat sebagai font variabel (satu berkas untuk semua weight) —
+ * lima berkas weight statis memperlambat muat pertama di jaringan HP.
+ */
 const sora = Sora({
   variable: "--font-sora",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 const amiriQuran = Amiri_Quran({
   variable: "--font-amiri",
   subsets: ["arabic"],
   weight: "400",
+  display: "swap",
 });
 
 export const metadata: Metadata = {

@@ -9,7 +9,7 @@
 import { useState } from "react";
 import { Minus, RotateCcw, Save, X } from "lucide-react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,7 +44,7 @@ export function TasbihSheet({ open, onClose }: { open: boolean; onClose: () => v
   const reached = tasbih.count >= tasbih.target;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 24 }}
@@ -95,7 +95,7 @@ export function TasbihSheet({ open, onClose }: { open: boolean; onClose: () => v
       {/* ---------- Piringan hitung ---------- */}
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center gap-6 px-6">
         <p className="max-w-full truncate text-center font-display text-lg font-semibold text-tz-accent">{tasbih.dhikr}</p>
-        <motion.button
+        <m.button
           type="button"
           onClick={() => {
             tasbihAdd(1);
@@ -152,7 +152,7 @@ export function TasbihSheet({ open, onClose }: { open: boolean; onClose: () => v
               {reached ? "Target tercapai" : `${pct}%`}
             </span>
           </span>
-        </motion.button>
+        </m.button>
 
         <div className="flex items-center gap-3">
           <button
@@ -259,6 +259,6 @@ export function TasbihSheet({ open, onClose }: { open: boolean; onClose: () => v
           </button>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

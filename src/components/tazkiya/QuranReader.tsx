@@ -20,7 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { fetchSurah, getSurah, type SurahData } from "@/lib/tazkiya/quran";
 import { todayKey } from "@/lib/tazkiya/dates";
@@ -156,7 +156,7 @@ export function QuranReader({
   const lhIdx = Math.max(0, LINE_HEIGHTS.indexOf(settings.readerLineHeight));
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, x: 60 * (animated ? 1 : 0) }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 60 * (animated ? 1 : 0) }}
@@ -462,6 +462,6 @@ export function QuranReader({
           </>
         ) : null}
       </div>
-    </motion.div>
+    </m.div>
   );
 }

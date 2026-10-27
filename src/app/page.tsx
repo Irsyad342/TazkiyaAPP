@@ -8,17 +8,25 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, LazyMotion, domAnimation, m } from "framer-motion";
 import { LoaderCircle } from "lucide-react";
 import { Toaster } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { BottomNav, type TabId } from "@/components/tazkiya/BottomNav";
 import { HomePage } from "@/components/tazkiya/HomePage";
 import { QuranPage } from "@/components/tazkiya/QuranPage";
-import { QuranReader } from "@/components/tazkiya/QuranReader";
 import { ProfilePage } from "@/components/tazkiya/ProfilePage";
 import { TasbihSheet } from "@/components/tazkiya/TasbihSheet";
 import { TargetSheet } from "@/components/tazkiya/TargetSheet";
+
+/*
+ * Pembaca Al-Qur'an dimuat terpisah (lazy) — hanya diunduh saat pengguna
+ * membuka surah, sehingga bundle awal tetap kecil di jaringan HP.
+ */
+const QuranReader = dynamic(() => import("@/components/tazkiya/QuranReader").then((mod) => ({ default: mod.QuranReader })), {
+  ssr: false,
+  loading: () => null,
+});
 
 /*
  * Statistik dimuat terpisah (lazy) — pustaka grafik tidak membebani
@@ -174,9 +182,9 @@ export default function Page() {
       <main className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-tz-stage">
         <div
           aria-hidden
-          className="animate-tz-aurora absolute left-1/2 top-1/3 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-tz-purple/30 blur-[130px]"
+          className="animate-tz-aurora absolute left-1/2 top-1/3 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-tz-purple/30 blur-[90px] md:h-[420px] md:w-[420px] md:blur-[130px]"
         />
-        <div aria-hidden className="absolute bottom-10 right-1/4 h-64 w-64 rounded-full bg-tz-violet/16 blur-[110px]" />
+        <div aria-hidden className="absolute bottom-10 right-1/4 h-44 w-44 rounded-full bg-tz-violet/16 blur-[70px] md:h-64 md:w-64 md:blur-[110px]" />
         <div className="relative flex flex-col items-center gap-4">
           <div className="animate-tz-pulse relative flex h-[72px] w-[72px] items-center justify-center rounded-[1.6rem] border border-tz-violet/40 bg-gradient-to-br from-tz-purple to-tz-violet font-display text-3xl font-bold text-white">
             ت
@@ -188,12 +196,13 @@ export default function Page() {
   }
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <main className="relative flex min-h-dvh w-full items-center justify-center bg-tz-stage" aria-label="Aplikasi Tazkiya">
       {/* Aura latar (desktop / area di luar bingkai) */}
       <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="animate-tz-aurora absolute left-1/2 top-[28%] h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-tz-purple/30 blur-[150px]" />
-        <div className="absolute bottom-0 right-[16%] h-80 w-80 rounded-full bg-tz-violet/16 blur-[130px]" />
-        <div className="absolute left-[8%] top-[12%] h-64 w-64 rounded-full bg-tz-orb-deep/30 blur-[120px]" />
+        <div className="animate-tz-aurora absolute left-1/2 top-[28%] h-[340px] w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-tz-purple/30 blur-[90px] md:h-[560px] md:w-[560px] md:blur-[150px]" />
+        <div className="absolute bottom-0 right-[16%] h-52 w-52 rounded-full bg-tz-violet/16 blur-[80px] md:h-80 md:w-80 md:blur-[130px]" />
+        <div className="absolute left-[8%] top-[12%] h-44 w-44 rounded-full bg-tz-orb-deep/30 blur-[70px] md:h-64 md:w-64 md:blur-[120px]" />
       </div>
 
       {/* Bingkai ponsel */}
@@ -211,7 +220,7 @@ export default function Page() {
 
         <div id="konten-tazkiya" className="no-scrollbar relative z-10 flex-1 overflow-y-auto px-5 pb-36 pt-[max(1rem,env(safe-area-inset-top))]">
           <AnimatePresence mode="wait" initial={false}>
-            <motion.div
+            <m.div
               key={tab}
               initial={{ opacity: 0, y: 14 * (animations ? 1 : 0) }}
               animate={{ opacity: 1, y: 0 }}
@@ -222,7 +231,7 @@ export default function Page() {
               {tab === "quran" && <QuranPage onOpenReader={openReader} />}
               {tab === "statistik" && <StatsPage />}
               {tab === "profil" && <ProfilePage onOpenTargets={openTargets} />}
-            </motion.div>
+            </m.div>
           </AnimatePresence>
         </div>
 
@@ -271,5 +280,6 @@ export default function Page() {
         }
       />
     </main>
+    </LazyMotion>
   );
 }
