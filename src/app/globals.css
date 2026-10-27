@@ -1,0 +1,889 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-jakarta);
+  --font-display: var(--font-sora);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@theme {
+  /* Palet Tazkiya — Dark Purple Glassmorphism + Violet Glow (dark = default) */
+  --color-tz-ink: #f2eefb;
+  --color-tz-deep: #100c19;
+  --color-tz-purple: #55339a;
+  --color-tz-violet: #9c72ef;
+  --color-tz-lavender: #d8c5ff;
+  --color-tz-muted: #a79bc6;
+  --color-tz-line: rgba(255, 255, 255, 0.1);
+  --color-tz-accent: #d8c5ff;
+  --color-tz-frame: #171321;
+  --color-tz-stage: #0d0a14;
+  --color-tz-panel: rgba(255, 255, 255, 0.05);
+  --color-tz-panel-soft: rgba(255, 255, 255, 0.04);
+  --color-tz-panel-strong: rgba(255, 255, 255, 0.1);
+  --color-tz-line-soft: rgba(255, 255, 255, 0.06);
+  --color-tz-line-strong: rgba(255, 255, 255, 0.25);
+  --color-tz-track: rgba(255, 255, 255, 0.12);
+  --color-tz-aurora-a: rgba(34, 25, 56, 0.55);
+  --color-tz-aurora-b: rgba(20, 15, 31, 0.85);
+  --color-tz-orb-deep: #3b2372;
+  /* Lavender dekoratif (pantulan kaca) — dipakai di kedua tema */
+  --color-tz-lav-deco: #a98ae8;
+}
+
+:root {
+  --radius: 1.1rem;
+  --background: #14101e;
+  --foreground: #f2eefb;
+  --card: #1d1630;
+  --card-foreground: #f2eefb;
+  --popover: #241b3a;
+  --popover-foreground: #f2eefb;
+  --primary: #9c72ef;
+  --primary-foreground: #1a1028;
+  --secondary: rgba(156, 114, 239, 0.14);
+  --secondary-foreground: #d8c5ff;
+  --muted: rgba(255, 255, 255, 0.06);
+  --muted-foreground: #a79bc6;
+  --accent: rgba(156, 114, 239, 0.16);
+  --accent-foreground: #e9dffc;
+  --destructive: #fb7185;
+  --border: rgba(255, 255, 255, 0.09);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #9c72ef;
+  --chart-1: #9c72ef;
+  --chart-2: #d8c5ff;
+  --chart-3: #55339a;
+  --chart-4: #c4a7ff;
+  --chart-5: #7a4fd4;
+  --sidebar: #211735;
+  --sidebar-foreground: #f2eefb;
+  --sidebar-primary: #9c72ef;
+  --sidebar-primary-foreground: #1a1028;
+  --sidebar-accent: rgba(156, 114, 239, 0.16);
+  --sidebar-accent-foreground: #e9dffc;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #9c72ef;
+  /* Token turunan tema (bayangan input, fokus, grafik) */
+  --tz-inset: rgba(0, 0, 0, 0.25);
+  --tz-ring-soft: rgba(156, 114, 239, 0.16);
+  --tz-chart-grid: rgba(255, 255, 255, 0.06);
+  --tz-chart-axis: #a79bc6;
+  --tz-empty-cell: rgba(255, 255, 255, 0.045);
+}
+
+.dark {
+  --background: #14101e;
+  --foreground: #f2eefb;
+  --card: #1d1630;
+  --card-foreground: #f2eefb;
+  --popover: #241b3a;
+  --popover-foreground: #f2eefb;
+  --primary: #9c72ef;
+  --primary-foreground: #1a1028;
+  --secondary: rgba(156, 114, 239, 0.14);
+  --secondary-foreground: #d8c5ff;
+  --muted: rgba(255, 255, 255, 0.06);
+  --muted-foreground: #a79bc6;
+  --accent: rgba(156, 114, 239, 0.16);
+  --accent-foreground: #e9dffc;
+  --destructive: #fb7185;
+  --border: rgba(255, 255, 255, 0.09);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #9c72ef;
+}
+
+/* ---------- Tema terang — palet lavender bersih Tazkiya ----------
+   Background #F5F1F5 · alt #EEE7F0 · kartu #FFFFFF · permukaan #F8F4FA
+   Teks #292331 / #706778 · border #E4DCE9 · ungu #7546C8 · lavender #A98AE8 */
+html[data-theme="light"] {
+  --background: #f5f1f5;
+  --foreground: #292331;
+  --card: #ffffff;
+  --card-foreground: #292331;
+  --popover: #ffffff;
+  --popover-foreground: #292331;
+  --primary: #7546c8;
+  --primary-foreground: #ffffff;
+  --secondary: rgba(117, 70, 200, 0.12);
+  --secondary-foreground: #5c3aa4;
+  --muted: rgba(41, 35, 49, 0.05);
+  --muted-foreground: #706778;
+  --accent: rgba(117, 70, 200, 0.12);
+  --accent-foreground: #5c3aa4;
+  --destructive: #d92d3f;
+  --border: #e4dce9;
+  --input: rgba(41, 35, 49, 0.16);
+  --ring: #7546c8;
+  --chart-1: #7546c8;
+  --chart-2: #a98ae8;
+  --chart-3: #55339a;
+  --chart-4: #c4a7ff;
+  --chart-5: #7a4fd4;
+  /* Token Tazkiya versi terang */
+  --color-tz-ink: #292331;
+  --color-tz-muted: #706778;
+  --color-tz-violet: #7546c8;
+  --color-tz-lavender: #6d43b8;
+  --color-tz-accent: #7546c8;
+  --color-tz-frame: #f5f1f5;
+  --color-tz-stage: #e9e2ee;
+  --color-tz-panel: rgba(255, 255, 255, 0.78);
+  --color-tz-panel-soft: #f8f4fa;
+  --color-tz-panel-strong: #ffffff;
+  --color-tz-line: #e4dce9;
+  --color-tz-line-soft: rgba(228, 220, 233, 0.55);
+  --color-tz-line-strong: #d3c5e2;
+  --color-tz-track: rgba(41, 35, 49, 0.08);
+  --color-tz-aurora-a: rgba(255, 255, 255, 0.6);
+  --color-tz-aurora-b: rgba(238, 231, 240, 0.85);
+  --color-tz-orb-deep: #cdb5f0;
+  --tz-inset: rgba(41, 35, 49, 0.07);
+  --tz-ring-soft: rgba(117, 70, 200, 0.16);
+  --tz-chart-grid: rgba(41, 35, 49, 0.08);
+  --tz-chart-axis: #706778;
+  --tz-empty-cell: rgba(41, 35, 49, 0.05);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html {
+    background-color: #0c0913;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01" on;
+  }
+  ::selection {
+    color: #fff;
+    background: rgba(156, 114, 239, 0.45);
+  }
+  html[data-theme="light"] {
+    background-color: #f5f1f5;
+  }
+  html[data-theme="light"] ::selection {
+    color: #292331;
+    background: rgba(117, 70, 200, 0.22);
+  }
+}
+
+@layer utilities {
+  /* Kaca dasar (v2 — tepi gradasi via :before) */
+  .glass {
+    -webkit-backdrop-filter: blur(22px) saturate(1.25);
+    backdrop-filter: blur(22px) saturate(1.25);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.067), rgba(255, 255, 255, 0.02) 55%, rgba(120, 82, 200, 0.05));
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    position: relative;
+    box-shadow:
+      0 18px 44px -18px rgba(8, 5, 15, 0.65),
+      0 4px 14px -8px rgba(8, 5, 15, 0.4),
+      inset 0 1px rgba(255, 255, 255, 0.08);
+  }
+  .glass::before {
+    content: "";
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.02) 38%, rgba(156, 114, 239, 0.12) 100%);
+    padding: 1px;
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+    mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+    -webkit-mask-clip: content-box, border-box;
+    mask-clip: content-box, border-box;
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  .glass-strong {
+    -webkit-backdrop-filter: blur(30px) saturate(1.3);
+    backdrop-filter: blur(30px) saturate(1.3);
+    background: linear-gradient(160deg, rgba(48, 34, 78, 0.88), rgba(24, 17, 41, 0.94));
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    position: relative;
+    box-shadow: 0 24px 60px -20px rgba(8, 5, 15, 0.75), inset 0 1px rgba(255, 255, 255, 0.09);
+  }
+  /* Pagar: kelas kaca tidak boleh menimpa position:fixed milik konten dialog
+     Radix (AlertDialog/Dialog/Sheet) — tanpa ini dialog jatuh ke alur dokumen
+     dan terpotong tepi bawah layar (bug tasbih reset, Task 7 & Task 10). */
+  [data-slot="alert-dialog-content"],
+  [data-slot="dialog-content"],
+  [data-slot="sheet-content"] {
+    position: fixed !important;
+  }
+  .glass-strong::before {
+    content: "";
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.03) 40%, rgba(156, 114, 239, 0.16) 100%);
+    padding: 1px;
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+    mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+    -webkit-mask-clip: content-box, border-box;
+    mask-clip: content-box, border-box;
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  .glass-violet {
+    -webkit-backdrop-filter: blur(22px) saturate(1.25);
+    backdrop-filter: blur(22px) saturate(1.25);
+    background: linear-gradient(145deg, rgba(156, 114, 239, 0.17), rgba(85, 51, 154, 0.1) 52%, rgba(33, 23, 53, 0.32));
+    border: 1px solid rgba(156, 114, 239, 0.26);
+    position: relative;
+    box-shadow: 0 16px 44px -16px rgba(85, 51, 154, 0.45), inset 0 1px rgba(255, 255, 255, 0.1);
+  }
+  .glass-violet::before {
+    content: "";
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(165deg, rgba(216, 197, 255, 0.28), rgba(255, 255, 255, 0.02) 42%, rgba(156, 114, 239, 0.2) 100%);
+    padding: 1px;
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+    mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+    -webkit-mask-clip: content-box, border-box;
+    mask-clip: content-box, border-box;
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  .glass-hero {
+    background:
+      radial-gradient(120% 160% at 90% -20%, rgba(216, 197, 255, 0.38), rgba(156, 114, 239, 0) 52%),
+      radial-gradient(90% 120% at -10% 115%, rgba(64, 210, 235, 0.1), rgba(64, 210, 235, 0) 55%),
+      linear-gradient(140deg, #66419f 0%, #4a2d8a 40%, #2c1d55 78%, #241746 100%);
+    border: 1px solid rgba(178, 143, 255, 0.45);
+    position: relative;
+    box-shadow:
+      0 30px 80px -24px rgba(85, 51, 154, 0.65),
+      0 0 60px -12px rgba(156, 114, 239, 0.5),
+      inset 0 1px rgba(255, 255, 255, 0.22),
+      inset 0 -1px rgba(13, 9, 22, 0.35);
+  }
+  .glass-hero::before {
+    content: "";
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.04) 34%, rgba(216, 197, 255, 0.24) 100%);
+    padding: 1px;
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+    mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+    -webkit-mask-clip: content-box, border-box;
+    mask-clip: content-box, border-box;
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  .glow-violet {
+    box-shadow: 0 0 34px -8px rgba(156, 114, 239, 0.6);
+  }
+  .glow-violet-sm {
+    box-shadow: 0 0 20px -5px rgba(156, 114, 239, 0.55);
+  }
+  .text-gradient-violet {
+    color: transparent;
+    background: linear-gradient(115deg, #ffffff 5%, #e4d6ff 48%, #b693ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .text-gradient-hero {
+    color: transparent;
+    background: linear-gradient(115deg, #ffffff 5%, #e4d6ff 48%, #b693ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .text-glow {
+    text-shadow: 0 0 22px rgba(156, 114, 239, 0.65);
+  }
+  .tz-aurora {
+    background:
+      radial-gradient(58% 42% at 82% -8%, rgba(156, 114, 239, 0.34), rgba(156, 114, 239, 0) 68%),
+      radial-gradient(46% 34% at 12% 4%, rgba(85, 51, 154, 0.42), rgba(85, 51, 154, 0) 70%),
+      radial-gradient(40% 30% at 55% 108%, rgba(124, 77, 212, 0.2), rgba(124, 77, 212, 0) 72%);
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .thin-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 114, 239, 0.35) transparent;
+  }
+  .thin-scrollbar::-webkit-scrollbar {
+    width: 5px;
+  }
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(156, 114, 239, 0.35);
+    border-radius: 999px;
+  }
+  .tap {
+    transition: transform 0.16s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+  }
+  .tap:active {
+    transform: scale(0.96);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  /* Kolom formulir tema-sadar (dipakai semua input aplikasi) */
+  .tz-field {
+    width: 100%;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-tz-line);
+    background: var(--color-tz-panel-strong);
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--color-tz-ink);
+    box-shadow: inset 0 1px 3px var(--tz-inset);
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+  .tz-field::placeholder {
+    color: color-mix(in srgb, var(--color-tz-muted) 60%, transparent);
+  }
+  .tz-field:focus {
+    border-color: color-mix(in srgb, var(--color-tz-violet) 55%, transparent);
+    box-shadow: 0 0 0 3px var(--tz-ring-soft), inset 0 1px 3px var(--tz-inset);
+  }
+}
+
+/* ---------- Kaca pada tema terang: pekat, jernih, minim blur ----------
+   Kartu terbaca sebagai permukaan putih bersih dengan border tipis dan
+   bayangan lembut — bukan mode gelap yang sekadar dibalik. */
+html[data-theme="light"] .glass {
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  backdrop-filter: blur(12px) saturate(1.1);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.84) 55%, rgba(248, 244, 250, 0.92));
+  border-color: #e4dce9;
+  box-shadow:
+    0 16px 36px -18px rgba(85, 51, 154, 0.18),
+    0 3px 10px -6px rgba(41, 35, 49, 0.08),
+    inset 0 1px rgba(255, 255, 255, 0.95);
+}
+html[data-theme="light"] .glass::before {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.3) 38%, rgba(169, 138, 232, 0.28));
+}
+html[data-theme="light"] .glass-strong {
+  -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  backdrop-filter: blur(16px) saturate(1.15);
+  background: linear-gradient(160deg, #ffffff, rgba(252, 250, 254, 0.97));
+  border-color: #e4dce9;
+  box-shadow: 0 22px 48px -20px rgba(85, 51, 154, 0.22), inset 0 1px #ffffff;
+}
+html[data-theme="light"] .glass-strong::before {
+  background: linear-gradient(165deg, #ffffff, rgba(255, 255, 255, 0.35) 40%, rgba(169, 138, 232, 0.3));
+}
+html[data-theme="light"] .glass-violet {
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  backdrop-filter: blur(12px) saturate(1.1);
+  background: linear-gradient(145deg, rgba(169, 138, 232, 0.2), rgba(117, 70, 200, 0.1) 52%, rgba(255, 255, 255, 0.92));
+  border-color: rgba(117, 70, 200, 0.26);
+  box-shadow: 0 16px 40px -18px rgba(117, 70, 200, 0.25), inset 0 1px rgba(255, 255, 255, 0.9);
+}
+html[data-theme="light"] .glass-violet::before {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2) 42%, rgba(169, 138, 232, 0.35) 100%);
+}
+html[data-theme="light"] .glass-hero {
+  background:
+    radial-gradient(120% 160% at 90% -20%, rgba(216, 197, 255, 0.55), rgba(156, 114, 239, 0) 52%),
+    linear-gradient(140deg, #8a5fd6 0%, #7546c8 40%, #5c35ad 80%, #4f2d97 100%);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 30px 70px -26px rgba(85, 51, 154, 0.42),
+    0 0 44px -14px rgba(117, 70, 200, 0.3),
+    inset 0 1px rgba(255, 255, 255, 0.42),
+    inset 0 -1px rgba(41, 35, 49, 0.06);
+}
+html[data-theme="light"] .text-gradient-violet {
+  background: linear-gradient(115deg, #3a2a6b 0%, #5c3aa4 55%, #7546c8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+html[data-theme="light"] .text-glow {
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.65);
+}
+html[data-theme="light"] .glow-violet {
+  box-shadow: 0 0 30px -8px rgba(117, 70, 200, 0.35);
+}
+html[data-theme="light"] .glow-violet-sm {
+  box-shadow: 0 0 18px -5px rgba(117, 70, 200, 0.32);
+}
+html[data-theme="light"] .tz-aurora {
+  background:
+    radial-gradient(58% 42% at 82% -8%, rgba(156, 114, 239, 0.16), rgba(156, 114, 239, 0) 68%),
+    radial-gradient(46% 34% at 12% 4%, rgba(124, 79, 224, 0.12), rgba(124, 79, 224, 0) 70%),
+    radial-gradient(40% 30% at 55% 108%, rgba(216, 197, 255, 0.3), rgba(216, 197, 255, 0) 72%);
+}
+html[data-theme="light"] .thin-scrollbar {
+  scrollbar-color: rgba(117, 70, 200, 0.4) transparent;
+}
+html[data-theme="light"] .thin-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(117, 70, 200, 0.4);
+}
+
+/* ---------- Keyframes animasi (versi ringan) ----------
+   Prinsip hemat GPU: hanya menganimasikan transform/opacity yang dikerjakan
+   kompositor. Animasi box-shadow/filter (memicu repaint tiap frame) dihapus —
+   efek glow dipertahankan sebagai bayangan/filter statis. */
+@keyframes tz-soft-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.94;
+  }
+}
+@keyframes tz-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes tz-aurora-drift {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: translate(0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-4%, 3%) scale(1.08);
+  }
+}
+@keyframes tz-spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-tz-pulse {
+  animation: tz-soft-pulse 1.6s ease-in-out infinite;
+}
+.animate-tz-fade-up {
+  animation: tz-fade-up 0.45s ease both;
+}
+.animate-tz-aurora {
+  animation: tz-aurora-drift 11s ease-in-out infinite;
+}
+.animate-tz-spin-slow {
+  animation: tz-spin-slow 14s linear infinite;
+}
+
+/* Pantulan statis (kartu profil) — tanpa gerak & tanpa filter blur */
+.tz-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.tz-shimmer > .tz-shimmer-bar {
+  pointer-events: none;
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1) 45%, rgba(255, 255, 255, 0.16) 58%, rgba(255, 255, 255, 0));
+  width: 42%;
+  position: absolute;
+  top: -30%;
+  bottom: -30%;
+  left: 8%;
+}
+
+/* ---------- Cahaya kartu hero Beranda (versi ringan) ----------
+   Semua lapisan gradien dipertahankan; hanya satu lapisan yang bergeser
+   sangat pelan (transform/opacity). Aura, orb, dan shimmer menjadi statis —
+   tanpa filter blur beranimasi, tanpa animasi box-shadow. */
+@keyframes tz-hero-flow {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: translate(-4%, -3%);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translate(4%, 3%);
+  }
+}
+.tz-hero-glow {
+  position: relative;
+  overflow: hidden;
+}
+.tz-hero-glow > .tz-hero-flow {
+  pointer-events: none;
+  will-change: transform, opacity;
+  background:
+    radial-gradient(40% 44% at 28% 30%, rgba(156, 114, 239, 0.5), rgba(156, 114, 239, 0) 70%),
+    radial-gradient(32% 36% at 70% 62%, rgba(216, 197, 255, 0.36), rgba(216, 197, 255, 0) 72%),
+    radial-gradient(36% 40% at 58% 18%, rgba(118, 80, 216, 0.5), rgba(118, 80, 216, 0) 74%);
+  animation: tz-hero-flow 16s ease-in-out infinite;
+  position: absolute;
+  inset: -45%;
+}
+.tz-hero-glow > .tz-hero-flow-2 {
+  pointer-events: none;
+  background:
+    radial-gradient(34% 38% at 74% 26%, rgba(216, 197, 255, 0.32), rgba(216, 197, 255, 0) 70%),
+    radial-gradient(38% 42% at 22% 76%, rgba(156, 114, 239, 0.4), rgba(156, 114, 239, 0) 72%);
+  position: absolute;
+  inset: -45%;
+}
+.tz-hero-glow > .tz-hero-aura {
+  pointer-events: none;
+  background:
+    radial-gradient(46% 42% at 30% 26%, rgba(156, 114, 239, 0.26), rgba(156, 114, 239, 0) 72%),
+    radial-gradient(38% 36% at 72% 70%, rgba(216, 197, 255, 0.2), rgba(216, 197, 255, 0) 74%);
+  position: absolute;
+  inset: -20%;
+}
+.tz-hero-glow > .tz-hero-shimmer {
+  display: none;
+}
+.tz-hero-breathe {
+  animation: tz-fade-up 0.45s ease both;
+}
+
+/* ---------- Cahaya kartu Al-Qur'an (versi ringan) ----------
+   Hanya veil yang bergeser pelan (transform/opacity); shimmer disembunyikan,
+   orb & seam statis, glow kartu/icon menjadi bayangan statis. */
+@keyframes tz-quran-veil {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: translate(-8%);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(8%);
+  }
+}
+.tz-quran-glow {
+  position: relative;
+  overflow: hidden;
+}
+.tz-quran-glow > .tz-quran-veil {
+  pointer-events: none;
+  will-change: transform, opacity;
+  background: linear-gradient(105deg, rgba(156, 114, 239, 0) 22%, rgba(156, 114, 239, 0.26) 38%, rgba(216, 197, 255, 0.22) 50%, rgba(118, 80, 216, 0.2) 62%, rgba(156, 114, 239, 0) 78%);
+  animation: tz-quran-veil 16s ease-in-out infinite;
+  position: absolute;
+  inset: -30% -35%;
+}
+.tz-quran-glow > .tz-quran-shimmer {
+  display: none;
+}
+.tz-quran-glow > .tz-quran-seam {
+  pointer-events: none;
+  background: linear-gradient(rgba(216, 197, 255, 0), rgba(216, 197, 255, 0.55) 45%, rgba(156, 114, 239, 0.4) 65%, rgba(216, 197, 255, 0));
+  border-radius: 999px;
+  width: 2px;
+  position: absolute;
+  top: 16%;
+  bottom: 16%;
+  right: 12px;
+  box-shadow: 0 0 14px 2px rgba(156, 114, 239, 0.35);
+}
+.tz-quran-breathe {
+  animation: tz-fade-up 0.45s ease both;
+}
+.tz-quran-icon {
+  box-shadow: 0 0 16px -4px rgba(156, 114, 239, 0.4);
+}
+
+/* Beam progres khas kartu Al-Qur'an */
+.tz-beam {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35), 0 0 10px -2px rgba(156, 114, 239, 0.3);
+}
+.tz-beam-fill {
+  background: linear-gradient(90deg, #55339a, #9c72ef 60%, #d8c5ff);
+  border-radius: 999px;
+  min-width: 0;
+  height: 100%;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 14px rgba(156, 114, 239, 0.75);
+}
+.tz-beam-runner {
+  pointer-events: none;
+  will-change: transform;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(237, 230, 255, 0.55) 30%, rgba(237, 230, 255, 0.75) 50%, rgba(237, 230, 255, 0.55) 70%, rgba(255, 255, 255, 0));
+  border-radius: 999px;
+  width: 24%;
+  animation: tz-beam-run 5.2s ease-in-out infinite;
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  left: 0;
+}
+@keyframes tz-beam-run {
+  0% {
+    transform: translate(-110%);
+  }
+  100% {
+    transform: translate(420%);
+  }
+}
+
+/* ---------- Varian terang untuk animasi (versi ringan) ---------- */
+@keyframes tz-hero-flow-light {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translate(-4%, -3%);
+  }
+  50% {
+    opacity: 0.62;
+    transform: translate(4%, 3%);
+  }
+}
+@keyframes tz-quran-veil-light {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translate(-8%);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translate(8%);
+  }
+}
+html[data-theme="light"] .tz-hero-glow > .tz-hero-flow {
+  animation-name: tz-hero-flow-light;
+}
+html[data-theme="light"] .tz-hero-glow > .tz-hero-aura {
+  background:
+    radial-gradient(46% 42% at 30% 26%, rgba(216, 197, 255, 0.42), rgba(216, 197, 255, 0) 72%),
+    radial-gradient(38% 36% at 72% 70%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 74%);
+}
+html[data-theme="light"] .tz-quran-glow > .tz-quran-veil {
+  animation-name: tz-quran-veil-light;
+}
+html[data-theme="light"] .tz-quran-glow > .tz-quran-seam {
+  background: linear-gradient(rgba(117, 70, 200, 0), rgba(117, 70, 200, 0.5) 45%, rgba(156, 114, 239, 0.35) 65%, rgba(117, 70, 200, 0));
+  box-shadow: 0 0 12px 2px rgba(117, 70, 200, 0.22);
+}
+html[data-theme="light"] .tz-quran-icon {
+  box-shadow: 0 0 14px -4px rgba(117, 70, 200, 0.25);
+}
+html[data-theme="light"] .tz-beam {
+  background: rgba(41, 35, 49, 0.1);
+  box-shadow: inset 0 1px 2px rgba(41, 35, 49, 0.12), 0 0 10px -2px rgba(117, 70, 200, 0.2);
+}
+html[data-theme="light"] .tz-beam-fill {
+  background: linear-gradient(90deg, #55339a, #7546c8 60%, #a98ae8);
+  box-shadow: 0 0 12px rgba(117, 70, 200, 0.45);
+}
+html[data-theme="light"] .tz-tasbih-disc {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(248, 244, 250, 0.96) 55%, rgba(169, 138, 232, 0.55));
+  box-shadow: inset 0 2px 24px rgba(255, 255, 255, 1), inset 0 -8px 26px rgba(85, 51, 154, 0.1), 0 24px 60px -14px rgba(85, 51, 154, 0.28), 0 0 44px -10px rgba(117, 70, 200, 0.28);
+}
+
+/* ---------- Mode Liquid Glass ---------- */
+html[data-glass="liquid"] .glass {
+  -webkit-backdrop-filter: blur(26px) saturate(1.7);
+  backdrop-filter: blur(26px) saturate(1.7);
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.055) 42%, rgba(156, 114, 239, 0.1) 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 24px 60px -24px rgba(8, 5, 15, 0.75),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.05),
+    inset 0 0 30px rgba(156, 114, 239, 0.07);
+}
+html[data-glass="liquid"] .glass::before {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.06) 30%, rgba(156, 114, 239, 0.22) 62%, rgba(216, 197, 255, 0.3) 100%);
+}
+html[data-glass="liquid"] .glass-strong {
+  -webkit-backdrop-filter: blur(30px) saturate(1.8);
+  backdrop-filter: blur(30px) saturate(1.8);
+  background: linear-gradient(155deg, rgba(70, 52, 110, 0.72), rgba(38, 27, 64, 0.85));
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 30px 70px -24px rgba(8, 5, 15, 0.85),
+    inset 0 1px 1px rgba(255, 255, 255, 0.32),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.06),
+    inset 0 0 36px rgba(156, 114, 239, 0.1);
+}
+html[data-glass="liquid"] .glass-violet {
+  background: linear-gradient(150deg, rgba(156, 114, 239, 0.24), rgba(85, 51, 154, 0.14) 55%, rgba(255, 255, 255, 0.07));
+  border-color: rgba(190, 156, 255, 0.38);
+  box-shadow:
+    0 20px 54px -20px rgba(85, 51, 154, 0.6),
+    inset 0 1px 1px rgba(255, 255, 255, 0.28),
+    inset 0 0 30px rgba(156, 114, 239, 0.12);
+}
+html[data-glass="liquid"] .glass-hero {
+  background:
+    radial-gradient(120% 160% at 90% -20%, rgba(216, 197, 255, 0.42), rgba(156, 114, 239, 0) 52%),
+    linear-gradient(140deg, rgba(124, 82, 190, 0.85) 0%, rgba(90, 55, 160, 0.9) 40%, rgba(52, 34, 100, 0.95) 80%, rgba(42, 28, 82, 0.96) 100%);
+  border-color: rgba(200, 168, 255, 0.5);
+  box-shadow:
+    0 30px 80px -24px rgba(85, 51, 154, 0.7),
+    0 0 60px -12px rgba(156, 114, 239, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.06),
+    inset 0 0 40px rgba(156, 114, 239, 0.12);
+}
+html[data-glass="liquid"] .glass-hero::after,
+html[data-glass="liquid"] .glass-strong::after {
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(0, 0, 0, 0) 40%, rgba(255, 255, 255, 0.075) 50%, rgba(0, 0, 0, 0) 60%);
+  animation: tz-liquid-sheen 14s ease-in-out infinite;
+  position: absolute;
+  inset: -30% -20%;
+  transform: translate(-80%);
+}
+@keyframes tz-liquid-sheen {
+  0%,
+  55% {
+    transform: translate(-85%);
+  }
+  90%,
+  100% {
+    transform: translate(85%);
+  }
+}
+html[data-theme="light"][data-glass="liquid"] .glass {
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.74) 45%, rgba(169, 138, 232, 0.16) 100%);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 22px 50px -22px rgba(85, 51, 154, 0.25),
+    inset 0 1px 1px #ffffff,
+    inset 0 -1px 1px rgba(85, 51, 154, 0.06),
+    inset 0 0 26px rgba(169, 138, 232, 0.14);
+}
+html[data-theme="light"][data-glass="liquid"] .glass::before {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.45) 30%, rgba(169, 138, 232, 0.35) 62%, rgba(255, 255, 255, 0.9) 100%);
+}
+html[data-theme="light"][data-glass="liquid"] .glass-strong {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.98), rgba(250, 247, 253, 0.99));
+  border-color: #ffffff;
+  box-shadow:
+    0 30px 70px -24px rgba(85, 51, 154, 0.28),
+    inset 0 1px 1px #ffffff,
+    inset 0 0 36px rgba(169, 138, 232, 0.16);
+}
+html[data-theme="light"][data-glass="liquid"] .glass-violet {
+  background: linear-gradient(150deg, rgba(169, 138, 232, 0.3), rgba(117, 70, 200, 0.14) 55%, rgba(255, 255, 255, 0.94));
+  border-color: rgba(117, 70, 200, 0.32);
+  box-shadow:
+    0 20px 50px -20px rgba(117, 70, 200, 0.32),
+    inset 0 1px 1px #ffffff,
+    inset 0 0 30px rgba(169, 138, 232, 0.18);
+}
+html[data-theme="light"][data-glass="liquid"] .glass-hero {
+  background:
+    radial-gradient(120% 160% at 90% -20%, rgba(216, 197, 255, 0.6), rgba(156, 114, 239, 0) 52%),
+    linear-gradient(140deg, rgba(146, 108, 220, 0.95) 0%, rgba(117, 70, 200, 0.97) 40%, rgba(85, 51, 154, 0.98) 80%, rgba(74, 45, 138, 0.98) 100%);
+  box-shadow:
+    0 30px 70px -26px rgba(85, 51, 154, 0.45),
+    0 0 44px -14px rgba(117, 70, 200, 0.32),
+    inset 0 1px 1px rgba(255, 255, 255, 0.45),
+    inset 0 0 40px rgba(255, 255, 255, 0.08);
+}
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  html[data-glass="liquid"] .glass {
+    background: linear-gradient(155deg, rgba(52, 38, 86, 0.96), rgba(30, 21, 52, 0.98));
+  }
+  html[data-theme="light"][data-glass="liquid"] .glass {
+    background: linear-gradient(155deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 250, 0.99));
+  }
+}
+
+/* ---------- Mode hemat animasi (saklar "Animasi transisi" = mati) ----------
+   Menghentikan sisa animasi dekoratif berkelanjutan (drift cahaya, aurora,
+   kilap liquid glass, runner beam) agar perangkat lambat tetap ringan. */
+html[data-anim="off"] .animate-tz-aurora,
+html[data-anim="off"] .animate-tz-pulse,
+html[data-anim="off"] .animate-tz-spin-slow,
+html[data-anim="off"] .tz-hero-glow > .tz-hero-flow,
+html[data-anim="off"] .tz-quran-glow > .tz-quran-veil,
+html[data-anim="off"] .tz-beam-runner,
+html[data-anim="off"] .glass-hero::after,
+html[data-anim="off"] .glass-strong::after {
+  animation: none !important;
+}
+
+/* Hemat daya OS: hormati preferensi "kurangi gerak" pengguna */
+@media (prefers-reduced-motion: reduce) {
+  html .animate-tz-aurora,
+  html .animate-tz-pulse,
+  html .animate-tz-spin-slow,
+  html .tz-hero-glow > .tz-hero-flow,
+  html .tz-quran-glow > .tz-quran-veil,
+  html .tz-beam-runner,
+  html .glass-hero::after,
+  html .glass-strong::after {
+    animation: none !important;
+  }
+}
+
+/* ---------- Tipografi Arab (Amiri Quran) ---------- */
+.quran-arabic {
+  font-feature-settings: normal;
+  word-spacing: 0.04em;
+  direction: rtl;
+  unicode-bidi: isolate;
+  font-family: var(--font-amiri), "Amiri Quran", Amiri, "Scheherazade New", "Noto Naskh Arabic", serif;
+}
+.quran-bismillah {
+  direction: rtl;
+  font-family: var(--font-amiri), "Amiri Quran", Amiri, serif;
+}
