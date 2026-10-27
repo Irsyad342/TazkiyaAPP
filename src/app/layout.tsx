@@ -24,6 +24,12 @@ export const metadata: Metadata = {
   description:
     "Tazkiya membantu Anda mencatat, memantau, dan meningkatkan konsistensi ibadah harian: salat wajib, Al-Qur'an, zikir, dan aktivitas lainnya.",
   keywords: ["Tazkiya", "pelacak ibadah", "salat", "Al-Qur'an", "zikir", "tasbih"],
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
