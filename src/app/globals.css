@@ -870,7 +870,8 @@ html[data-anim="off"] .glass-strong::after {
   html .tz-quran-glow > .tz-quran-veil,
   html .tz-beam-runner,
   html .glass-hero::after,
-  html .glass-strong::after {
+  html .glass-strong::after,
+  html .tz-sparkle {
     animation: none !important;
   }
 }
@@ -954,6 +955,32 @@ html[data-anim="off"] .glass-strong::after {
 .tz-list-cv > * {
   content-visibility: auto;
   contain-intrinsic-size: auto 88px;
+}
+
+/* ---------- Pop-up apresiasi salat: kilau halus sekali-jalan ----------
+   Partikel kecil memancar dari ikon selama <1 detik lalu berhenti —
+   tanpa animasi berkelanjutan. Dekoratif murni: bila animasi dimatikan
+   (setelan aplikasi, hemat daya OS, atau preferensi reduced motion),
+   partikel tidak tampil sama sekali. */
+@keyframes tz-sparkle {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--sx, 0px)), calc(-50% + var(--sy, 0px))) scale(1);
+    opacity: 0;
+  }
+}
+.tz-sparkle {
+  opacity: 0;
+  animation: tz-sparkle 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+html[data-anim="off"] .tz-sparkle {
+  animation: none !important;
 }
 
 /* ---------- Hormati preferensi transparansi OS ----------

@@ -46,12 +46,13 @@ import {
   type PrayerId,
   type PrayerMeta,
 } from "@/lib/tazkiya/types";
-import { formatGregorian, formatHijri, isFriday, lastNDays, todayKey } from "@/lib/tazkiya/dates";
+import { formatDayFull, formatGregorian, formatHijri, isFriday, lastNDays, todayKey } from "@/lib/tazkiya/dates";
 import { dayScore, prayerConsistency, surahProgressOnDate, totalActivities } from "@/lib/tazkiya/stats";
 import { duaOfTheDay } from "@/lib/tazkiya/duas";
 import { getSurah } from "@/lib/tazkiya/quran";
 import { Chip, GlassCard, GlowOrb, IconBox, ProgressBar, ProgressRing, SectionHeader } from "./ui-bits";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
+import { MotivationPopup, type MotivationVariant } from "./MotivationPopup";
 import type { TabId } from "./BottomNav";
 import { cn } from "@/lib/utils";
 
@@ -220,6 +221,7 @@ export function HomePage({
 
   // ---------- Pencatatan salat ----------
   const [recording, setRecording] = useState<PrayerMeta | null>(null);
+  const [motivation, setMotivation] = useState<{ variant: MotivationVariant; prayer: string } | null>(null);
   const detailOf = (id: PrayerId): PrayerDetail => selectPrayerDetail(prayerDetails, logs, today, id);
   const doneCount = prayersToday.filter((p) => detailOf(p.id).status === "done").length;
 
@@ -228,11 +230,14 @@ export function HomePage({
     setPrayerRecord(today, meta.id, detail);
     const fullName = meta.fullName ?? `Salat ${meta.label}`;
     if (detail?.status === "done") {
-      toast.success(
-        `Masya Allah! ${fullName} tercatat ${isJumat || detail.kind === "berjamaah" ? "berjamaah" : "mandiri"}`
-      );
+      // Apresiasi kini lewat pop-up motivasi (menggantikan toast sukses).
+      setMotivation({
+        variant: isJumat || detail.kind === "berjamaah" ? "jamaah" : "mandiri",
+        prayer: fullName,
+      });
     } else if (detail?.status === "missed") {
-      toast.info(`${fullName} dicatat tidak dilaksanakan — semoga besok lebih ringan`);
+      // Pop-up penyemangat — bukan menghakimi; toast tidak perlu lagi.
+      setMotivation({ variant: "missed", prayer: fullName });
     } else {
       toast.info(`Catatan ${fullName} dihapus`);
     }
@@ -686,6 +691,16 @@ export function HomePage({
           onSave={(detail) => {
             if (recording) savePrayer(recording, detail);
           }}
+        />
+      ) : null}
+
+      {/* ---------- Pop-up motivasi setelah catatan tersimpan ---------- */}
+      {motivation ? (
+        <MotivationPopup
+          variant={motivation.variant}
+          prayerLabel={motivation.prayer}
+          dateLabel={formatDayFull(today)}
+          onClose={() => setMotivation(null)}
         />
       ) : null}
     </div>

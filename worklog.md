@@ -272,3 +272,21 @@ Stage Summary:
 - Kartu salat merespons seketika: satu ketukan langsung memunculkan opsi status (mandiri/berjamaah/tidak dilaksanakan) tanpa jeda 1 detik.
 - Beban interaksi turun: tanpa 5 pointer-listener long-press + timer per kartu; satu file hook (~97 baris) hilang dari bundle.
 - Deploy: push ke main → Vercel auto-deploy https://tazkiyaapp.vercel.app/
+
+---
+Task ID: 15
+Agent: Main agent (Z.ai)
+Task: Pengembangan fitur terbatas — (1) redesain kartu "Pantau konsistensi ibadahmu", (2) pop-up motivasi setelah pencatatan salat, (3) variasi warna kalender riwayat. Tanpa deploy, tanpa mengubah data/fitur lama.
+
+Work Log:
+- Checkpoint: branch `backup/pre-fitur-statistik-popup-kalender` dibuat sebelum perubahan.
+- StatCards (StatsPage.tsx): 3 kartu kini beridentitas berbeda — biru (Activity, % hari ini + bar mini), amber (Flame, streak + segmen 3 hari), teal (Trophy, hari sempurna + keterangan periode). Angka 24px jadi elemen dominan; gradien tipis + glow kecil per kartu; formula statistik tidak diubah; toggle Mingguan/Bulanan tetap.
+- MotivationPopup.tsx (BARU): sheet bawah glass-strong 3 varian — jamaah (ilustrasi masjid SVG + teal, "MasyaAllah!"), mandiri (MoonStar + biru, "Alhamdulillah!"), missed (hati + amber lembut, "Tetap Semangat"). 3 variasi pesan per varian dipilih acak sekali-per-mount; tombol Alhamdulillah/Lanjutkan; tanpa aksi data; partikel kilau sekali-jalan (0.9s) menghormati data-anim="off" + prefers-reduced-motion (globals.css: keyframes tz-sparkle + aturan mati).
+- HomePage.tsx: savePrayer kini men-set state motivation (done berjamaah/mandiri/missed) — toast sukses/info digantikan pop-up; toast "dihapus" dipertahankan untuk status none; pop-up dirender setelah dialog catatan tertutup; tidak ada jalur catat ganda.
+- Kalender (StatsPage.tsx): warna per-status dari data asli — teal=berjamaah (glow jika lengkap 5), biru=mandiri (termasuk data lama tanpa jenis), amber=hanya terlewat, abu netral=tanpa data (tidak dihukum), masa depan redup; titik kombinasi 3px untuk hari campuran (biru/amber di atas dasar teal, amber di atas dasar biru); tooltip rincian per hari; legenda 5 item (Berjamaah/Mandiri/Ada yang terlewat/Belum ada data/Hari ini); cincin hari ini dipertahankan; navigasi bulan tidak berubah.
+- Verifikasi: eslint 0, tsc 0, build TZ_DIST_DIR=.next-prod sukses; agent-browser 420×860 — pop-up 3 varian tampil tepat sesuai status (screenshot tersimpan di scripts/), variasi pesan berbeda antar-pencatatan, alasan missed (Ketiduran) tersimpan, data bertahan setelah reload, toggle Bulanan mengubah grafik & keterangan, kalender 4 skenario warna terverifikasi (10 Okt teal penuh 0.75 + glow, 15 Okt amber, 20 Okt biru, 25 Okt teal+titik biru, 28 Okt teal+cincin+2 titik), tema gelap & terang keduanya terbaca; localStorage uji dibersihkan; TIDAK ada push/deploy.
+
+Stage Summary:
+- 3 fitur baru sesuai permintaan; nol perubahan skema data, nol dependensi baru, nol perubahan halaman lain.
+- File berubah: StatsPage.tsx, HomePage.tsx, globals.css, PrayerRecordDialog.tsx (komentar diperbarui), MotivationPopup.tsx (baru).
+- Commit lokal di main; menunggu keputusan pengguna untuk deploy.

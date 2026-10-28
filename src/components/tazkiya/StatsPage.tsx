@@ -32,6 +32,7 @@ import {
 } from "@/lib/tazkiya/stats";
 import {
   PRAYERS,
+  PRAYER_IDS,
   SALAT_JUMAT,
   ZUHUR_ALTERNATIF,
   missReasonLabel,
@@ -227,11 +228,30 @@ export function StatsPage() {
   })();
   const maxActivity = Math.max(1, ...topActivities.map((a) => a.count));
 
-  // Kalender heatmap: nilai pct per tanggal untuk bulan terpilih
+  // Kalender riwayat: status ibadah per tanggal dari data asli.
+  // Warna = jenis pencatatan terbanyak/terbaik hari itu:
+  //   teal (berjamaah) > biru (mandiri) > amber (ada yang terlewat);
+  // tanpa data = abu netral (BUKAN hari gagal). Hari tanpa data sama
+  // sekali tidak dihukum — tetap abu redup.
   const calendar = monthCalendar(today, monthOffset);
-  const calendarWithPct = calendar.map((cell) =>
-    cell.key && !cell.isFuture ? { ...cell, pct: dayScore(logs[cell.key], cell.key, tracked).pct } : cell
-  );
+  const calendarWithStatus = calendar.map((cell) => {
+    if (!cell.key || cell.isFuture)
+      return { ...cell, jamaah: 0, mandiri: 0, missed: 0, done: 0, hasData: false };
+    let jamaah = 0;
+    let mandiri = 0;
+    let missed = 0;
+    for (const id of PRAYER_IDS) {
+      const d = selectPrayerDetail(prayerDetails, logs, cell.key, id);
+      if (d.status === "done") {
+        // Data lama (boolean) tanpa jenis pelaksanaan dihitung mandiri.
+        if (d.kind === "berjamaah") jamaah++;
+        else mandiri++;
+      } else if (d.status === "missed") {
+        missed++;
+      }
+    }
+    return { ...cell, jamaah, mandiri, missed, done: jamaah + mandiri, hasData: jamaah + mandiri > 0 || missed > 0 };
+  });
   const canGoNext = monthOffset < 0;
 
   return (
@@ -244,28 +264,66 @@ export function StatsPage() {
         </div>
       </header>
 
-      {/* ---------- Ringkasan atas ---------- */}
+      {/* ---------- Ringkasan atas — tiga identitas aksen berbeda ----------
+        Biru = progres hari ini · Amber = streak · Teal = hari sempurna.
+        Angka jadi elemen paling menonjol; keterangan tetap terbaca. */}
       <section aria-label="Ringkasan utama" className="grid grid-cols-3 gap-3">
         <GlassCard className="p-3.5">
-          <IconBox tone="violet" size="sm">
+          <div aria-hidden className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-sky-400/[0.17] to-transparent light:from-sky-400/25" />
+          <div aria-hidden className="absolute -right-5 -top-6 h-14 w-14 rounded-full bg-sky-400/14 blur-lg light:bg-sky-400/25" />
+          <IconBox size="sm" className="relative border-sky-300/30 bg-sky-400/[0.15] text-sky-300 light:border-sky-500/25 light:bg-sky-500/12 light:text-sky-600">
             <Activity />
           </IconBox>
-          <p className="mt-3 font-display text-[21px] font-bold leading-none text-tz-ink">{todayScore.pct}%</p>
-          <p className="mt-1 text-[10px] leading-tight text-tz-muted">Hari ini</p>
+          <p className="relative mt-2.5 font-display text-[24px] font-bold leading-none tabular-nums text-tz-ink">
+            {todayScore.pct}
+            <span className="ml-0.5 text-[12px] font-semibold text-tz-muted">%</span>
+          </p>
+          <p className="relative mt-1 text-[10px] leading-tight text-tz-muted">Hari ini</p>
+          <div
+            className="relative mt-2 h-1 w-full overflow-hidden rounded-full bg-tz-track"
+            role="img"
+            aria-label={`Ibadah hari ini ${todayScore.pct}% dari target`}
+          >
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-300 light:from-sky-500 light:to-sky-400"
+              style={{ width: `${todayScore.pct}%` }}
+            />
+          </div>
         </GlassCard>
         <GlassCard className="p-3.5">
-          <IconBox tone="lavender" size="sm" className="border-amber-300/25 bg-amber-400/12 text-amber-300">
+          <div aria-hidden className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-amber-400/[0.15] to-transparent light:from-amber-400/22" />
+          <div aria-hidden className="absolute -left-5 -bottom-6 h-14 w-14 rounded-full bg-amber-400/14 blur-lg light:bg-amber-400/25" />
+          <IconBox size="sm" className="relative border-amber-300/30 bg-amber-400/[0.15] text-amber-300 light:border-amber-500/25 light:bg-amber-500/12 light:text-amber-600">
             <Flame />
           </IconBox>
-          <p className="mt-3 font-display text-[21px] font-bold leading-none text-tz-ink">{streak}</p>
-          <p className="mt-1 text-[10px] leading-tight text-tz-muted">Hari streak 5 salat</p>
+          <p className="relative mt-2.5 font-display text-[24px] font-bold leading-none tabular-nums text-tz-ink">{streak}</p>
+          <p className="relative mt-1 text-[10px] leading-tight text-tz-muted">Hari streak 5 salat</p>
+          <div className="relative mt-2 flex items-center gap-1" aria-hidden>
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className={cn(
+                  "h-1 flex-1 rounded-full",
+                  i < Math.min(streak, 3)
+                    ? "bg-gradient-to-r from-amber-400 to-orange-400 light:from-amber-500 light:to-orange-500"
+                    : "bg-tz-track"
+                )}
+              />
+            ))}
+          </div>
         </GlassCard>
         <GlassCard className="p-3.5">
-          <IconBox tone="lavender" size="sm" className="border-emerald-300/25 bg-emerald-400/12 text-emerald-300">
+          <div aria-hidden className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-teal-400/[0.16] to-transparent light:from-teal-400/24" />
+          <div aria-hidden className="absolute -right-5 -top-6 h-14 w-14 rounded-full bg-teal-400/14 blur-lg light:bg-teal-400/25" />
+          <IconBox size="sm" className="relative border-teal-300/30 bg-teal-400/[0.15] text-teal-300 light:border-teal-500/25 light:bg-teal-500/12 light:text-teal-600">
             <Trophy />
           </IconBox>
-          <p className="mt-3 font-display text-[21px] font-bold leading-none text-tz-ink">{summary.perfectDays}</p>
-          <p className="mt-1 text-[10px] leading-tight text-tz-muted">Hari sempurna</p>
+          <p className="relative mt-2.5 font-display text-[24px] font-bold leading-none tabular-nums text-tz-ink">{summary.perfectDays}</p>
+          <p className="relative mt-1 text-[10px] leading-tight text-tz-muted">Hari sempurna</p>
+          <div className="relative mt-2 flex items-center gap-1" aria-hidden>
+            <span className="h-1 flex-1 rounded-full bg-gradient-to-r from-teal-400 to-emerald-400 light:from-teal-500 light:to-emerald-500" />
+            <span className="text-[8px] font-semibold uppercase tracking-wide text-tz-muted/70">{period === "mingguan" ? "minggu ini" : "bulan ini"}</span>
+          </div>
         </GlassCard>
       </section>
 
@@ -315,7 +373,7 @@ export function StatsPage() {
 
       {/* ---------- Kalender riwayat ---------- */}
       <section aria-label="Kalender riwayat ibadah">
-        <SectionHeader title="Kalender Riwayat" caption="Semakin gelap, semakin lengkap ibadahmu" />
+        <SectionHeader title="Kalender Riwayat" caption="Warna menunjukkan status ibadah yang tercatat tiap hari" />
         <GlassCard className="p-4">
           <div className="mb-3 flex items-center justify-between">
             <button
@@ -346,41 +404,90 @@ export function StatsPage() {
                 {d}
               </span>
             ))}
-            {calendarWithPct.map((cell, i) => {
+            {calendarWithStatus.map((cell, i) => {
               if (!cell.key) return <span key={`blank-${i}`} aria-hidden className="aspect-square" />;
-              const pct = cell.pct ?? 0;
-              const intensity = pct / 100;
+              const intensity = cell.done / 5;
+              // Warna dasar hari: teal (ada berjamaah) > biru (mandiri) >
+              // amber (hanya terlewat); tanpa data = abu netral.
+              let bg: string | undefined;
+              let glow: string | undefined;
+              if (cell.hasData) {
+                if (cell.jamaah > 0) {
+                  bg = `rgba(45,212,191,${(0.17 + intensity * 0.58).toFixed(3)})`;
+                  if (cell.done === 5) glow = "0 0 12px -2px rgba(45,212,191,0.75)";
+                } else if (cell.mandiri > 0) {
+                  bg = `rgba(56,189,248,${(0.15 + intensity * 0.52).toFixed(3)})`;
+                  if (cell.done === 5) glow = "0 0 12px -2px rgba(56,189,248,0.7)";
+                } else {
+                  bg = `rgba(251,191,36,${(0.15 + (cell.missed / 5) * 0.35).toFixed(3)})`;
+                }
+              } else if (!cell.isFuture) {
+                bg = "var(--tz-empty-cell)";
+              }
+              // Titik kombinasi: hanya status yang BUKAN warna dasar hari,
+              // agar hari campuran tetap terbaca tanpa memenuhi warna.
+              // (Dasar teal → titik biru/amber; dasar biru → titik amber.)
+              const mixDots = [
+                cell.jamaah > 0 && cell.mandiri > 0 ? "sky" : null,
+                (cell.jamaah > 0 || cell.mandiri > 0) && cell.missed > 0 ? "amber" : null,
+              ].filter(Boolean) as string[];
+              const detailText = cell.hasData
+                ? [
+                    cell.jamaah > 0 ? `${cell.jamaah} berjamaah` : null,
+                    cell.mandiri > 0 ? `${cell.mandiri} mandiri` : null,
+                    cell.missed > 0 ? `${cell.missed} tidak dilaksanakan` : null,
+                  ]
+                    .filter(Boolean)
+                    .join(", ")
+                : "belum ada catatan salat";
               return (
                 <span
                   key={cell.key}
-                  title={`${formatDayMonth(cell.key)} — ${pct}% ibadah tercatat`}
+                  title={`${formatDayMonth(cell.key)} — ${detailText}${cell.done === 5 ? " · lengkap" : ""}`}
                   className={cn(
-                    "relative flex aspect-square items-center justify-center rounded-lg text-[10px] font-semibold transition-colors",
+                    "relative flex aspect-square flex-col items-center justify-center rounded-lg text-[10px] font-semibold transition-colors",
                     cell.isFuture ? "bg-tz-panel-soft text-tz-ink/20" : "text-tz-ink/90",
                     cell.isToday && "ring-2 ring-tz-violet ring-offset-2 ring-offset-tz-frame"
                   )}
-                  style={{
-                    background:
-                      !cell.isFuture && pct > 0
-                        ? `rgba(156,114,239,${0.12 + intensity * 0.75})`
-                        : cell.isFuture
-                          ? undefined
-                          : "var(--tz-empty-cell)",
-                    boxShadow: !cell.isFuture && pct >= 100 ? "0 0 12px -2px rgba(156,114,239,0.8)" : undefined,
-                  }}
+                  style={{ background: bg, boxShadow: glow }}
                 >
-                  {cell.day}
+                  <span className="leading-none">{cell.day}</span>
+                  {/* Indikator kombinasi status (bukan hanya warna dasar) */}
+                  {!cell.isFuture && mixDots.length > 0 ? (
+                    <span aria-hidden className="mt-[2px] flex items-center gap-[2px]">
+                      {mixDots.map((dot) => (
+                        <span
+                          key={dot}
+                          className={cn(
+                            "h-[3px] w-[3px] rounded-full",
+                            dot === "sky" && "bg-sky-100 light:bg-sky-700",
+                            dot === "amber" && "bg-amber-100 light:bg-amber-700"
+                          )}
+                        />
+                      ))}
+                    </span>
+                  ) : null}
                 </span>
               );
             })}
           </div>
-          <div className="mt-3 flex items-center justify-center gap-2 text-[10px] text-tz-muted">
-            <span>Kosong</span>
-            <span className="h-2.5 w-6 rounded-full bg-tz-track" />
-            <span className="h-2.5 w-6 rounded-full" style={{ background: "rgba(156,114,239,0.3)" }} />
-            <span className="h-2.5 w-6 rounded-full" style={{ background: "rgba(156,114,239,0.6)" }} />
-            <span className="h-2.5 w-6 rounded-full bg-tz-violet" />
-            <span>Sempurna</span>
+          {/* Legenda warna status */}
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[10px] text-tz-muted">
+            <span className="flex items-center gap-1">
+              <span aria-hidden className="h-2 w-2 rounded-full bg-teal-400/90 light:bg-teal-500" /> Berjamaah
+            </span>
+            <span className="flex items-center gap-1">
+              <span aria-hidden className="h-2 w-2 rounded-full bg-sky-400/90 light:bg-sky-500" /> Mandiri
+            </span>
+            <span className="flex items-center gap-1">
+              <span aria-hidden className="h-2 w-2 rounded-full bg-amber-400/80 light:bg-amber-500" /> Ada yang terlewat
+            </span>
+            <span className="flex items-center gap-1">
+              <span aria-hidden className="h-2 w-2 rounded-full border border-tz-line-strong bg-tz-track" /> Belum ada data
+            </span>
+            <span className="flex items-center gap-1">
+              <span aria-hidden className="h-2 w-2 rounded-full ring-2 ring-tz-violet ring-offset-1 ring-offset-tz-frame" /> Hari ini
+            </span>
           </div>
         </GlassCard>
       </section>
