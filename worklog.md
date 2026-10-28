@@ -232,3 +232,25 @@ Stage Summary:
 - HP (≤640px): nol animasi kontinu, blur GPU dikurangi ±50%, bundle awal -130KB min, font -4 berkas, list Qur'an hemat paint — sumber "berat" utama (blur + animasi + parse JS) semuanya ditekan; visual & fitur tidak berubah.
 - Desktop: seluruh animasi & orb besar dipertahankan persis seperti sebelumnya.
 - Saklar "Animasi transisi" & Liquid Glass tetap berfungsi di semua mode.
+
+---
+Task ID: 13
+Agent: Main agent (Z.ai)
+Task: Optimasi performa TazkiyaAPP agar ringan saat dijalankan di handphone (keluhan: "terasa berat").
+
+Work Log:
+- Audit performa: baseline first-load produksi 285KB terkompresi; identifikasi 3 sumber beban utama — (1) recharts ±100–160KB terkompresi diunduh saat buka tab Statistik, (2) belasan lapisan backdrop-filter blur pada kartu kaca yang dihitung ulang tiap frame saat menggulir, (3) font Amiri Quran + orb blur besar di-preload meski tak terlihat di HP.
+- Membuat `src/components/tazkiya/AreaChartLite.tsx` (±3KB, SVG murni): kurva monoton d3 curveMonotoneX, isian gradien, grid, label sumbu, titik data, tooltip sentuh dengan garis penunjuk. StatsPage beralih ke komponen ini; dependensi recharts dihapus dari package.json.
+- Fix bug render awal: guard areaD berdasarkan xy.length (width belum terukur saat render pertama).
+- globals.css mode ringan HP (≤640px): blur kaca diperkecil lagi — glass 9px, glass-strong 12px, glass-violet 9px, liquid 10/14px (sebelumnya 12/18/14/20px); Chip tanpa backdrop-blur; toast blur 14/18→10/12px.
+- page.tsx: aura luar `hidden md:block` (tak terlihat di balik bingkai penuh HP); orb dalam bingkai versi HP lebih kecil + blur-2xl ( OuterOrb base blur dipindah ke className agar tidak konflik); transisi antartab 0.22s→0.16s.
+- layout.tsx: Amiri_Quran `preload: false` (44KB tidak lagi diunduh di buka pertama; browser menunduhnya saat teks Arab tampil).
+- next.config.ts: dukungan TZ_DIST_DIR untuk build verifikasi terpisah (.next-prod); eslint mengabaikan .next-prod; .gitignore += .next-prod; perbaiki noise file-mode via core.fileMode false.
+- Verifikasi: lint 0 error, tsc 0 error, build produksi sukses; agent-browser (420×860) — beranda OK, statistik mingguan/bulanan + tooltip OK, catat Subuh mandiri → toast + progres 11% (1/9) OK, pembaca Al-Fatihah + font Arab on-demand OK, tanpa error console; data uji dibersihkan (localStorage clear).
+- Commit `212f3bf` push ke main → Vercel deploy aktif; produksi kini 2 preload font (sebelumnya 3).
+
+Stage Summary:
+- Chunk tab Statistik: ±100–160KB → 6,7KB (recharts hilang total dari bundle).
+- GPU HP: radius blur tiap kartu kaca turun ~25–40% + 4 lapisan orb blur besar dikurangi/ disembunyikan → gulir jauh lebih mulus.
+- Muat pertama: font Amiri Quran (44KB) tidak lagi di-preload; transisi tab lebih responsif.
+- Deploy produksi: https://tazkiyaapp.vercel.app/ (commit 212f3bf).
