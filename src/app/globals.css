@@ -892,33 +892,34 @@ html[data-anim="off"] .glass-strong::after {
    Visual TIDAK berubah — kaca tetap kaca, glow tetap ada. Yang dikurangi
    hanya biaya GPU: (1) radius backdrop-filter diperkecil (biaya blur naik
    kuadratik terhadap radius dan dihitung ulang tiap frame saat konten di
-   baliknya bergulir), (2) animasi dekoratif tanpa batas waktu dihentikan
-   agar kompositor HP tidak bekerja terus-menerus, (3) will-change dilepas
-   agar lapisan GPU berlebih tidak menggantung. Desktop tidak terpengaruh. */
+   baliknya bergulir — di HP ada belasan kartu kaca per layar), (2) animasi
+   dekoratif tanpa batas waktu dihentikan agar kompositor HP tidak bekerja
+   terus-menerus, (3) will-change dilepas agar lapisan GPU berlebih tidak
+   menggantung. Desktop tidak terpengaruh. */
 @media (max-width: 640px) {
   .glass {
-    -webkit-backdrop-filter: blur(12px) saturate(1.2);
-    backdrop-filter: blur(12px) saturate(1.2);
+    -webkit-backdrop-filter: blur(9px) saturate(1.1);
+    backdrop-filter: blur(9px) saturate(1.1);
   }
   .glass-strong {
-    -webkit-backdrop-filter: blur(18px) saturate(1.25);
-    backdrop-filter: blur(18px) saturate(1.25);
+    -webkit-backdrop-filter: blur(12px) saturate(1.15);
+    backdrop-filter: blur(12px) saturate(1.15);
   }
   .glass-violet {
-    -webkit-backdrop-filter: blur(12px) saturate(1.2);
-    backdrop-filter: blur(12px) saturate(1.2);
+    -webkit-backdrop-filter: blur(9px) saturate(1.1);
+    backdrop-filter: blur(9px) saturate(1.1);
   }
   html[data-glass="liquid"] .glass {
-    -webkit-backdrop-filter: blur(14px) saturate(1.4);
-    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(10px) saturate(1.25);
+    backdrop-filter: blur(10px) saturate(1.25);
   }
   html[data-glass="liquid"] .glass-strong {
-    -webkit-backdrop-filter: blur(20px) saturate(1.5);
-    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    backdrop-filter: blur(14px) saturate(1.3);
   }
   html[data-theme="light"][data-glass="liquid"] .glass {
-    -webkit-backdrop-filter: blur(12px) saturate(1.2);
-    backdrop-filter: blur(12px) saturate(1.2);
+    -webkit-backdrop-filter: blur(9px) saturate(1.1);
+    backdrop-filter: blur(9px) saturate(1.1);
   }
 
   html .animate-tz-aurora,

@@ -41,9 +41,11 @@ const StatsPage = dynamic(() => import("@/components/tazkiya/StatsPage").then((m
   ),
 });
 
-/* Orb dekoratif besar untuk latar luar bingkai (desktop). */
+/* Orb dekoratif untuk latar luar bingkai (desktop).
+   Radius blur diatur lewat className agar bisa berbeda antara HP (blur-2xl,
+   lebih murah) dan desktop (blur-3xl) tanpa konflik kelas Tailwind. */
 function OuterOrb({ className }: { className?: string }) {
-  return <div aria-hidden className={`pointer-events-none absolute rounded-full blur-3xl ${className ?? ""}`} />;
+  return <div aria-hidden className={`pointer-events-none absolute rounded-full ${className ?? ""}`} />;
 }
 
 const TAB_TITLES: Record<TabId, string> = {
@@ -198,8 +200,10 @@ export default function Page() {
   return (
     <LazyMotion features={domAnimation} strict>
     <main className="relative flex min-h-dvh w-full items-center justify-center bg-tz-stage" aria-label="Aplikasi Tazkiya">
-      {/* Aura latar (desktop / area di luar bingkai) */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
+      {/* Aura latar (desktop / area di luar bingkai) — disembunyikan di HP:
+          di layar ≤430px bingkai menutupi seluruh layar sehingga aura ini tak
+          terlihat, tetapi 3 lapisan blur besar tetap memakan memori & GPU. */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 hidden overflow-hidden md:block">
         <div className="animate-tz-aurora absolute left-1/2 top-[28%] h-[340px] w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-tz-purple/30 blur-[90px] md:h-[560px] md:w-[560px] md:blur-[150px]" />
         <div className="absolute bottom-0 right-[16%] h-52 w-52 rounded-full bg-tz-violet/16 blur-[80px] md:h-80 md:w-80 md:blur-[130px]" />
         <div className="absolute left-[8%] top-[12%] h-44 w-44 rounded-full bg-tz-orb-deep/30 blur-[70px] md:h-64 md:w-64 md:blur-[120px]" />
@@ -212,9 +216,11 @@ export default function Page() {
       >
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="tz-aurora animate-tz-aurora absolute inset-0" />
-          <OuterOrb className="-right-28 -top-28 h-80 w-80 bg-tz-violet/20" />
-          <OuterOrb className="-left-32 top-1/3 h-72 w-72 bg-tz-purple/25" />
-          <OuterOrb className="bottom-16 right-0 h-60 w-60 bg-tz-violet/10" />
+          {/* Orb dekoratif: versi HP lebih kecil & blur lebih tipis — area filter
+              blur tumbuh kuadratik, 4 lapisan besar berarti biaya komposit tinggi. */}
+          <OuterOrb className="-right-20 -top-20 h-52 w-52 bg-tz-violet/20 blur-2xl md:-right-28 md:-top-28 md:h-80 md:w-80 md:blur-3xl" />
+          <OuterOrb className="-left-24 top-1/3 h-48 w-48 bg-tz-purple/25 blur-2xl md:-left-32 md:h-72 md:w-72 md:blur-3xl" />
+          <OuterOrb className="bottom-16 right-0 h-40 w-40 bg-tz-violet/10 blur-2xl md:h-60 md:w-60 md:blur-3xl" />
           <div className="absolute inset-0 bg-gradient-to-b from-tz-aurora-a via-transparent to-tz-aurora-b" />
         </div>
 
@@ -222,10 +228,10 @@ export default function Page() {
           <AnimatePresence mode="wait" initial={false}>
             <m.div
               key={tab}
-              initial={{ opacity: 0, y: 14 * (animations ? 1 : 0) }}
+              initial={{ opacity: 0, y: 10 * (animations ? 1 : 0) }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: animations ? -10 : 0 }}
-              transition={{ duration: 0.22 * (animations ? 1 : 0), ease: "easeOut" }}
+              exit={{ opacity: 0, y: animations ? -8 : 0 }}
+              transition={{ duration: 0.16 * (animations ? 1 : 0), ease: "easeOut" }}
             >
               {tab === "beranda" && <HomePage onNavigate={setTab} onOpenTasbih={openTasbih} />}
               {tab === "quran" && <QuranPage onOpenReader={openReader} />}
@@ -261,7 +267,7 @@ export default function Page() {
                   color: "#292331",
                   borderRadius: "16px",
                   fontSize: "13px",
-                  backdropFilter: "blur(14px)",
+                  backdropFilter: "blur(10px)",
                   boxShadow: "0 12px 40px rgba(85,51,154,0.22)",
                 },
               }
@@ -273,7 +279,7 @@ export default function Page() {
                   color: "#F2EEFB",
                   borderRadius: "16px",
                   fontSize: "13px",
-                  backdropFilter: "blur(18px)",
+                  backdropFilter: "blur(12px)",
                   boxShadow: "0 12px 40px rgba(13,10,20,0.6)",
                 },
               }

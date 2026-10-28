@@ -63,3 +63,4 @@ server.log
 /download/
 *.pid
 *.db
+.next-prod/

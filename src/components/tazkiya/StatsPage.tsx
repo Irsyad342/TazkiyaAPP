@@ -16,15 +16,6 @@ import {
   Flame,
   Trophy,
 } from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip as ReTooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import {
@@ -49,6 +40,7 @@ import {
 } from "@/lib/tazkiya/types";
 import { formatDayFull, isFriday, formatDayMonth, lastNDays, relativeDayLabel, todayKey, weekdayShort } from "@/lib/tazkiya/dates";
 import { Chip, GlassCard, GlowOrb, IconBox, ProgressBar, SectionHeader } from "./ui-bits";
+import { AreaChartLite } from "./AreaChartLite";
 import { cn } from "@/lib/utils";
 
 type Period = "mingguan" | "bulanan";
@@ -307,64 +299,12 @@ export function StatsPage() {
         <GlassCard className="p-4 pb-2">
           <GlowOrb className="-right-10 -top-12 h-32 w-32 bg-tz-violet/15" />
           <div className="relative h-56 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 10, right: 8, left: -18, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="tzArea" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={isLight ? "#7546C8" : "#9C72EF"} stopOpacity={0.55} />
-                    <stop offset="100%" stopColor={isLight ? "#7546C8" : "#9C72EF"} stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid stroke={isLight ? "rgba(41,35,49,0.08)" : "rgba(255,255,255,0.06)"} vertical={false} />
-                <XAxis
-                  dataKey="label"
-                  tick={{ fill: isLight ? "#706778" : "#A79BC6", fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                  interval={4 * (period === "bulanan" ? 1 : 0)}
-                />
-                <YAxis
-                  domain={[0, 100]}
-                  tick={{ fill: isLight ? "#706778" : "#A79BC6", fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(v: number) => `${v}%`}
-                />
-                <ReTooltip
-                  contentStyle={
-                    isLight
-                      ? {
-                          background: "rgba(255,255,255,0.97)",
-                          border: "1px solid rgba(117,70,200,0.3)",
-                          borderRadius: 14,
-                          color: "#292331",
-                          fontSize: 12,
-                          boxShadow: "0 14px 40px -10px rgba(85,51,154,0.3)",
-                        }
-                      : {
-                          background: "rgba(36,27,58,0.95)",
-                          border: "1px solid rgba(156,114,239,0.35)",
-                          borderRadius: 14,
-                          color: "#fff",
-                          fontSize: 12,
-                          boxShadow: "0 14px 40px -10px rgba(8,5,15,0.7)",
-                        }
-                  }
-                  labelStyle={{ color: isLight ? "#5C3AA4" : "#D8C5FF" }}
-                  formatter={(value: number | string) => [`${value}%`, "Penyelesaian"]}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="pct"
-                  stroke={isLight ? "#7546C8" : "#9C72EF"}
-                  strokeWidth={2.5}
-                  fill="url(#tzArea)"
-                  dot={period === "mingguan" ? { r: 3, fill: isLight ? "#A98AE8" : "#D8C5FF", strokeWidth: 0 } : false}
-                  activeDot={{ r: 5, fill: isLight ? "#A98AE8" : "#D8C5FF", stroke: isLight ? "#7546C8" : "#9C72EF", strokeWidth: 2 }}
-                  style={{ filter: "drop-shadow(0 4px 10px rgba(156,114,239,0.45))" }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            <AreaChartLite
+              data={chartData}
+              isLight={isLight}
+              step={period === "bulanan" ? 5 : 1}
+              ariaLabel={period === "mingguan" ? "Grafik aktivitas 7 hari terakhir" : "Grafik aktivitas 30 hari terakhir"}
+            />
           </div>
           <div className="glass-violet relative mb-2 mt-3 flex items-center justify-between rounded-[1.15rem] px-4 py-2.5">
             <p className="text-[11px] text-tz-accent/90">Rata-rata penyelesaian</p>

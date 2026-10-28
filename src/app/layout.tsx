@@ -18,11 +18,18 @@ const sora = Sora({
   display: "swap",
 });
 
+/*
+ * Amiri Quran hanya diperlukan saat teks Arab tampil (Pembaca Al-Qur'an).
+ * preload: false membuat font ±200 KB ini TIDAK diunduh di buka pertama —
+ * browser menunduhnya otomatis begitu teks .quran-arabic dirender — sehingga
+ * muat awal beranda di jaringan HP jauh lebih ringan.
+ */
 const amiriQuran = Amiri_Quran({
   variable: "--font-amiri",
   subsets: ["arabic"],
   weight: "400",
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
