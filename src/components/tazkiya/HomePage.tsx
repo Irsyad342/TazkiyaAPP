@@ -52,7 +52,6 @@ import { duaOfTheDay } from "@/lib/tazkiya/duas";
 import { getSurah } from "@/lib/tazkiya/quran";
 import { Chip, GlassCard, GlowOrb, IconBox, ProgressBar, ProgressRing, SectionHeader } from "./ui-bits";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
-import { useLongPress } from "./useLongPress";
 import type { TabId } from "./BottomNav";
 import { cn } from "@/lib/utils";
 
@@ -103,21 +102,18 @@ function useToday(): string {
   return today;
 }
 
-/** Kartu satu slot salat — simetris, tanpa ikon pojok; tekan & tahan untuk mencatat. */
+/** Kartu satu slot salat — simetris, tanpa ikon pojok; ketuk langsung membuka opsi pencatatan. */
 function PrayerSlotCard({
   meta,
   icon: Icon,
   detail,
   onPress,
-  canVibrate,
 }: {
   meta: PrayerMeta;
   icon: typeof Sun;
   detail: PrayerDetail;
   onPress: () => void;
-  canVibrate: boolean;
 }) {
-  const { pressing, longPressProps } = useLongPress(onPress, { vibrate: canVibrate });
   const isDone = detail.status === "done";
   const isMissed = detail.status === "missed";
   const fullName = meta.fullName ?? `Salat ${meta.label}`;
@@ -126,7 +122,7 @@ function PrayerSlotCard({
   return (
     <button
       type="button"
-      aria-label={`Tekan dan tahan untuk mencatat ${fullName} — saat ini ${
+      aria-label={`Ketuk untuk mencatat ${fullName} — saat ini ${
         isDone ? `dilaksanakan${detail.kind ? ` (${detail.kind})` : ""}` : isMissed ? "tidak dilaksanakan" : "belum dicatat"
       }`}
       title={
@@ -134,10 +130,9 @@ function PrayerSlotCard({
           ? `${fullName} — dilaksanakan${detail.kind === "berjamaah" ? " berjamaah" : detail.kind === "mandiri" ? " mandiri" : ""}`
           : isMissed
             ? `${fullName} — tidak dilaksanakan (${reasonLabel})`
-            : `${fullName} — tekan & tahan untuk mencatat`
+            : `${fullName} — ketuk untuk mencatat`
       }
       onClick={onPress}
-      {...longPressProps}
       className={cn(
         "tap relative flex min-h-[86px] select-none flex-col items-center justify-center gap-2 rounded-[1.15rem] border px-1 py-2.5 transition-all",
         isDone
@@ -145,7 +140,6 @@ function PrayerSlotCard({
           : isMissed
             ? "border-rose-300/35 bg-rose-400/[0.06] light:border-rose-300 light:bg-rose-50"
             : "glass",
-        pressing && "scale-[0.955] ring-2 ring-tz-violet/60"
       )}
     >
       <span
@@ -380,7 +374,7 @@ export function HomePage({
               ? fridayAlt
                 ? "Jumat — dicatat sebagai Salat Zuhur (alternatif)"
                 : "Jumat — Salat Zuhur digantikan Salat Jumat"
-              : "Tekan & tahan kartu salat untuk mencatat status dan detailnya"
+              : "Ketuk kartu salat untuk mencatat status dan detailnya"
           }
           action={
             <Chip
@@ -394,7 +388,7 @@ export function HomePage({
             </Chip>
           }
         />
-        <div className="grid grid-cols-5 gap-2" role="group" aria-label="Kartu salat wajib — tekan dan tahan untuk mencatat">
+        <div className="grid grid-cols-5 gap-2" role="group" aria-label="Kartu salat wajib — ketuk untuk mencatat">
           {prayersToday.map((p) => {
             const Icon = p.id === "zuhur" && friday ? (fridayAlt ? Sun : Users) : PRAYER_ICONS[p.id];
             return (
@@ -404,7 +398,6 @@ export function HomePage({
                 icon={Icon}
                 detail={detailOf(p.id)}
                 onPress={() => setRecording(p)}
-                canVibrate={settings.vibration}
               />
             );
           })}

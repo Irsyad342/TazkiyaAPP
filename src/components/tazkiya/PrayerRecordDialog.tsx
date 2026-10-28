@@ -2,8 +2,7 @@
 
 /**
  * Tazkiya — Bottom sheet pencatatan salat.
- * Dibuka dengan tekan-dan-tahan (±1 detik) pada kartu salat atau klik/
- * keyboard (alternatif aksesibilitas). Satu alur lengkap tanpa popup
+ * Dibuka dengan mengetuk kartu salat (klik/keyboard juga berfungsi). Satu alur lengkap tanpa popup
  * bertingkat: tiga status → jenis pelaksanaan / alasan → simpan.
  * Tiga status (belum dicatat / sudah dilaksanakan / tidak dilaksanakan),
  * jenis pelaksanaan (mandiri / berjamaah), dan alasan dengan redaksi netral

@@ -254,3 +254,21 @@ Stage Summary:
 - GPU HP: radius blur tiap kartu kaca turun ~25–40% + 4 lapisan orb blur besar dikurangi/ disembunyikan → gulir jauh lebih mulus.
 - Muat pertama: font Amiri Quran (44KB) tidak lagi di-preload; transisi tab lebih responsif.
 - Deploy produksi: https://tazkiyaapp.vercel.app/ (commit 212f3bf).
+
+---
+Task ID: 14
+Agent: Main agent (Z.ai)
+Task: Hapus fitur tekan & tahan (long-press) kartu salat — ketuk langsung membuka opsi pencatatan (permintaan pengguna: "ga berfungsi juga" + ingin lebih ringan).
+
+Work Log:
+- Telusuri penggunaan: hook `useLongPress` hanya dipakai di `PrayerSlotCard` (HomePage.tsx); klik biasa sudah memanggil `onPress` yang sama (buka PrayerRecordDialog) → long-press murni redundan dan menambah beban pointer-event tiap kartu.
+- HomePage.tsx: hapus impor & pemakaian `useLongPress` pada PrayerSlotCard; kartu kini murni `onClick` (tap/klik langsung membuka sheet opsi); hapus state `pressing`, prop `canVibrate`, dan `{...longPressProps}` (umpan balik tekan tetap ada via kelas CSS `.tap` → scale 0.96 saat aktif).
+- Redaksi UI diperbarui: caption "Tekan & tahan kartu salat…" → "Ketuk kartu salat untuk mencatat status dan detailnya"; aria-label kartu/grup/title tooltip ikut disesuaikan (aksesibilitas konsisten).
+- Hapus file `src/components/tazkiya/useLongPress.ts` (tidak lagi dirujuk di mana pun).
+- PrayerRecordDialog.tsx: komentar header diperbarui (dibuka dengan mengetuk kartu).
+- Verifikasi: eslint 0 error, tsc 0 error, next build produksi sukses.
+
+Stage Summary:
+- Kartu salat merespons seketika: satu ketukan langsung memunculkan opsi status (mandiri/berjamaah/tidak dilaksanakan) tanpa jeda 1 detik.
+- Beban interaksi turun: tanpa 5 pointer-listener long-press + timer per kartu; satu file hook (~97 baris) hilang dari bundle.
+- Deploy: push ke main → Vercel auto-deploy https://tazkiyaapp.vercel.app/
