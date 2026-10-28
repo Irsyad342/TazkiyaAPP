@@ -996,3 +996,67 @@ html[data-anim="off"] .tz-sparkle {
     backdrop-filter: none !important;
   }
 }
+
+/* ---------- Kartu 2D datar (Task 16 — permintaan pengguna) ----------
+   Semua kartu di semua halaman tampil datar (2D), tanpa kesan 3D dan lebih
+   ringan di HP. Menimpa SEMUA varian kaca (gelap/terang/liquid, mobile):
+   - backdrop-filter dimatikan (penghemat GPU terbesar — blur dihitung ulang
+     tiap frame saat konten di balik kartu bergulir)
+   - bayangan besar & inner-highlight dihilangkan (sumber utama kesan 3D)
+   - tepi gloss ::before dan sheen ::after disembunyikan
+   - utilitas glow (glow-violet, ikon Qur'an) dinetralkan
+   - lapisan cahaya ambien kartu hero disembunyikan
+   Border 1px dan latar kartu tetap ada — kartu tetap terbaca rapi sebagai
+   permukaan datar. Blok ini sengaja paling akhir agar menang atas semua
+   varian di atasnya; animasi tetap hormat pada data-anim="off" dan
+   prefers-reduced-motion seperti sebelumnya. */
+.glass,
+.glass-strong,
+.glass-violet,
+.glass-hero,
+html[data-theme="light"] .glass,
+html[data-theme="light"] .glass-strong,
+html[data-theme="light"] .glass-violet,
+html[data-theme="light"] .glass-hero,
+html[data-glass="liquid"] .glass,
+html[data-glass="liquid"] .glass-strong,
+html[data-glass="liquid"] .glass-violet,
+html[data-glass="liquid"] .glass-hero,
+html[data-theme="light"][data-glass="liquid"] .glass,
+html[data-theme="light"][data-glass="liquid"] .glass-strong,
+html[data-theme="light"][data-glass="liquid"] .glass-violet,
+html[data-theme="light"][data-glass="liquid"] .glass-hero {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.glass::before,
+.glass-strong::before,
+.glass-violet::before,
+.glass-hero::before,
+html[data-glass="liquid"] .glass-hero::after,
+html[data-glass="liquid"] .glass-strong::after {
+  content: none;
+  display: none;
+}
+
+.glow-violet,
+.glow-violet-sm,
+html[data-theme="light"] .glow-violet,
+html[data-theme="light"] .glow-violet-sm,
+.tz-quran-icon {
+  box-shadow: none;
+}
+
+/* Lapisan cahaya ambien kartu hero (glow radial berlapis) — penyumbang
+   kesan kedalaman sekaligus biaya kompositor; disembunyikan agar kartu
+   benar-benar datar. */
+.tz-hero-glow > .tz-hero-flow,
+.tz-hero-glow > .tz-hero-flow-2,
+.tz-hero-glow > .tz-hero-aura,
+.tz-quran-glow > .tz-quran-veil {
+  display: none;
+}
+
+/* penanda recompile task16 */

@@ -265,13 +265,12 @@ export function StatsPage() {
       </header>
 
       {/* ---------- Ringkasan atas — tiga identitas aksen berbeda ----------
-        Biru = progres hari ini · Amber = streak · Teal = hari sempurna.
-        Angka jadi elemen paling menonjol; keterangan tetap terbaca. */}
+        Kuning = progres hari ini · Oranye = streak · Teal = hari sempurna.
+        Kartu 2D datar (Task 16): tanpa glow/blur/gradasi kedalaman; angka
+        tetap elemen paling menonjol dan keterangan tetap terbaca. */}
       <section aria-label="Ringkasan utama" className="grid grid-cols-3 gap-3">
         <GlassCard className="p-3.5">
-          <div aria-hidden className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-sky-400/[0.17] to-transparent light:from-sky-400/25" />
-          <div aria-hidden className="absolute -right-5 -top-6 h-14 w-14 rounded-full bg-sky-400/14 blur-lg light:bg-sky-400/25" />
-          <IconBox size="sm" className="relative border-sky-300/30 bg-sky-400/[0.15] text-sky-300 light:border-sky-500/25 light:bg-sky-500/12 light:text-sky-600">
+          <IconBox size="sm" className="relative border-yellow-400/35 bg-yellow-400/15 text-yellow-300 light:border-yellow-500/35 light:bg-yellow-400/20 light:text-yellow-600">
             <Activity />
           </IconBox>
           <p className="relative mt-2.5 font-display text-[24px] font-bold leading-none tabular-nums text-tz-ink">
@@ -285,15 +284,13 @@ export function StatsPage() {
             aria-label={`Ibadah hari ini ${todayScore.pct}% dari target`}
           >
             <div
-              className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-300 light:from-sky-500 light:to-sky-400"
+              className="h-full rounded-full bg-yellow-400 light:bg-yellow-500"
               style={{ width: `${todayScore.pct}%` }}
             />
           </div>
         </GlassCard>
         <GlassCard className="p-3.5">
-          <div aria-hidden className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-amber-400/[0.15] to-transparent light:from-amber-400/22" />
-          <div aria-hidden className="absolute -left-5 -bottom-6 h-14 w-14 rounded-full bg-amber-400/14 blur-lg light:bg-amber-400/25" />
-          <IconBox size="sm" className="relative border-amber-300/30 bg-amber-400/[0.15] text-amber-300 light:border-amber-500/25 light:bg-amber-500/12 light:text-amber-600">
+          <IconBox size="sm" className="relative border-orange-400/35 bg-orange-400/15 text-orange-300 light:border-orange-500/35 light:bg-orange-400/20 light:text-orange-600">
             <Flame />
           </IconBox>
           <p className="relative mt-2.5 font-display text-[24px] font-bold leading-none tabular-nums text-tz-ink">{streak}</p>
@@ -305,7 +302,7 @@ export function StatsPage() {
                 className={cn(
                   "h-1 flex-1 rounded-full",
                   i < Math.min(streak, 3)
-                    ? "bg-gradient-to-r from-amber-400 to-orange-400 light:from-amber-500 light:to-orange-500"
+                    ? "bg-orange-400 light:bg-orange-500"
                     : "bg-tz-track"
                 )}
               />
@@ -313,15 +310,13 @@ export function StatsPage() {
           </div>
         </GlassCard>
         <GlassCard className="p-3.5">
-          <div aria-hidden className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-teal-400/[0.16] to-transparent light:from-teal-400/24" />
-          <div aria-hidden className="absolute -right-5 -top-6 h-14 w-14 rounded-full bg-teal-400/14 blur-lg light:bg-teal-400/25" />
-          <IconBox size="sm" className="relative border-teal-300/30 bg-teal-400/[0.15] text-teal-300 light:border-teal-500/25 light:bg-teal-500/12 light:text-teal-600">
+          <IconBox size="sm" className="relative border-teal-400/35 bg-teal-400/15 text-teal-300 light:border-teal-500/35 light:bg-teal-400/20 light:text-teal-600">
             <Trophy />
           </IconBox>
           <p className="relative mt-2.5 font-display text-[24px] font-bold leading-none tabular-nums text-tz-ink">{summary.perfectDays}</p>
           <p className="relative mt-1 text-[10px] leading-tight text-tz-muted">Hari sempurna</p>
           <div className="relative mt-2 flex items-center gap-1" aria-hidden>
-            <span className="h-1 flex-1 rounded-full bg-gradient-to-r from-teal-400 to-emerald-400 light:from-teal-500 light:to-emerald-500" />
+            <span className="h-1 flex-1 rounded-full bg-teal-400 light:bg-teal-500" />
             <span className="text-[8px] font-semibold uppercase tracking-wide text-tz-muted/70">{period === "mingguan" ? "minggu ini" : "bulan ini"}</span>
           </div>
         </GlassCard>
@@ -339,7 +334,7 @@ export function StatsPage() {
             className={cn(
               "tap flex-1 rounded-[0.7rem] py-2 text-sm font-semibold capitalize transition-all",
               period === p
-                ? "border border-tz-violet/45 bg-gradient-to-r from-tz-purple to-tz-violet text-white shadow-[0_6px_20px_-6px_rgba(85,51,154,0.9),inset_0_1px_0_rgba(255,255,255,0.22)]"
+                ? "border border-tz-violet/60 bg-tz-violet text-white"
                 : "text-tz-muted hover:text-tz-accent"
             )}
           >
@@ -407,17 +402,26 @@ export function StatsPage() {
             {calendarWithStatus.map((cell, i) => {
               if (!cell.key) return <span key={`blank-${i}`} aria-hidden className="aspect-square" />;
               const intensity = cell.done / 5;
-              // Warna dasar hari: teal (ada berjamaah) > biru (mandiri) >
-              // amber (hanya terlewat); tanpa data = abu netral.
+              // Sel kalender berbentuk LINGKARAN (bukan kotak) — tampilan
+              // lebih lembut. Warna dasar hari: teal (ada berjamaah) >
+              // biru (mandiri) > amber (hanya terlewat); tanpa data = abu
+              // netral (BUKAN hari gagal). Hari INI ditandai warna PENUH
+              // (solid) + teks putih — kontras jelas tanpa cincin/ring.
               let bg: string | undefined;
-              let glow: string | undefined;
-              if (cell.hasData) {
+              if (!cell.isFuture && cell.isToday) {
+                bg =
+                  cell.jamaah > 0
+                    ? "#14b8a6"
+                    : cell.mandiri > 0
+                      ? "#0ea5e9"
+                      : cell.missed > 0
+                        ? "#f59e0b"
+                        : "var(--tz-violet)";
+              } else if (cell.hasData) {
                 if (cell.jamaah > 0) {
                   bg = `rgba(45,212,191,${(0.17 + intensity * 0.58).toFixed(3)})`;
-                  if (cell.done === 5) glow = "0 0 12px -2px rgba(45,212,191,0.75)";
                 } else if (cell.mandiri > 0) {
                   bg = `rgba(56,189,248,${(0.15 + intensity * 0.52).toFixed(3)})`;
-                  if (cell.done === 5) glow = "0 0 12px -2px rgba(56,189,248,0.7)";
                 } else {
                   bg = `rgba(251,191,36,${(0.15 + (cell.missed / 5) * 0.35).toFixed(3)})`;
                 }
@@ -443,13 +447,16 @@ export function StatsPage() {
               return (
                 <span
                   key={cell.key}
-                  title={`${formatDayMonth(cell.key)} — ${detailText}${cell.done === 5 ? " · lengkap" : ""}`}
+                  title={`${formatDayMonth(cell.key)} — ${detailText}${cell.done === 5 ? " · lengkap" : ""}${cell.isToday ? " · hari ini" : ""}`}
                   className={cn(
-                    "relative flex aspect-square flex-col items-center justify-center rounded-lg text-[10px] font-semibold transition-colors",
-                    cell.isFuture ? "bg-tz-panel-soft text-tz-ink/20" : "text-tz-ink/90",
-                    cell.isToday && "ring-2 ring-tz-violet ring-offset-2 ring-offset-tz-frame"
+                    "relative flex aspect-square flex-col items-center justify-center rounded-full text-[10px] font-semibold transition-colors",
+                    cell.isFuture
+                      ? "bg-tz-panel-soft text-tz-ink/20"
+                      : cell.isToday
+                        ? "text-white"
+                        : "text-tz-ink/90"
                   )}
-                  style={{ background: bg, boxShadow: glow }}
+                  style={{ background: bg }}
                 >
                   <span className="leading-none">{cell.day}</span>
                   {/* Indikator kombinasi status (bukan hanya warna dasar) */}
@@ -460,8 +467,11 @@ export function StatsPage() {
                           key={dot}
                           className={cn(
                             "h-[3px] w-[3px] rounded-full",
-                            dot === "sky" && "bg-sky-100 light:bg-sky-700",
-                            dot === "amber" && "bg-amber-100 light:bg-amber-700"
+                            cell.isToday
+                              ? "bg-white/90"
+                              : dot === "sky"
+                                ? "bg-sky-100 light:bg-sky-700"
+                                : "bg-amber-100 light:bg-amber-700"
                           )}
                         />
                       ))}
@@ -486,7 +496,7 @@ export function StatsPage() {
               <span aria-hidden className="h-2 w-2 rounded-full border border-tz-line-strong bg-tz-track" /> Belum ada data
             </span>
             <span className="flex items-center gap-1">
-              <span aria-hidden className="h-2 w-2 rounded-full ring-2 ring-tz-violet ring-offset-1 ring-offset-tz-frame" /> Hari ini
+              <span aria-hidden className="h-2 w-2 rounded-full bg-tz-violet" /> Hari ini
             </span>
           </div>
         </GlassCard>
@@ -505,7 +515,7 @@ export function StatsPage() {
                 className={cn(
                   "flex h-6 w-6 shrink-0 items-center justify-center rounded-[0.5rem] text-[10px] font-bold",
                   idx === 0
-                    ? "bg-gradient-to-br from-tz-violet to-tz-purple text-white shadow-[0_0_12px_-2px_rgba(156,114,239,0.8)]"
+                    ? "bg-tz-violet text-white"
                     : "border border-white/8 bg-tz-panel text-tz-muted light:border-tz-line light:bg-tz-panel-soft"
                 )}
               >
@@ -559,7 +569,7 @@ export function StatsPage() {
                           ) : null}
                           {doneH > 0.5 ? (
                             <span
-                              className="w-full shrink-0 bg-gradient-to-t from-tz-purple via-tz-violet to-tz-lavender shadow-[0_0_12px_-2px_rgba(156,114,239,0.8)]"
+                              className="w-full shrink-0 bg-gradient-to-t from-tz-purple via-tz-violet to-tz-lavender"
                               style={{ height: `${(doneH / totalH) * 100}%` }}
                             />
                           ) : null}

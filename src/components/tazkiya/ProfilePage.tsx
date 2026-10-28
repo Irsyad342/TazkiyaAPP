@@ -284,7 +284,7 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
         <button
           type="button"
           onClick={onOpenTargets}
-          className="tap glass-violet relative block w-full overflow-hidden rounded-[1.35rem] p-4 text-left transition-all hover:shadow-[0_16px_40px_-16px_rgba(117,70,200,0.45)]"
+          className="tap glass-violet relative block w-full overflow-hidden rounded-[1.35rem] p-4 text-left transition-all"
           aria-label="Buka halaman Target Ibadah"
         >
           <GlowOrb className="-right-6 -top-8 h-24 w-24 bg-tz-violet/25" />

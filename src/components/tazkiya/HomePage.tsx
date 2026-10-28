@@ -341,7 +341,7 @@ export function HomePage({
             </div>
           </div>
           <ProgressRing value={score.pct} size={116} stroke={10} trackClass="stroke-white/20">
-            <span className="font-display text-[22px] font-bold text-white drop-shadow-[0_0_12px_rgba(255,255,255,0.35)]">
+            <span className="font-display text-[22px] font-bold text-white">
               {score.done}/{total}
             </span>
             <span className="mt-0.5 text-[10px] font-medium text-tz-lavender/90">aktivitas</span>
@@ -358,7 +358,7 @@ export function HomePage({
           { label: "Profil", icon: CircleUserRound, onClick: () => onNavigate("profil") },
         ].map(({ label, icon: Icon, onClick }) => (
           <button key={label} type="button" onClick={onClick} className="tap group flex flex-col items-center gap-2 rounded-2xl py-1">
-            <span className="glass relative flex h-[56px] w-[56px] items-center justify-center rounded-[1.15rem] text-tz-violet transition-all duration-200 group-hover:shadow-[0_0_26px_-4px_rgba(156,114,239,0.7)] group-active:scale-95">
+            <span className="glass relative flex h-[56px] w-[56px] items-center justify-center rounded-[1.15rem] text-tz-violet transition-all duration-200 group-active:scale-95">
               <span
                 aria-hidden
                 className="absolute inset-0 rounded-[1.15rem] bg-gradient-to-br from-tz-violet/12 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
@@ -518,7 +518,7 @@ export function HomePage({
                   className={cn(
                     "tap relative overflow-hidden rounded-[1.25rem] border p-3.5 text-left transition-all",
                     done
-                      ? "border-tz-violet/45 bg-gradient-to-br from-tz-violet/25 via-tz-purple/12 to-transparent shadow-[0_0_24px_-8px_rgba(156,114,239,0.7),inset_0_1px_0_rgba(255,255,255,0.12)]"
+                      ? "border-tz-violet/45 bg-tz-violet/15"
                       : "glass"
                   )}
                 >
@@ -528,7 +528,7 @@ export function HomePage({
                       <Icon />
                     </IconBox>
                     {done ? (
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-tz-violet text-white shadow-[0_0_10px_1px_rgba(156,114,239,0.7)]">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-tz-violet text-white">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3.4} strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
                           <path d="M20 6 9 17l-5-5" />
                         </svg>
@@ -537,7 +537,7 @@ export function HomePage({
                       <span className="h-5 w-5 rounded-full border border-dashed border-tz-line-strong" />
                     )}
                   </div>
-                  <p className={cn("relative mt-2.5 text-[13px] font-semibold", done ? "text-white" : "text-tz-ink/85")}>{label}</p>
+                  <p className={cn("relative mt-2.5 text-[13px] font-semibold", !done && "text-tz-muted")}>{label}</p>
                   <p className="relative text-[11px] text-tz-muted">{caption}</p>
                 </button>
               );

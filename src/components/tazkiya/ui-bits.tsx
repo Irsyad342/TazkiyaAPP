@@ -61,7 +61,7 @@ export function SectionHeader({
   return (
     <div className={cn("mb-3 flex items-end justify-between gap-3 px-1", className)}>
       <div className="flex items-center gap-2.5">
-        <span aria-hidden className="h-4 w-1 rounded-full bg-gradient-to-b from-tz-violet to-tz-purple glow-violet-sm" />
+        <span aria-hidden className="h-4 w-1 rounded-full bg-tz-violet" />
         <div>
           <h2 className="font-display text-[16px] font-semibold tracking-tight text-tz-ink">{title}</h2>
           {caption ? <p className="mt-0.5 text-[11px] text-tz-muted">{caption}</p> : null}
@@ -97,12 +97,12 @@ export function IconBox({
               ? "h-12 w-12 rounded-2xl [&>svg]:h-[22px] [&>svg]:w-[22px]"
               : "h-10 w-10 rounded-[0.8rem] [&>svg]:h-[18px] [&>svg]:w-[18px]",
         tone === "solid"
-          ? "border border-tz-violet/50 bg-gradient-to-br from-tz-violet to-tz-purple text-white glow-violet-sm"
+          ? "border border-tz-violet bg-tz-violet text-white"
           : tone === "ghost"
             ? "border border-tz-line bg-tz-panel text-tz-muted"
             : tone === "lavender"
               ? "border border-tz-lavender/25 bg-tz-lavender/12 text-tz-lavender"
-              : "border border-tz-violet/25 bg-gradient-to-br from-tz-violet/22 to-tz-purple/12 text-tz-violet",
+              : "border border-tz-violet/25 bg-tz-violet/12 text-tz-violet",
         className
       )}
     >
@@ -158,7 +158,6 @@ export function ProgressRing({
           strokeDasharray={`${dash} ${c}`}
           style={{
             transition: "stroke-dasharray 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
-            filter: `drop-shadow(0 0 ${Math.max(5, 0.8 * stroke)}px rgba(156,114,239,0.7))`,
           }}
         />
       </svg>
@@ -172,13 +171,12 @@ export function ProgressRing({
 export function ProgressBar({ value, className }: { value: number; className?: string }) {
   const clamped = Math.max(0, Math.min(100, value));
   return (
-    <div className={cn("h-2 w-full overflow-hidden rounded-full bg-tz-track shadow-[inset_0_1px_2px_rgba(0,0,0,0.35)]", className)}>
+    <div className={cn("h-2 w-full overflow-hidden rounded-full bg-tz-track", className)}>
       <div
         className="h-full rounded-full bg-gradient-to-r from-tz-purple via-tz-violet to-tz-lavender"
         style={{
           width: `${clamped}%`,
           transition: "width 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
-          boxShadow: "0 0 14px rgba(156,114,239,0.75)",
         }}
       />
     </div>
@@ -204,9 +202,8 @@ export function Chip({ children, className }: { children: ReactNode; className?:
 
 export function EmptyState({ icon, title, caption }: { icon: ReactNode; title: string; caption?: string }) {
   return (
-    <div className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[1.25rem] border border-dashed border-tz-violet/25 bg-gradient-to-b from-tz-violet/[0.06] to-transparent px-4 py-7 text-center">
-      <div className="absolute -top-8 left-1/2 h-16 w-32 -translate-x-1/2 rounded-full bg-tz-violet/15 blur-2xl" aria-hidden />
-      <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-tz-violet/25 bg-gradient-to-br from-tz-violet/20 to-tz-purple/10 text-tz-violet">
+    <div className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[1.25rem] border border-dashed border-tz-violet/25 bg-tz-violet/[0.05] px-4 py-7 text-center">
+      <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-tz-violet/25 bg-tz-violet/12 text-tz-violet">
         {icon}
       </div>
       <p className="text-sm font-medium text-tz-ink/90">{title}</p>
@@ -218,5 +215,9 @@ export function EmptyState({ icon, title, caption }: { icon: ReactNode; title: s
 /* ---------------- Orb dekoratif ---------------- */
 
 export function GlowOrb({ className }: { className?: string }) {
-  return <div aria-hidden className={cn("pointer-events-none absolute rounded-full blur-3xl", className)} />;
+  // Mode 2D datar (Task 16): ornamen blur yang memberi kesan 3D/berat
+  // tidak dirender lagi. API komponen dipertahankan agar pemakaian lama
+  // di semua halaman tidak perlu diubah.
+  void className;
+  return null;
 }

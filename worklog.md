@@ -299,3 +299,23 @@ Re-verifikasi independen (sesi lanjutan, 28 Okt — kode @93ad4b7 tidak diubah):
 - Kalender: 25-27 Okt abu netral (--tz-empty-cell), 28 Okt teal 0.40 + 2 titik kombinasi (biru+amber) + cincin hari ini, 30 Okt redup; legenda 5 item; tema gelap & terang terbaca (screenshot verify-*.png di scripts/).
 - Anomali output: render terminal sesi ini sempat menampilkan `[motivation` sebagai `otivation` (karakter `[m` termakan escape ANSI) — file asli benar; diverifikasi via rg + tsc.
 - TIDAK ada push/deploy; screenshot verifikasi baru di-commit sebagai bukti.
+
+---
+Task ID: 16
+Agent: Main agent (Z.ai)
+Task: Revisi visual dari pengguna — (1) sel kalender jangan tampil seperti kotak, (2) semua kartu di semua halaman 2D datar tanpa efek 3D agar ringan, (3) kartu statistik biru diganti kuning + penyesuaian warna.
+
+Work Log:
+- globals.css: blok "Kartu 2D datar" di akhir file menimpa SEMUA varian kaca (gelap/terang/liquid, mobile ≤640px) — backdrop-filter: none, box-shadow: none, ::before gloss & ::after sheen disembunyikan, glow-violet/glow-violet-sm/tz-quran-icon dinetralkan, lapisan cahaya ambien hero (tz-hero-flow/flow-2/aura, tz-quran-veil) display:none. Border 1px + latar kartu tetap.
+- ui-bits.tsx: IconBox flat (tanpa gradien/glow), tick SectionHeader flat, ProgressRing tanpa drop-shadow, ProgressBar tanpa inset+glow, EmptyState tanpa orb blur, GlowOrb → return null (API dipertahankan; ornamen blur tidak dirender di semua halaman).
+- StatsPage.tsx: kartu statistik — kuning (Activity, % hari ini, bar kuning), ORANYE (Flame, streak; digeser dari amber agar beda jelas dari kuning), teal (Trophy) — tanpa wash/blur orb/glow; toggle Mingguan/Bulanan aktif flat solid violet; badge peringkat & bar pola 7 hari tanpa glow; KALENDER: sel rounded-full (lingkaran, bukan kotak), hari ini = warna solid + teks putih (teal/sky/amber sesuai status, violet bila kosong) tanpa ring kotak, glow 5/5 dihapus, titik kombinasi putih di hari solid, legenda "Hari ini" jadi titik solid, tooltip + " · hari ini".
+- HomePage.tsx: hero tanpa drop-shadow teks ring; tile aksi cepat tanpa hover glow; kartu aktivitas done flat (tanpa gradien glow + inset), label pakai text-tz-ink dua tema, badge centang tanpa glow.
+- ProfilePage.tsx: kartu Target Ibadah tanpa hover shadow 3D.
+- package.json: script build menghormati TZ_DIST_DIR (cp hardcoded .next → ${TZ_DIST_DIR:-.next}) — memperbaiki inkonsistensi lama dengan next.config.ts; perilaku default (Vercel) tidak berubah.
+- Insiden: chunk CSS tersaji sempat diduga stale (marker komentar ikut ter-minifikasi hilang — cara cek salah), lalu dev server mati berulang setelah di-restart (proses background terbunuh antar sesi tool). Solusi: restart dengan setsid double-fork; diverifikasi computed style browser: backdrop=none, shadow=none, ::before display=none.
+- Verifikasi: eslint 0, tsc 0, build TZ_DIST_DIR=.next-prod sukses (standalone + static terkopi); agent-browser 420×860 — kartu kuning/oranye/teal flat di tema gelap & terang, kalender lingkaran (28 = teal solid + teks putih + titik putih), pop-up 3 varian tetap berfungsi dengan sheet flat, data bertahan (33%, 3/9) melewati restart server; konsol 0 error; screenshot final-*.png di scripts/. TIDAK ada push/deploy.
+
+Stage Summary:
+- Semua kartu di semua halaman kini 2D datar (tanpa backdrop-filter = penghemat GPU terbesar di HP), kalender tidak lagi kotak-kotak, kartu statistik kuning/oranye/teal.
+- Data, formula statistik, alur pencatatan, pop-up, dan fitur lain tidak berubah.
+- Commit lokal di main; menunggu keputusan pengguna untuk deploy.
