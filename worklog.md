@@ -290,3 +290,12 @@ Stage Summary:
 - 3 fitur baru sesuai permintaan; nol perubahan skema data, nol dependensi baru, nol perubahan halaman lain.
 - File berubah: StatsPage.tsx, HomePage.tsx, globals.css, PrayerRecordDialog.tsx (komentar diperbarui), MotivationPopup.tsx (baru).
 - Commit lokal di main; menunggu keputusan pengguna untuk deploy.
+
+Re-verifikasi independen (sesi lanjutan, 28 Okt — kode @93ad4b7 tidak diubah):
+- eslint 0, tsc --noEmit 0, build TZ_DIST_DIR=.next-prod sukses; konsol browser & dev.log bersih tanpa error.
+- agent-browser 420×860 dari data kosong: Subuh berjamaah → pop-up "MasyaAllah!" (variasi pesan ke-2 tampil — randomisasi bekerja); Zuhur mandiri → "Alhamdulillah!" pesan khas mandiri; Asar tidak dilaksanakan + alasan "Ketiduran" → "Tetap Semangat" + tombol "Lanjutkan".
+- Reload: ketiga catatan bertahan (aria-label kartu benar, tanpa duplikat); localStorage `logs` (format lama) & `prayerDetails` (kind/reason) utuh — skema tidak berubah.
+- Kartu: ikon lucide activity/flame/trophy terverifikasi, angka dominan (22%/0/0), toggle Mingguan↔Bulanan berfungsi.
+- Kalender: 25-27 Okt abu netral (--tz-empty-cell), 28 Okt teal 0.40 + 2 titik kombinasi (biru+amber) + cincin hari ini, 30 Okt redup; legenda 5 item; tema gelap & terang terbaca (screenshot verify-*.png di scripts/).
+- Anomali output: render terminal sesi ini sempat menampilkan `[motivation` sebagai `otivation` (karakter `[m` termakan escape ANSI) — file asli benar; diverifikasi via rg + tsc.
+- TIDAK ada push/deploy; screenshot verifikasi baru di-commit sebagai bukti.
