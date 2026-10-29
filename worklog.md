@@ -319,3 +319,18 @@ Stage Summary:
 - Semua kartu di semua halaman kini 2D datar (tanpa backdrop-filter = penghemat GPU terbesar di HP), kalender tidak lagi kotak-kotak, kartu statistik kuning/oranye/teal.
 - Data, formula statistik, alur pencatatan, pop-up, dan fitur lain tidak berubah.
 - Commit lokal di main; menunggu keputusan pengguna untuk deploy.
+
+## Task 17 — Deploy produksi (permintaan pengguna: "deploy kan")
+Tanggal: 2026-10-29
+
+Task: Deploy semua commit lokal ke produksi Vercel (https://tazkiyaapp.vercel.app).
+
+Yang dikerjakan:
+- Audit pra-deploy commit 296d2f6: ditemukan src/components/tazkiya/useLongPress.ts ter-restore tak sengaja (kode mati — tidak diimpor komponen mana pun; grep hanya cocok di file-nya sendiri). DIHAPUS agar konsisten dengan d96e6a0 (fitur tekan-tahan tetap dihapus). tsc 0, eslint 0 setelahnya. Commit 0c7b0b1.
+- Push main: d96e6a0..0c7b0b1 (berisi 93ad4b7 fitur popup/kartu/kalender, 064a258 docs, 296d2f6 revisi visual 2D/kuning, 0c7b0b1 cleanup). Vercel auto-deploy terpicu.
+- Verifikasi produksi (agent-browser 420×860, https://tazkiyaapp.vercel.app): HTML berubah <60 dtk; halaman Statistik menampilkan 3 kartu kuning/oranye/teal flat, toggle flat, kalender sel BULAT + hari ini solid; Beranda flat 2D tanpa gloss/glow; page errors 0. Screenshot: scripts/deploy-prod-*.png.
+- Worklog + screenshot verification di-commit & di-push agar main == kondisi produksi.
+
+Catatan:
+- Data pengguna 100% localStorage perangkat masing-masing — deploy tidak menyentuh data.
+- Warna mandiri di kalender tetap sky (biru muda) sesuai interpretasi terverifikasi Task 16: "jangan biru" menunjuk kartu statistik (kini kuning). Bila pengguna ingin kalender juga tanpa biru, ubah STATUS_COLORS.mandiri + legenda (follow-up kecil).
