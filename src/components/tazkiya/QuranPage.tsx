@@ -2,9 +2,10 @@
 
 /**
  * Tazkiya — Halaman Al-Qur'an.
- * Kartu target bacaan dengan glow bergerak, tombol lanjutkan bacaan,
- * daftar surah & juz dengan pencarian, pencatatan progres manual,
- * penanda bacaan, dan riwayat bacaan.
+ * Kartu target bacaan, sorotan surah paling sering dibaca, jelajah surah
+ * (pencarian + filter + sortir dalam grid 2 kolom), juz 1–30, pencatatan
+ * ringkas (cukup surah & ayat — rentang dan penanda diisi otomatis),
+ * penanda manual, dan riwayat bacaan.
  */
 
 import { useMemo, useState } from "react";
@@ -13,12 +14,15 @@ import {
   Bookmark as BookmarkIcon,
   Check,
   ChevronRight,
+  Flame,
   History,
   Info,
   Play,
   Plus,
   Search,
+  Sparkles,
   Trash2,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
@@ -31,7 +35,25 @@ import { cn } from "@/lib/utils";
 const inputCls = "tz-field";
 const labelCls = "mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-tz-muted/90";
 
-function SurahRow({
+type PlaceFilter = "semua" | "Makkiyah" | "Madaniyah" | "ditandai";
+type SortMode = "nomor" | "nama" | "ayat";
+type ListMode = "surah" | "juz";
+
+const PLACE_FILTERS: { id: PlaceFilter; label: string }[] = [
+  { id: "semua", label: "Semua" },
+  { id: "Makkiyah", label: "Makkiyah" },
+  { id: "Madaniyah", label: "Madaniyah" },
+  { id: "ditandai", label: "Ditandai" },
+];
+
+const SORT_MODES: { id: SortMode; label: string }[] = [
+  { id: "nomor", label: "Nomor" },
+  { id: "nama", label: "A–Z" },
+  { id: "ayat", label: "Ayat" },
+];
+
+/** Kartu surah ringkas untuk grid jelajah. */
+function SurahCard({
   surah,
   showArabic,
   isLastRead,
@@ -49,26 +71,59 @@ function SurahRow({
       <button
         type="button"
         onClick={onOpen}
-        className="tap flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition-colors hover:bg-tz-panel-soft"
+        className="tap relative flex h-full w-full flex-col rounded-2xl border border-tz-line bg-tz-panel-soft p-3 text-left transition-all hover:border-tz-violet/45"
         aria-label={`Buka ${surah.latin}`}
       >
-        <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.6rem] border border-tz-violet/30 bg-gradient-to-br from-tz-violet/20 to-tz-purple/10 text-[11px] font-bold text-tz-accent shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
-          {surah.number}
-          {isLastRead ? (
-            <span aria-hidden className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-tz-violet shadow-[0_0_6px_1px_rgba(156,114,239,0.8)]" />
+        <div className="flex items-start justify-between gap-1">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-tz-violet/30 bg-tz-violet/15 text-[10.5px] font-bold text-tz-accent">
+            {surah.number}
+          </span>
+          {showArabic ? (
+            <span className="quran-arabic truncate text-[15px] leading-snug text-tz-accent/90">{surah.arabic}</span>
           ) : null}
+        </div>
+        <span className="mt-1.5 flex items-center gap-1 truncate text-[12.5px] font-bold text-tz-ink">
+          {surah.latin}
+          {isBookmarked ? <BookmarkIcon size={11} className="shrink-0 text-tz-accent" aria-label="Ada penanda" /> : null}
         </span>
-        <span className="min-w-0 flex-1">
-          <span className="flex items-baseline gap-1.5">
-            <span className="truncate text-[13px] font-semibold text-tz-ink">{surah.latin}</span>
-            {isBookmarked ? <BookmarkIcon size={11} className="shrink-0 text-tz-accent" aria-label="Ada penanda" /> : null}
-            {showArabic ? <span className="quran-arabic ml-auto shrink-0 text-[15px] text-tz-accent">{surah.arabic}</span> : null}
-          </span>
-          <span className="block truncate text-[11px] text-tz-muted">
-            {surah.meaning} · {surah.verses} ayat · {surah.place}
-          </span>
+        <span className="truncate text-[10.5px] text-tz-muted">{surah.meaning}</span>
+        <span className="text-[10px] font-medium text-tz-muted/80">
+          {surah.verses} ayat · {surah.place}
         </span>
-        <ChevronRight size={15} className="shrink-0 text-tz-muted/60" />
+        {isLastRead ? (
+          <span className="absolute -top-1.5 right-2 rounded-full bg-tz-violet px-1.5 py-px text-[8.5px] font-bold uppercase tracking-wide text-white">
+            Terakhir
+          </span>
+        ) : null}
+      </button>
+    </li>
+  );
+}
+
+/** Kartu juz ringkas (juz 1–30 tetap dipertahankan, tampil lebih ringkas). */
+function JuzCard({ juz, onOpen }: { juz: (typeof JUZ_RANGES)[number]; onOpen: () => void }) {
+  const start = getSurah(juz.startSurah);
+  const end = getSurah(juz.endSurah);
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={onOpen}
+        className="tap flex h-full w-full flex-col rounded-2xl border border-tz-line bg-tz-panel-soft p-3 text-left transition-all hover:border-tz-violet/45"
+        aria-label={`Buka Juz ${juz.juz} dari ${start?.latin}`}
+      >
+        <div className="flex items-center justify-between gap-1">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-tz-violet/30 bg-tz-violet/15 text-[10.5px] font-bold text-tz-accent">
+            {juz.juz}
+          </span>
+          <span className="text-[9.5px] font-semibold uppercase tracking-wide text-tz-muted/80">
+            {juz.surahs.length} surah
+          </span>
+        </div>
+        <span className="mt-1.5 truncate text-[12.5px] font-bold text-tz-ink">Juz {juz.juz}</span>
+        <span className="truncate text-[10.5px] text-tz-accent/90">
+          {start?.latin} {juz.startAyah} — {end?.latin} {juz.endAyah}
+        </span>
       </button>
     </li>
   );
@@ -96,16 +151,18 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
     zikirCount: 0,
   };
 
-  const [amount, setAmount] = useState("");
-  const [surahSel, setSurahSel] = useState("");
-  const [ayahFrom, setAyahFrom] = useState("");
-  const [ayahTo, setAyahTo] = useState("");
-  const [markLast, setMarkLast] = useState(true);
+  // Form catat ringkas: cukup surah + ayat.
+  const [catSurah, setCatSurah] = useState("");
+  const [catAyat, setCatAyat] = useState("");
+  // Penanda manual: cukup surah + ayat.
   const [bmSurah, setBmSurah] = useState("");
   const [bmAyah, setBmAyah] = useState("");
   const [formOpen, setFormOpen] = useState(false);
+  // Jelajah: pencarian, filter, sortir.
   const [query, setQuery] = useState("");
-  const [listMode, setListMode] = useState<"surah" | "juz">("surah");
+  const [listMode, setListMode] = useState<ListMode>("surah");
+  const [placeFilter, setPlaceFilter] = useState<PlaceFilter>("semua");
+  const [sortMode, setSortMode] = useState<SortMode>("nomor");
 
   const targetType = settings.quranTargetType;
   const target = settings.quranDailyTarget;
@@ -119,27 +176,116 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
   const targetValue = targetType === "surah" ? (targetSurahMeta?.verses ?? 1) : target;
   const pct = Math.min(100, Math.round((value / Math.max(1, targetValue)) * 100));
   const unit = targetType === "halaman" ? "halaman" : "ayat";
-  // Satuan form pencatatan manual: pada mode "surah" yang dicatat tetap jumlah ayat.
-  const formUnit = targetType === "halaman" ? "halaman" : "ayat";
 
   const manualBookmark = bookmarks[0];
   const lastPos = lastRead ?? (manualBookmark ? { surah: manualBookmark.surah, ayah: manualBookmark.ayah } : null);
   const lastSurahMeta = lastPos ? getSurah(lastPos.surah) : undefined;
   const bookmarkedSurahs = useMemo(() => new Set(ayahBookmarks.map((b) => b.surah)), [ayahBookmarks]);
 
+  /* ---------- Sorotan: surah yang paling sering dibaca/dibuka ---------- */
+  const spotlight = useMemo(() => {
+    const map = new Map<number, { count: number; lastDate: string; verses: number }>();
+    for (const e of readingHistory) {
+      if (!e.surah) continue;
+      const cur = map.get(e.surah) ?? { count: 0, lastDate: e.date, verses: 0 };
+      cur.count += 1;
+      cur.verses += e.verses;
+      if (e.date > cur.lastDate) cur.lastDate = e.date;
+      map.set(e.surah, cur);
+    }
+    return [...map.entries()].sort((a, b) => {
+      if (b[1].count !== a[1].count) return b[1].count - a[1].count;
+      if (lastRead?.surah === a[0]) return -1;
+      if (lastRead?.surah === b[0]) return 1;
+      return b[1].lastDate.localeCompare(a[1].lastDate);
+    });
+  }, [readingHistory, lastRead]);
+  const topEntry = spotlight[0];
+  const topMeta = topEntry ? getSurah(topEntry[0]) : undefined;
+  const runnerUps = spotlight.slice(1, 3);
+
+  /* ---------- Filter & sortir daftar surah ---------- */
+  const filterCounts = useMemo(
+    () => ({
+      makkiyah: SURAH_LIST.filter((s) => s.place === "Makkiyah").length,
+      madaniyah: SURAH_LIST.filter((s) => s.place === "Madaniyah").length,
+      ditandai: bookmarkedSurahs.size,
+    }),
+    [bookmarkedSurahs]
+  );
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return SURAH_LIST;
     const norm = normalizeArabic(query.trim());
-    return SURAH_LIST.filter(
-      (s) =>
-        s.latin.toLowerCase().includes(q) ||
-        s.meaning.toLowerCase().includes(q) ||
-        String(s.number) === q ||
-        s.arabic.includes(query.trim()) ||
-        (norm.length > 0 && normalizeArabic(s.arabic).includes(norm))
-    );
+    let list = SURAH_LIST;
+    if (q) {
+      list = list.filter(
+        (s) =>
+          s.latin.toLowerCase().includes(q) ||
+          s.meaning.toLowerCase().includes(q) ||
+          String(s.number) === q ||
+          s.arabic.includes(query.trim()) ||
+          (norm.length > 0 && normalizeArabic(s.arabic).includes(norm))
+      );
+    }
+    if (placeFilter === "Makkiyah" || placeFilter === "Madaniyah") list = list.filter((s) => s.place === placeFilter);
+    else if (placeFilter === "ditandai") list = list.filter((s) => bookmarkedSurahs.has(s.number));
+    if (sortMode === "nama") return [...list].sort((a, b) => a.latin.localeCompare(b.latin));
+    if (sortMode === "ayat") return [...list].sort((a, b) => b.verses - a.verses);
+    return list;
+  }, [query, placeFilter, sortMode, bookmarkedSurahs]);
+
+  const juzFiltered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return JUZ_RANGES;
+    return JUZ_RANGES.filter((j) => String(j.juz) === q || j.surahs.some((n) => getSurah(n)?.latin.toLowerCase().includes(q)));
   }, [query]);
+
+  /* ---------- Pratinjau catat ringkas: surah + ayat → rentang otomatis ---------- */
+  const catPreview = useMemo(() => {
+    const s = parseInt(catSurah, 10);
+    const y = parseInt(catAyat, 10);
+    if (!catSurah || Number.isNaN(s) || !catAyat || Number.isNaN(y) || y < 1) return null;
+    const meta = getSurah(s);
+    if (!meta) return null;
+    const refAyah = manualBookmark?.surah === s ? manualBookmark.ayah : lastRead?.surah === s ? lastRead.ayah : 0;
+    const from = refAyah > 0 && refAyah < y ? refAyah + 1 : 1;
+    const to = Math.min(y, meta.verses);
+    return { meta, from, to, continuing: from > 1, exceeds: y > meta.verses };
+  }, [catSurah, catAyat, manualBookmark, lastRead]);
+
+  const saveCatatan = () => {
+    const s = parseInt(catSurah, 10);
+    const y = parseInt(catAyat, 10);
+    if (!catSurah || Number.isNaN(s)) {
+      toast.error("Pilih surah terlebih dahulu");
+      return;
+    }
+    if (!catAyat || Number.isNaN(y) || y < 1) {
+      toast.error("Masukkan nomor ayat yang valid");
+      return;
+    }
+    const meta = getSurah(s);
+    if (meta && y > meta.verses) {
+      toast.error(`${meta.latin} hanya memiliki ${meta.verses} ayat`);
+      return;
+    }
+    const p = catPreview;
+    if (!p) return;
+    addQuranProgress(today, {
+      pages: 0,
+      verses: p.to - p.from + 1,
+      surah: s,
+      ayahFrom: p.from,
+      ayahTo: p.to,
+      markBookmark: true,
+    });
+    toast.success(
+      `Bacaan disimpan: ${p.meta.latin} ${p.from}${p.to > p.from ? `–${p.to}` : ""} · ${p.to - p.from + 1} ayat · penanda di ayat ${p.to}`
+    );
+    setCatSurah("");
+    setCatAyat("");
+  };
 
   return (
     <div className="space-y-6">
@@ -179,9 +325,13 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
               {value.toLocaleString("id-ID")}
               <span className="ml-1.5 text-xs font-semibold text-tz-lavender/85 light:text-violet-200">
                 {targetType === "surah" ? (
-                  <>/ Surah {targetSurahMeta?.latin ?? "?"} · {targetValue} ayat</>
+                  <>
+                    / Surah {targetSurahMeta?.latin ?? "?"} · {targetValue} ayat
+                  </>
                 ) : (
-                  <>/ {target.toLocaleString("id-ID")} {unit}</>
+                  <>
+                    / {target.toLocaleString("id-ID")} {unit}
+                  </>
                 )}
               </span>
             </p>
@@ -231,20 +381,89 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
         <ChevronRight size={17} className="shrink-0 text-tz-muted/70" />
       </button>
 
-      {/* ---------- Daftar surah & juz ---------- */}
+      {/* ---------- Sorotan: paling sering dibaca ---------- */}
+      {topEntry && topMeta ? (
+        <section aria-label="Surah paling sering dibaca">
+          <button
+            type="button"
+            onClick={() =>
+              onOpenReader(
+                topEntry[0],
+                lastRead?.surah === topEntry[0] ? lastRead.ayah : manualBookmark?.surah === topEntry[0] ? manualBookmark.ayah : 1
+              )
+            }
+            className="tap glass w-full rounded-[1.3rem] border border-tz-violet/35 p-4 text-left transition-all hover:border-tz-violet/55"
+            aria-label={`Buka ${topMeta.latin} — dibaca ${topEntry[1].count} kali`}
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-tz-violet/35 bg-tz-violet/15 text-tz-accent">
+                <Flame size={19} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.14em] text-tz-accent/90">
+                  <Sparkles size={11} className="shrink-0" /> Paling sering dibaca
+                </span>
+                <span className="mt-0.5 flex items-baseline gap-1.5 truncate">
+                  <span className="text-[15px] font-bold text-tz-ink">{topMeta.latin}</span>
+                  {settings.showArabic ? (
+                    <span className="quran-arabic text-[14px] text-tz-accent">{topMeta.arabic}</span>
+                  ) : null}
+                </span>
+                <span className="block truncate text-[11px] text-tz-muted">
+                  {topEntry[1].count}× dicatat · {topEntry[1].verses.toLocaleString("id-ID")} ayat total · terakhir{" "}
+                  {relativeDayLabel(topEntry[1].lastDate, today)}
+                </span>
+              </span>
+              <ChevronRight size={16} className="shrink-0 text-tz-muted/70" />
+            </div>
+            {runnerUps.length > 0 ? (
+              <span className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-tz-line-soft pt-3">
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-tz-muted/80">Juga sering:</span>
+                {runnerUps.map(([n, st], i) => (
+                  <span
+                    key={n}
+                    className="flex items-center gap-1 rounded-full border border-tz-line bg-tz-panel-soft px-2 py-0.5 text-[10.5px] text-tz-muted"
+                  >
+                    <span className="font-bold text-tz-accent">{i + 2}.</span> {getSurah(n)?.latin} · {st.count}×
+                  </span>
+                ))}
+              </span>
+            ) : null}
+          </button>
+        </section>
+      ) : null}
+
+      {/* ---------- Jelajah: pencarian + filter + sortir ---------- */}
       <section aria-label="Daftar surah dan juz">
         <GlassCard className="p-4">
+          {/* Pencarian — desain baru: pil lembut, ikon dalam lingkaran, tombol bersihkan */}
           <div className="relative">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-tz-muted" />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute left-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-tz-violet/25 bg-tz-violet/15 text-tz-accent"
+            >
+              <Search size={13} />
+            </span>
             <input
-              type="search"
+              type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Cari surah — nama Arab, Latin, atau nomor…"
+              placeholder="Cari surah…"
               aria-label="Cari surah"
-              className={cn(inputCls, "pl-10")}
+              className={cn(inputCls, "rounded-full! py-2.5! pl-11!", query && "pr-11!")}
             />
+            {query ? (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                aria-label="Bersihkan pencarian"
+                className="tap absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-tz-violet/15 text-tz-muted transition-colors hover:text-tz-accent"
+              >
+                <X size={13} />
+              </button>
+            ) : null}
           </div>
+
           <div
             className="mt-3 grid grid-cols-2 gap-1.5 rounded-xl border border-tz-line bg-tz-panel-soft p-1.5"
             role="tablist"
@@ -268,60 +487,94 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
               </button>
             ))}
           </div>
+
           {listMode === "surah" ? (
-            <ul className="tz-list-cv mt-1 divide-y divide-tz-line-soft">
-              {filtered.map((s) => (
-                <SurahRow
-                  key={s.number}
-                  surah={s}
-                  showArabic={settings.showArabic}
-                  isLastRead={lastRead?.surah === s.number}
-                  isBookmarked={bookmarkedSurahs.has(s.number)}
-                  onOpen={() => onOpenReader(s.number, lastRead?.surah === s.number ? lastRead.ayah : 1)}
-                />
-              ))}
-              {filtered.length === 0 ? (
-                <li className="px-2 py-6 text-center text-sm text-tz-muted">Surah tidak ditemukan</li>
-              ) : null}
-            </ul>
-          ) : (
-            <ul className="tz-list-cv mt-1 divide-y divide-tz-line-soft">
-              {JUZ_RANGES.map((j) => {
-                const start = getSurah(j.startSurah);
-                const end = getSurah(j.endSurah);
-                return (
-                  <li key={j.juz}>
+            <>
+              {/* Filter cepat */}
+              <div className="-mx-1 mt-3 flex gap-1.5 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none]" role="group" aria-label="Filter surah">
+                {PLACE_FILTERS.map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    aria-pressed={placeFilter === f.id}
+                    onClick={() => setPlaceFilter(f.id)}
+                    className={cn(
+                      "tap shrink-0 rounded-full border px-3 py-1.5 text-[11.5px] font-semibold transition-all",
+                      placeFilter === f.id
+                        ? "border-tz-violet/60 bg-tz-violet text-white shadow-[0_4px_14px_-6px_rgba(85,51,154,0.9)]"
+                        : "border-tz-line bg-tz-panel-soft text-tz-muted hover:text-tz-accent"
+                    )}
+                  >
+                    {f.label}
+                    {f.id === "Makkiyah" ? ` · ${filterCounts.makkiyah}` : ""}
+                    {f.id === "Madaniyah" ? ` · ${filterCounts.madaniyah}` : ""}
+                    {f.id === "ditandai" ? ` · ${filterCounts.ditandai}` : ""}
+                  </button>
+                ))}
+              </div>
+              {/* Sortir + jumlah hasil */}
+              <div className="mt-2.5 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5" role="group" aria-label="Urutkan surah">
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-tz-muted/80">Urut</span>
+                  {SORT_MODES.map((s) => (
                     <button
+                      key={s.id}
                       type="button"
-                      onClick={() => onOpenReader(j.startSurah, j.startAyah)}
-                      className="tap flex w-full items-center gap-3 rounded-xl px-2 py-3 text-left transition-colors hover:bg-tz-panel-soft"
-                      aria-label={`Buka Juz ${j.juz} dari ${start?.latin}`}
+                      aria-pressed={sortMode === s.id}
+                      onClick={() => setSortMode(s.id)}
+                      className={cn(
+                        "tap rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-all",
+                        sortMode === s.id
+                          ? "border-tz-violet/55 bg-tz-violet/15 text-tz-accent"
+                          : "border-tz-line bg-tz-panel-soft text-tz-muted hover:text-tz-accent"
+                      )}
                     >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.6rem] border border-tz-violet/30 bg-gradient-to-br from-tz-violet/20 to-tz-purple/10 text-[11px] font-bold text-tz-accent shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
-                        {j.juz}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="flex items-baseline gap-1.5">
-                          <span className="truncate text-[13px] font-semibold text-tz-ink">Juz {j.juz}</span>
-                          <span className="text-[11px] text-tz-muted">
-                            {start?.latin} {j.startAyah} — {end?.latin} {j.endAyah}
-                          </span>
-                        </span>
-                        <span className="mt-0.5 block truncate text-[10.5px] text-tz-muted">
-                          {j.surahs.map((n) => getSurah(n)?.latin).join(" · ")}
-                        </span>
-                      </span>
-                      <ChevronRight size={15} className="shrink-0 text-tz-muted/60" />
+                      {s.label}
                     </button>
-                  </li>
-                );
-              })}
-            </ul>
+                  ))}
+                </div>
+                <span className="shrink-0 text-[10.5px] text-tz-muted">{filtered.length} surah</span>
+              </div>
+
+              <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {filtered.map((s) => (
+                  <SurahCard
+                    key={s.number}
+                    surah={s}
+                    showArabic={settings.showArabic}
+                    isLastRead={lastRead?.surah === s.number}
+                    isBookmarked={bookmarkedSurahs.has(s.number)}
+                    onOpen={() => onOpenReader(s.number, lastRead?.surah === s.number ? lastRead.ayah : 1)}
+                  />
+                ))}
+              </ul>
+              {filtered.length === 0 ? (
+                <p className="mt-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3 py-4 text-center text-sm text-tz-muted">
+                  Tidak ada surah yang cocok — coba kata kunci atau filter lain.
+                </p>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <p className="mt-3 text-[10.5px] text-tz-muted">
+                {juzFiltered.length} dari {JUZ_RANGES.length} juz — sentuh untuk membuka dari awal juz.
+              </p>
+              <ul className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {juzFiltered.map((j) => (
+                  <JuzCard key={j.juz} juz={j} onOpen={() => onOpenReader(j.startSurah, j.startAyah)} />
+                ))}
+              </ul>
+              {juzFiltered.length === 0 ? (
+                <p className="mt-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3 py-4 text-center text-sm text-tz-muted">
+                  Juz tidak ditemukan — coba nomor juz atau nama surah di dalamnya.
+                </p>
+              ) : null}
+            </>
           )}
         </GlassCard>
       </section>
 
-      {/* ---------- Catat bacaan & penanda ---------- */}
+      {/* ---------- Catat bacaan & penanda (ringkas) ---------- */}
       <section aria-label="Catat bacaan dan penanda">
         <GlassCard className="overflow-hidden">
           <button
@@ -330,66 +583,26 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
             className="tap flex w-full items-center gap-3 px-4 py-3.5 text-left"
             aria-expanded={formOpen}
           >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-tz-violet/25 bg-gradient-to-br from-tz-violet/22 to-tz-purple/12 text-tz-violet">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-tz-violet/25 bg-tz-violet/15 text-tz-violet">
               <Plus size={18} />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block text-[14px] font-semibold text-tz-ink">Catat Bacaan &amp; Penanda</span>
-              <span className="block text-[11px] text-tz-muted">Tambahkan progres manual atau pindahkan penanda</span>
+              <span className="block text-[11px] text-tz-muted">Cukup surah &amp; ayat — rentang dan penanda diisi otomatis</span>
             </span>
             <ChevronRight size={16} className={cn("shrink-0 text-tz-muted/70 transition-transform", formOpen && "rotate-90")} />
           </button>
           {formOpen ? (
-            <div className="space-y-5 border-t border-tz-line-soft p-4">
-              <div className="space-y-4">
-                <p className={labelCls}>Tambah progres bacaan</p>
-                <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-4 border-t border-tz-line-soft p-4">
+              {/* Catat bacaan: hanya surah + ayat */}
+              <div>
+                <p className={labelCls}>Catat bacaan</p>
+                <div className="grid grid-cols-[1.5fr_1fr] gap-3">
                   <div>
-                    <label className={labelCls} htmlFor="jenis-bacaan">
-                      Satuan bacaan
+                    <label className={labelCls} htmlFor="cat-surah">
+                      Surah
                     </label>
-                    <select
-                      id="jenis-bacaan"
-                      value={targetType}
-                      onChange={(e) => {
-                        const v = e.target.value as "halaman" | "ayat" | "surah";
-                        if (v === "surah") {
-                          useWorshipStore.getState().updateSettings({ quranTargetType: "surah" });
-                          toast.success(`Target: surah ${getSurah(settings.quranTargetSurah)?.latin ?? ""} — atur di Target Ibadah bila perlu`);
-                        } else {
-                          useWorshipStore.getState().setQuranTarget(v, settings.quranDailyTarget);
-                          toast.success(`Satuan diubah ke ${v === "halaman" ? "halaman" : "ayat"}`);
-                        }
-                      }}
-                      className={inputCls}
-                    >
-                      <option value="halaman">Halaman</option>
-                      <option value="ayat">Ayat</option>
-                      <option value="surah">Surah</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className={labelCls} htmlFor="jumlah-bacaan">
-                      Jumlah dibaca
-                    </label>
-                    <input
-                      id="jumlah-bacaan"
-                      type="number"
-                      min={1}
-                      inputMode="numeric"
-                      placeholder={`mis. ${formUnit === "halaman" ? "3" : "50"}`}
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className={inputCls}
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="col-span-3 sm:col-span-1">
-                    <label className={labelCls} htmlFor="surah-bacaan">
-                      Surah (opsional)
-                    </label>
-                    <select id="surah-bacaan" value={surahSel} onChange={(e) => setSurahSel(e.target.value)} className={inputCls}>
+                    <select id="cat-surah" value={catSurah} onChange={(e) => setCatSurah(e.target.value)} className={inputCls}>
                       <option value="">— Pilih —</option>
                       {SURAH_LIST.map((s) => (
                         <option key={s.number} value={s.number}>
@@ -399,93 +612,55 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                     </select>
                   </div>
                   <div>
-                    <label className={labelCls} htmlFor="ayat-awal">
-                      Ayat awal
+                    <label className={labelCls} htmlFor="cat-ayat">
+                      Ayat terakhir
                     </label>
                     <input
-                      id="ayat-awal"
-                      type="number"
-                      min={1}
-                      inputMode="numeric"
-                      placeholder="mis. 1"
-                      value={ayahFrom}
-                      onChange={(e) => setAyahFrom(e.target.value)}
-                      className={inputCls}
-                    />
-                  </div>
-                  <div>
-                    <label className={labelCls} htmlFor="ayat-akhir">
-                      Ayat akhir
-                    </label>
-                    <input
-                      id="ayat-akhir"
+                      id="cat-ayat"
                       type="number"
                       min={1}
                       inputMode="numeric"
                       placeholder="mis. 10"
-                      value={ayahTo}
-                      onChange={(e) => setAyahTo(e.target.value)}
+                      value={catAyat}
+                      onChange={(e) => setCatAyat(e.target.value)}
                       className={inputCls}
                     />
                   </div>
                 </div>
-                <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 py-2.5">
-                  <input type="checkbox" checked={markLast} onChange={(e) => setMarkLast(e.target.checked)} className="h-4 w-4 accent-tz-violet" />
-                  <span className="text-xs text-tz-ink/85">Perbarui penanda bacaan ke posisi terakhir</span>
-                </label>
+                {catPreview ? (
+                  <p className="mt-2 flex items-start gap-1.5 rounded-xl border border-tz-violet/25 bg-tz-violet/10 px-3 py-2 text-[11px] leading-relaxed text-tz-ink/90">
+                    <Sparkles size={12} className="mt-0.5 shrink-0 text-tz-accent" />
+                    <span>
+                      {catPreview.exceeds ? (
+                        <>
+                          {catPreview.meta.latin} hanya {catPreview.meta.verses} ayat —{" "}
+                        </>
+                      ) : null}
+                      Tercatat: {catPreview.meta.latin} {catPreview.from}
+                      {catPreview.to > catPreview.from ? `–${catPreview.to}` : ""} · {catPreview.to - catPreview.from + 1} ayat ·
+                      penanda pindah ke ayat {catPreview.to}
+                      {catPreview.continuing ? " (lanjutan dari posisi terakhir)" : ""}
+                    </span>
+                  </p>
+                ) : (
+                  <p className="mt-2 text-[11px] leading-relaxed text-tz-muted">
+                    Pilih surah &amp; ayat terakhir — rentang bacaan dihitung otomatis dari posisi terakhirmu.
+                  </p>
+                )}
                 <button
                   type="button"
-                  onClick={() => {
-                    const n = parseInt(amount, 10);
-                    if (!amount || Number.isNaN(n) || n <= 0) {
-                      toast.error(`Masukkan jumlah ${formUnit} yang valid (lebih dari 0)`);
-                      return;
-                    }
-                    const surahNum = surahSel ? parseInt(surahSel, 10) : undefined;
-                    const from = ayahFrom ? parseInt(ayahFrom, 10) : undefined;
-                    const to = ayahTo ? parseInt(ayahTo, 10) : undefined;
-                    if (surahNum !== undefined && from !== undefined && to !== undefined && to < from) {
-                      toast.error("Ayat akhir tidak boleh lebih kecil dari ayat awal");
-                      return;
-                    }
-                    if (surahNum !== undefined && from !== undefined) {
-                      const m = getSurah(surahNum);
-                      if (m && from > m.verses) {
-                        toast.error(`${m.latin} hanya memiliki ${m.verses} ayat`);
-                        return;
-                      }
-                    }
-                    if (surahNum !== undefined && to !== undefined) {
-                      const m = getSurah(surahNum);
-                      if (m && to > m.verses) {
-                        toast.error(`${m.latin} hanya memiliki ${m.verses} ayat`);
-                        return;
-                      }
-                    }
-                    addQuranProgress(today, {
-                      // Mode "surah" tetap mencatat ayat — bacaan surah dihitung per ayat.
-                      pages: formUnit === "halaman" ? n : 0,
-                      verses: formUnit === "ayat" ? n : 0,
-                      surah: surahNum,
-                      ayahFrom: from,
-                      ayahTo: to,
-                      markBookmark: markLast,
-                    });
-                    toast.success(`Bacaan disimpan: ${n.toLocaleString("id-ID")} ${formUnit}`);
-                    setAmount("");
-                    setAyahFrom("");
-                    setAyahTo("");
-                  }}
-                  className="tap flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[0.9rem] border border-tz-violet/50 bg-gradient-to-r from-tz-purple via-tz-violet to-tz-purple font-semibold text-white shadow-[0_10px_30px_-8px_rgba(85,51,154,0.8),inset_0_1px_0_rgba(255,255,255,0.25)] transition-all hover:brightness-110"
+                  onClick={saveCatatan}
+                  className="tap mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[0.9rem] border border-tz-violet/50 bg-gradient-to-r from-tz-purple via-tz-violet to-tz-purple font-semibold text-white shadow-[0_10px_30px_-8px_rgba(85,51,154,0.8),inset_0_1px_0_rgba(255,255,255,0.25)] transition-all hover:brightness-110"
                 >
-                  <Plus size={18} /> Tambah Progres &amp; Simpan
+                  <Check size={17} /> Simpan Bacaan
                 </button>
               </div>
 
+              {/* Penanda manual: cukup surah + ayat */}
               <div className="space-y-3 border-t border-tz-line-soft pt-4">
-                <p className={labelCls}>Penanda bacaan manual</p>
+                <p className={labelCls}>Penanda manual</p>
                 {manualBookmark ? (
-                  <div className="glass-violet flex items-center gap-3 rounded-2xl p-3.5">
+                  <div className="flex items-center gap-3 rounded-2xl border border-tz-violet/25 bg-tz-violet/10 p-3.5">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-tz-violet to-tz-purple text-white glow-violet-sm">
                       <BookmarkIcon size={20} />
                     </span>
@@ -516,11 +691,11 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                   <EmptyState
                     icon={<BookmarkIcon size={18} />}
                     title="Belum ada penanda bacaan"
-                    caption="Simpan posisi terakhirmu agar mudah melanjutkan bacaan nanti."
+                    caption="Penanda otomatis terisi saat kamu membaca di pembaca Al-Qur'an."
                   />
                 )}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="col-span-3 sm:col-span-1">
+                <div className="grid grid-cols-[1.5fr_1fr] gap-3">
+                  <div>
                     <label className={labelCls} htmlFor="bm-surah">
                       Surah
                     </label>
@@ -548,36 +723,34 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                       className={inputCls}
                     />
                   </div>
-                  <div className="flex items-end">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const s = bmSurah ? parseInt(bmSurah, 10) : NaN;
-                        const a = bmAyah ? parseInt(bmAyah, 10) : NaN;
-                        if (Number.isNaN(s)) {
-                          toast.error("Pilih surah terlebih dahulu");
-                          return;
-                        }
-                        const meta = getSurah(s);
-                        if (Number.isNaN(a) || a < 1) {
-                          toast.error("Masukkan nomor ayat yang valid");
-                          return;
-                        }
-                        if (meta && a > meta.verses) {
-                          toast.error(`${meta.latin} hanya memiliki ${meta.verses} ayat`);
-                          return;
-                        }
-                        saveBookmark({ surah: s, ayah: a, savedAt: new Date().toISOString() });
-                        toast.success(`Penanda disimpan: ${meta?.latin} ayat ${a}`);
-                        setBmSurah("");
-                        setBmAyah("");
-                      }}
-                      className="tap flex min-h-[42px] w-full items-center justify-center gap-1.5 rounded-xl border border-tz-violet/45 bg-gradient-to-br from-tz-violet/22 to-tz-purple/12 text-sm font-semibold text-tz-accent transition-all hover:from-tz-violet/32"
-                    >
-                      <Check size={16} /> Simpan
-                    </button>
-                  </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const s = bmSurah ? parseInt(bmSurah, 10) : NaN;
+                    const a = bmAyah ? parseInt(bmAyah, 10) : NaN;
+                    if (Number.isNaN(s)) {
+                      toast.error("Pilih surah terlebih dahulu");
+                      return;
+                    }
+                    const meta = getSurah(s);
+                    if (Number.isNaN(a) || a < 1) {
+                      toast.error("Masukkan nomor ayat yang valid");
+                      return;
+                    }
+                    if (meta && a > meta.verses) {
+                      toast.error(`${meta.latin} hanya memiliki ${meta.verses} ayat`);
+                      return;
+                    }
+                    saveBookmark({ surah: s, ayah: a, savedAt: new Date().toISOString() });
+                    toast.success(`Penanda disimpan: ${meta?.latin} ayat ${a}`);
+                    setBmSurah("");
+                    setBmAyah("");
+                  }}
+                  className="tap flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl border border-tz-violet/45 bg-tz-violet/15 text-sm font-semibold text-tz-accent transition-all hover:bg-tz-violet/25"
+                >
+                  <BookmarkIcon size={15} /> Simpan Penanda
+                </button>
               </div>
             </div>
           ) : null}
@@ -591,7 +764,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
           <EmptyState
             icon={<History size={18} />}
             title="Riwayat masih kosong"
-            caption="Setiap bacaan yang kamu catat akan muncul di sini."
+            caption="Bacaan tercatat otomatis dari pembaca, atau catat manual lewat form di atas."
           />
         ) : (
           <GlassCard className="thin-scrollbar max-h-96 overflow-y-auto">
@@ -600,8 +773,8 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                 const s = e.surah ? getSurah(e.surah) : undefined;
                 return (
                   <li key={e.id} className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-tz-panel-soft">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-tz-violet/22 bg-gradient-to-br from-tz-violet/18 to-tz-purple/10 text-tz-violet">
-                      <BookOpen size={16} />
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-tz-violet/25 bg-tz-violet/12 text-tz-violet">
+                      {e.auto ? <Flame size={15} /> : <BookOpen size={16} />}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[13px] font-medium text-tz-ink/90">
@@ -610,7 +783,14 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                         {e.verses > 0 ? `${e.verses.toLocaleString("id-ID")} ayat` : ""}
                         {s ? ` — ${s.latin}${e.ayahFrom ? ` : ${e.ayahFrom}-${e.ayahTo ?? e.ayahFrom}` : ""}` : ""}
                       </p>
-                      <p className="text-[11px] text-tz-muted">{relativeDayLabel(e.date, today)}</p>
+                      <p className="flex items-center gap-1.5 text-[11px] text-tz-muted">
+                        {relativeDayLabel(e.date, today)}
+                        {e.auto ? (
+                          <span className="inline-flex items-center rounded-full border border-tz-violet/30 bg-tz-violet/10 px-1.5 py-px text-[8.5px] font-bold uppercase tracking-wide text-tz-accent">
+                            Otomatis
+                          </span>
+                        ) : null}
+                      </p>
                     </div>
                     <button
                       type="button"
@@ -635,8 +815,9 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
       <div className="pb-1">
         <p className="flex items-start gap-1.5 rounded-xl border border-tz-line bg-tz-panel-soft px-3 py-2 text-[11px] leading-relaxed text-tz-muted">
           <Info size={13} className="mt-0.5 shrink-0" />
-          Teks ayat &amp; terjemahan diambil dari AlQuran Cloud API (edisi Uthmani &amp; Kemenag). Surah yang pernah dibuka
-          tersimpan di perangkat agar tetap bisa dibaca saat offline.
+          Teks ayat &amp; terjemahan diambil dari AlQuran Cloud API (edisi Uthmani &amp; Kemenag). Bacaan di pembaca tercatat
+          otomatis dari ayat awal sampai ayat akhir, dan surah yang pernah dibuka tersimpan di perangkat agar tetap bisa
+          dibaca saat offline.
         </p>
         <div className="mt-3 text-center">
           <Chip>{readingHistory.length.toLocaleString("id-ID")} total catatan bacaan</Chip>

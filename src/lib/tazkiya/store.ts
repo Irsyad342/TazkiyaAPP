@@ -32,7 +32,7 @@ interface WorshipActions {
   toggleExtra: (date: string, id: ExtraId) => void;
   addQuranProgress: (
     date: string,
-    data: { pages: number; verses: number; surah?: number; ayahFrom?: number; ayahTo?: number; markBookmark?: boolean }
+    data: { pages: number; verses: number; surah?: number; ayahFrom?: number; ayahTo?: number; markBookmark?: boolean; auto?: boolean }
   ) => void;
   deleteReadingEntry: (id: string) => void;
   saveBookmark: (b: QuranBookmark) => void;
@@ -148,6 +148,7 @@ export const useWorshipStore = create<WorshipStore>()(
             ayahFrom: data.ayahFrom,
             ayahTo: data.ayahTo,
             savedAt: new Date().toISOString(),
+            auto: data.auto,
           };
           const bookmarks = data.markBookmark && data.surah
             ? [

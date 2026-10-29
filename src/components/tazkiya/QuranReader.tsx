@@ -3,7 +3,8 @@
 /**
  * Tazkiya — Pembaca Al-Qur'an (overlay layar penuh).
  * Teks Uthmani + terjemahan Kemenag, penanda per-ayat, pengaturan tampilan,
- * dan pencatatan progres manual. Ringan: tanpa audio/murottal.
+ * dan pencatatan progres OTOMATIS (ayat awal → ayat akhir yang terbaca).
+ * Ringan: tanpa audio/murottal.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -13,7 +14,6 @@ import {
   Minus,
   Plus,
   RotateCcw,
-  Save,
   Settings2,
   TriangleAlert,
   Type,
@@ -54,18 +54,29 @@ export function QuranReader({
   const [offline, setOffline] = useState(false);
   const [currentAyah, setCurrentAyah] = useState(startAyah ?? 1);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [catatOpen, setCatatOpen] = useState(false);
-  const [catatPages, setCatatPages] = useState(1);
-  const [catatAyat, setCatatAyat] = useState(1);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const ayahRefs = useRef(new Map<number, HTMLDivElement>());
   const lastReadRef = useRef(1);
   const lastSavedRef = useRef<{ surah: number; ayah: number } | null>(null);
 
+  // ---- Sesi bacaan otomatis: ayat awal → ayat akhir yang benar-benar terbaca ----
+  const sessionStart = Math.max(1, startAyah ?? 1);
+  const sessionStartAt = useRef(Date.now());
+  const minSeenRef = useRef(sessionStart);
+  const maxSeenRef = useRef(sessionStart);
+  const recordedRef = useRef(false);
+  const dataRef = useRef<SurahData | null>(null);
+
   useEffect(() => {
     lastReadRef.current = currentAyah;
+    minSeenRef.current = Math.min(minSeenRef.current, currentAyah);
+    maxSeenRef.current = Math.max(maxSeenRef.current, currentAyah);
   }, [currentAyah]);
+
+  useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
 
   const bookmarkSet = useMemo(() => {
     const s = new Set<number>();
@@ -122,12 +133,54 @@ export function QuranReader({
     setLastRead(surah, ayah);
   }, [surah, setLastRead]);
 
-  // Rekam posisi terakhir berkala + saat komponen ditutup.
+  /**
+   * Tutup sesi: simpan posisi terakhir, pindahkan penanda otomatis, dan
+   * catat rentang bacaan (ayat awal → akhir) ke tracker bila sesi bermakna
+   * (dibaca ≥15 dtk atau pengguna menggulir melewati posisi awal).
+   * Aman dipanggil dua kali — hanya sesi pertama yang direkam.
+   */
+  const finishSession = useCallback(() => {
+    if (recordedRef.current) return;
+    if (Date.now() - sessionStartAt.current < 1200) return; // buka-tutup kilat — abaikan
+    const d = dataRef.current;
+    if (!d) return; // teks tak termuat (error/offline) — jangan mengarang progres
+    recordedRef.current = true;
+    commitLastRead();
+    const from = Math.max(1, Math.min(sessionStart, minSeenRef.current));
+    const to = Math.max(maxSeenRef.current, lastReadRef.current);
+    const meaningful = to > from || minSeenRef.current < sessionStart || Date.now() - sessionStartAt.current >= 15000;
+    if (!meaningful) return;
+    const verses = Math.max(1, to - from + 1);
+    const pageFrom = d.ayahs[from - 1]?.page ?? 0;
+    const pageTo = d.ayahs[to - 1]?.page ?? pageFrom;
+    const pages = Math.max(0, pageTo - pageFrom + 1);
+    // Penanda otomatis mengikuti posisi terakhir yang terbaca.
+    saveBookmark({ surah, ayah: to, savedAt: new Date().toISOString() });
+    addQuranProgress(todayKey(), {
+      pages,
+      verses,
+      surah,
+      ayahFrom: from,
+      ayahTo: to,
+      markBookmark: false, // penanda sudah diatur di atas
+      auto: true,
+    });
+    toast.success(
+      `Tercatat otomatis: ${meta?.latin ?? "Surah"} ${from}${to > from ? `–${to}` : ""} · ${verses} ayat${pages > 1 ? ` · ${pages} halaman` : ""}`
+    );
+  }, [surah, sessionStart, commitLastRead, saveBookmark, addQuranProgress, meta?.latin]);
+
+  const finishSessionRef = useRef(finishSession);
+  useEffect(() => {
+    finishSessionRef.current = finishSession;
+  }, [finishSession]);
+
+  // Rekam posisi terakhir berkala; saat pembaca ditutup, sesi ditutup otomatis.
   useEffect(() => {
     const interval = setInterval(commitLastRead, 2500);
     return () => {
       clearInterval(interval);
-      commitLastRead();
+      finishSessionRef.current();
     };
   }, [commitLastRead]);
 
@@ -152,7 +205,6 @@ export function QuranReader({
     return () => observer.disconnect();
   }, [data]);
 
-  const relativePage = data ? Math.max(1, (data.ayahs[currentAyah - 1]?.page ?? 1) - (data.ayahs[0]?.page ?? 1) + 1) : 1;
   const lhIdx = Math.max(0, LINE_HEIGHTS.indexOf(settings.readerLineHeight));
 
   return (
@@ -175,7 +227,7 @@ export function QuranReader({
           <button
             type="button"
             onClick={() => {
-              commitLastRead();
+              finishSession();
               onClose();
             }}
             aria-label="Kembali ke daftar surah"
@@ -214,28 +266,6 @@ export function QuranReader({
             )}
           >
             <Settings2 size={17} />
-          </button>
-        </div>
-
-        <div className="mt-2.5 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              if (!catatOpen) {
-                setCatatPages(relativePage);
-                setCatatAyat(currentAyah);
-              }
-              setCatatOpen((v) => !v);
-            }}
-            aria-expanded={catatOpen}
-            className={cn(
-              "tap flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl border text-[12px] font-semibold transition-colors",
-              catatOpen
-                ? "border-tz-violet/60 bg-tz-violet/20 text-tz-accent"
-                : "border-tz-violet/45 bg-gradient-to-r from-tz-purple/30 to-tz-violet/25 text-tz-accent"
-            )}
-          >
-            <Save size={14} /> {catatOpen ? "Tutup pencatatan" : "Catat bacaan"}
           </button>
         </div>
 
@@ -321,62 +351,9 @@ export function QuranReader({
               </button>
             </div>
             <p className="text-[10.5px] leading-relaxed text-tz-muted">
-              Semua pengaturan tersimpan otomatis di perangkat Anda.
+              Bacaan dicatat otomatis saat pembaca ditutup — dari ayat awal sampai ayat terakhir yang kamu baca — lalu
+              penanda ikut berpindah. Semua pengaturan juga tersimpan otomatis di perangkat Anda.
             </p>
-          </div>
-        ) : null}
-
-        {catatOpen ? (
-          <div className="mt-2.5 space-y-2.5 rounded-2xl border border-tz-line bg-tz-panel-soft p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-tz-muted">Catat progres bacaan hari ini</p>
-            <div className="grid grid-cols-2 gap-2.5">
-              <label className="block">
-                <span className="mb-1 block text-[10.5px] text-tz-muted">Halaman mushaf</span>
-                <input
-                  type="number"
-                  min={1}
-                  inputMode="numeric"
-                  value={catatPages}
-                  onChange={(e) => setCatatPages(Number(e.target.value))}
-                  className="w-full rounded-lg border border-tz-line bg-tz-panel px-2.5 py-2 text-sm text-tz-ink outline-none focus:border-tz-violet/60"
-                />
-              </label>
-              <label className="block">
-                <span className="mb-1 block text-[10.5px] text-tz-muted">Ayat (sampai ayat {currentAyah})</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={meta?.verses ?? undefined}
-                  inputMode="numeric"
-                  value={catatAyat}
-                  onChange={(e) => setCatatAyat(Number(e.target.value))}
-                  className="w-full rounded-lg border border-tz-line bg-tz-panel px-2.5 py-2 text-sm text-tz-ink outline-none focus:border-tz-violet/60"
-                />
-              </label>
-            </div>
-            <p className="text-[10.5px] leading-relaxed text-tz-muted">
-              Membuka surah tidak otomatis dihitung sebagai bacaan — tekan tombol di bawah untuk mencatatnya ke tracker &amp; statistik.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                const pages = Math.max(0, Math.floor(catatPages) || 0);
-                const ayat = Math.max(1, Math.floor(catatAyat) || 1);
-                addQuranProgress(todayKey(), {
-                  pages,
-                  verses: ayat,
-                  surah,
-                  ayahFrom: 1,
-                  ayahTo: Math.min(ayat, meta?.verses ?? ayat),
-                  markBookmark: true,
-                });
-                toast.success(`Progres disimpan: ${pages} halaman · ${ayat} ayat`);
-                setCatatOpen(false);
-              }}
-              className="tap flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl border border-tz-violet/50 bg-gradient-to-r from-tz-purple to-tz-violet text-sm font-semibold text-white"
-            >
-              <Save size={15} /> Simpan ke tracker ibadah
-            </button>
           </div>
         ) : null}
       </header>

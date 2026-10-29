@@ -184,6 +184,8 @@ export interface ReadingEntry {
   ayahFrom?: number;
   ayahTo?: number;
   savedAt: string; // ISO
+  /** true = direkam otomatis oleh pembaca (dari ayat awal sampai ayat akhir yang terbaca). */
+  auto?: boolean;
 }
 
 export interface ReminderTime {
