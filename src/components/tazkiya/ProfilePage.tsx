@@ -3,15 +3,17 @@
 /**
  * Tazkiya — Halaman Profil & Pengaturan.
  * Nama, foto, Target Ibadah (halaman khusus), pengingat, lokasi otomatis (GPS),
- * tema & Liquid Glass, preferensi, dan riwayat salat 7 hari.
+ * tema & Liquid Glass, akun (login/keluar), dan riwayat aktivitas dinamis.
  *
  * CATATAN KETERBATASAN (jujur kepada pengguna):
  * - Pengingat & jadwal salat: waktu hanya TERSIMPAN sebagai preferensi lokal;
  *   notifikasi sistem belum aktif pada versi prototipe ini.
- * - Semua data disimpan di localStorage perangkat (tanpa backend/akun).
+ * - Tanpa login: data tersimpan di localStorage perangkat. Setelah masuk akun,
+ *   data tersinkron ke cloud milik akun sendiri (dilindungi RLS Supabase).
  */
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import {
   BadgeCheck,
   Bell,
@@ -21,11 +23,15 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
+  CloudOff,
+  CloudUpload,
   Droplets,
   Flame,
   Info,
   LoaderCircle,
   LocateFixed,
+  LogIn,
+  LogOut,
   MapPin,
   Pencil,
   Sparkles,
@@ -34,7 +40,19 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useWorshipStore } from "@/lib/tazkiya/store";
+import { useAuthStore } from "@/lib/auth/auth-store";
 import {
   PRAYERS,
   SALAT_JUMAT,
@@ -48,9 +66,9 @@ import {
 import { buildGeo, getPosition, reverseGeocode, watchDevicePosition } from "@/lib/tazkiya/geo";
 import { computePrayerTimes, PRAYER_METHOD_OPTIONS } from "@/lib/tazkiya/prayerTimes";
 import { convertImageToWebp, formatBytes } from "@/lib/tazkiya/image";
-import { computeStreak, summarizeRange } from "@/lib/tazkiya/stats";
-import { formatGregorian, isFriday, lastNDays, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
-import { Chip, GlassCard, GlowOrb, IconBox, SectionHeader } from "./ui-bits";
+import { computeStreak, summarizeRange, recordedDateList, reviewActivityDays } from "@/lib/tazkiya/stats";
+import { formatGregorian, isFriday, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
+import { Chip, EmptyState, GlassCard, GlowOrb, IconBox, SectionHeader } from "./ui-bits";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { cn } from "@/lib/utils";
 
@@ -79,6 +97,11 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
   const updateSettings = useWorshipStore((s) => s.updateSettings);
   const tasbihSetTarget = useWorshipStore((s) => s.tasbihSetTarget);
   const tasbih = useWorshipStore((s) => s.tasbih);
+  const authStatus = useAuthStore((s) => s.status);
+  const authUser = useAuthStore((s) => s.user);
+  const syncPhase = useAuthStore((s) => s.syncPhase);
+  const syncError = useAuthStore((s) => s.syncError);
+  const signOut = useAuthStore((s) => s.signOut);
 
   const fileRef = useRef<HTMLInputElement>(null);
   const [editingName, setEditingName] = useState(false);
@@ -103,7 +126,21 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
     : null;
   const autoMethod = PRAYER_METHOD_OPTIONS.find((m) => m.id === (settings.prayerMethod ?? "kemenag"));
   const allTime = summarizeRange(logs, Object.keys(logs), settings.trackedExtras);
-  const historyDays = lastNDays(7, today).slice().reverse(); // terbaru dulu
+  /** Riwayat dinamis: hanya tanggal ber-catatan (tumbuh 1..7), lalu jendela 7 hari berjalan. */
+  const recorded = recordedDateList(logs, prayerDetails);
+  const historyDays = reviewActivityDays(recorded, today);
+
+  /** Label status sinkronisasi akun untuk kartu Akun. */
+  const syncStatusLabel =
+    syncPhase === "active"
+      ? "Tersinkron otomatis"
+      : syncPhase === "resolving"
+        ? "Menyiapkan sinkronisasi…"
+        : syncPhase === "awaiting-decision"
+          ? "Menunggu keputusan data"
+          : syncPhase === "error"
+            ? (syncError ?? "Gangguan sinkronisasi")
+            : "Siap";
 
   /** Konversi otomatis ke WebP kecil sebelum disimpan (hemat penyimpanan & egress bila kelak diunggah). */
   const onAvatarChange = async (file: File | undefined) => {
@@ -326,6 +363,118 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
         </div>
       </section>
 
+      {/* ---------- Akun: masuk / keluar / status sinkronisasi ---------- */}
+      <section aria-label="Akun">
+        <SectionHeader title="Akun" caption="Sinkronkan data ibadah di semua perangkat" />
+        <GlassCard className="p-4">
+          {authStatus === "loading" ? (
+            <div className="flex items-center gap-3" aria-busy="true">
+              <IconBox tone="ghost" size="sm">
+                <LoaderCircle size={16} className="animate-spin" />
+              </IconBox>
+              <p className="text-[12.5px] text-tz-muted">Memeriksa sesi akun…</p>
+            </div>
+          ) : authStatus === "unconfigured" ? (
+            <div className="flex items-start gap-3">
+              <IconBox tone="ghost" size="sm">
+                <CloudOff />
+              </IconBox>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-tz-ink">Fitur akun belum diaktifkan</p>
+                <p className="mt-0.5 text-[11px] leading-relaxed text-tz-muted">
+                  Deployment ini belum mengatur konfigurasi Supabase. Data tetap tersimpan aman di perangkat ini.
+                </p>
+              </div>
+            </div>
+          ) : authStatus === "signedIn" && authUser ? (
+            <>
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.8rem] border border-tz-violet/25 bg-gradient-to-br from-tz-violet/25 to-tz-purple/15 font-display text-[15px] font-bold text-tz-accent">
+                  {authUser.name.trim().charAt(0).toUpperCase() || "T"}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-tz-ink">{authUser.name}</p>
+                  <p className="truncate text-[11px] text-tz-muted">{authUser.email}</p>
+                </div>
+                <Chip className="shrink-0 border-tz-violet/30 bg-tz-violet/10">{syncStatusLabel}</Chip>
+              </div>
+              {syncPhase === "error" ? (
+                <p className="mt-3 flex items-start gap-1.5 rounded-xl border border-amber-300/25 bg-amber-400/10 px-3 py-2 text-[11px] leading-relaxed text-amber-700 light:border-amber-300/60 light:bg-amber-50 light:text-amber-800">
+                  <Info size={13} className="mt-0.5 shrink-0" />
+                  {syncError ?? "Gangguan sinkronisasi — data tetap tersimpan di perangkat dan akan dicoba ulang."}
+                </p>
+              ) : null}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button
+                    type="button"
+                    className="tap mt-3.5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border border-rose-400/35 bg-rose-400/10 text-sm font-semibold text-rose-500 transition-colors hover:bg-rose-400/16 light:text-rose-600"
+                  >
+                    <LogOut size={15} />
+                    Keluar dari akun
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Keluar dari akun?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Data ibadahmu tetap tersimpan aman di akun dan bisa diakses kembali setelah masuk lagi. Catatan
+                      baru yang kamu buat saat keluar nanti akan digabungkan otomatis ke akun.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => {
+                        void signOut();
+                        toast.info("Kamu telah keluar — data akunmu tersimpan aman.");
+                      }}
+                    >
+                      Ya, keluar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
+          ) : (
+            <>
+              <div className="flex items-start gap-3">
+                <IconBox tone="violet" size="sm">
+                  <CloudUpload />
+                </IconBox>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-tz-ink">Simpan data ibadahmu ke akun</p>
+                  <p className="mt-0.5 text-[11px] leading-relaxed text-tz-muted">
+                    Masuk atau buat akun agar catatan tersimpan aman di cloud milikmu sendiri dan bisa dibuka dari
+                    perangkat lain.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-3.5 grid grid-cols-2 gap-2">
+                <Link
+                  href="/auth"
+                  className="tap flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-tz-violet to-tz-purple text-[13px] font-bold text-white shadow-[0_10px_26px_-12px_rgba(117,70,200,0.95)] transition-all hover:brightness-110"
+                >
+                  <LogIn size={15} />
+                  Masuk
+                </Link>
+                <Link
+                  href="/auth?mode=register"
+                  className="tap flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-tz-violet/40 bg-tz-violet/10 text-[13px] font-semibold text-tz-accent transition-colors hover:bg-tz-violet/18"
+                >
+                  <CloudUpload size={15} />
+                  Buat akun
+                </Link>
+              </div>
+              <p className="mt-3 text-[10.5px] leading-relaxed text-tz-muted/80">
+                Punya catatan lama di perangkat ini? Setelah masuk, kamu akan ditawari memindahkannya ke akun — tidak ada
+                data yang hilang.
+              </p>
+            </>
+          )}
+        </GlassCard>
+      </section>
+
       {/* ---------- Target Ibadah (halaman khusus) ---------- */}
       <section aria-label="Target ibadah">
         <SectionHeader title="Target Ibadah" caption="Salat, bacaan Al-Qur'an, zikir, dan ibadah tambahan" />
@@ -357,11 +506,27 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
         </button>
       </section>
 
-      {/* ---------- Riwayat aktivitas 7 hari terakhir ---------- */}
-      <section aria-label="Riwayat aktivitas 7 hari terakhir">
-        <SectionHeader title="Riwayat Aktivitas 7 Hari Terakhir" caption="Ringkasan per hari — ketuk untuk detail dan ubah" />
+      {/* ---------- Riwayat aktivitas dinamis (tumbuh 1..7 hari, lalu jendela berjalan) ---------- */}
+      <section aria-label="Riwayat aktivitas">
+        <SectionHeader
+          title="Riwayat Aktivitas"
+          caption={
+            recorded.length > 0
+              ? `${recorded.length} hari aktif tercatat · ketuk untuk detail dan ubah`
+              : "Berkembang otomatis dari catatan ibadahmu"
+          }
+        />
         <GlassCard className="space-y-1 p-3">
-          {historyDays.map((day) => {
+          {historyDays.length === 0 ? (
+            <div className="p-1.5">
+              <EmptyState
+                icon={<CalendarDays size={20} />}
+                title="Mulai perjalanan ibadahmu hari ini"
+                caption="Riwayat akan terisi setelah kamu mencatat salat, Al-Qur'an, atau zikir pertamamu. Tanggal sebelum catatan pertama tidak dihitung sebagai hari gagal."
+              />
+            </div>
+          ) : (
+            historyDays.map((day) => {
             const expanded = expandedDay === day;
             const dayLog = logs[day];
             const doneN = PRAYERS.filter((p) => selectPrayerDetail(prayerDetails, logs, day, p.id).status === "done").length;
@@ -458,7 +623,8 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
                 ) : null}
               </div>
             );
-          })}
+            })
+          )}
         </GlassCard>
       </section>
 

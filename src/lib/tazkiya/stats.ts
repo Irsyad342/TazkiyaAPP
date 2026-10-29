@@ -18,7 +18,7 @@ import {
   type ReadingEntry,
   type ReminderTime,
 } from "./types";
-import { addDays, keyToDate, mondayOf, todayKey, weekdayShort } from "./dates";
+import { addDays, keyToDate, lastNDays, mondayOf, todayKey, weekdayShort } from "./dates";
 
 /** Total aktivitas untuk daftar extras yang dilacak (5 salat + extras terpilih). */
 export function totalActivities(trackedExtras: ExtraId[] = EXTRA_IDS): number {
@@ -341,4 +341,48 @@ export function prayerConsistency(args: {
     pct: totals.opportunities > 0 ? Math.round((totals.done / totals.opportunities) * 100) : 0,
     reasons,
   };
+}
+
+/* ---------- Riwayat aktivitas Profil (dinamis, berbasis catatan nyata) ----------
+ * - Hari aktif = tanggal unik yang benar-benar memiliki catatan valid.
+ * - Hari tanpa catatan TIDAK dianggap gagal — hanya "belum ada catatan".
+ * - Sebelum catatan pertama: tampilan kosong yang ramah (tanpa data fiktif).
+ * - Setelah itu daftar bertumbuh 1..7 tanggal; mencapai 7 → jendela tujuh
+ *   hari berjalan yang konsisten (berakhir hari ini).
+ */
+
+/** Apakah satu tanggal memiliki catatan valid (bukan entri kosong)? */
+export function hasAnyDayRecord(
+  logs: Record<string, DailyLog> | undefined,
+  prayerDetails: Record<string, Partial<Record<PrayerId, PrayerDetail>>> | undefined,
+  date: string
+): boolean {
+  const d = prayerDetails?.[date];
+  if (d && Object.keys(d).length > 0) return true;
+  const l = logs?.[date];
+  if (!l) return false;
+  if (PRAYER_IDS.some((p) => l.prayers?.[p])) return true;
+  if (EXTRA_IDS.some((e) => l.extras?.[e])) return true;
+  if ((l.quranPages ?? 0) > 0 || (l.quranVerses ?? 0) > 0 || (l.zikirCount ?? 0) > 0) return true;
+  return false;
+}
+
+/** Semua tanggal dengan catatan valid, urut lama → baru. */
+export function recordedDateList(
+  logs: Record<string, DailyLog>,
+  prayerDetails: Record<string, Partial<Record<PrayerId, PrayerDetail>>>
+): string[] {
+  const dates = new Set<string>([...Object.keys(logs ?? {}), ...Object.keys(prayerDetails ?? {})]);
+  return [...dates].filter((d) => hasAnyDayRecord(logs, prayerDetails, d)).sort();
+}
+
+/**
+ * Hari-hari yang ditampilkan pada Riwayat Aktivitas Profil (urut terbaru dulu):
+ * 0 catatan → kosong; 1..7 catatan → tanggal nyata (bertumbuh); >7 → jendela
+ * tujuh hari berjalan (hari tanpa catatan tampil netral, bukan gagal).
+ */
+export function reviewActivityDays(recorded: string[], today: string): string[] {
+  if (recorded.length === 0) return [];
+  if (recorded.length <= 7) return [...recorded].sort().reverse();
+  return lastNDays(7, today).slice().reverse();
 }

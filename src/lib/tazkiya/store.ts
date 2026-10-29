@@ -23,6 +23,7 @@ import {
   type Settings,
   type TasbihState,
 } from "./types";
+import type { CloudDoc } from "@/lib/sync/doc";
 
 interface WorshipActions {
   /** Pencatatan salat lengkap: status + jenis pelaksanaan / alasan. */
@@ -50,6 +51,10 @@ interface WorshipActions {
   commitZikirToDay: (date: string) => number;
   clearReadingHistory: () => void;
   resetAll: () => void;
+  /** Ganti seluruh data dengan dokumen akun (dipakai sinkronisasi cloud). */
+  importCloudData: (doc: CloudDoc) => void;
+  /** Kosongkan data ibadah (logout) — pengaturan perangkat tetap dipertahankan. */
+  clearWorshipData: () => void;
 }
 
 export type WorshipStore = {
@@ -255,6 +260,48 @@ export const useWorshipStore = create<WorshipStore>()(
           readingHistory: [],
           tasbih: { count: 0, target: 100, dhikr: DEFAULT_ZIKIR_DHIKR },
           fridayZuhurAlt: {},
+        })),
+
+      /**
+       * Terapkan dokumen akun (hasil hidrasi/penggabungan) ke store.
+       * Pengaturan disaring dengan aturan yang sama seperti hidrasi persist
+       * agar data lama dari cloud tetap aman.
+       */
+      importCloudData: (doc) =>
+        set(() => {
+          const base = createDefaultSettings();
+          const settings = { ...base, ...(doc.settings ?? {}) };
+          settings.trackedExtras = sanitizeTrackedExtras(settings.trackedExtras);
+          settings.prayerTimesAuto = true;
+          if (settings.geo) settings.geo = { ...settings.geo, auto: true };
+          return {
+            settings,
+            logs: doc.logs ?? {},
+            prayerDetails: doc.prayerDetails ?? {},
+            fridayZuhurAlt: doc.fridayZuhurAlt ?? {},
+            bookmarks: doc.bookmarks ?? [],
+            ayahBookmarks: doc.ayahBookmarks ?? [],
+            lastRead: doc.lastRead ?? null,
+            readingHistory: doc.readingHistory ?? [],
+            tasbih: doc.tasbih ?? { count: 0, target: 100, dhikr: DEFAULT_ZIKIR_DHIKR },
+          };
+        }),
+
+      /**
+       * Logout: data ibadah dikosongkan di perangkat (salinannya aman di akun
+       * dan di cadangan pra-login) — pengaturan (tema, nama, foto, GPS, target)
+       * TETAP dipertahankan agar pengalaman perangkat tidak berubah.
+       */
+      clearWorshipData: () =>
+        set((s) => ({
+          logs: {},
+          prayerDetails: {},
+          fridayZuhurAlt: {},
+          bookmarks: [],
+          ayahBookmarks: [],
+          lastRead: null,
+          readingHistory: [],
+          tasbih: { ...s.tasbih, count: 0 },
         })),
     }),
     {

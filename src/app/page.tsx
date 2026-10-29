@@ -13,6 +13,7 @@ import { LoaderCircle } from "lucide-react";
 import { Toaster } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { BottomNav, type TabId } from "@/components/tazkiya/BottomNav";
+import { AuthGate } from "@/components/tazkiya/AuthGate";
 import { HomePage } from "@/components/tazkiya/HomePage";
 import { QuranPage } from "@/components/tazkiya/QuranPage";
 import { ProfilePage } from "@/components/tazkiya/ProfilePage";
@@ -250,6 +251,9 @@ export default function Page() {
         <AnimatePresence>{tasbihOpen && <TasbihSheet open={tasbihOpen} onClose={() => setTasbihOpen(false)} />}</AnimatePresence>
 
         <AnimatePresence>{targetOpen && <TargetSheet onClose={() => setTargetOpen(false)} />}</AnimatePresence>
+
+        {/* Gerbang akun: inisialisasi sesi + dialog keputusan data (migrasi/gabung). */}
+        <AuthGate />
 
         <BottomNav active={tab} onChange={setTab} />
       </div>
