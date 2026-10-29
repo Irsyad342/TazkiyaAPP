@@ -12,9 +12,18 @@
  * "belum dikonfigurasi" secara jujur.
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "./public-config";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+/**
+ * Prioritas sumber konfigurasi:
+ *   1. Environment variable saat build (Vercel env vars) — standar.
+ *   2. Konstanta publik yang di-commit (public-config.ts) — diisi otomatis
+ *      oleh scripts/activate-supabase.ts bila env var tidak tersedia.
+ */
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || PUBLIC_SUPABASE_URL;
+const SUPABASE_ANON_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() || PUBLIC_SUPABASE_ANON_KEY;
 
 /** URL valid https (atau localhost untuk pengembangan lokal/self-host). */
 function urlLooksValid(raw?: string): boolean {
