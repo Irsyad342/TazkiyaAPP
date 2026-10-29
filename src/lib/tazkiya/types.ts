@@ -202,7 +202,8 @@ export interface Settings {
   avatarDataUrl?: string;
   /** Metode sudut perhitungan jadwal salat otomatis (GPS) — bawaan Kemenag RI. */
   prayerMethod?: PrayerCalcMethod;
-  /** Jadwal salat otomatis dari koordinat GPS (butuh settings.geo). */
+  /** Jadwal salat otomatis dari koordinat GPS (butuh settings.geo).
+   * Lokasi kini otomatis penuh — flag dipaksa aktif saat hidrasi untuk data lama. */
   prayerTimesAuto?: boolean;
   quranTargetType: QuranTargetType;
   quranDailyTarget: number;
@@ -210,8 +211,11 @@ export interface Settings {
   zikirTarget: number;
   /** Aktivitas tambahan yang dilacak (memengaruhi tampilan Beranda & skor). */
   trackedExtras: ExtraId[];
+  /** Warisan mode lokasi manual (input kota sudah dihapus dari UI).
+   *  Kolom dipertahankan agar data lama tetap terbaca; tidak dipakai lagi. */
   city: string;
-  /** Lokasi perangkat (opsional — terisi setelah pengguna mengaktifkannya). */
+  /** Lokasi perangkat (GPS) — terisi setelah izin lokasi diberikan; pembaruan
+   *  otomatis selalu aktif (lokasi otomatis penuh). */
   geo?: DeviceGeo;
   remindersEnabled: boolean;
   reminderTimes: Record<PrayerId, ReminderTime>;
@@ -276,7 +280,8 @@ export function createDefaultSettings(): Settings {
     trackedExtras: ["duha", "tahajud", "puasa", "sedekah"],
     city: "Jakarta",
     prayerMethod: "kemenag",
-    prayerTimesAuto: false,
+    // Lokasi otomatis penuh: jadwal GPS selalu aktif (aktif nyata saat koordinat tersedia).
+    prayerTimesAuto: true,
     remindersEnabled: false,
     reminderTimes: {
       subuh: { enabled: true, time: "04:30" },

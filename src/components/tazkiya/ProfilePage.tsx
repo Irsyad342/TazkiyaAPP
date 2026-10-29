@@ -2,7 +2,7 @@
 
 /**
  * Tazkiya — Halaman Profil & Pengaturan.
- * Nama, foto, Target Ibadah (halaman khusus), pengingat, lokasi,
+ * Nama, foto, Target Ibadah (halaman khusus), pengingat, lokasi otomatis (GPS),
  * tema & Liquid Glass, preferensi, dan riwayat salat 7 hari.
  *
  * CATATAN KETERBATASAN (jujur kepada pengguna):
@@ -13,6 +13,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  BadgeCheck,
   Bell,
   CalendarClock,
   CalendarDays,
@@ -44,8 +45,8 @@ import {
   type PrayerMeta,
   type ThemeMode,
 } from "@/lib/tazkiya/types";
-import { buildGeo, geoStatusText, getPosition, reverseGeocode, watchDevicePosition } from "@/lib/tazkiya/geo";
-import { computePrayerTimes, PRAYER_METHOD_OPTIONS, resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
+import { buildGeo, getPosition, reverseGeocode, watchDevicePosition } from "@/lib/tazkiya/geo";
+import { computePrayerTimes, PRAYER_METHOD_OPTIONS } from "@/lib/tazkiya/prayerTimes";
 import { convertImageToWebp, formatBytes } from "@/lib/tazkiya/image";
 import { computeStreak, summarizeRange } from "@/lib/tazkiya/stats";
 import { formatGregorian, isFriday, lastNDays, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
@@ -53,14 +54,21 @@ import { Chip, GlassCard, GlowOrb, IconBox, SectionHeader } from "./ui-bits";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { cn } from "@/lib/utils";
 
-const inputCls = "tz-field";
-const labelCls = "mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-tz-muted/90";
-
 const THEME_OPTIONS: { id: ThemeMode; label: string; hint: string; bg: string; dot: string }[] = [
   { id: "dark", label: "Gelap", hint: "Ungu malam", bg: "linear-gradient(140deg,#211735,#171321)", dot: "#9C72EF" },
   { id: "light", label: "Terang", hint: "Lavender bersih", bg: "linear-gradient(140deg,#ffffff,#f5f1f5)", dot: "#7546C8" },
   { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#211735 50%,#f5f1f5 50%)", dot: "#B693FF" },
 ];
+
+/** Lencana "Otomatis" — menandai fitur lokasi yang selalu aktif tanpa saklar. */
+function AutoBadge() {
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-tz-violet/35 bg-tz-violet/12 px-2.5 py-1 text-[10px] font-bold text-tz-accent">
+      <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-tz-violet" />
+      Otomatis
+    </span>
+  );
+}
 
 export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
   const settings = useWorshipStore((s) => s.settings);
@@ -75,24 +83,24 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState(settings.name);
-  const [cityDraft, setCityDraft] = useState(settings.city);
   const [geoBusy, setGeoBusy] = useState(false);
   const [expandedDay, setExpandedDay] = useState<string | null>(null);
   const [editingPrayer, setEditingPrayer] = useState<{ date: string; meta: PrayerMeta } | null>(null);
 
   const today = todayKey();
   const streak = computeStreak(logs, today);
+  /** Lokasi aktif = izin pernah diberikan & koordinat tersimpan. */
+  const geoActive = !!settings.geo;
 
-  /** Waktu salat otomatis hari ini (bila fitur aktif) — murni dihitung dari koordinat GPS. */
-  const autoTimes =
-    settings.prayerTimesAuto && settings.geo
-      ? computePrayerTimes(
-          settings.geo.lat,
-          settings.geo.lng,
-          new Date(`${today}T12:00:00`),
-          settings.prayerMethod ?? "kemenag"
-        )
-      : null;
+  /** Waktu salat otomatis hari ini — murni dihitung dari koordinat GPS perangkat. */
+  const autoTimes = settings.geo
+    ? computePrayerTimes(
+        settings.geo.lat,
+        settings.geo.lng,
+        new Date(`${today}T12:00:00`),
+        settings.prayerMethod ?? "kemenag"
+      )
+    : null;
   const autoMethod = PRAYER_METHOD_OPTIONS.find((m) => m.id === (settings.prayerMethod ?? "kemenag"));
   const allTime = summarizeRange(logs, Object.keys(logs), settings.trackedExtras);
   const historyDays = lastNDays(7, today).slice().reverse(); // terbaru dulu
@@ -121,12 +129,12 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
     return PRAYERS.find((p) => p.id === id) ?? PRAYERS[0];
   };
 
-  /* ---------- Lokasi perangkat (GPS) ---------- */
+  /* ---------- Lokasi perangkat (GPS — otomatis penuh, tanpa mode manual) ---------- */
 
-  /** Simpan posisi valid; nama kota via reverse geocoding bila perlu. */
-  const saveGeoPosition = async (pos: GeolocationPosition, auto: boolean) => {
+  /** Simpan posisi valid (pembaruan otomatis selalu aktif); nama kota via reverse geocoding bila perlu. */
+  const saveGeoPosition = async (pos: GeolocationPosition) => {
     const prev = useWorshipStore.getState().settings.geo;
-    const next = buildGeo(prev ? { ...prev, auto } : { auto, lat: 0, lng: 0, updatedAt: "" }, pos);
+    const next = buildGeo(prev ? { ...prev, auto: true } : { auto: true, lat: 0, lng: 0, updatedAt: "" }, pos);
     if (!next.label) {
       const label = await reverseGeocode(next.lat, next.lng);
       next.label = label ?? prev?.label;
@@ -135,6 +143,7 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
     return next;
   };
 
+  /** Satu tombol untuk semuanya: minta izin (bila pertama kali) & simpan posisi terkini. */
   const useCurrentLocation = async () => {
     if (geoBusy) return;
     setGeoBusy(true);
@@ -144,67 +153,29 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
       setGeoBusy(false);
       return;
     }
-    const next = await saveGeoPosition(res.pos, settings.geo?.auto ?? false);
-    toast.success(next.label ? `Lokasi diperbarui: ${next.label}` : "Lokasi perangkat diperbarui");
-    setGeoBusy(false);
-  };
-
-  const toggleGeoAuto = async (v: boolean) => {
-    if (geoBusy) return;
-    if (v) {
-      setGeoBusy(true);
-      const res = await getPosition();
-      setGeoBusy(false);
-      if (res.failure) {
-        toast.error(res.failure.message);
-        return; // jangan aktifkan tanpa posisi valid — tidak ada koordinat palsu
-      }
-      const next = await saveGeoPosition(res.pos, true);
-      toast.success(next.label ? `Lokasi otomatis aktif — ${next.label}` : "Pembaruan lokasi otomatis aktif");
-    } else {
-      updateSettings({ geo: settings.geo ? { ...settings.geo, auto: false } : undefined });
-      toast.info("Pembaruan lokasi otomatis dimatikan");
-    }
-  };
-
-  /** Aktifkan jadwal otomatis: pastikan koordinat tersedia dulu (minta izin bila perlu). */
-  const toggleAutoSchedule = async (v: boolean) => {
-    if (geoBusy) return;
-    if (!v) {
-      updateSettings({ prayerTimesAuto: false });
-      toast.info("Jadwal salat otomatis dimatikan — kembali ke jadwal manual");
-      return;
-    }
-    if (settings.geo) {
-      updateSettings({ prayerTimesAuto: true });
-      toast.success("Jadwal salat otomatis aktif — dihitung dari koordinat perangkat");
-      return;
-    }
-    // Belum ada koordinat: minta posisi sekali (izin diminta karena aksi pengguna).
-    setGeoBusy(true);
-    const res = await getPosition();
-    if (res.failure) {
-      setGeoBusy(false);
-      toast.error(`${res.failure.message} Aktifkan lokasi di atas lalu coba lagi.`);
-      return; // jangan aktifkan tanpa koordinat — tidak ada waktu palsu
-    }
-    const next = await saveGeoPosition(res.pos, useWorshipStore.getState().settings.geo?.auto ?? false);
-    updateSettings({ prayerTimesAuto: true });
-    setGeoBusy(false);
+    const firstTime = !useWorshipStore.getState().settings.geo;
+    const next = await saveGeoPosition(res.pos);
     toast.success(
-      next.label ? `Jadwal otomatis aktif — ${next.label}` : "Jadwal salat otomatis aktif"
+      next.label
+        ? firstTime
+          ? `Lokasi otomatis aktif — ${next.label}`
+          : `Lokasi diperbarui: ${next.label}`
+        : firstTime
+          ? "Lokasi otomatis aktif"
+          : "Lokasi perangkat diperbarui"
     );
+    setGeoBusy(false);
   };
 
-  /** Pemantauan posisi hanya saat fitur aktif + halaman terlihat (hemat baterai). */
+  /** Pembaruan posisi otomatis saat berpindah: berjalan selama halaman ini terlihat (hemat baterai). */
   useEffect(() => {
-    if (!settings.geo?.auto) return;
+    if (!geoActive) return; // belum ada izin/posisi — tunggu tombol lokasi ditekan
     let stopWatch: (() => void) | null = null;
     const start = () => {
       if (stopWatch) return;
       stopWatch = watchDevicePosition(
         (pos) => {
-          void saveGeoPosition(pos, true);
+          void saveGeoPosition(pos);
         },
         () => {
           /* kegagalan berulang tidak di-spam sebagai toast; status terakhir tetap ditampilkan */
@@ -222,36 +193,53 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
       stop();
       document.removeEventListener("visibilitychange", onVis);
     };
-  }, [settings.geo?.auto]);
+  }, [geoActive]);
 
   return (
     <div className="space-y-6">
-      {/* ---------- Kartu profil ---------- */}
-      <GlassCard variant="hero" className="animate-tz-fade-up tz-shimmer p-5">
-        <span className="tz-shimmer-bar" aria-hidden />
-        <GlowOrb className="-right-10 -top-14 h-40 w-40 bg-tz-lavender/25" />
-        <GlowOrb className="-bottom-14 -left-8 h-36 w-36 bg-tz-orb-deep/70" />
-        <div className="relative flex items-center gap-4">
-          <div className="relative">
-            <div className="absolute -inset-1.5 rounded-full bg-gradient-to-br from-tz-lavender/60 to-tz-purple/60 blur-[7px]" aria-hidden />
-            {settings.avatarDataUrl ? (
-              <img
-                src={settings.avatarDataUrl}
-                alt={`Foto profil ${settings.name}`}
-                className="relative h-[68px] w-[68px] rounded-full border-2 border-tz-line-strong object-cover"
-              />
-            ) : (
-              <div className="relative flex h-[68px] w-[68px] items-center justify-center rounded-full border-2 border-tz-line-strong bg-gradient-to-br from-tz-purple to-tz-violet font-display text-2xl font-bold text-white">
-                {settings.name.trim().charAt(0).toUpperCase() || "T"}
-              </div>
-            )}
+      {/* ---------- Kartu profil: glassmorphism di atas foto (ala referensi 2025) ---------- */}
+      <section
+        aria-label="Kartu profil"
+        className="animate-tz-fade-up relative overflow-hidden rounded-[1.75rem] border border-tz-line-strong shadow-[0_26px_54px_-26px_rgba(10,6,20,0.55)]"
+      >
+        {/* Latar: foto pengguna diperbesar & diburamkan — dasar efek kaca */}
+        {settings.avatarDataUrl ? (
+          <img
+            src={settings.avatarDataUrl}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full scale-[1.18] object-cover blur-[14px]"
+          />
+        ) : (
+          <div aria-hidden className="absolute inset-0 bg-[radial-gradient(120%_110%_at_18%_0%,#55339a_0%,#33205f_46%,#171321_100%)]" />
+        )}
+        {/* Selimut ungu agar teks putih selalu terbaca di atas foto apa pun */}
+        <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-[#171321]/50 via-[#33205f]/40 to-[#171321]/90" />
+
+        <div className="relative flex min-h-[282px] flex-col p-4">
+          {/* Baris atas: avatar + tombol ganti foto bergaya kaca */}
+          <div className="flex items-start justify-between">
+            <div className="relative">
+              <div aria-hidden className="absolute -inset-1 rounded-full bg-gradient-to-br from-tz-lavender/70 to-tz-purple/70 blur-[6px]" />
+              {settings.avatarDataUrl ? (
+                <img
+                  src={settings.avatarDataUrl}
+                  alt={`Foto profil ${settings.name}`}
+                  className="relative h-[72px] w-[72px] rounded-full border-2 border-white/60 object-cover shadow-lg"
+                />
+              ) : (
+                <div className="relative flex h-[72px] w-[72px] items-center justify-center rounded-full border-2 border-white/60 bg-gradient-to-br from-tz-violet to-tz-purple font-display text-2xl font-bold text-white">
+                  {settings.name.trim().charAt(0).toUpperCase() || "T"}
+                </div>
+              )}
+            </div>
             <button
               type="button"
               aria-label="Ubah foto profil"
               onClick={() => fileRef.current?.click()}
-              className="tap absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-tz-line-strong bg-tz-deep text-tz-lavender shadow-[0_0_14px_-2px_rgba(156,114,239,0.8)]"
+              className="tap flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/12 text-white backdrop-blur-md transition-colors hover:bg-white/20"
             >
-              <Camera size={13} />
+              <Camera size={16} />
             </button>
             <input
               ref={fileRef}
@@ -262,7 +250,11 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
               aria-hidden
             />
           </div>
-          <div className="min-w-0 flex-1">
+
+          <div aria-hidden className="flex-1" />
+
+          {/* Panel kaca melayang: identitas + statistik (ala kartu referensi) */}
+          <div className="rounded-2xl border border-white/20 bg-white/10 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-xl">
             {editingName ? (
               <div className="flex items-center gap-2">
                 <input
@@ -270,7 +262,8 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
                   onChange={(e) => setNameDraft(e.target.value)}
                   maxLength={40}
                   aria-label="Nama pengguna"
-                  className={inputCls}
+                  placeholder="Nama pengguna"
+                  className="min-h-0 w-full rounded-xl border border-white/30 bg-white/10 px-3 py-2 text-[15px] font-semibold text-white outline-none backdrop-blur-md placeholder:font-normal placeholder:text-white/45 focus:border-white/55"
                   autoFocus
                 />
                 <button
@@ -292,8 +285,9 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <p className="truncate font-display text-[21px] font-bold text-tz-ink light:text-white">{settings.name}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="truncate font-display text-[19px] font-bold text-white drop-shadow-sm">{settings.name}</p>
+                <BadgeCheck size={16} className="shrink-0 text-[#D8C5FF]" aria-label="Anggota Tazkiya" />
                 <button
                   type="button"
                   aria-label="Edit nama"
@@ -301,26 +295,36 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
                     setNameDraft(settings.name);
                     setEditingName(true);
                   }}
-                  className="tap flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-tz-line bg-tz-panel-strong text-tz-accent transition-all hover:bg-tz-track"
+                  className="tap ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/12 text-white backdrop-blur-md transition-colors hover:bg-white/20"
                 >
-                  <Pencil size={13} />
+                  <Pencil size={12} />
                 </button>
               </div>
             )}
-            <p className="mt-0.5 text-xs text-white/85">Anggota sejak {formatGregorian(new Date(settings.createdAt))}</p>
-            <div className="mt-2.5 flex flex-wrap gap-1.5">
-              <Chip className="border-tz-line-strong bg-tz-panel-strong text-tz-ink">
-                <Flame size={12} className="text-amber-400 light:text-amber-500" />
-                {streak} hari streak
-              </Chip>
-              <Chip className="border-tz-line-strong bg-tz-panel-strong text-tz-ink">
-                <Sparkles size={12} className="text-tz-accent" />
-                {allTime.totalDone.toLocaleString("id-ID")} ibadah tercatat
-              </Chip>
+            <p className="mt-0.5 text-[11.5px] text-white/80">Anggota sejak {formatGregorian(new Date(settings.createdAt))}</p>
+
+            {/* Dua angka besar berdampingan — mengikuti kartu referensi */}
+            <div className="mt-3.5 grid grid-cols-2 divide-x divide-white/15">
+              <div className="pr-3">
+                <p className="font-display text-[22px] font-extrabold leading-none text-white">{streak}</p>
+                <p className="mt-1.5 flex items-center gap-1 text-[10.5px] font-medium text-white/75">
+                  <Flame size={11} className="text-amber-300" aria-hidden />
+                  hari streak
+                </p>
+              </div>
+              <div className="pl-3.5">
+                <p className="font-display text-[22px] font-extrabold leading-none text-white">
+                  {allTime.totalDone.toLocaleString("id-ID")}
+                </p>
+                <p className="mt-1.5 flex items-center gap-1 text-[10.5px] font-medium text-white/75">
+                  <Sparkles size={11} className="text-[#D8C5FF]" aria-hidden />
+                  ibadah tercatat
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </GlassCard>
+      </section>
 
       {/* ---------- Target Ibadah (halaman khusus) ---------- */}
       <section aria-label="Target ibadah">
@@ -485,7 +489,7 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
             {autoTimes ? (
               <p className="flex items-start gap-1.5 rounded-xl border border-tz-violet/25 bg-tz-violet/[0.07] px-3 py-2 text-[11px] leading-relaxed text-tz-accent">
                 <CalendarClock size={13} className="mt-0.5 shrink-0" />
-                Waktu di bawah otomatis dari GPS ({autoMethod?.label}) — pengingat mengikuti jadwal daerahmu. Atur ulang di "Pengaturan Lokasi".
+                Waktu di bawah otomatis dari GPS ({autoMethod?.label}) — pengingat mengikuti jadwal daerahmu.
               </p>
             ) : null}
             {PRAYERS.map((p) => {
@@ -533,47 +537,36 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
         </GlassCard>
       </section>
 
-      {/* ---------- Lokasi ---------- */}
+      {/* ---------- Lokasi (otomatis penuh — tanpa input kota manual) ---------- */}
       <section aria-label="Pengaturan lokasi">
-        <SectionHeader title="Pengaturan Lokasi" caption="Lokasi perangkat & preferensi jadwal salat" />
+        <SectionHeader title="Pengaturan Lokasi" caption="Otomatis dari GPS — jadwal salat ikut menyesuaikan saat berpindah" />
         <GlassCard className="space-y-3 p-4">
-          <div className="flex items-end gap-2">
-            <div className="flex-1">
-              <label className={labelCls} htmlFor="kota">
-                Kota / wilayah (manual)
-              </label>
-              <input id="kota" value={cityDraft} onChange={(e) => setCityDraft(e.target.value)} placeholder="mis. Bandung" className={inputCls} />
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                const c = cityDraft.trim();
-                if (!c) {
-                  toast.error("Nama kota tidak boleh kosong");
-                  return;
-                }
-                updateSettings({ city: c });
-                toast.success(`Lokasi manual disimpan: ${c}`);
-              }}
-              className="tap flex min-h-[42px] items-center gap-1.5 rounded-xl bg-gradient-to-r from-tz-purple to-tz-violet px-4 text-sm font-semibold text-white shadow-[0_6px_18px_-6px_rgba(85,51,154,0.9),inset_0_1px_0_rgba(255,255,255,0.22)]"
-            >
-              <MapPin size={15} /> Simpan
-            </button>
-          </div>
-
-          {/* GPS perangkat */}
+          {/* Status lokasi otomatis */}
           <div className="flex items-center justify-between gap-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 py-3">
             <div className="flex min-w-0 items-center gap-3">
               <IconBox tone="violet" size="sm">
                 <LocateFixed />
               </IconBox>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-tz-ink">Perbarui otomatis saat berpindah</p>
-                <p className="text-[11px] leading-snug text-tz-muted">Hanya saat aplikasi terlihat — berhenti sendiri agar hemat baterai</p>
+                <p className="text-sm font-medium text-tz-ink">Lokasi otomatis (GPS)</p>
+                <p className="truncate text-[11px] leading-snug text-tz-muted">
+                  {settings.geo ? (settings.geo.label ?? "Koordinat perangkat") : "Belum aktif — butuh izin lokasi"}
+                </p>
               </div>
             </div>
-            <Switch checked={!!settings.geo?.auto} onCheckedChange={toggleGeoAuto} aria-label="Perbarui lokasi otomatis" disabled={geoBusy} />
+            <span
+              className={cn(
+                "shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-bold",
+                settings.geo
+                  ? "border-tz-violet/35 bg-tz-violet/12 text-tz-accent"
+                  : "border-tz-line bg-tz-panel-strong text-tz-muted"
+              )}
+            >
+              {settings.geo ? "Aktif" : "Nonaktif"}
+            </span>
           </div>
+
+          {/* Satu tombol: minta izin (pertama kali) / perbarui posisi sekarang */}
           <button
             type="button"
             onClick={useCurrentLocation}
@@ -581,40 +574,46 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
             className="tap flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border border-tz-violet/40 bg-tz-violet/10 text-sm font-semibold text-tz-accent transition-all hover:bg-tz-violet/18 disabled:opacity-50"
           >
             {geoBusy ? <LoaderCircle size={16} className="animate-spin" /> : <LocateFixed size={16} />}
-            {geoBusy ? "Mencari lokasi…" : "Gunakan Lokasi Saat Ini"}
+            {geoBusy ? "Mencari lokasi…" : settings.geo ? "Perbarui Lokasi Saat Ini" : "Aktifkan Lokasi Otomatis"}
           </button>
-          <div className="flex items-start gap-2 rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 py-2.5">
-            <MapPin size={14} className="mt-0.5 shrink-0 text-tz-violet" />
-            <div className="min-w-0">
-              <p className="truncate text-[12px] font-semibold text-tz-ink">{settings.geo?.label ?? "Belum ada lokasi perangkat"}</p>
-              <p className="text-[10.5px] text-tz-muted">{geoStatusText(settings.geo)}</p>
+
+          {/* Pembaruan saat berpindah — selalu otomatis, tanpa saklar */}
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 py-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <IconBox tone="violet" size="sm">
+                <MapPin />
+              </IconBox>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-tz-ink">Pembaruan saat berpindah</p>
+                <p className="text-[11px] leading-snug text-tz-muted">
+                  Posisi mengikuti kamu otomatis — hanya saat aplikasi terlihat, hemat baterai
+                </p>
+              </div>
             </div>
+            <AutoBadge />
           </div>
 
-          {/* ---------- Jadwal salat otomatis (GPS) ---------- */}
+          {/* Jadwal salat otomatis — selalu otomatis, tanpa saklar */}
           <div className="flex items-center justify-between gap-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 py-3">
             <div className="flex min-w-0 items-center gap-3">
               <IconBox tone="violet" size="sm">
                 <CalendarClock />
               </IconBox>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-tz-ink">Jadwal salat otomatis (GPS)</p>
-                <p className="text-[11px] leading-snug text-tz-muted">Waktu dihitung dari koordinat — sesuai daerahmu, ikut berubah saat berpindah</p>
+                <p className="text-sm font-medium text-tz-ink">Jadwal salat otomatis</p>
+                <p className="text-[11px] leading-snug text-tz-muted">
+                  Waktu dihitung dari koordinat GPS dan ikut berubah saat berpindah daerah
+                </p>
               </div>
             </div>
-            <Switch
-              checked={!!settings.prayerTimesAuto}
-              onCheckedChange={toggleAutoSchedule}
-              aria-label="Jadwal salat otomatis dari GPS"
-              disabled={geoBusy}
-            />
+            <AutoBadge />
           </div>
 
-          {settings.prayerTimesAuto && settings.geo && autoTimes ? (
+          {autoTimes ? (
             <div className="rounded-xl border border-tz-violet/25 bg-tz-violet/[0.06] p-3">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-tz-accent">Jadwal hari ini</p>
-                <p className="truncate text-[10.5px] text-tz-muted">{settings.geo.label ?? "Koordinat perangkat"}</p>
+                <p className="truncate text-[10.5px] text-tz-muted">{settings.geo?.label ?? "Koordinat perangkat"}</p>
               </div>
               <div className="mt-2 space-y-1.5">
                 {PRAYERS.map((p) => (
@@ -649,16 +648,17 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
                 </p>
               </div>
             </div>
-          ) : settings.prayerTimesAuto && !settings.geo ? (
-            <p className="rounded-xl border border-amber-300/25 bg-amber-400/10 px-3 py-2 text-[11px] text-amber-700 light:border-amber-300/60 light:bg-amber-50 light:text-amber-800">
-              Jadwal otomatis aktif tetapi belum ada koordinat — tekan "Gunakan Lokasi Saat Ini" di atas.
+          ) : (
+            <p className="rounded-xl border border-tz-violet/25 bg-tz-violet/[0.07] px-3 py-2 text-[11px] leading-relaxed text-tz-accent">
+              Aktifkan lokasi dengan tombol di atas — jadwal salat, pengingat, dan Beranda langsung menyesuaikan daerahmu.
             </p>
-          ) : null}
+          )}
 
           <p className="flex items-start gap-1.5 rounded-xl border border-amber-300/25 bg-amber-400/10 px-3 py-2 text-[11px] leading-relaxed text-amber-700 light:border-amber-300/60 light:bg-amber-50 light:text-amber-800">
             <Info size={13} className="mt-0.5 shrink-0" />
-            Izin lokasi hanya diminta saat Anda mengaktifkan fitur ini. Koordinat disimpan di perangkat dan hanya dipakai
-            untuk nama kota (reverse geocoding) dan perhitungan jadwal salat otomatis — tidak dikirim ke server Tazkiya.
+            Izin lokasi hanya diminta saat tombol lokasi pertama kali dipakai. Posisi diperbarui otomatis selama aplikasi
+            terlihat; koordinat disimpan di perangkat dan hanya dipakai untuk nama kota (reverse geocoding) serta
+            perhitungan jadwal salat — tidak dikirim ke server Tazkiya.
           </p>
         </GlassCard>
       </section>

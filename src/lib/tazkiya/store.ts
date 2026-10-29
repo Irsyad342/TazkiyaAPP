@@ -273,6 +273,11 @@ export const useWorshipStore = create<WorshipStore>()(
         // "Doa Harian" tidak lagi dilacak — bersihkan dari data lama tanpa
         // menghapus catatan aktivitas lainnya.
         settings.trackedExtras = sanitizeTrackedExtras(settings.trackedExtras);
+        // Lokasi kini otomatis penuh: input kota manual & kedua saklar sudah
+        // dihapus dari UI. Paksa flag otomatis aktif untuk data lama agar
+        // jadwal salat selalu menyesuaikan koordinat GPS.
+        settings.prayerTimesAuto = true;
+        if (settings.geo) settings.geo = { ...settings.geo, auto: true };
         const merged = { ...current, ...p, settings } as WorshipStore;
         // Migrasi sekali-jalan: browser yang pernah mengisi "data contoh"
         // dibersihkan dari seluruh data demo (fitur data demo sudah dihapus

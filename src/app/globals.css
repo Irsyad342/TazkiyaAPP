@@ -741,15 +741,18 @@ html[data-theme="light"] .tz-tasbih-disc {
 }
 
 /* ---------- Kartu "Taskello" Al-Qur'an ----------
-   Kartu mengikuti tema: gelap pada mode gelap, terang pada mode terang (efek
-   artwork & drift tetap jalan di kedua tema):
-   bingkai, artwork cahaya ungu-emas blur di bagian atas,
-   panel bertab (judul + subjudul) dengan takik cekung khas folder,
-   dan baris statistik angka-besar di dasar kartu. */
+   Glassmorphism: artwork cahaya ungu-emas memenuhi seluruh kartu, lalu
+   panel bertab (judul + subjudul) dan baris statistik membacanya lewat
+   kaca buram (backdrop-blur) — persis gaya kartu referensi. Kartu mengikuti
+   tema: gelap pada mode gelap, terang pada mode terang (efek artwork &
+   drift tetap jalan di kedua tema). */
 .tz-task-card {
   --task-bezel: #120d1b;
-  --task-panel: #251f31;
   --task-art-h: 132px;
+  /* Kaca panel: warna panel dibuat transparan agar artwork di belakangnya
+     terbacablur oleh backdrop-filter (inti efek glassmorphism) */
+  --task-glass: rgba(32, 26, 44, 0.52);
+  --task-glass-border: rgba(255, 255, 255, 0.14);
   /* Tinta kartu (default gelap) — ditimpa per tema agar teks ikut mode terang */
   --task-ink: #ffffff;
   --task-ink-70: rgba(255, 255, 255, 0.75);
@@ -770,11 +773,18 @@ html[data-theme="light"] .tz-tasbih-disc {
   position: relative;
   overflow: hidden;
   border-radius: 24px;
+  /* Latar artwork kini memenuhi seluruh kartu — panel kaca di bawah
+     membacanya lewat blur, bukan menutupinya dengan warna pekat */
+  background:
+    radial-gradient(120% 90% at 88% -10%, rgba(216, 197, 255, 0.2), rgba(216, 197, 255, 0) 55%),
+    radial-gradient(115% 82% at 8% 0%, rgba(85, 51, 154, 0.72), rgba(85, 51, 154, 0) 62%),
+    linear-gradient(168deg, #241645 0%, #170f2e 42%, #1a1230 100%);
 }
 /* ---- Varian mode terang: kartu ikut terang, efek artwork & drift tetap jalan ---- */
 html[data-theme="light"] .tz-task-card {
   --task-bezel: #fdfbff;
-  --task-panel: #f3ecfb;
+  --task-glass: rgba(250, 246, 255, 0.55);
+  --task-glass-border: rgba(117, 70, 200, 0.16);
   --task-ink: #33254d;
   --task-ink-70: rgba(51, 37, 77, 0.78);
   --task-ink-55: rgba(51, 37, 77, 0.62);
@@ -787,11 +797,11 @@ html[data-theme="light"] .tz-task-card {
     0 24px 48px -24px rgba(85, 51, 154, 0.3),
     inset 0 0 0 1px rgba(117, 70, 200, 0.12);
 }
-html[data-theme="light"] .tz-task-art {
+html[data-theme="light"] .tz-task-inner {
   background:
-    radial-gradient(120% 150% at 88% -10%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 55%),
-    radial-gradient(130% 135% at 8% 115%, rgba(156, 114, 239, 0.4), rgba(156, 114, 239, 0) 62%),
-    linear-gradient(118deg, #eee2fd 0%, #faf6ff 48%, #e4d6f9 100%);
+    radial-gradient(120% 90% at 88% -10%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 55%),
+    radial-gradient(115% 82% at 8% 0%, rgba(156, 114, 239, 0.38), rgba(156, 114, 239, 0) 62%),
+    linear-gradient(168deg, #eee2fd 0%, #faf6ff 46%, #e9dbf8 100%);
 }
 html[data-theme="light"] .tz-task-blob-violet {
   background: radial-gradient(closest-side, rgba(156, 114, 239, 0.55), rgba(156, 114, 239, 0));
@@ -803,15 +813,13 @@ html[data-theme="light"] .tz-task-blob-hot {
   background: radial-gradient(closest-side, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
 }
 
-/* Artwork cahaya: ungu Tazkiya + aksen emas hangat (ganti oranye referensi) */
+/* Artwork cahaya: ungu Tazkiya + aksen emas hangat (ganti oranye referensi).
+   Kini selebar kartu (full-bleed) — blob di bagian atas akan terbaca buram
+   di balik panel kaca pada paruh bawah kartu. */
 .tz-task-art {
   position: absolute;
-  inset: 0 0 auto 0;
-  height: var(--task-art-h);
-  background:
-    radial-gradient(120% 150% at 88% -10%, rgba(216, 197, 255, 0.32), rgba(216, 197, 255, 0) 55%),
-    radial-gradient(130% 135% at 8% 115%, rgba(85, 51, 154, 0.85), rgba(85, 51, 154, 0) 62%),
-    linear-gradient(118deg, #241645 0%, #170f2e 48%, #33205f 100%);
+  inset: 0;
+  pointer-events: none;
 }
 .tz-task-art > .tz-task-blob {
   position: absolute;
@@ -821,25 +829,25 @@ html[data-theme="light"] .tz-task-blob-hot {
 }
 .tz-task-blob-violet {
   left: -12%;
-  top: -32%;
+  top: -28%;
   width: 55%;
-  height: 125%;
+  height: 54%;
   background: radial-gradient(closest-side, rgba(156, 114, 239, 0.95), rgba(156, 114, 239, 0));
   animation: tz-art-drift-a 13s ease-in-out infinite alternate;
 }
 .tz-task-blob-gold {
   right: -8%;
-  top: -38%;
+  top: -34%;
   width: 50%;
-  height: 120%;
+  height: 50%;
   background: radial-gradient(closest-side, rgba(240, 179, 94, 0.7), rgba(240, 179, 94, 0));
   animation: tz-art-drift-b 16s ease-in-out infinite alternate;
 }
 .tz-task-blob-hot {
   left: 36%;
-  top: -20%;
+  top: -18%;
   width: 32%;
-  height: 88%;
+  height: 38%;
   background: radial-gradient(closest-side, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0));
   animation: tz-art-drift-c 19s ease-in-out infinite alternate;
 }
@@ -879,12 +887,16 @@ html[data-theme="light"] .tz-task-blob-hot {
   }
 }
 
-/* Panel dengan tab berbentuk folder + takik cekung di kanan tab */
+/* Panel kaca dengan tab berbentuk folder + takik cekung di kanan tab.
+   Latar kaca transparan + backdrop-blur: artwork di baliknya terbaca buram
+   (glassmorphism khas kartu referensi). */
 .tz-task-panel {
   position: relative;
   z-index: 1;
   margin-top: var(--task-art-h);
-  background: var(--task-panel);
+  background: var(--task-glass);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
   border-radius: 0 0 24px 24px;
   padding: 9px 18px 20px;
 }
@@ -896,7 +908,9 @@ html[data-theme="light"] .tz-task-blob-hot {
   flex-direction: column;
   align-items: flex-start;
   max-width: 92%;
-  background: var(--task-panel);
+  background: var(--task-glass);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
   border-radius: 14px 22px 0 0;
   padding: 12px 18px 8px;
 }
@@ -907,7 +921,7 @@ html[data-theme="light"] .tz-task-blob-hot {
   bottom: 0;
   width: 14px;
   height: 14px;
-  background: radial-gradient(circle at 100% 0, rgba(0, 0, 0, 0) 14px, var(--task-panel) 14.5px);
+  background: radial-gradient(circle at 100% 0, rgba(0, 0, 0, 0) 14px, var(--task-glass) 14.5px);
 }
 
 /* Beam progres: versi gelap untuk kartu gelap (default), versi terang untuk tema terang */

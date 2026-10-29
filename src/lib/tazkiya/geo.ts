@@ -1,9 +1,10 @@
 /**
  * Tazkiya — Lokasi perangkat (Geolocation API).
- * Prinsip privasi & baterai:
- * - Izin HANYA diminta setelah pengguna mengaktifkan fitur ini.
- * - Pembaruan posisi hanya berjalan saat fitur aktif dan aplikasi terlihat;
- *   dihentikan saat fitur dimatikan / halaman ditutup / tab tersembunyi.
+ * Prinsip privasi & baterai (lokasi otomatis penuh):
+ * - Izin diminta saat fitur lokasi pertama kali dipakai (tombol
+ *   "Aktifkan Lokasi Otomatis" / "Perbarui Lokasi Saat Ini").
+ * - Pembaruan posisi berjalan otomatis selama halaman terkait terlihat;
+ *   dihentikan saat halaman ditutup / tab tersembunyi (hemat baterai).
  * - Koordinat disimpan lokal (localStorage), tidak dikirim ke server Tazkiya.
  *   Penamaan kota memakai layanan reverse geocoding publik (tanpa API key).
  * - Tidak pernah membuat koordinat acak: bila GPS gagal, posisi tidak diubah.
@@ -23,9 +24,9 @@ export interface GeoFailure {
 
 function failureOf(err: GeolocationPositionError): GeoFailure {
   if (err.code === err.PERMISSION_DENIED)
-    return { code: "denied", message: "Izin lokasi ditolak. Aktifkan izin lokasi di pengaturan browser, atau gunakan lokasi manual." };
+    return { code: "denied", message: "Izin lokasi ditolak. Aktifkan izin lokasi untuk aplikasi ini di pengaturan perangkat, lalu coba lagi." };
   if (err.code === err.POSITION_UNAVAILABLE)
-    return { code: "unavailable", message: "Posisi tidak tersedia saat ini. Coba lagi beberapa saat atau gunakan lokasi manual." };
+    return { code: "unavailable", message: "Posisi tidak tersedia saat ini. Coba lagi beberapa saat." };
   if (err.code === err.TIMEOUT)
     return { code: "timeout", message: "Waktu pencarian lokasi habis. Coba lagi di tempat yang lebih terbuka." };
   return { code: "unavailable", message: "Gagal mendapatkan lokasi." };
@@ -37,8 +38,8 @@ export function getPosition(timeoutMs = 15000): Promise<{ pos: GeolocationPositi
     if (!geoSupported()) {
       resolve({
         failure: window.isSecureContext
-          ? { code: "unsupported", message: "Perangkat ini tidak mendukung pencarian lokasi. Gunakan lokasi manual." }
-          : { code: "insecure", message: "Lokasi butuh koneksi aman (HTTPS). Gunakan lokasi manual untuk saat ini." },
+          ? { code: "unsupported", message: "Perangkat ini tidak mendukung pencarian lokasi." }
+          : { code: "insecure", message: "Lokasi butuh koneksi aman (HTTPS)." },
       });
       return;
     }
@@ -52,7 +53,7 @@ export function getPosition(timeoutMs = 15000): Promise<{ pos: GeolocationPositi
 
 /**
  * Mulai pemantauan posisi (watchPosition). Mengembalikan fungsi pembersih.
- * Hanya dipakai saat "perbarui otomatis" aktif dan halaman terlihat.
+ * Dipakai untuk pembaruan otomatis saat halaman terlihat.
  */
 export function watchDevicePosition(
   onValid: (pos: GeolocationPosition) => void,
@@ -61,8 +62,8 @@ export function watchDevicePosition(
   if (!geoSupported()) {
     onFailure(
       window.isSecureContext
-        ? { code: "unsupported", message: "Perangkat ini tidak mendukung pencarian lokasi. Gunakan lokasi manual." }
-        : { code: "insecure", message: "Lokasi butuh koneksi aman (HTTPS). Gunakan lokasi manual untuk saat ini." }
+        ? { code: "unsupported", message: "Perangkat ini tidak mendukung pencarian lokasi." }
+        : { code: "insecure", message: "Lokasi butuh koneksi aman (HTTPS)." }
     );
     return () => {};
   }
