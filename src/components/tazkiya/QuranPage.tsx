@@ -162,22 +162,22 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
         <GlowOrb className="tz-quran-orb -bottom-14 left-6 h-32 w-32 bg-tz-orb-deep/70" />
         <span className="tz-quran-seam" aria-hidden />
         <div className="relative flex items-center gap-4">
-          <div className="tz-quran-icon flex h-14 w-14 shrink-0 items-center justify-center rounded-[1.1rem] border border-tz-violet/40 bg-gradient-to-br from-tz-violet/35 to-tz-purple/15 text-tz-lavender">
+          <div className="tz-quran-icon flex h-14 w-14 shrink-0 items-center justify-center rounded-[1.1rem] border border-tz-violet/40 bg-gradient-to-br from-tz-violet/35 to-tz-purple/15 text-tz-lavender light:text-violet-100">
             <BookOpen size={26} />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-2">
-              <p className="flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-tz-lavender/90">
+              <p className="flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-tz-lavender/90 light:text-violet-100">
                 <BookOpen size={12} className="shrink-0" />
                 Target Bacaan Harian
               </p>
-              <span className="shrink-0 rounded-full border border-tz-lavender/30 bg-white/10 px-2 py-0.5 text-[10px] font-bold text-tz-lavender text-glow">
+              <span className="shrink-0 rounded-full border border-tz-lavender/30 bg-white/10 px-2 py-0.5 text-[10px] font-bold text-tz-lavender text-glow light:text-white">
                 {pct}%
               </span>
             </div>
             <p className="mt-1.5 font-display text-[30px] font-extrabold leading-none tracking-tight text-gradient-hero">
               {value.toLocaleString("id-ID")}
-              <span className="ml-1.5 text-xs font-semibold text-tz-lavender/85">
+              <span className="ml-1.5 text-xs font-semibold text-tz-lavender/85 light:text-violet-200">
                 {targetType === "surah" ? (
                   <>/ Surah {targetSurahMeta?.latin ?? "?"} · {targetValue} ayat</>
                 ) : (
@@ -200,7 +200,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
             <p className="mt-2 text-[11px] leading-relaxed text-white/75">
               {pct >= 100 ? "Target hari ini tercapai. Barakallah!" : `${Math.max(0, targetValue - value).toLocaleString("id-ID")} ${targetType === "surah" ? "ayat" : unit} lagi menuju target`}
             </p>
-            <p className="mt-1 flex items-center gap-1.5 truncate text-[11px] text-tz-lavender/85">
+            <p className="mt-1 flex items-center gap-1.5 truncate text-[11px] text-tz-lavender/85 light:text-violet-200">
               <BookmarkIcon size={12} className="shrink-0" />
               {lastPos
                 ? `Terakhir: ${getSurah(lastPos.surah)?.latin ?? `Surah ${lastPos.surah}`} · ayat ${lastPos.ayah}`

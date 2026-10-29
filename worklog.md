@@ -334,3 +334,24 @@ Yang dikerjakan:
 Catatan:
 - Data pengguna 100% localStorage perangkat masing-masing — deploy tidak menyentuh data.
 - Warna mandiri di kalender tetap sky (biru muda) sesuai interpretasi terverifikasi Task 16: "jangan biru" menunjuk kartu statistik (kini kuning). Bila pengguna ingin kalender juga tanpa biru, ubah STATUS_COLORS.mandiri + legenda (follow-up kecil).
+
+## Task 18 — Perbaikan warna mode terang + jadwal salat otomatis GPS (permintaan pengguna)
+Tanggal: 2026-10-29
+
+Task: (1) "perbaiki perpaduan warnanya di mode terang — warnanya nabrak/kurang enak dilihat" (bukti 3 screenshot: kartu hero Beranda/Target Bacaan/Profil), (2) "jadwal sholat menyesuaikan GPS real time / posisi pengguna agar sesuai jadwal daerah", (3) langsung deploy.
+
+Akar masalah warna: di tema terang `.glass-hero` tetap ungu (#8a5fd6→#4f2d97) tetapi `text-gradient-violet` diganti teks GELAP (#3a2a6b) + `text-tz-ink`/`text-tz-lavender` ikut gelap → teks gelap di atas ungu = nabrak.
+
+Perbaikan warna (teks terang di dalam kartu ungu):
+- globals.css: override ter-SCOPE `html[data-theme="light"] .glass-hero .text-gradient-violet` → gradient putih (pemakaian di luar hero, mis. judul "Statistik", tetap gelap).
+- HomePage hero: label + "%" + "aktivitas" + ikon chip → light:text-violet-100/200; ProgressBar dapat prop fillClass (ui-bits) → isi bar putih di terang.
+- QuranPage hero: ikon, label, badge %, satuan, baris terakhir baca → light:text-violet-100/200/white.
+- ProfilePage: nama pengguna → light:text-white. Mode gelap tak berubah (diverifikasi screenshot).
+
+Jadwal salat otomatis GPS (melengkapi janji "menyusul" di kartu Lokasi):
+- BARU src/lib/tazkiya/prayerTimes.ts: perhitungan astronomis lokal (posisi matahari, presisi ±1-2 mnt) — tanpa jaringan & tanpa dependensi baru; metode Kemenag RI (20°/18°, default), MWL, Mesir, ISNA, Ummul Qura (Isya=Magrib+90); ihtiyat +2 mnt; Asar Syafi'i; zona waktu perangkat; resolvePrayerSchedule() = GPS bila aktif, selain itu jadwal manual lama (bentuk data sama, drop-in).
+- types.ts: Settings += prayerTimesAuto?, prayerMethod? (field opsional — data lama aman; default Kemenag).
+- Integrasi: HomePage & StatsPage (prayerConsistency/slot berlalu) kini pakai jadwal efektif; ProfilePage: toggle "Jadwal salat otomatis (GPS)" (minta izin saat diaktifkan; gagal → toast, tidak mengarang koordinat), panel "Jadwal hari ini" (5 waktu + nama lokasi), pemilih metode 5 chip, input pengingat menampilkan waktu GPS (disabled) saat aktif, catatan "menyusul" diganti keterangan final.
+- Validasi algoritma: AlAdhan API 29-10-2026 — Jakarta/Aceh/London/Makkah: selisih 0-2 mnt (tepat = ihtiyat +2); Isya Makkah = Magrib+90 persis. scripts/test-prayer-times.ts.
+- Browser test: alur nyata headless menolak izin → graceful (benar); jalur koordinat tersimpan: jadwal tampil (21:09/04:38/07:53/10:48/11:59 UTC = WIB−7 persis), metode berganti dengan benar (MWL Isya 11:55), pengingat otomatis, mode terang 3 kartu rapi, mode gelap tak berubah, konsol 0 error.
+- eslint 0, tsc 0, build TZ_DIST_DIR=.next-prod sukses.

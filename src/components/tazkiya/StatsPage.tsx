@@ -40,6 +40,7 @@ import {
   type PrayerId,
 } from "@/lib/tazkiya/types";
 import { formatDayFull, isFriday, formatDayMonth, lastNDays, relativeDayLabel, todayKey, weekdayShort } from "@/lib/tazkiya/dates";
+import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { Chip, GlassCard, GlowOrb, IconBox, ProgressBar, SectionHeader } from "./ui-bits";
 import { AreaChartLite } from "./AreaChartLite";
 import { cn } from "@/lib/utils";
@@ -181,12 +182,14 @@ function DayDetailSheet({
 export function StatsPage() {
   const logs = useWorshipStore((s) => s.logs);
   const prayerDetails = useWorshipStore((s) => s.prayerDetails);
-  const reminderTimes = useWorshipStore((s) => s.settings.reminderTimes);
+  const settings = useWorshipStore((s) => s.settings);
   const tracked = useWorshipStore((s) => s.settings.trackedExtras);
   const resolved = useResolvedTheme();
   const isLight = resolved === "light";
 
   const today = todayKey();
+  // Jadwal efektif untuk logika slot yang sudah berlalu: GPS bila otomatis, selain itu manual.
+  const reminderTimes = resolvePrayerSchedule(settings, today);
   const [period, setPeriod] = useState<Period>("mingguan");
   const [monthOffset, setMonthOffset] = useState(0);
   const [patternDay, setPatternDay] = useState<string | null>(null);

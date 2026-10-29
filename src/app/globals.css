@@ -447,6 +447,14 @@ html[data-theme="light"] .text-gradient-violet {
   -webkit-background-clip: text;
   background-clip: text;
 }
+/* Di dalam kartu hero (latar ungu), teks gradient TETAP TERANG pada tema
+   terang — teks gelap di atas ungu tidak terbaca (umpan pengguna 29-10-2026).
+   Pemakaian di luar hero (mis. judul "Statistik") tetap versi gelap. */
+html[data-theme="light"] .glass-hero .text-gradient-violet {
+  background: linear-gradient(115deg, #ffffff 5%, #e4d6ff 48%, #b693ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
 html[data-theme="light"] .text-glow {
   text-shadow: 0 1px 8px rgba(255, 255, 255, 0.65);
 }

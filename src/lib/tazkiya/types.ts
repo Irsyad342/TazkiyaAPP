@@ -191,10 +191,17 @@ export interface ReminderTime {
   time: string; // HH:mm
 }
 
+/** Metode sudut perhitungan jadwal salat otomatis (didefinisikan di prayerTimes.ts). */
+export type PrayerCalcMethod = "kemenag" | "mwl" | "egypt" | "isna" | "makkah";
+
 export interface Settings {
   name: string;
   /** Foto profil — data URL WebP kecil (±256px, hasil konversi otomatis; JPEG bila browser tak mendukung enkode WebP). */
   avatarDataUrl?: string;
+  /** Metode sudut perhitungan jadwal salat otomatis (GPS) — bawaan Kemenag RI. */
+  prayerMethod?: PrayerCalcMethod;
+  /** Jadwal salat otomatis dari koordinat GPS (butuh settings.geo). */
+  prayerTimesAuto?: boolean;
   quranTargetType: QuranTargetType;
   quranDailyTarget: number;
   quranTargetSurah: number; // 1..114 — dipakai bila quranTargetType = "surah"
@@ -266,6 +273,8 @@ export function createDefaultSettings(): Settings {
     zikirTarget: 100,
     trackedExtras: ["duha", "tahajud", "puasa", "sedekah"],
     city: "Jakarta",
+    prayerMethod: "kemenag",
+    prayerTimesAuto: false,
     remindersEnabled: false,
     reminderTimes: {
       subuh: { enabled: true, time: "04:30" },

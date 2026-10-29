@@ -48,6 +48,7 @@ import {
 } from "@/lib/tazkiya/types";
 import { formatDayFull, formatGregorian, formatHijri, isFriday, lastNDays, todayKey } from "@/lib/tazkiya/dates";
 import { dayScore, prayerConsistency, surahProgressOnDate, totalActivities } from "@/lib/tazkiya/stats";
+import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { duaOfTheDay } from "@/lib/tazkiya/duas";
 import { getSurah } from "@/lib/tazkiya/quran";
 import { Chip, GlassCard, GlowOrb, IconBox, ProgressBar, ProgressRing, SectionHeader } from "./ui-bits";
@@ -249,7 +250,8 @@ export function HomePage({
     logs,
     dates: lastNDays(7, today),
     today,
-    reminderTimes: settings.reminderTimes,
+    // Jadwal efektif: hasil hitung GPS bila "jadwal otomatis" aktif, selain itu manual.
+    reminderTimes: resolvePrayerSchedule(settings, today),
   });
 
   const extrasList = EXTRAS.filter((e) => tracked.includes(e.id));
@@ -315,27 +317,27 @@ export function HomePage({
         <div aria-hidden className="absolute -right-8 top-1/2 h-40 w-40 -translate-y-1/2 rounded-full border border-white/10" />
         <div className="relative flex items-center justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <p className="flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-tz-lavender/90">
+            <p className="flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-tz-lavender/90 light:text-violet-100">
               <Sparkles size={12} className="shrink-0" />
               Progres Ibadah Hari Ini
             </p>
             <p className="mt-2 font-display text-[54px] font-extrabold leading-none tracking-tight text-gradient-violet">
               {score.pct}
-              <span className="ml-1 text-2xl font-semibold text-tz-lavender/85">%</span>
+              <span className="ml-1 text-2xl font-semibold text-tz-lavender/85 light:text-violet-200">%</span>
             </p>
             <p className="mt-2 text-xs leading-relaxed text-white/80">
               {score.done} dari {total} ibadah tercatat selesai
             </p>
             <div className="mt-4 max-w-[210px]">
-              <ProgressBar value={score.pct} className="h-[7px] bg-white/20" />
+              <ProgressBar value={score.pct} className="h-[7px] bg-white/20" fillClass="light:from-white light:via-violet-100 light:to-violet-300" />
             </div>
             <div className="mt-4 flex flex-wrap gap-1.5">
               <Chip className="border-white/25 bg-white/12 text-white">
-                <Sparkles size={12} className="text-tz-lavender" />
+                <Sparkles size={12} className="text-tz-lavender light:text-violet-100" />
                 {detailOf("subuh").status === "done" ? "Subuh selesai" : "Jaga Subuh-mu"}
               </Chip>
               <Chip className="border-white/25 bg-white/12 text-white">
-                <CircleDot size={12} className="text-tz-lavender" />
+                <CircleDot size={12} className="text-tz-lavender light:text-violet-100" />
                 Zikir {log.zikirCount.toLocaleString("id-ID")}
               </Chip>
             </div>
@@ -344,7 +346,7 @@ export function HomePage({
             <span className="font-display text-[22px] font-bold text-white">
               {score.done}/{total}
             </span>
-            <span className="mt-0.5 text-[10px] font-medium text-tz-lavender/90">aktivitas</span>
+            <span className="mt-0.5 text-[10px] font-medium text-tz-lavender/90 light:text-violet-200">aktivitas</span>
           </ProgressRing>
         </div>
       </GlassCard>

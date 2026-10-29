@@ -168,12 +168,12 @@ export function ProgressRing({
 
 /* ---------------- ProgressBar ---------------- */
 
-export function ProgressBar({ value, className }: { value: number; className?: string }) {
+export function ProgressBar({ value, className, fillClass }: { value: number; className?: string; fillClass?: string }) {
   const clamped = Math.max(0, Math.min(100, value));
   return (
     <div className={cn("h-2 w-full overflow-hidden rounded-full bg-tz-track", className)}>
       <div
-        className="h-full rounded-full bg-gradient-to-r from-tz-purple via-tz-violet to-tz-lavender"
+        className={cn("h-full rounded-full bg-gradient-to-r from-tz-purple via-tz-violet to-tz-lavender", fillClass)}
         style={{
           width: `${clamped}%`,
           transition: "width 0.6s cubic-bezier(0.22, 1, 0.36, 1)",

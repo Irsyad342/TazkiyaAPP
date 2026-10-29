@@ -14,6 +14,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Bell,
+  CalendarClock,
   CalendarDays,
   Camera,
   Check,
@@ -39,10 +40,12 @@ import {
   ZUHUR_ALTERNATIF,
   missReasonLabel,
   selectPrayerDetail,
+  type PrayerCalcMethod,
   type PrayerMeta,
   type ThemeMode,
 } from "@/lib/tazkiya/types";
 import { buildGeo, geoStatusText, getPosition, reverseGeocode, watchDevicePosition } from "@/lib/tazkiya/geo";
+import { computePrayerTimes, PRAYER_METHOD_OPTIONS, resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { convertImageToWebp, formatBytes } from "@/lib/tazkiya/image";
 import { computeStreak, summarizeRange } from "@/lib/tazkiya/stats";
 import { formatGregorian, isFriday, lastNDays, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
@@ -79,6 +82,18 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
 
   const today = todayKey();
   const streak = computeStreak(logs, today);
+
+  /** Waktu salat otomatis hari ini (bila fitur aktif) — murni dihitung dari koordinat GPS. */
+  const autoTimes =
+    settings.prayerTimesAuto && settings.geo
+      ? computePrayerTimes(
+          settings.geo.lat,
+          settings.geo.lng,
+          new Date(`${today}T12:00:00`),
+          settings.prayerMethod ?? "kemenag"
+        )
+      : null;
+  const autoMethod = PRAYER_METHOD_OPTIONS.find((m) => m.id === (settings.prayerMethod ?? "kemenag"));
   const allTime = summarizeRange(logs, Object.keys(logs), settings.trackedExtras);
   const historyDays = lastNDays(7, today).slice().reverse(); // terbaru dulu
 
@@ -150,6 +165,35 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
       updateSettings({ geo: settings.geo ? { ...settings.geo, auto: false } : undefined });
       toast.info("Pembaruan lokasi otomatis dimatikan");
     }
+  };
+
+  /** Aktifkan jadwal otomatis: pastikan koordinat tersedia dulu (minta izin bila perlu). */
+  const toggleAutoSchedule = async (v: boolean) => {
+    if (geoBusy) return;
+    if (!v) {
+      updateSettings({ prayerTimesAuto: false });
+      toast.info("Jadwal salat otomatis dimatikan — kembali ke jadwal manual");
+      return;
+    }
+    if (settings.geo) {
+      updateSettings({ prayerTimesAuto: true });
+      toast.success("Jadwal salat otomatis aktif — dihitung dari koordinat perangkat");
+      return;
+    }
+    // Belum ada koordinat: minta posisi sekali (izin diminta karena aksi pengguna).
+    setGeoBusy(true);
+    const res = await getPosition();
+    if (res.failure) {
+      setGeoBusy(false);
+      toast.error(`${res.failure.message} Aktifkan lokasi di atas lalu coba lagi.`);
+      return; // jangan aktifkan tanpa koordinat — tidak ada waktu palsu
+    }
+    const next = await saveGeoPosition(res.pos, useWorshipStore.getState().settings.geo?.auto ?? false);
+    updateSettings({ prayerTimesAuto: true });
+    setGeoBusy(false);
+    toast.success(
+      next.label ? `Jadwal otomatis aktif — ${next.label}` : "Jadwal salat otomatis aktif"
+    );
   };
 
   /** Pemantauan posisi hanya saat fitur aktif + halaman terlihat (hemat baterai). */
@@ -249,7 +293,7 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <p className="truncate font-display text-[21px] font-bold text-tz-ink">{settings.name}</p>
+                <p className="truncate font-display text-[21px] font-bold text-tz-ink light:text-white">{settings.name}</p>
                 <button
                   type="button"
                   aria-label="Edit nama"
@@ -438,6 +482,12 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
             />
           </div>
           <div className={cn("mt-4 space-y-2 transition-opacity", !settings.remindersEnabled && "pointer-events-none opacity-40")}>
+            {autoTimes ? (
+              <p className="flex items-start gap-1.5 rounded-xl border border-tz-violet/25 bg-tz-violet/[0.07] px-3 py-2 text-[11px] leading-relaxed text-tz-accent">
+                <CalendarClock size={13} className="mt-0.5 shrink-0" />
+                Waktu di bawah otomatis dari GPS ({autoMethod?.label}) — pengingat mengikuti jadwal daerahmu. Atur ulang di "Pengaturan Lokasi".
+              </p>
+            ) : null}
             {PRAYERS.map((p) => {
               const rt = settings.reminderTimes[p.id];
               return (
@@ -452,13 +502,14 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
                     <input
                       id={`waktu-${p.id}`}
                       type="time"
-                      value={rt.time}
+                      value={autoTimes ? autoTimes[p.id] : rt.time}
+                      disabled={!!autoTimes}
                       onChange={(e) =>
                         updateSettings({
                           reminderTimes: { ...settings.reminderTimes, [p.id]: { ...rt, time: e.target.value } },
                         })
                       }
-                      className="rounded-lg border border-tz-line bg-tz-panel-strong px-2.5 py-1.5 text-xs text-tz-ink outline-none transition-colors focus:border-tz-violet/60"
+                      className="rounded-lg border border-tz-line bg-tz-panel-strong px-2.5 py-1.5 text-xs text-tz-ink outline-none transition-colors focus:border-tz-violet/60 disabled:opacity-80"
                     />
                     <Switch
                       checked={rt.enabled}
@@ -539,11 +590,75 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
               <p className="text-[10.5px] text-tz-muted">{geoStatusText(settings.geo)}</p>
             </div>
           </div>
+
+          {/* ---------- Jadwal salat otomatis (GPS) ---------- */}
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 py-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <IconBox tone="violet" size="sm">
+                <CalendarClock />
+              </IconBox>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-tz-ink">Jadwal salat otomatis (GPS)</p>
+                <p className="text-[11px] leading-snug text-tz-muted">Waktu dihitung dari koordinat — sesuai daerahmu, ikut berubah saat berpindah</p>
+              </div>
+            </div>
+            <Switch
+              checked={!!settings.prayerTimesAuto}
+              onCheckedChange={toggleAutoSchedule}
+              aria-label="Jadwal salat otomatis dari GPS"
+              disabled={geoBusy}
+            />
+          </div>
+
+          {settings.prayerTimesAuto && settings.geo && autoTimes ? (
+            <div className="rounded-xl border border-tz-violet/25 bg-tz-violet/[0.06] p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-tz-accent">Jadwal hari ini</p>
+                <p className="truncate text-[10.5px] text-tz-muted">{settings.geo.label ?? "Koordinat perangkat"}</p>
+              </div>
+              <div className="mt-2 space-y-1.5">
+                {PRAYERS.map((p) => (
+                  <div key={p.id} className="flex items-center justify-between gap-2 text-[12.5px]">
+                    <span className="text-tz-muted">Salat {p.label}</span>
+                    <span className="font-semibold tabular-nums text-tz-ink">{autoTimes[p.id]}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-2.5">
+                <p className="text-[10.5px] font-semibold text-tz-muted">Metode perhitungan</p>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {PRAYER_METHOD_OPTIONS.map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      title={m.note}
+                      onClick={() => updateSettings({ prayerMethod: m.id as PrayerCalcMethod })}
+                      className={cn(
+                        "tap rounded-full border px-2.5 py-1 text-[10.5px] font-semibold transition-colors",
+                        (settings.prayerMethod ?? "kemenag") === m.id
+                          ? "border-tz-violet bg-tz-violet text-white"
+                          : "border-tz-line bg-tz-panel-strong text-tz-muted hover:text-tz-accent"
+                      )}
+                    >
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-1.5 text-[10px] leading-relaxed text-tz-muted/80">
+                  {autoMethod?.note} · zona waktu mengikuti perangkat · dihitung langsung di perangkat tanpa dikirim ke server.
+                </p>
+              </div>
+            </div>
+          ) : settings.prayerTimesAuto && !settings.geo ? (
+            <p className="rounded-xl border border-amber-300/25 bg-amber-400/10 px-3 py-2 text-[11px] text-amber-700 light:border-amber-300/60 light:bg-amber-50 light:text-amber-800">
+              Jadwal otomatis aktif tetapi belum ada koordinat — tekan "Gunakan Lokasi Saat Ini" di atas.
+            </p>
+          ) : null}
+
           <p className="flex items-start gap-1.5 rounded-xl border border-amber-300/25 bg-amber-400/10 px-3 py-2 text-[11px] leading-relaxed text-amber-700 light:border-amber-300/60 light:bg-amber-50 light:text-amber-800">
             <Info size={13} className="mt-0.5 shrink-0" />
             Izin lokasi hanya diminta saat Anda mengaktifkan fitur ini. Koordinat disimpan di perangkat dan hanya dipakai
-            untuk menampilkan nama kota (via layanan reverse geocoding) — tidak dikirim ke server Tazkiya. Perhitungan jadwal
-            salat otomatis berdasarkan koordinat menyusul pada versi berikutnya.
+            untuk nama kota (reverse geocoding) dan perhitungan jadwal salat otomatis — tidak dikirim ke server Tazkiya.
           </p>
         </GlassCard>
       </section>
