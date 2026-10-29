@@ -39,7 +39,7 @@ import {
   selectPrayerDetail,
   type PrayerId,
 } from "@/lib/tazkiya/types";
-import { formatDayFull, isFriday, formatDayMonth, lastNDays, relativeDayLabel, todayKey, weekdayShort } from "@/lib/tazkiya/dates";
+import { addDays, formatDayFull, isFriday, formatDayMonth, lastNDays, mondayOf, relativeDayLabel, todayKey, weekdayShort } from "@/lib/tazkiya/dates";
 import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { Chip, GlassCard, GlowOrb, IconBox, ProgressBar, SectionHeader } from "./ui-bits";
 import { AreaChartLite } from "./AreaChartLite";
@@ -207,11 +207,13 @@ export function StatsPage() {
   const keys = period === "mingguan" ? series.map((d) => d.date) : monthRange(today);
   const summary = summarizeRange(logs, keys, tracked);
 
-  /** Pola 7 hari terakhir (data asli; Jumat = 1 slot Zuhur). */
+  /** Pola minggu berjalan: Senin s.d. Minggu — terisi kiri→kanan mengikuti hari.
+   *  Hari yang belum datang tampil kosong (dim), bukan menggeser riwayat ke kiri. */
+  const monday = mondayOf(today);
   const pattern = prayerConsistency({
     prayerDetails,
     logs,
-    dates: lastNDays(7, today),
+    dates: [0, 1, 2, 3, 4, 5, 6].map((i) => addDays(monday, i)),
     today,
     reminderTimes,
   });
@@ -537,25 +539,31 @@ export function StatsPage() {
       </section>
 
       {/* ---------- Pola Ibadah 7 Hari ---------- */}
-      <section aria-label="Pola ibadah 7 hari">
-        <SectionHeader title="Pola Ibadah 7 Hari" caption="Salat terlaksana per hari — ketuk hari untuk rincian" />
+      <section aria-label="Pola ibadah minggu ini">
+        <SectionHeader title="Pola Ibadah Minggu Ini" caption="Senin sampai Minggu — terisi dari kiri mengikuti hari berjalan" />
         <GlassCard className="p-4">
           <GlowOrb className="-left-10 -bottom-12 h-32 w-32 bg-tz-violet/15" />
           <div className="relative flex h-36 items-end justify-between gap-1.5">
             {pattern.days.map((d) => {
               const isToday = d.date === today;
+              const isFuture = d.date > today;
               // Skala tetap 0–5 agar antarhari adil; kolom = slot yang sudah berlalu.
               const doneH = (d.done / 5) * 100;
               const missedH = (d.missed / 5) * 100;
               const unrecH = (d.unrecorded / 5) * 100;
               const totalH = doneH + missedH + unrecH;
+              const dayLabel = isToday ? "Hari Ini" : isFuture ? formatDayFull(d.date) : relativeDayLabel(d.date, today);
               return (
                 <button
                   key={d.date}
                   type="button"
                   onClick={() => setPatternDay(d.date)}
-                  aria-label={`Rincian ${relativeDayLabel(d.date, today)} — ${d.done} salat terlaksana, ${d.missed} tidak dilaksanakan, ${d.unrecorded} belum dicatat`}
-                  className="flex h-full flex-1 cursor-pointer flex-col items-center gap-1.5"
+                  aria-label={
+                    isFuture
+                      ? `Rincian ${dayLabel} — hari belum berjalan`
+                      : `Rincian ${dayLabel} — ${d.done} salat terlaksana, ${d.missed} tidak dilaksanakan, ${d.unrecorded} belum dicatat`
+                  }
+                  className={cn("flex h-full flex-1 cursor-pointer flex-col items-center gap-1.5", isFuture && "opacity-45")}
                 >
                   <span className={cn("text-[9.5px] font-semibold tabular-nums", isToday ? "text-tz-accent" : "text-tz-muted/80")}>
                     {d.done > 0 ? d.done : ""}

@@ -4,8 +4,8 @@
  * Tazkiya — Halaman Al-Qur'an.
  * Kartu target bacaan, sorotan surah paling sering dibaca, jelajah surah
  * (pencarian + filter + sortir dalam grid 2 kolom), juz 1–30, pencatatan
- * ringkas (cukup surah & ayat — rentang dan penanda diisi otomatis),
- * penanda manual, dan riwayat bacaan.
+ * ringkas (cukup surah & ayat — rentang dan penanda diisi otomatis), dan
+ * riwayat bacaan.
  */
 
 import { useMemo, useState } from "react";
@@ -138,8 +138,6 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
   const readingHistory = useWorshipStore((s) => s.readingHistory);
   const addQuranProgress = useWorshipStore((s) => s.addQuranProgress);
   const deleteReadingEntry = useWorshipStore((s) => s.deleteReadingEntry);
-  const saveBookmark = useWorshipStore((s) => s.saveBookmark);
-  const deleteBookmark = useWorshipStore((s) => s.deleteBookmark);
 
   const today = todayKey();
   const log = logs[today] ?? {
@@ -154,9 +152,6 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
   // Form catat ringkas: cukup surah + ayat.
   const [catSurah, setCatSurah] = useState("");
   const [catAyat, setCatAyat] = useState("");
-  // Penanda manual: cukup surah + ayat.
-  const [bmSurah, setBmSurah] = useState("");
-  const [bmAyah, setBmAyah] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   // Jelajah: pencarian, filter, sortir.
   const [query, setQuery] = useState("");
@@ -304,25 +299,25 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
         </span>
       </header>
 
-      {/* ---------- Kartu target gaya "Taskello": bingkai gelap + artwork cahaya + tab ---------- */}
+      {/* ---------- Kartu target gaya "Taskello": bingkai + artwork cahaya + tab (ikon tema) ---------- */}
       <article className="tz-task-card animate-tz-fade-up" aria-label="Target bacaan harian">
         <div className="tz-task-inner">
           <div className="tz-task-art" aria-hidden>
             <span className="tz-task-blob tz-task-blob-violet" />
             <span className="tz-task-blob tz-task-blob-gold" />
             <span className="tz-task-blob tz-task-blob-hot" />
-            <p className="absolute right-4 top-3.5 text-right leading-tight text-white">
+            <p className="absolute right-4 top-3.5 text-right leading-tight text-[color:var(--task-ink)]">
               <span className="block text-[11px] font-bold tracking-tight">Tazkiya</span>
-              <span className="block text-[9.5px] font-medium text-white/60">Al-Qur&apos;an</span>
+              <span className="block text-[9.5px] font-medium text-[color:var(--task-ink-55)]">Al-Qur&apos;an</span>
             </p>
           </div>
           <div className="tz-task-panel">
             <div className="tz-task-tab">
               <span className="flex items-center gap-2">
-                <span className="font-display text-[16px] font-bold tracking-tight text-white">Target Bacaan Harian</span>
-                <span className="shrink-0 rounded-full bg-white/12 px-2 py-0.5 text-[10px] font-bold text-white">{pct}%</span>
+                <span className="font-display text-[16px] font-bold tracking-tight text-[color:var(--task-ink)]">Target Bacaan Harian</span>
+                <span className="shrink-0 rounded-full bg-[color:var(--task-pill-bg)] px-2 py-0.5 text-[10px] font-bold text-[color:var(--task-ink)]">{pct}%</span>
               </span>
-              <span className="mt-px truncate text-[11.5px] font-medium text-white/50">{targetSubtitle}</span>
+              <span className="mt-px truncate text-[11.5px] font-medium text-[color:var(--task-ink-55)]">{targetSubtitle}</span>
             </div>
             <div
               className="tz-beam h-[6px]"
@@ -336,11 +331,11 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                 <span className="tz-beam-runner" />
               </div>
             </div>
-            <p className="mt-2.5 text-[12px] leading-relaxed text-white/75">
+            <p className="mt-2.5 text-[12px] leading-relaxed text-[color:var(--task-ink-70)]">
               {pct >= 100 ? "Target hari ini tercapai. Barakallah!" : `${Math.max(0, targetValue - value).toLocaleString("id-ID")} ${targetType === "surah" ? "ayat" : unit} lagi menuju target`}
             </p>
-            <p className="mt-1.5 flex items-center gap-1.5 truncate text-[11px] text-white/55">
-              <BookmarkIcon size={12} className="shrink-0 text-tz-lav-deco" />
+            <p className="mt-1.5 flex items-center gap-1.5 truncate text-[11px] text-[color:var(--task-ink-55)]">
+              <BookmarkIcon size={12} className="shrink-0 text-[color:var(--task-deco)]" />
               {lastPos
                 ? `Terakhir: ${getSurah(lastPos.surah)?.latin ?? `Surah ${lastPos.surah}`} · ayat ${lastPos.ayah}`
                 : "Belum ada bacaan — buka surah pertamamu"}
@@ -348,13 +343,13 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
             {/* Baris statistik angka-besar khas kartu referensi */}
             <div className="mt-4 flex items-end justify-between gap-3">
               <p className="flex items-baseline gap-2">
-                <span className="font-display text-[36px] font-extrabold leading-none tracking-tight text-white">
+                <span className="font-display text-[36px] font-extrabold leading-none tracking-tight text-[color:var(--task-ink)]">
                   {value.toLocaleString("id-ID")}
                 </span>
-                <span className="text-[12px] font-semibold text-white/45">{unit}</span>
+                <span className="text-[12px] font-semibold text-[color:var(--task-ink-45)]">{unit}</span>
               </p>
-              <p className="text-[14px] font-bold text-white">
-                dari {targetValue.toLocaleString("id-ID")} <span className="font-semibold text-white/55">{unit}</span>
+              <p className="text-[14px] font-bold text-[color:var(--task-ink)]">
+                dari {targetValue.toLocaleString("id-ID")} <span className="font-semibold text-[color:var(--task-ink-55)]">{unit}</span>
               </p>
             </div>
           </div>
@@ -402,32 +397,32 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                   <span className="tz-task-blob tz-task-blob-violet" />
                   <span className="tz-task-blob tz-task-blob-gold" />
                   <span className="tz-task-blob tz-task-blob-hot" />
-                  <p className="absolute right-4 top-3.5 text-right leading-tight text-white">
+                  <p className="absolute right-4 top-3.5 text-right leading-tight text-[color:var(--task-ink)]">
                     <span className="block text-[11px] font-bold tracking-tight">Sorotan</span>
-                    <span className="block text-[9.5px] font-medium text-white/60">Bacaanmu</span>
+                    <span className="block text-[9.5px] font-medium text-[color:var(--task-ink-55)]">Bacaanmu</span>
                   </p>
                 </div>
                 <div className="tz-task-panel">
                   <div className="tz-task-tab">
                     <span className="flex items-baseline gap-2">
-                      <span className="font-display text-[16px] font-bold tracking-tight text-white">{topMeta.latin}</span>
+                      <span className="font-display text-[16px] font-bold tracking-tight text-[color:var(--task-ink)]">{topMeta.latin}</span>
                       {settings.showArabic ? (
-                        <span className="quran-arabic text-[13px] text-tz-lav-deco">{topMeta.arabic}</span>
+                        <span className="quran-arabic text-[13px] text-[color:var(--task-deco)]">{topMeta.arabic}</span>
                       ) : null}
                     </span>
-                    <span className="mt-px truncate text-[11.5px] font-medium text-white/50">
+                    <span className="mt-px truncate text-[11.5px] font-medium text-[color:var(--task-ink-55)]">
                       Paling sering dibaca · terakhir {relativeDayLabel(topEntry[1].lastDate, today)}
                     </span>
                   </div>
                   {runnerUps.length > 0 ? (
                     <p className="flex flex-wrap items-center gap-1.5">
-                      <span className="text-[9.5px] font-semibold uppercase tracking-wide text-white/50">Juga sering</span>
+                      <span className="text-[9.5px] font-semibold uppercase tracking-wide text-[color:var(--task-ink-55)]">Juga sering</span>
                       {runnerUps.map(([n, st], i) => (
                         <span
                           key={n}
-                          className="rounded-full border border-white/12 bg-white/6 px-2 py-0.5 text-[10.5px] text-white/80"
+                          className="rounded-full border border-[color:var(--task-chip-border)] bg-[color:var(--task-chip-bg)] px-2 py-0.5 text-[10.5px] text-[color:var(--task-ink-70)]"
                         >
-                          <span className="font-bold text-tz-lav-deco">{i + 2}.</span> {getSurah(n)?.latin} · {st.count}×
+                          <span className="font-bold text-[color:var(--task-deco)]">{i + 2}.</span> {getSurah(n)?.latin} · {st.count}×
                         </span>
                       ))}
                     </p>
@@ -435,13 +430,13 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                   {/* Baris statistik angka-besar khas kartu referensi */}
                   <div className="mt-4 flex items-end justify-between gap-3">
                     <p className="flex items-baseline gap-2">
-                      <span className="font-display text-[36px] font-extrabold leading-none tracking-tight text-white">
+                      <span className="font-display text-[36px] font-extrabold leading-none tracking-tight text-[color:var(--task-ink)]">
                         {topEntry[1].count}
                       </span>
-                      <span className="text-[12px] font-semibold text-white/45">kali dibaca</span>
+                      <span className="text-[12px] font-semibold text-[color:var(--task-ink-45)]">kali dibaca</span>
                     </p>
-                    <p className="text-[14px] font-bold text-white">
-                      {topEntry[1].verses.toLocaleString("id-ID")} <span className="font-semibold text-white/55">ayat</span>
+                    <p className="text-[14px] font-bold text-[color:var(--task-ink)]">
+                      {topEntry[1].verses.toLocaleString("id-ID")} <span className="font-semibold text-[color:var(--task-ink-55)]">ayat</span>
                     </p>
                   </div>
                 </div>
@@ -605,7 +600,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
               <Plus size={18} />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-[14px] font-semibold text-tz-ink">Catat Bacaan &amp; Penanda</span>
+              <span className="block text-[14px] font-semibold text-tz-ink">Catat Bacaan</span>
               <span className="block text-[11px] text-tz-muted">Cukup surah &amp; ayat — rentang dan penanda diisi otomatis</span>
             </span>
             <ChevronRight size={16} className={cn("shrink-0 text-tz-muted/70 transition-transform", formOpen && "rotate-90")} />
@@ -671,103 +666,6 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                   className="tap mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[0.9rem] border border-tz-violet/50 bg-gradient-to-r from-tz-purple via-tz-violet to-tz-purple font-semibold text-white shadow-[0_10px_30px_-8px_rgba(85,51,154,0.8),inset_0_1px_0_rgba(255,255,255,0.25)] transition-all hover:brightness-110"
                 >
                   <Check size={17} /> Simpan Bacaan
-                </button>
-              </div>
-
-              {/* Penanda manual: cukup surah + ayat */}
-              <div className="space-y-3 border-t border-tz-line-soft pt-4">
-                <p className={labelCls}>Penanda manual</p>
-                {manualBookmark ? (
-                  <div className="flex items-center gap-3 rounded-2xl border border-tz-violet/25 bg-tz-violet/10 p-3.5">
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-tz-violet to-tz-purple text-white glow-violet-sm">
-                      <BookmarkIcon size={20} />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-tz-ink">
-                        {getSurah(manualBookmark.surah)?.latin ?? `Surah ${manualBookmark.surah}`}
-                        {settings.showArabic ? (
-                          <span className="quran-arabic ml-1.5 font-normal text-tz-accent">{getSurah(manualBookmark.surah)?.arabic}</span>
-                        ) : null}
-                      </p>
-                      <p className="text-[11px] text-tz-accent/85">
-                        Ayat {manualBookmark.ayah} · {getSurah(manualBookmark.surah)?.verses} ayat total
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        deleteBookmark();
-                        toast.info("Penanda bacaan dihapus");
-                      }}
-                      aria-label="Hapus penanda bacaan"
-                      className="tap flex h-9 w-9 items-center justify-center rounded-full border border-tz-line bg-tz-panel text-tz-muted transition-colors hover:text-rose-300"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ) : (
-                  <EmptyState
-                    icon={<BookmarkIcon size={18} />}
-                    title="Belum ada penanda bacaan"
-                    caption="Penanda otomatis terisi saat kamu membaca di pembaca Al-Qur'an."
-                  />
-                )}
-                <div className="grid grid-cols-[1.5fr_1fr] gap-3">
-                  <div>
-                    <label className={labelCls} htmlFor="bm-surah">
-                      Surah
-                    </label>
-                    <select id="bm-surah" value={bmSurah} onChange={(e) => setBmSurah(e.target.value)} className={inputCls}>
-                      <option value="">— Pilih —</option>
-                      {SURAH_LIST.map((s) => (
-                        <option key={s.number} value={s.number}>
-                          {s.number}. {s.latin}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className={labelCls} htmlFor="bm-ayah">
-                      Ayat
-                    </label>
-                    <input
-                      id="bm-ayah"
-                      type="number"
-                      min={1}
-                      inputMode="numeric"
-                      placeholder="mis. 1"
-                      value={bmAyah}
-                      onChange={(e) => setBmAyah(e.target.value)}
-                      className={inputCls}
-                    />
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const s = bmSurah ? parseInt(bmSurah, 10) : NaN;
-                    const a = bmAyah ? parseInt(bmAyah, 10) : NaN;
-                    if (Number.isNaN(s)) {
-                      toast.error("Pilih surah terlebih dahulu");
-                      return;
-                    }
-                    const meta = getSurah(s);
-                    if (Number.isNaN(a) || a < 1) {
-                      toast.error("Masukkan nomor ayat yang valid");
-                      return;
-                    }
-                    if (meta && a > meta.verses) {
-                      toast.error(`${meta.latin} hanya memiliki ${meta.verses} ayat`);
-                      return;
-                    }
-                    saveBookmark({ surah: s, ayah: a, savedAt: new Date().toISOString() });
-                    toast.success(`Penanda disimpan: ${meta?.latin} ayat ${a}`);
-                    setBmSurah("");
-                    setBmAyah("");
-                  }}
-                  className="tap flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl border border-tz-violet/45 bg-tz-violet/15 text-sm font-semibold text-tz-accent transition-all hover:bg-tz-violet/25"
-                >
-                  <BookmarkIcon size={15} /> Simpan Penanda
                 </button>
               </div>
             </div>
