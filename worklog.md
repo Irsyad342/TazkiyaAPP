@@ -469,3 +469,15 @@ Dikerjakan (via koneksi postgres pooler 6543):
 - Keamanan: sb_secret HANYA dipakai server-side utk setup/uji; TIDAK masuk repo/klien. Semua skrip ambil kredensial via env, tanpa hardcode.
 
 Status: DB 100% siap; TINGGAL publishable/anon key (dashboard → Project Settings → API Keys) → tulis public-config.ts → push → E2E produksi.
+
+## Task 27 — AKTIVASI SELESAI: login produksi LIVE & teruji end-to-end ✅
+Tanggal: 2026-10-30
+
+Pemilik mengirim publishable key (sb_publishable_tt_lOE_...). Rangkaian penuntasan:
+- Validasi key: auth/v1/health 200; REST user_data 200 (anon 0 baris — RLS aktif).
+- public-config.ts diisi Project URL + publishable key (nilai publik; secret key TIDAK pernah masuk repo) → commit 02f858c → push → Vercel deploy OTOMATIS.
+- Config terverifikasi masuk bundle produksi dalam ~20 detik setelah push.
+- E2E penuh via API (publishable key, sama seperti browser): daftar → sesi langsung → login ulang → tulis user_data → baca sendiri → akun-2 → ISOLASI LULUS (0 baris terlihat) → multi-tenant sehat → cleanup (2 akun uji dihapus, user_data kembali 0). Skrip: scripts/e2e-production.ts.
+- E2E via UI SUNGGUHAN di produksi (agent-browser): /auth tanpa banner "belum dikonfigurasi", form aktif, tab Daftar → daftar "Uji Tazkiya" → BERHASIL → redirect "/" auto-login dengan progres 0% / streak 0 (tanpa data fiktif). Akun uji terverifikasi di auth.users (confirmed=true — trigger autoconfirm bekerja) lalu dihapus bersih.
+- Produksi: /auth 200, / 200.
+Catatan opsional tersisa (milik pemilik, ±30 dtk di dashboard): Authentication → URL Configuration → Site URL = https://tazkiyaapp.vercel.app + Redirect URL https://tazkiyaapp.vercel.app/** — diperlukan agar tautan email "lupa kata sandi" membuka aplikasi (alur ganti sandi saat login sudah berfungsi tanpa ini).
