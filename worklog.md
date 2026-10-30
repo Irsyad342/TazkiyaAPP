@@ -514,3 +514,11 @@ Baru: src/lib/tazkiya/achievements.ts, scripts/test-achievements.ts. Diubah: Pro
 
 ### Uji
 tsc 0 error; eslint src bersih; test-sync-merge 34/34; test-achievements 16/16 (pengguna baru kosong, tanggal pencapaian benar, run terputus tidak diberi badge, minggu kronologis, tanpa data palsu); build sukses; browser lokal (420px): Profil & Statistik gelap+terang, Bulanan+majmundah bulan terkunci, pemilihan tanggal & ringkasan akurat (Sen 26: berjamaah 3, mandiri 2, Qur'an 5 hlm · 12 ayat, zikir 33), empty state tanpa badge palsu, Edit Profil & Pengaturan berfungsi.
+
+### Verifikasi Produksi (tazkiyaapp.vercel.app, 30 Okt 2026)
+Deploy live = commit 22f62c5. Smoke test agent-browser 420x860, gelap + terang:
+- Profil: kartu charcoal + status "Perjalanan Ibadah Aktif" + strip "Terus bertumbuh dalam istiqamah"; pencapaian empty state benar.
+- Statistik tanpa data: kartu konsistensi 0/0/0; kalender Mingguan aktif, 30 Okt terpilih, ringkasan "belum ada catatan (bukan hari gagal)"; Pola minggu semua batang "belum dicatat" (tanpa data palsu).
+- Statistik dengan data uji (seed Sen 26–Jum 30 via scripts/seed-prod-week.js): konsistensi 22% hari ini (2/9 item terlacak — rumus asli), hari sempurna 1; batang kronologis kiri→kanan terisi bawah→atas (Sen 5 · Sel 4 · Rab 2 · Kam 3 · Jum 2; Sab/Min kosong); chip per catatan Berjamaah 8 · Mandiri 6 · Tidak dilaksanakan 2 · Belum dicatat 4 (logika elapsed-slot asli); Qur'an 14 hlm · 32 ayat, Zikir 115; ringkasan Hari Ini akurat.
+- Bulanan: grid status per tanggal konsisten legenda; navigasi September aman, "Bulan berikutnya" disabled di bulan berjalan; lingkup "Paling Sering" ikut Mingguan/Bulanan.
+- Data uji dihapus setelah verifikasi (localStorage browser tes dibersihkan; browser pengguna tak terpengaruh).
