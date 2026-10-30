@@ -455,3 +455,17 @@ Dikerjakan (agar sisa langkah manusia diminimalkan ke SATU input):
 - TSC 0 error; eslint bersih; test-sync-merge 34/34 tetap lulus; push f9be11e.
 
 Status: menunggu SATU input pemilik (token ATAU URL+anon key) → satu perintah menyelesaikan semuanya sampai uji E2E lulus.
+## Task 26 — Aktivasi Supabase via kredensial pemilik (DB siap penuh)
+Tanggal: 2026-10-30
+
+Pemilik membuat proyek Supabase asli (ref ujapagwhhvpskvyitxbn, ap-southeast-1) & memberi: password DB + direct/pooler connection + sb_secret key + GitHub token. Dashboard login dengan TazkiyaAPP78 gagal ("invalid login credentials" — bukan password akun dashboard; captcha hCaptcha 2 halaman berhasil dipecahkan dulu). Tidak ada percobaan tebak lanjutan.
+
+Dikerjakan (via koneksi postgres pooler 6543):
+- supabase/schema.sql DIEKSEKUSI PENUH: tabel user_data + 4 policy RLS terverifikasi di pg_policies.
+- JWT secret TIDAK ditemukan di DB (GUC app.settings kosong, vault kosong, pg_db_role_setting tanpa secret, auth.config tidak ada — platform baru menyimpannya di env service) → legacy anon key tidak dapat di-mint; browser client butuh publishable/anon key dari dashboard.
+- Trigger tz_autoconfirm_signup terpasang + grant (auto-confirm user baru; no-op bila sudah terkonfirmasi). Terverifikasi: signup via API langsung dapat SESI (confirm email OFF bawaan proyek) — dua lapis aman.
+- BUKTI RLS via simulasi PostgREST (set local role authenticated + request.jwt.claims): user-1 baca 1 baris miliknya; user-2 baca 0 baris (ISOLASI LULUS); anon 0 baris. User uji dibersihkan; user_data 0 baris.
+- Skrip baru: scripts/supabase-direct-setup.ts (setup penuh), scripts/finalize-db.ts (trigger+RLS proof), scripts/probe-jwt*.ts (diagnostik); pg@8.13.1 + @types/pg ditambah (setup DB saja, tidak dipakai klien).
+- Keamanan: sb_secret HANYA dipakai server-side utk setup/uji; TIDAK masuk repo/klien. Semua skrip ambil kredensial via env, tanpa hardcode.
+
+Status: DB 100% siap; TINGGAL publishable/anon key (dashboard → Project Settings → API Keys) → tulis public-config.ts → push → E2E produksi.
