@@ -522,3 +522,12 @@ Deploy live = commit 22f62c5. Smoke test agent-browser 420x860, gelap + terang:
 - Statistik dengan data uji (seed Sen 26–Jum 30 via scripts/seed-prod-week.js): konsistensi 22% hari ini (2/9 item terlacak — rumus asli), hari sempurna 1; batang kronologis kiri→kanan terisi bawah→atas (Sen 5 · Sel 4 · Rab 2 · Kam 3 · Jum 2; Sab/Min kosong); chip per catatan Berjamaah 8 · Mandiri 6 · Tidak dilaksanakan 2 · Belum dicatat 4 (logika elapsed-slot asli); Qur'an 14 hlm · 32 ayat, Zikir 115; ringkasan Hari Ini akurat.
 - Bulanan: grid status per tanggal konsisten legenda; navigasi September aman, "Bulan berikutnya" disabled di bulan berjalan; lingkup "Paling Sering" ikut Mingguan/Bulanan.
 - Data uji dihapus setelah verifikasi (localStorage browser tes dibersihkan; browser pengguna tak terpengaruh).
+
+### Revisi kartu profil (umpan balik "ga mirip") — 30 Okt 2026
+Kartu utama disusun ulang mengikuti layout referensi lampiran secara ketat, warna tetap aksen Tazkiya (emerald/violet, bukan lime referensi):
+- Baris atas: titik hijau + "Perjalanan Ibadah Aktif" (kiri, tanpa pill) & jam perangkat HH:mm berjalan (kanan, ikon Clock, interval 15 dtk).
+- Baris tengah kiri: avatar 56px + chip kamera emerald di sudut (fitur ganti foto tetap); di kanannya nama + BadgeCheck dan email/akun (rata kiri, bukan tengah).
+- Dua tombol setara penuh selebar kartu (Edit Profil, Pengaturan) bergaya abu gelap seragam ala referensi.
+- Kartu hijau menyembul dari balik kartu hitam (-mt-58/pt-58): gradasi emerald-300→teal-400, teks gelap "Terus bertumbuh dalam istiqamah" + Zap; glow emerald bawah tetap terkontrol.
+- Dihapus dari kartu: grid streak/ibadah tercatat (computeStreak/summarize off dari file ini; data tetap tampil di Statistik), "Anggota sejak", pill status, tombol pensil inline (edit nama kini via tombol Edit Profil — perilaku sama).
+- Ikon: +Clock, −Flame; Sparkles tetap (dipakai Preferensi). Uji: tsc 0, eslint 0, sync-merge 34/34, achievements 16/16, build sukses; visual lokal gelap+terang, edit nama & scroll Pengaturan berfungsi.
