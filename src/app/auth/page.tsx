@@ -153,6 +153,11 @@ function AuthForm() {
   const fieldError = (k: string) =>
     fieldErrors[k] ? <p className="mt-1 text-[10.5px] font-medium text-rose-500 light:text-rose-600">{fieldErrors[k]}</p> : null;
 
+  // Kelas input seragam: tinggi nyaman disentuh + border merah saat validasi gagal.
+  // (utility menang atas .tz-field karena tz-field kini di @layer components)
+  const fieldCls = (k: string, extra?: string) =>
+    cn("tz-field min-h-[46px]", extra, fieldErrors[k] && "border-rose-400/70 focus:border-rose-400/80");
+
   const title = resetMode ? "Atur Kata Sandi Baru" : forgotOpen ? "Atur Ulang Kata Sandi" : mode === "login" ? "Selamat Datang Kembali" : "Buat Akun Baru";
   const subtitle = resetMode
     ? "Buat kata sandi baru untuk akunmu"
@@ -231,7 +236,8 @@ function AuthForm() {
                     type={showPw ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="tz-field pl-10 pr-11"
+                    className={fieldCls("password", "pl-10 pr-11")}
+                    aria-invalid={!!fieldErrors.password}
                     placeholder="Minimal 8 karakter"
                     autoComplete="new-password"
                     disabled={unconfigured || busy}
@@ -241,7 +247,7 @@ function AuthForm() {
                     type="button"
                     onClick={() => setShowPw((v) => !v)}
                     aria-label={showPw ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
-                    className="tap absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-tz-muted transition-colors hover:text-tz-accent"
+                    className="tap absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-tz-muted transition-colors hover:text-tz-accent"
                   >
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -268,9 +274,11 @@ function AuthForm() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="tz-field pl-10"
+                    className={fieldCls("email", "pl-10")}
+                    aria-invalid={!!fieldErrors.email}
                     placeholder="nama@email.com"
                     autoComplete="email"
+                    inputMode="email"
                     disabled={unconfigured || busy}
                     required
                   />
@@ -342,7 +350,8 @@ function AuthForm() {
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="tz-field pl-10"
+                        className={fieldCls("name", "pl-10")}
+                        aria-invalid={!!fieldErrors.name}
                         placeholder="Nama kamu"
                         autoComplete="name"
                         maxLength={40}
@@ -362,9 +371,11 @@ function AuthForm() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="tz-field pl-10"
+                      className={fieldCls("email", "pl-10")}
+                      aria-invalid={!!fieldErrors.email}
                       placeholder="nama@email.com"
                       autoComplete="email"
+                      inputMode="email"
                       disabled={unconfigured || busy}
                       required
                     />
@@ -380,7 +391,8 @@ function AuthForm() {
                       type={showPw ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="tz-field pl-10 pr-11"
+                      className={fieldCls("password", "pl-10 pr-11")}
+                      aria-invalid={!!fieldErrors.password}
                       placeholder={mode === "register" ? "Minimal 8 karakter" : "Kata sandi kamu"}
                       autoComplete={mode === "register" ? "new-password" : "current-password"}
                       disabled={unconfigured || busy}
@@ -390,7 +402,7 @@ function AuthForm() {
                       type="button"
                       onClick={() => setShowPw((v) => !v)}
                       aria-label={showPw ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
-                      className="tap absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-tz-muted transition-colors hover:text-tz-accent"
+                      className="tap absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-tz-muted transition-colors hover:text-tz-accent"
                     >
                       {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -407,7 +419,8 @@ function AuthForm() {
                         type={showPw ? "text" : "password"}
                         value={confirm}
                         onChange={(e) => setConfirm(e.target.value)}
-                        className="tz-field pl-10"
+                        className={fieldCls("confirm", "pl-10")}
+                        aria-invalid={!!fieldErrors.confirm}
                         placeholder="Ulangi kata sandi"
                         autoComplete="new-password"
                         disabled={unconfigured || busy}

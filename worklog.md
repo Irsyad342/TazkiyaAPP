@@ -481,3 +481,14 @@ Pemilik mengirim publishable key (sb_publishable_tt_lOE_...). Rangkaian penuntas
 - E2E via UI SUNGGUHAN di produksi (agent-browser): /auth tanpa banner "belum dikonfigurasi", form aktif, tab Daftar → daftar "Uji Tazkiya" → BERHASIL → redirect "/" auto-login dengan progres 0% / streak 0 (tanpa data fiktif). Akun uji terverifikasi di auth.users (confirmed=true — trigger autoconfirm bekerja) lalu dihapus bersih.
 - Produksi: /auth 200, / 200.
 Catatan opsional tersisa (milik pemilik, ±30 dtk di dashboard): Authentication → URL Configuration → Site URL = https://tazkiyaapp.vercel.app + Redirect URL https://tazkiyaapp.vercel.app/** — diperlukan agar tautan email "lupa kata sandi" membuka aplikasi (alur ganti sandi saat login sudah berfungsi tanpa ini).
+
+## Task 28 — Perbaikan visual form Masuk & Daftar (ikon menimpa teks)
+Tanggal: 2026-10-30
+
+Laporan pemilik + screenshot: placeholder terpotong ikon ("ama kamu", "ma@email.com", "inimal 8 karakter"). AKAR MASALAH: `.tz-field` didefinisikan di `@layer utilities` SETELAH utility Tailwind → shorthand `padding: .625rem .875rem` menimpa `pl-10` (cascade same-layer, urutan sumber), sehingga teks input menembus ke bawah ikon.
+
+Diperbaiki:
+- globals.css: `.tz-field` (+ ::placeholder/:focus, plus :disabled baru) dipindah ke `@layer components` → utility Tailwind (pl-*, pr-*, border-*, min-h-*) SELALU menang. Aman utk seluruh pemakai tz-field (TargetSheet, PrayerRecordDialog, QuranPage — semuanya tanpa utility padding, tak ada perubahan perilaku).
+- auth/page.tsx: helper `fieldCls()` — semua 6 input konsisten `min-h-[46px]` (target sentuh nyaman), border merah `border-rose-400/70` saat validasi gagal, `aria-invalid`, tombol mata `right-2.5 p-1.5`, `inputMode="email"`.
+
+Verifikasi: tsc 0 error; eslint bersih; test-sync-merge 34/34; build lokal sukses; screenshot browser lokal (dark+light, register+login, state error) — placeholder penuh & tak tertimpa.

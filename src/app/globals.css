@@ -372,7 +372,14 @@ html[data-theme="light"] {
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  /* Kolom formulir tema-sadar (dipakai semua input aplikasi) */
+}
+
+/* ---------- Kolom formulir tema-sadar (dipakai semua input aplikasi) ----------
+   Sengaja di @layer components — BUKAN utilities — agar utility Tailwind
+   (pl-*, pr-*, border-*, min-h-*, resize-*) SELALU menang atas gaya dasar field.
+   Sebelumnya blok ini ada di @layer utilities SETELAH utility Tailwind, sehingga
+   shorthand `padding`/`border` menimpa pl-10 dan ikon menutupi teks input. */
+@layer components {
   .tz-field {
     width: 100%;
     border-radius: 0.75rem;
@@ -387,11 +394,15 @@ html[data-theme="light"] {
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   }
   .tz-field::placeholder {
-    color: color-mix(in srgb, var(--color-tz-muted) 60%, transparent);
+    color: color-mix(in srgb, var(--color-tz-muted) 65%, transparent);
   }
   .tz-field:focus {
     border-color: color-mix(in srgb, var(--color-tz-violet) 55%, transparent);
     box-shadow: 0 0 0 3px var(--tz-ring-soft), inset 0 1px 3px var(--tz-inset);
+  }
+  .tz-field:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }
 
