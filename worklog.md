@@ -492,3 +492,25 @@ Diperbaiki:
 - auth/page.tsx: helper `fieldCls()` — semua 6 input konsisten `min-h-[46px]` (target sentuh nyaman), border merah `border-rose-400/70` saat validasi gagal, `aria-invalid`, tombol mata `right-2.5 p-1.5`, `inputMode="email"`.
 
 Verifikasi: tsc 0 error; eslint bersih; test-sync-merge 34/34; build lokal sukses; screenshot browser lokal (dark+light, register+login, state error) — placeholder penuh & tak tertimpa.
+
+## Task 29 — Redesign Profil & Statistik (referensi Pinterest + 4 gambar terlampir)
+Tanggal: 2026-10-30
+
+Checkpoint: branch `backup/pre-redesign` @ d9fdc1a (aman di GitHub). Deployment tetap jalan sesuai instruksi akhir "langsung deploykan saja sampai berhasil".
+
+### Profil
+- Kartu utama charcoal (#141218) membulat besar, efek floating berlapis, glow emerald terkontrol di bawah kartu (statis, redup di tema terang), glass secukupnya. Isi: avatar+halo emerald, nama+BadgeCheck, email akun (atau "Belum masuk akun"), status "Perjalanan Ibadah Aktif", tombol Edit Profil (fokus edit nama) & Pengaturan (scroll ke Preferensi), streak & ibadah tercatat (data asli).
+- Strip neon hijau "Terus bertumbuh dalam istiqamah" menempel di bawah kartu.
+- Kartu pencapaian ala badge "Orange Belt": kartu bertumpuk + emblem medal glow + judul/deskripsi/tanggal. Modul baru `src/lib/tazkiya/achievements.ts` — 4 pencapaian MURNI dari catatan nyata: Langkah Pertama, Hari Sempurna, Tiga Hari Aktif, Pekan Pertama (7 hari lengkap beruntun). Pengguna baru → empty state "Pencapaian pertamamu dimulai dari sini". Tanpa penilaian keimanan.
+
+### Statistik
+- Kartu "Pantau Konsistensi" satu komposisi premium: 3 blok dengan aksen cyan (hari ini) / amber (streak) / emerald (hari sempurna), angka 27px + animasi hitung halus (useCountUp, hormati reduced-motion & data-anim off). Rumus perhitungan TIDAK diubah.
+- Grafik AreaChart lama ("Aktivitas 7/30 Hari Terakhir" + "Rata-rata penyelesaian") DIHAPUS; toggle Mingguan/Bulanan pindah ke dalam kartu kalender (tetap mengendalikan cakupan hari sempurna & "Paling Sering").
+- Pola Ibadah Minggu Ini: subjudul baru, batang Mon–Sun kronologis kiri→kanan, segmen dari BAWAH: berjamaah (violet) → mandiri (lavender) → tidak dilaksanakan (rose) → belum dicatat (dashed); animasi tumbuh berurutan kiri→kanan (delay per kolom); legenda 4 status; chip jumlah CATATAN (bukan tanggal) — logika elapsed-slot lama tetap; kartu Al-Qur'an & Zikir 7 hari tetap.
+- Kalender glassmorphism slate/cyan (tidak dominan ungu): header bulan + navigasi minggu/bulan (tidak bisa maju melewati sekarang), tampilan Mingguan (strip 7 hari kronologis + titik status) & Bulanan (grid lingkaran fungsi utuh), tanggal dipilih = cincin cyan, hari ini = cyan, legenda konsisten ("Tidak dilaksanakan"/"Belum dicatat"), ringkasan tanggal terpilih di bawah (chip + Qur'an/Zikir; hari depan = "belum berjalan"; tanpa catatan ≠ gagal).
+
+### File
+Baru: src/lib/tazkiya/achievements.ts, scripts/test-achievements.ts. Diubah: ProfilePage.tsx, StatsPage.tsx, globals.css (tz-bar-grow/tz-pop/tz-fade-in + guard reduced-motion & data-anim).
+
+### Uji
+tsc 0 error; eslint src bersih; test-sync-merge 34/34; test-achievements 16/16 (pengguna baru kosong, tanggal pencapaian benar, run terputus tidak diberi badge, minggu kronologis, tanpa data palsu); build sukses; browser lokal (420px): Profil & Statistik gelap+terang, Bulanan+majmundah bulan terkunci, pemilihan tanggal & ringkasan akurat (Sen 26: berjamaah 3, mandiri 2, Qur'an 5 hlm · 12 ayat, zikir 33), empty state tanpa badge palsu, Edit Profil & Pengaturan berfungsi.

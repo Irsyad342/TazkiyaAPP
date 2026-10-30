@@ -1291,3 +1291,52 @@ html[data-theme="light"] .glow-violet-sm,
 }
 
 /* penanda recompile task16 */
+
+/* ---------- Animasi ringan redesign Profil & Statistik ----------
+   Hanya transform/opacity/height pendek (hemat daya). Hormati
+   prefers-reduced-motion dan setelan "Animasi transisi" (data-anim="off"). */
+.tz-bar-grow {
+  transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tz-pop {
+  animation: tz-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes tz-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.tz-fade-in {
+  animation: tz-fade-in 0.35s ease both;
+}
+@keyframes tz-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html .tz-bar-grow {
+    transition: none !important;
+  }
+  html .tz-pop,
+  html .tz-fade-in {
+    animation: none !important;
+  }
+}
+html[data-anim="off"] .tz-bar-grow {
+  transition: none !important;
+}
+html[data-anim="off"] .tz-pop,
+html[data-anim="off"] .tz-fade-in {
+  animation: none !important;
+}
