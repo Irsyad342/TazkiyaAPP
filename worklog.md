@@ -531,3 +531,27 @@ Kartu utama disusun ulang mengikuti layout referensi lampiran secara ketat, warn
 - Kartu hijau menyembul dari balik kartu hitam (-mt-58/pt-58): gradasi emerald-300→teal-400, teks gelap "Terus bertumbuh dalam istiqamah" + Zap; glow emerald bawah tetap terkontrol.
 - Dihapus dari kartu: grid streak/ibadah tercatat (computeStreak/summarize off dari file ini; data tetap tampil di Statistik), "Anggota sejak", pill status, tombol pensil inline (edit nama kini via tombol Edit Profil — perilaku sama).
 - Ikon: +Clock, −Flame; Sparkles tetap (dipakai Preferensi). Uji: tsc 0, eslint 0, sync-merge 34/34, achievements 16/16, build sukses; visual lokal gelap+terang, edit nama & scroll Pengaturan berfungsi.
+
+## Task 30 — Aksen ungu kartu profil, hierarki kartu statistik, Fokus Ibadah Hari Ini
+Tanggal: 2026-10-31. Checkpoint: branch `backup/pre-task30` (@34869bd, aman di GitHub).
+
+### 1. Kartu profil → identitas ungu theme-aware (tidak lagi hijau/hitam di tema terang)
+- Dark: charcoal bernuansa ungu (#191225, radial #2b2040→#150e22), border violet transparan (tz-violet/25), glow bawah violet terkontrol, kartu menyembul gradasi #7950C8→#9B70E8 teks lavender muda.
+- Light: kartu PUTIH-lavender (linear #fff→#f3ecfb), border lavender, shadow lembut 0 24px 50px -30px rgba(90,60,160,.35), teks gelap (tz-ink), kartu menyembul #BCA4F5→#9B70E8 teks ungu tua #2b1a4d.
+- Semua elemen ikut tema: titik status, jam, halo avatar, chip kamera, BadgeCheck, tombol Edit/Pengaturan (tz-violet tint), teks nama/email. Perubahan instan via varian `light:` (tanpa reload). Dipertahankan: avatar, nama/email, status, dua tombol, efek bertumpuk.
+
+### 2. Kartu statistik — hierarki baru (bukan panel 3 kolom)
+- Kartu utama full-width: "Progres Ibadah Hari Ini" — angka % besar (34px, text-gradient-violet), ikon Activity violet, keterangan "X dari Y ibadah terlaksana" (dari dayScore — rumus asli), progress bar horizontal violet (tz-bar-grow-x, terisi kiri→kanan).
+- Dua kartu pendukung grid-cols-2: Streak 5 Salat (Flame amber + indikator 3 segmen) & Hari Sempurna (Trophy teal + lingkup minggu/bulan — logika period dipertahankan).
+- Angka count-up halus (useCountUp ada), fade-up kartu; rumus & sumber data tidak disentuh.
+
+### 3. Pencapaian DIHAPUS dari Profil → diganti "Fokus Ibadah Hari Ini"
+- Section Pencapaian (judul, "x dari 4 tercapai", kartu lencana, emblem, tanggal) dihapus dari tampilan. `src/lib/tazkiya/achievements.ts` + test TETAP ada (tidak dipakai komponen lain saat ini, tidak dihapus).
+- Kartu baru: subjudul "Langkah kecil untuk menjaga istiqamah setiap hari."; header Target violet + "Progres Sholat Hari Ini"; 5 indikator (Subuh, Zuhur/Salat Jumat sesuai fridayZuhurAlt, Asar, Magrib, Isya) — done=violet check, missed=rose minus (netral), belum=dashed kosong; progress bar terlaksana/5; pesan kondisi: kosong/"X dari 5 sholat tercatat"/apresiasi lengkap/catatan netral terlewat; chip pendukung Al-Qur'an & Zikir HANYA bila ada catatan hari ini; tombol "Lanjutkan Tracker" → Beranda (prop baru onGoTracker di page.tsx, goTracker=setTab("beranda")).
+- Murni baca data tracker (selectPrayerDetail + prayerMetaFor): tanpa pencatatan ganda, tanpa mengubah status, tanpa menganggap buka aplikasi sebagai ibadah.
+
+### File
+Diubah: ProfilePage.tsx, StatsPage.tsx, page.tsx, globals.css (tz-bar-grow-x + guard reduced-motion/data-anim). Baru: scripts/seed-today-focus.js (alat uji visual). achievements.ts tidak disentuh.
+
+### Uji (12 butir — lulus semua)
+tsc 0; eslint 0; sync-merge 34/34; build sukses; visual lokal 420px: profil dark=ungu tanpa hijau, profil light=putih-lavender otomatis; statistik dark+light hierarki baru dengan nilai benar (33%=3/9; 67%=6/9; sempurna 1); Pencapaian tidak tampil; Fokus Ibadah 3 kondisi (kosong-implisit token, 3/5 tercatat + catatan terlewat netral, 5/5 apresiasi); Lanjutkan Tracker pindah ke Beranda; data tidak hilang (localStorage tetap); responsif tetap; animasi transform/opacity + guard.

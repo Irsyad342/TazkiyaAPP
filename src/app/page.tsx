@@ -179,6 +179,8 @@ export default function Page() {
   const closeReader = useCallback(() => setReader(null), []);
   const openTasbih = useCallback(() => setTasbihOpen(true), []);
   const openTargets = useCallback(() => setTargetOpen(true), []);
+  /** "Lanjutkan Tracker" (Fokus Ibadah, halaman Profil) → tracker salat di Beranda. */
+  const goTracker = useCallback(() => setTab("beranda"), []);
 
   if (!hydrated) {
     return (
@@ -237,7 +239,7 @@ export default function Page() {
               {tab === "beranda" && <HomePage onNavigate={setTab} onOpenTasbih={openTasbih} />}
               {tab === "quran" && <QuranPage onOpenReader={openReader} />}
               {tab === "statistik" && <StatsPage />}
-              {tab === "profil" && <ProfilePage onOpenTargets={openTargets} />}
+              {tab === "profil" && <ProfilePage onOpenTargets={openTargets} onGoTracker={goTracker} />}
             </m.div>
           </AnimatePresence>
         </div>

@@ -17,6 +17,7 @@ import Link from "next/link";
 import {
   BadgeCheck,
   Bell,
+  BookOpen,
   CalendarClock,
   CalendarDays,
   Camera,
@@ -33,8 +34,9 @@ import {
   LogIn,
   LogOut,
   MapPin,
-  Medal,
+  Minus,
   Pencil,
+  ListChecks,
   Settings2,
   Sparkles,
   Target,
@@ -70,7 +72,6 @@ import { buildGeo, getPosition, reverseGeocode, watchDevicePosition } from "@/li
 import { computePrayerTimes, PRAYER_METHOD_OPTIONS } from "@/lib/tazkiya/prayerTimes";
 import { convertImageToWebp, formatBytes } from "@/lib/tazkiya/image";
 import { recordedDateList, reviewActivityDays } from "@/lib/tazkiya/stats";
-import { computeAchievements, latestEarned } from "@/lib/tazkiya/achievements";
 import { formatGregorian, isFriday, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
 import { Chip, EmptyState, GlassCard, GlowOrb, IconBox, SectionHeader } from "./ui-bits";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
@@ -98,7 +99,13 @@ function AutoBadge() {
   );
 }
 
-export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
+export function ProfilePage({
+  onOpenTargets,
+  onGoTracker,
+}: {
+  onOpenTargets: () => void;
+  onGoTracker: () => void;
+}) {
   const settings = useWorshipStore((s) => s.settings);
   const logs = useWorshipStore((s) => s.logs);
   const prayerDetails = useWorshipStore((s) => s.prayerDetails);
@@ -140,14 +147,15 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
     const t = setInterval(() => setClock(hhmmNow()), 15000);
     return () => clearInterval(t);
   }, []);
+  /** Progress bar Fokus Ibadah tumbuh dari kiri sesudah mount (hormati reduced-motion). */
+  const [barsIn, setBarsIn] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setBarsIn(true), 120);
+    return () => clearTimeout(t);
+  }, []);
   /** Riwayat dinamis: hanya tanggal ber-catatan (tumbuh 1..7), lalu jendela 7 hari berjalan. */
   const recorded = recordedDateList(logs, prayerDetails);
   const historyDays = reviewActivityDays(recorded, today);
-
-  /** Pencapaian — hanya dari catatan nyata; tanpa penilaian keimanan. */
-  const achievements = computeAchievements(logs, prayerDetails);
-  const featuredAchievement = latestEarned(achievements);
-  const achEarnedCount = achievements.filter((a) => !!a.earnedAt).length;
 
   /** Gulir halus ke seksi Pengaturan (Preferensi) pada halaman ini. */
   const goSettings = () => {
@@ -192,6 +200,20 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
     if (id === "zuhur" && isFriday(date) && fridayZuhurAlt?.[date]) return ZUHUR_ALTERNATIF;
     return PRAYERS.find((p) => p.id === id) ?? PRAYERS[0];
   };
+
+  /** Fokus Ibadah Hari Ini — status lima salat wajib hari ini dari catatan asli.
+   *  Murni pembacaan data tracker yang sudah ada: tanpa pencatatan ganda,
+   *  tanpa mengubah status, tanpa menganggap membuka aplikasi sebagai ibadah. */
+  const focusDetails = PRAYERS.map((p) => {
+    const detail = selectPrayerDetail(prayerDetails, logs, today, p.id);
+    return { id: p.id, label: prayerMetaFor(today, p.id).label, status: detail.status, kind: detail.kind };
+  });
+  const focusDone = focusDetails.filter((d) => d.status === "done").length;
+  const focusMissed = focusDetails.filter((d) => d.status === "missed").length;
+  const focusRecorded = focusDone + focusMissed;
+  const todayLog = logs[today];
+  const todayQuran = todayLog?.quranPages ?? 0;
+  const todayZikir = todayLog?.zikirCount ?? 0;
 
   /* ---------- Lokasi perangkat (GPS — otomatis penuh, tanpa mode manual) ---------- */
 
@@ -261,23 +283,23 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
 
   return (
     <div className="space-y-6">
-      {/* ---------- Kartu profil utama — hitam terangkat, kartu hijau menyembul di bawah (ala referensi) ---------- */}
+      {/* ---------- Kartu profil utama — charcoal-ungu terangkat, kartu violet menyembul (tema aktif) ---------- */}
       <section aria-label="Kartu profil" className="animate-tz-fade-up relative">
-        {/* Cahaya emerald lembut di bawah komposisi — statis & terkontrol */}
-        <div aria-hidden className="absolute inset-x-10 -bottom-2 h-16 rounded-full bg-emerald-400/25 blur-2xl light:bg-emerald-400/20" />
+        {/* Cahaya violet lembut di bawah komposisi — statis & terkontrol */}
+        <div aria-hidden className="absolute inset-x-10 -bottom-2 h-16 rounded-full bg-tz-violet/25 blur-2xl light:bg-tz-violet/20" />
 
-        {/* Kartu hitam — lapis depan */}
-        <div className="relative z-10 overflow-hidden rounded-[1.9rem] border border-white/10 bg-[#141218] shadow-[0_30px_70px_-30px_rgba(6,18,12,0.85)] light:border-slate-300/70">
-          <div aria-hidden className="absolute inset-0 bg-[radial-gradient(130%_100%_at_18%_0%,#2b2436_0%,#1b1723_46%,#120f17_100%)]" />
+        {/* Kartu utama — lapis depan */}
+        <div className="relative z-10 overflow-hidden rounded-[1.9rem] border border-tz-violet/25 bg-[#191225] shadow-[0_30px_70px_-30px_rgba(22,12,44,0.9)] light:border-tz-violet/20 light:bg-white light:shadow-[0_24px_50px_-30px_rgba(90,60,160,0.35)]">
+          <div aria-hidden className="absolute inset-0 bg-[radial-gradient(130%_100%_at_18%_0%,#2b2040_0%,#1d142e_46%,#150e22_100%)] light:bg-[linear-gradient(150deg,#ffffff_0%,#faf7fe_55%,#f3ecfb_100%)]" />
 
           <div className="relative flex flex-col gap-5 p-5">
             {/* Status (kiri) + jam perangkat (kanan) */}
             <div className="flex items-center justify-between gap-2">
-              <span className="flex min-w-0 items-center gap-2 text-[11.5px] font-semibold text-white/75">
-                <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400 shadow-[0_0_8px_1px_rgba(52,211,153,0.8)]" />
+              <span className="flex min-w-0 items-center gap-2 text-[11.5px] font-semibold text-tz-accent light:text-[#6b46c1]">
+                <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-tz-violet shadow-[0_0_8px_1px_rgba(156,114,239,0.75)] light:shadow-[0_0_8px_1px_rgba(117,70,200,0.4)]" />
                 Perjalanan Ibadah Aktif
               </span>
-              <span className="flex shrink-0 items-center gap-1.5 tabular-nums text-[11.5px] font-medium text-white/60">
+              <span className="flex shrink-0 items-center gap-1.5 tabular-nums text-[11.5px] font-medium text-white/60 light:text-tz-muted">
                 <Clock size={13} aria-hidden />
                 {clock}
               </span>
@@ -292,7 +314,7 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
                   maxLength={40}
                   aria-label="Nama pengguna"
                   placeholder="Nama pengguna"
-                  className="min-h-[44px] w-full rounded-xl border border-white/25 bg-white/10 px-3 text-[14px] font-semibold text-white outline-none backdrop-blur-md placeholder:font-normal placeholder:text-white/40 focus:border-emerald-300/50"
+                  className="min-h-[44px] w-full rounded-xl border border-tz-violet/30 bg-white/[0.08] px-3 text-[14px] font-semibold text-white outline-none backdrop-blur-md placeholder:font-normal placeholder:text-white/40 focus:border-tz-violet/60 light:border-tz-violet/25 light:bg-white light:text-tz-ink light:placeholder:text-tz-muted/60"
                   autoFocus
                 />
                 <button
@@ -308,7 +330,7 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
                     setEditingName(false);
                     toast.success("Nama diperbarui");
                   }}
-                  className="tap flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-[#08130d] shadow-[0_0_16px_-3px_rgba(52,211,153,0.7)]"
+                  className="tap flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-tz-violet to-tz-purple text-white shadow-[0_0_16px_-3px_rgba(156,114,239,0.7)]"
                 >
                   <Check size={17} />
                 </button>
@@ -316,15 +338,15 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
             ) : (
               <div className="flex items-center gap-3.5">
                 <div className="relative shrink-0">
-                  <div aria-hidden className="absolute -inset-1 rounded-full bg-gradient-to-br from-emerald-300/40 via-emerald-400/15 to-transparent blur-[6px]" />
+                  <div aria-hidden className="absolute -inset-1 rounded-full bg-gradient-to-br from-tz-violet/45 via-tz-purple/15 to-transparent blur-[6px]" />
                   {settings.avatarDataUrl ? (
                     <img
                       src={settings.avatarDataUrl}
                       alt={`Foto profil ${settings.name}`}
-                      className="relative h-14 w-14 rounded-full border-2 border-white/70 object-cover shadow-lg"
+                      className="relative h-14 w-14 rounded-full border-2 border-white/70 object-cover shadow-lg light:border-white"
                     />
                   ) : (
-                    <div className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-white/70 bg-gradient-to-br from-tz-violet to-tz-purple font-display text-xl font-bold text-white">
+                    <div className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-white/70 bg-gradient-to-br from-tz-violet to-tz-purple font-display text-xl font-bold text-white light:border-white">
                       {settings.name.trim().charAt(0).toUpperCase() || "T"}
                     </div>
                   )}
@@ -332,24 +354,24 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
                     type="button"
                     aria-label="Ubah foto profil"
                     onClick={() => fileRef.current?.click()}
-                    className="tap absolute -bottom-0.5 -right-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#141218] bg-emerald-400 text-[#052e1c] transition-colors hover:bg-emerald-300"
+                    className="tap absolute -bottom-0.5 -right-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#191225] bg-tz-violet text-white transition-colors hover:bg-tz-purple light:border-white light:bg-[#7546c8]"
                   >
                     <Camera size={13} />
                   </button>
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <p className="truncate font-display text-[19px] font-bold leading-tight text-white">{settings.name}</p>
-                    <BadgeCheck size={16} className="shrink-0 text-emerald-300" aria-label="Anggota Tazkiya" />
+                    <p className="truncate font-display text-[19px] font-bold leading-tight text-white light:text-tz-ink">{settings.name}</p>
+                    <BadgeCheck size={16} className="shrink-0 text-tz-violet light:text-[#7546c8]" aria-label="Anggota Tazkiya" />
                   </div>
-                  <p className="mt-0.5 truncate text-[12px] font-medium text-white/55">
+                  <p className="mt-0.5 truncate text-[12px] font-medium text-white/55 light:text-tz-muted">
                     {authStatus === "signedIn" && authUser ? authUser.email : "Belum masuk akun · data di perangkat"}
                   </p>
                 </div>
               </div>
             )}
 
-            {/* Dua tombol setara — penuh selebar kartu */}
+            {/* Dua tombol setara — penuh selebar kartu, aksen ungu */}
             <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"
@@ -357,7 +379,7 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
                   setNameDraft(settings.name);
                   setEditingName(true);
                 }}
-                className="tap flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.09] text-[13px] font-semibold text-white transition-colors hover:bg-white/[0.15] active:bg-white/[0.2]"
+                className="tap flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-tz-violet/30 bg-tz-violet/[0.14] text-[13px] font-semibold text-tz-accent transition-colors hover:bg-tz-violet/[0.22] active:bg-tz-violet/[0.28] light:border-tz-violet/25 light:bg-tz-violet/[0.08] light:text-[#5b3aa6] light:hover:bg-tz-violet/[0.15]"
               >
                 <Pencil size={14} aria-hidden />
                 Edit Profil
@@ -365,7 +387,7 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
               <button
                 type="button"
                 onClick={goSettings}
-                className="tap flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.09] text-[13px] font-semibold text-white transition-colors hover:bg-white/[0.15] active:bg-white/[0.2]"
+                className="tap flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-tz-violet/30 bg-tz-violet/[0.14] text-[13px] font-semibold text-tz-accent transition-colors hover:bg-tz-violet/[0.22] active:bg-tz-violet/[0.28] light:border-tz-violet/25 light:bg-tz-violet/[0.08] light:text-[#5b3aa6] light:hover:bg-tz-violet/[0.15]"
               >
                 <Settings2 size={14} aria-hidden />
                 Pengaturan
@@ -374,11 +396,11 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
           </div>
         </div>
 
-        {/* Kartu hijau — lapis belakang, menyembul di bawah kartu hitam */}
-        <div className="relative z-0 -mt-[58px] rounded-[1.9rem] bg-gradient-to-b from-emerald-300 via-emerald-400 to-teal-400 px-4 pt-[58px] shadow-[0_18px_40px_-20px_rgba(16,185,129,0.85)]">
+        {/* Kartu violet — lapis belakang, menyembul di bawah kartu utama */}
+        <div className="relative z-0 -mt-[58px] rounded-[1.9rem] bg-gradient-to-b from-[#7950C8] via-[#8a5fe0] to-[#9B70E8] px-4 pt-[58px] shadow-[0_18px_40px_-20px_rgba(121,80,200,0.85)] light:from-[#BCA4F5] light:via-[#ae90ee] light:to-[#9B70E8] light:shadow-[0_18px_40px_-22px_rgba(121,80,200,0.5)]">
           <div className="flex h-[52px] items-center justify-center gap-2">
-            <Zap size={14} className="shrink-0 text-[#04281a]" aria-hidden />
-            <p className="truncate text-center text-[13px] font-bold tracking-wide text-[#04281a]">
+            <Zap size={14} className="shrink-0 text-[#f3edff] light:text-[#2b1a4d]" aria-hidden />
+            <p className="truncate text-center text-[13px] font-bold tracking-wide text-[#f7f2ff] light:text-[#2b1a4d]">
               Terus bertumbuh dalam istiqamah
             </p>
           </div>
@@ -394,59 +416,121 @@ export function ProfilePage({ onOpenTargets }: { onOpenTargets: () => void }) {
         />
       </section>
 
-      {/* ---------- Kartu pencapaian — hanya dari catatan nyata ---------- */}
-      <section aria-label="Pencapaian" className="animate-tz-fade-up">
-        <SectionHeader
-          title="Pencapaian"
-          caption={
-            achEarnedCount > 0
-              ? `${achEarnedCount} dari ${achievements.length} tercapai — tumbuh dari catatan aslimu`
-              : "Muncul otomatis dari aktivitas yang benar-benar tercatat"
-          }
-        />
-        {featuredAchievement && featuredAchievement.earnedAt ? (
-          <div key={`${featuredAchievement.id}-${featuredAchievement.earnedAt}`} className="tz-pop relative">
-            {/* Lapisan bawah bertumpuk */}
-            <div aria-hidden className="absolute inset-x-5 -bottom-1.5 top-6 -rotate-[1.1deg] rounded-[1.6rem] border border-white/[0.07] bg-white/[0.03] light:border-slate-300/70 light:bg-slate-200/60" />
-            <div className="relative overflow-hidden rounded-[1.65rem] border border-white/10 bg-[#17141d] p-5 text-center shadow-[0_26px_54px_-28px_rgba(10,6,20,0.8)] light:border-slate-300/80">
-              <div aria-hidden className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_0%,#262031_0%,#17141d_62%)]" />
-              <div aria-hidden className="absolute inset-x-10 bottom-0 h-[3px] rounded-full bg-gradient-to-r from-transparent via-emerald-400/80 to-transparent" />
-              <div className="relative">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/25 bg-emerald-400/10 px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.14em] text-emerald-300">
-                  <Medal size={11} />
-                  Pencapaian
-                </span>
-                {/* Emblem dengan glow lembut */}
-                <div className="relative mx-auto mt-3.5 flex h-[76px] w-[76px] items-center justify-center">
-                  <div aria-hidden className="absolute inset-0 rounded-[1.6rem] bg-gradient-to-br from-emerald-300/40 to-emerald-600/10 blur-[9px]" />
-                  <div className="relative flex h-[64px] w-[64px] items-center justify-center rounded-[1.4rem] border border-emerald-300/45 bg-gradient-to-br from-emerald-400/25 to-emerald-600/10 shadow-[0_0_24px_-5px_rgba(52,211,153,0.6)]">
-                    <Medal size={27} className="text-emerald-300" />
-                  </div>
-                </div>
-                <p className="mt-3 font-display text-[16.5px] font-bold text-white">{featuredAchievement.title}</p>
-                <p className="mx-auto mt-0.5 max-w-[250px] text-[11.5px] leading-relaxed text-white/65">{featuredAchievement.description}</p>
-                <p className="mt-2 text-[10.5px] font-semibold text-emerald-300">
-                  Dicapai {formatGregorian(new Date(`${featuredAchievement.earnedAt}T00:00:00`))}
+      {/* ---------- Fokus Ibadah Hari Ini — progres salat wajib dari catatan asli ---------- */}
+      <section aria-label="Fokus ibadah hari ini" className="animate-tz-fade-up">
+        <SectionHeader title="Fokus Ibadah Hari Ini" caption="Langkah kecil untuk menjaga istiqamah setiap hari." />
+        <GlassCard className="p-4">
+          <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-br from-tz-violet/[0.1] via-transparent to-tz-purple/[0.14]" />
+          <div className="relative">
+            {/* Kepala kartu: ikon + teks kondisi dinamis */}
+            <div className="flex items-center gap-3">
+              <IconBox tone="violet" size="sm">
+                <Target />
+              </IconBox>
+              <div className="min-w-0 flex-1">
+                <p className="text-[14px] font-bold text-tz-ink">Progres Sholat Hari Ini</p>
+                <p className="mt-0.5 text-[11.5px] leading-snug text-tz-muted">
+                  {focusRecorded === 0
+                    ? "Belum ada aktivitas tercatat. Mulai perjalanan ibadahmu hari ini."
+                    : focusRecorded === 5
+                      ? "Alhamdulillah, seluruh catatan sholat hari ini sudah lengkap."
+                      : `${focusRecorded} dari 5 sholat tercatat.`}
                 </p>
-                {achEarnedCount > 1 ? (
-                  <div className="mt-3 flex items-center justify-center gap-1.5" aria-hidden>
-                    {achievements.map((a) => (
-                      <span key={a.id} className={cn("h-1.5 w-1.5 rounded-full", a.earnedAt ? "bg-emerald-400" : "bg-white/15")} />
-                    ))}
-                  </div>
-                ) : null}
               </div>
             </div>
+
+            {/* Lima indikator salat — Subuh, Zuhur/Jumat, Asar, Magrib, Isya */}
+            <div className="mt-3.5 grid grid-cols-5 gap-1.5">
+              {focusDetails.map((d) => (
+                <div
+                  key={d.id}
+                  className={cn(
+                    "flex flex-col items-center gap-1.5 rounded-xl border px-1 py-2",
+                    d.status === "done"
+                      ? "border-tz-violet/35 bg-tz-violet/[0.09] light:border-tz-violet/30 light:bg-tz-violet/[0.08]"
+                      : d.status === "missed"
+                        ? "border-rose-300/30 bg-rose-400/[0.07] light:border-rose-300/60 light:bg-rose-400/[0.08]"
+                        : "border-dashed border-tz-line-strong bg-transparent"
+                  )}
+                >
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "flex h-6 w-6 items-center justify-center rounded-full border",
+                      d.status === "done"
+                        ? "border-tz-violet/50 bg-tz-violet/20 text-tz-violet light:bg-tz-violet/15"
+                        : d.status === "missed"
+                          ? "border-rose-300/45 bg-rose-400/10 text-rose-300 light:text-rose-500"
+                          : "border-dashed border-tz-line-strong text-tz-muted/45"
+                    )}
+                  >
+                    {d.status === "done" ? <Check size={12} /> : d.status === "missed" ? <Minus size={12} /> : <span className="h-1 w-1 rounded-full bg-current" />}
+                  </span>
+                  <span
+                    className={cn(
+                      "text-center text-[9.5px] font-semibold leading-tight",
+                      d.status === "none" ? "text-tz-muted/70" : "text-tz-muted"
+                    )}
+                  >
+                    {d.label}
+                  </span>
+                  <span className="sr-only">
+                    {d.label} — {d.status === "done" ? "terlaksana" : d.status === "missed" ? "terlewat" : "belum dicatat"}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Progress bar — terisi kiri ke kanan sesuai jumlah salat terlaksana */}
+            <div
+              className="mt-3.5 h-2 w-full overflow-hidden rounded-full bg-tz-track"
+              role="img"
+              aria-label={`Salat terlaksana hari ini ${focusDone} dari 5`}
+            >
+              <div
+                className="tz-bar-grow-x h-full rounded-full bg-gradient-to-r from-tz-purple to-tz-violet"
+                style={{ width: `${barsIn ? (focusDone / 5) * 100 : 0}%` }}
+              />
+            </div>
+
+            {/* Catatan netral bila ada salat terlewat — tanpa menghakimi */}
+            {focusMissed > 0 ? (
+              <p className="mt-2.5 flex items-center gap-1.5 text-[11px] leading-snug text-tz-muted">
+                <Minus size={12} className="shrink-0 text-rose-300 light:text-rose-400" aria-hidden />
+                {focusMissed} salat terlewat hari ini — tidak apa-apa, besok kesempatan baru.
+              </p>
+            ) : null}
+
+            {/* Ringkasan pendukung — hanya bila ada catatan Al-Qur'an/Zikir hari ini */}
+            {todayQuran > 0 || todayZikir > 0 ? (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                {todayQuran > 0 ? (
+                  <Chip className="shrink-0 border-tz-violet/30 bg-tz-violet/10">
+                    <BookOpen size={11} aria-hidden />
+                    Al-Qur&apos;an {todayQuran} hlm
+                  </Chip>
+                ) : null}
+                {todayZikir > 0 ? (
+                  <Chip className="shrink-0 border-tz-violet/30 bg-tz-violet/10">
+                    <Sparkles size={11} aria-hidden />
+                    Zikir {todayZikir} hitungan
+                  </Chip>
+                ) : null}
+              </div>
+            ) : null}
+
+            {/* Aksi — menuju tracker salat di Beranda (fitur yang sudah ada) */}
+            <button
+              type="button"
+              onClick={onGoTracker}
+              className="tap mt-3.5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-tz-purple to-tz-violet text-[13.5px] font-bold text-white shadow-[0_12px_26px_-12px_rgba(121,80,200,0.8)] transition-opacity hover:opacity-95 active:opacity-90"
+            >
+              <ListChecks size={15} aria-hidden />
+              Lanjutkan Tracker
+              <ChevronRight size={15} aria-hidden />
+            </button>
           </div>
-        ) : (
-          <GlassCard className="p-1.5">
-            <EmptyState
-              icon={<Medal size={20} />}
-              title="Pencapaian pertamamu dimulai dari sini"
-              caption="Catat ibadah pertamamu untuk membuka lencana Langkah Pertama. Pencapaian hanya muncul dari aktivitas yang benar-benar tercatat — tanpa penilaian apa pun."
-            />
-          </GlassCard>
-        )}
+        </GlassCard>
       </section>
 
       {/* ---------- Akun: masuk / keluar / status sinkronisasi ---------- */}

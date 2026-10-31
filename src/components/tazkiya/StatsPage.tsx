@@ -327,41 +327,57 @@ export function StatsPage() {
         </div>
       </header>
 
-      {/* ---------- Ringkasan utama — satu komposisi premium, tiga aksen ----------
-        Cyan = progres hari ini · Amber = streak 5 salat · Emerald = hari sempurna.
+      {/* ---------- Ringkasan utama — hierarki baru: kartu utama + dua kartu pendukung ----------
+        Ungu = progres hari ini (aksen utama) · Amber = streak 5 salat · Teal = hari sempurna.
         Angka besar dengan animasi hitung halus; rumus perhitungan TIDAK diubah. */}
-      <section aria-label="Ringkasan utama">
-        <GlassCard className="p-4">
-          <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-br from-sky-500/[0.08] via-transparent to-emerald-500/[0.08]" />
-          <div className="relative grid grid-cols-3 divide-x divide-tz-line">
-            {/* Hari ini — aksen cyan */}
-            <div className="pr-3">
-              <IconBox size="sm" className="border-sky-400/35 bg-sky-400/15 text-sky-300 light:border-sky-500/35 light:bg-sky-400/20 light:text-sky-600">
-                <Activity />
-              </IconBox>
-              <p className="mt-2.5 font-display text-[27px] font-bold leading-none tabular-nums text-tz-ink">
-                {todayPct}
-                <span className="ml-0.5 text-[12px] font-semibold text-tz-muted">%</span>
-              </p>
-              <p className="mt-1 text-[10px] leading-tight text-tz-muted">Hari ini</p>
-              <div
-                className="mt-2 h-1 w-full overflow-hidden rounded-full bg-tz-track"
-                role="img"
-                aria-label={`Ibadah hari ini ${todayScore.pct}% dari target`}
-              >
-                <div
-                  className="tz-bar-grow h-full rounded-full bg-gradient-to-r from-sky-400 to-cyan-300 light:from-sky-500 light:to-cyan-400"
-                  style={{ width: `${barsIn ? todayScore.pct : 0}%` }}
-                />
+      <section aria-label="Ringkasan utama" className="space-y-3">
+        {/* Kartu utama — Progres Ibadah Hari Ini (aksen ungu Tazkiya) */}
+        <GlassCard className="animate-tz-fade-up p-5">
+          <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-br from-tz-violet/[0.12] via-transparent to-tz-purple/[0.16]" />
+          <div className="relative">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <IconBox className="shrink-0 border-tz-violet/35 bg-tz-violet/15 text-tz-violet light:border-tz-violet/25 light:bg-tz-violet/[0.12] light:text-[#7546c8]">
+                  <Activity />
+                </IconBox>
+                <div className="min-w-0">
+                  <p className="text-[13.5px] font-bold text-tz-ink">Progres Ibadah Hari Ini</p>
+                  <p className="mt-0.5 text-[11px] leading-snug text-tz-muted">
+                    {todayScore.done} dari {todayScore.total} ibadah terlaksana
+                  </p>
+                </div>
               </div>
+              <p className="shrink-0 font-display text-[34px] font-extrabold leading-none tabular-nums text-gradient-violet">
+                {todayPct}
+                <span className="ml-0.5 text-[14px] font-bold text-tz-muted">%</span>
+              </p>
             </div>
-            {/* Streak 5 salat — aksen amber */}
-            <div className="px-3">
+            <div
+              className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-tz-track"
+              role="img"
+              aria-label={`Ibadah hari ini ${todayScore.pct}% dari target`}
+            >
+              <div
+                className="tz-bar-grow-x h-full rounded-full bg-gradient-to-r from-tz-purple to-tz-violet"
+                style={{ width: `${barsIn ? todayScore.pct : 0}%` }}
+              />
+            </div>
+            <p className="mt-2 text-[10.5px] leading-tight text-tz-muted">
+              Persentase seluruh ibadah terlacak yang sudah terlaksana hari ini.
+            </p>
+          </div>
+        </GlassCard>
+
+        {/* Dua kartu pendukung — ukuran seimbang di bawah kartu utama */}
+        <div className="grid grid-cols-2 gap-3">
+          <GlassCard className="animate-tz-fade-up p-4">
+            <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-br from-amber-500/[0.09] via-transparent to-transparent" />
+            <div className="relative">
               <IconBox size="sm" className="border-amber-400/35 bg-amber-400/15 text-amber-300 light:border-amber-500/35 light:bg-amber-400/20 light:text-amber-600">
                 <Flame />
               </IconBox>
-              <p className="mt-2.5 font-display text-[27px] font-bold leading-none tabular-nums text-tz-ink">{streakN}</p>
-              <p className="mt-1 text-[10px] leading-tight text-tz-muted">Hari streak 5 salat</p>
+              <p className="mt-2.5 font-display text-[26px] font-bold leading-none tabular-nums text-tz-ink">{streakN}</p>
+              <p className="mt-1 text-[10.5px] leading-tight text-tz-muted">Hari Streak 5 Salat</p>
               <div className="mt-2 flex items-center gap-1" aria-hidden>
                 {[0, 1, 2].map((i) => (
                   <span
@@ -376,20 +392,22 @@ export function StatsPage() {
                 ))}
               </div>
             </div>
-            {/* Hari sempurna — aksen emerald */}
-            <div className="pl-3">
-              <IconBox size="sm" className="border-emerald-400/35 bg-emerald-400/15 text-emerald-300 light:border-emerald-500/35 light:bg-emerald-400/20 light:text-emerald-600">
+          </GlassCard>
+          <GlassCard className="animate-tz-fade-up p-4">
+            <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-br from-teal-500/[0.09] via-transparent to-transparent" />
+            <div className="relative">
+              <IconBox size="sm" className="border-teal-400/35 bg-teal-400/15 text-teal-300 light:border-teal-500/35 light:bg-teal-400/20 light:text-teal-600">
                 <Trophy />
               </IconBox>
-              <p className="mt-2.5 font-display text-[27px] font-bold leading-none tabular-nums text-tz-ink">{perfectN}</p>
-              <p className="mt-1 text-[10px] leading-tight text-tz-muted">Hari sempurna</p>
+              <p className="mt-2.5 font-display text-[26px] font-bold leading-none tabular-nums text-tz-ink">{perfectN}</p>
+              <p className="mt-1 text-[10.5px] leading-tight text-tz-muted">Hari Sempurna</p>
               <div className="mt-2 flex items-center gap-1" aria-hidden>
-                <span className="h-1 flex-1 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400 light:from-emerald-500 light:to-teal-500" />
+                <span className="h-1 flex-1 rounded-full bg-gradient-to-r from-teal-400 to-emerald-400 light:from-teal-500 light:to-emerald-500" />
                 <span className="text-[8px] font-semibold uppercase tracking-wide text-tz-muted/70">{period === "mingguan" ? "minggu ini" : "bulan ini"}</span>
               </div>
             </div>
-          </div>
-        </GlassCard>
+          </GlassCard>
+        </div>
       </section>
 
 

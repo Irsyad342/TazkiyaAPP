@@ -1298,6 +1298,10 @@ html[data-theme="light"] .glow-violet-sm,
 .tz-bar-grow {
   transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
+/* Varian horizontal (progress bar) — mengisi dari KIRI ke KANAN. */
+.tz-bar-grow-x {
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
 .tz-pop {
   animation: tz-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -1325,7 +1329,8 @@ html[data-theme="light"] .glow-violet-sm,
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  html .tz-bar-grow {
+  html .tz-bar-grow,
+  html .tz-bar-grow-x {
     transition: none !important;
   }
   html .tz-pop,
@@ -1333,7 +1338,8 @@ html[data-theme="light"] .glow-violet-sm,
     animation: none !important;
   }
 }
-html[data-anim="off"] .tz-bar-grow {
+html[data-anim="off"] .tz-bar-grow,
+html[data-anim="off"] .tz-bar-grow-x {
   transition: none !important;
 }
 html[data-anim="off"] .tz-pop,
