@@ -2,6 +2,8 @@
 
 /**
  * Tazkiya — Komponen visual dasar bergaya Dark Purple Glassmorphism.
+ * Variant "clean" (Task 33): kartu solid bersih ala dashboard modern
+ * (referensi Iconiy) — permukaan datar + bayangan lembut, dua tema.
  */
 
 import { useId, type ReactNode } from "react";
@@ -9,7 +11,7 @@ import { cn } from "@/lib/utils";
 
 /* ---------------- GlassCard ---------------- */
 
-type GlassVariant = "plain" | "violet" | "strong" | "hero";
+type GlassVariant = "plain" | "violet" | "strong" | "hero" | "clean";
 
 export function GlassCard({
   children,
@@ -25,11 +27,13 @@ export function GlassCard({
   const variantClass =
     variant === "hero"
       ? "glass-hero"
-      : variant === "violet"
-        ? "glass-violet"
-        : variant === "strong"
-          ? "glass-strong"
-          : "glass";
+      : variant === "clean"
+        ? "tz-card-clean"
+        : variant === "violet"
+          ? "glass-violet"
+          : variant === "strong"
+            ? "glass-strong"
+            : "glass";
   return (
     <div
       onClick={onClick}

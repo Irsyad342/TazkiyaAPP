@@ -319,6 +319,23 @@ html[data-theme="light"] {
     -webkit-mask-composite: xor;
     mask-composite: exclude;
   }
+  /* ---------- Kartu bersih ala dashboard modern (Task 33 — referensi Iconiy) ----------
+     Permukaan solid datar + bayangan menyebar lembut, BUKAN kaca: light = kartu
+     putih bersih di atas kanvas lavender (persis referensi), dark = charcoal-ungu
+     satu keluarga dengan kartu profil (Task 30). Tanpa backdrop-filter — murah di
+     GPU dan tidak tersentuh blok "Kartu 2D datar" Task 16 (kelas berbeda). */
+  .tz-card-clean {
+    background: #191225;
+    border: 1px solid rgba(156, 114, 239, 0.2);
+    box-shadow: 0 26px 60px -34px rgba(22, 12, 44, 0.9);
+  }
+  html[data-theme="light"] .tz-card-clean {
+    background: #ffffff;
+    border: 1px solid rgba(41, 35, 49, 0.05);
+    box-shadow:
+      0 1px 2px rgba(41, 35, 49, 0.04),
+      0 22px 44px -28px rgba(90, 60, 160, 0.3);
+  }
   .glow-violet {
     box-shadow: 0 0 34px -8px rgba(156, 114, 239, 0.6);
   }

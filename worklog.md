@@ -572,3 +572,20 @@ Di tampilan HP, header bagian (mis. "Salat Wajib" di Beranda) tampak tidak simet
 
 ### Uji
 tsc 0; eslint 0; build sukses. Visual lokal 420px & 360px (dark+light, seed 2 selesai): chip "2/5 selesai" & tombol "Detail" satu baris rata tengah, garis aksen penuh; halaman Profil (Fokus Ibadah/Akun/Target) ikut rapi. Tidak ada perubahan data/rumus/fitur.
+## Task 33 — Kartu ringkasan Statistik digaya kartu bersih ala dashboard modern (referensi Iconiy)
+Tanggal: 2026-10-31. **Di-deploy produksi** via cherry-pick (cabang `deploy/statistik-only` → `main`) — HANYA perubahan Statistik; Task 32/32b (hero maskot Beranda) tetap lokal, belum deploy.
+
+### Catatan deploy (cabang ini)
+Commit ini adalah cherry-pick dari `1d89075` di main lokal; berisi perubahan Statistik saja (StatsPage/ui-bits/tz-card-clean) di atas state produksi `2d51f41`. Entri Task 32/32b tidak termasuk di cabang ini.
+
+### Permintaan
+User mengirim screenshot halaman Statistik (kartu Progres Ibadah Hari Ini + Hari Streak + Hari Sempurna) dan referensi desain "Iconiy": kartu putih bersih radius besar, bayangan menyebar lembut, hierarki tipografi tegas (angka besar + label kecil abu), chip ikon tint tanpa border, progress bar minimalis. Permintaan: ubah kartu pada bagian itu mengikuti referensi. Revisi terarah — kartu lain (Kalender Riwayat, dst) tidak disentuh.
+
+### Perubahan
+- `src/app/globals.css`: utilitas baru `.tz-card-clean` — permukaan solid datar + bayangan lembut (bukan kaca; tanpa backdrop-filter, tidak tersentuh blok "Kartu 2D datar" Task 16): dark = `#191225` + border violet/20 (satu keluarga kartu profil Task 30), light = putih + border 5% + bayangan ungu menyebar ala referensi.
+- `src/components/tazkiya/ui-bits.tsx`: GlassCard menerima `variant="clean"` (additive — pemakaian lama tidak berubah).
+- `src/components/tazkiya/StatsPage.tsx` (3 kartu ringkasan saja): `variant="clean"`; overlay gradasi dalam kartu dihapus; chip ikon tanpa border (violet/amber/teal tint); angka utama 34→40px & pendukung 26→30px extrabold; label/keterangan dirapikan (14px bold + 11.5px muted; label pendukung 11px); progress bar utama h-2.5→h-2; label "MINGGU INI/BULAN INI" 8→9px. Rumus & sumber data (dayScore, computeStreak, dll) TIDAK diubah.
+
+### Uji (lulus semua)
+tsc 0; eslint 0; build sukses. Visual lokal 420px dark+light (seed 3/9 tercatat → 33% benar): kartu solid bersih sesuai referensi, angka dominan, chip tint tanpa border; light tampak seperti referensi (kartu putih di kanvas lavender). Ujian 360px dark+light: tanpa scroll horizontal (scrollX=0), judul wrap rapi, komposisi terjaga. Kalender Riwayat & bagian lain tidak berubah; data/auth/navigasi tidak disentuh. Bayangan statis (bukan blur animasi), aman reduced-motion.
+>>>>>>> 1d89075 (Task 33 (LOKAL, belum deploy): kartu ringkasan Statistik digaya kartu bersih ala dashboard modern (referensi Iconiy) — varian tz-card-clean dua tema, chip ikon tanpa border, angka dominan; rumus data tidak diubah)
