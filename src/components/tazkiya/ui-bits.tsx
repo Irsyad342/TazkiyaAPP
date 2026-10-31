@@ -59,15 +59,17 @@ export function SectionHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("mb-3 flex items-end justify-between gap-3 px-1", className)}>
-      <div className="flex items-center gap-2.5">
-        <span aria-hidden className="h-4 w-1 rounded-full bg-tz-violet" />
-        <div>
+    <div className={cn("mb-3 flex items-center justify-between gap-3 px-1", className)}>
+      <div className="flex min-w-0 items-center gap-2.5">
+        <span aria-hidden className="w-1 shrink-0 self-stretch rounded-full bg-tz-violet" />
+        <div className="min-w-0">
           <h2 className="font-display text-[16px] font-semibold tracking-tight text-tz-ink">{title}</h2>
-          {caption ? <p className="mt-0.5 text-[11px] text-tz-muted">{caption}</p> : null}
+          {caption ? <p className="mt-0.5 text-[11px] leading-snug text-tz-muted">{caption}</p> : null}
         </div>
       </div>
-      {action}
+      {action ? (
+        <div className="flex shrink-0 items-center whitespace-nowrap">{action}</div>
+      ) : null}
     </div>
   );
 }

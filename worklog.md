@@ -555,3 +555,20 @@ Diubah: ProfilePage.tsx, StatsPage.tsx, page.tsx, globals.css (tz-bar-grow-x + g
 
 ### Uji (12 butir — lulus semua)
 tsc 0; eslint 0; sync-merge 34/34; build sukses; visual lokal 420px: profil dark=ungu tanpa hijau, profil light=putih-lavender otomatis; statistik dark+light hierarki baru dengan nilai benar (33%=3/9; 67%=6/9; sempurna 1); Pencapaian tidak tampil; Fokus Ibadah 3 kondisi (kosong-implisit token, 3/5 tercatat + catatan terlewat netral, 5/5 apresiasi); Lanjutkan Tracker pindah ke Beranda; data tidak hilang (localStorage tetap); responsif tetap; animasi transform/opacity + guard.
+
+## Task 31 — Header section simetris di tampilan HP (SectionHeader)
+Tanggal: 2026-10-31. Checkpoint: branch `checkpoint/pre-header-mobile` (@98c4394, pushed).
+
+### Masalah (laporan user + screenshot)
+Di tampilan HP, header bagian (mis. "Salat Wajib" di Beranda) tampak tidak simetris:
+- Chip aksi "X/5 selesai" ter-wrap menjadi 2 baris karena flex item boleh menyusut (tanpa shrink-0/nowrap) saat caption panjang.
+- Chip sejajar bawah (`items-end`) sehingga tampak menggantung; garis aksen ungu (h-4, 16px) melayang di tengah blok teks (~38px).
+
+### Perbaikan — `src/components/tazkiya/ui-bits.tsx` (SectionHeader, komponen bersama 14 pemakaian)
+- Baris header `items-end` → `items-center`: chip/tombol aksi kini rata tengah vertikal terhadap blok judul+caption.
+- Aksi dibungkus `<div className="flex shrink-0 items-center whitespace-nowrap">`: chip/tombol tidak pernah ter-wrap (berlaku untuk semua pemakaian: chip Salat Wajib, tombol "Detail", dst).
+- Grup kiri + wadah teks diberi `min-w-0`: caption menyusut & wrap dengan rapi, tidak mendorong chip keluar.
+- Garis aksen ungu `h-4` → `w-1 shrink-0 self-stretch`: membentang penuh sejajar tinggi judul+caption (terjangkar, tidak melayang). Caption diberi `leading-snug`.
+
+### Uji
+tsc 0; eslint 0; build sukses. Visual lokal 420px & 360px (dark+light, seed 2 selesai): chip "2/5 selesai" & tombol "Detail" satu baris rata tengah, garis aksen penuh; halaman Profil (Fokus Ibadah/Akun/Target) ikut rapi. Tidak ada perubahan data/rumus/fitur.
