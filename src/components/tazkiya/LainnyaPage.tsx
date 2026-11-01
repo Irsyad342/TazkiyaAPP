@@ -3,12 +3,12 @@
 /**
  * Tazkiya — Halaman Lainnya: pintasan ke halaman tersendiri
  * (Jurnal Syukur, Zikir & Doa, Rizq & Amal, Profil).
- * Setiap menu membuka halaman penuh — bukan modal.
+ * Setiap menu adalah <button> sungguhan yang membuka halaman penuh — bukan modal.
  */
 
 import { ChevronRight, HandCoins, HandHeart, CircleUserRound, BookHeart } from "lucide-react";
 import type { SubPageId } from "./BottomNav";
-import { GlassCard } from "./ui-bits";
+import { cn } from "@/lib/utils";
 
 const MENUS: {
   id: SubPageId;
@@ -57,15 +57,20 @@ export function LainnyaPage({ onOpen }: { onOpen: (sub: SubPageId) => void }) {
 
       <section aria-label="Menu lainnya" className="space-y-3">
         {MENUS.map(({ id, title, caption, icon: Icon, tone }, i) => (
-          <GlassCard
+          <button
             key={id}
-            className={`animate-tz-fade-up cursor-pointer p-4`}
+            type="button"
             onClick={() => onOpen(id)}
+            aria-label={`Buka halaman ${title}`}
+            className={cn(
+              "tap block w-full rounded-[1.65rem] border border-tz-line bg-tz-panel-soft p-4 text-left transition-all hover:border-tz-violet/45 active:scale-[0.985] animate-tz-fade-up"
+            )}
+            style={{ animationDelay: `${i * 40}ms` }}
           >
-            <div className="flex items-center gap-3.5" style={{ animationDelay: `${i * 40}ms` }}>
+            <div className="flex items-center gap-3.5">
               <span
                 aria-hidden
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[0.95rem] border border-transparent ${tone}`}
+                className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-[0.95rem] border border-transparent", tone)}
               >
                 <Icon size={20} strokeWidth={1.9} />
               </span>
@@ -75,7 +80,7 @@ export function LainnyaPage({ onOpen }: { onOpen: (sub: SubPageId) => void }) {
               </span>
               <ChevronRight size={17} className="shrink-0 text-tz-muted/70" />
             </div>
-          </GlassCard>
+          </button>
         ))}
       </section>
 

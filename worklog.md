@@ -589,3 +589,30 @@ User mengirim screenshot halaman Statistik (kartu Progres Ibadah Hari Ini + Hari
 ### Uji (lulus semua)
 tsc 0; eslint 0; build sukses. Visual lokal 420px dark+light (seed 3/9 tercatat → 33% benar): kartu solid bersih sesuai referensi, angka dominan, chip tint tanpa border; light tampak seperti referensi (kartu putih di kanvas lavender). Ujian 360px dark+light: tanpa scroll horizontal (scrollX=0), judul wrap rapi, komposisi terjaga. Kalender Riwayat & bagian lain tidak berubah; data/auth/navigasi tidak disentuh. Bayangan statis (bukan blur animasi), aman reduced-motion.
 >>>>>>> 1d89075 (Task 33 (LOKAL, belum deploy): kartu ringkasan Statistik digaya kartu bersih ala dashboard modern (referensi Iconiy) — varian tz-card-clean dua tema, chip ikon tanpa border, angka dominan; rumus data tidak diubah)
+
+## Task 34 — Islamic Daily Companion: struktur Nūr + identitas ungu Tazkiya (nav 5 menu, Sholat+Qada, Jurnal Syukur, Zikir & Doa, Rizq & Amal, Progress)
+
+### Permintaan
+Pengembangan besar terinspirasi konsep Nūr — Daily Companion for a Better Deen (referensi Behance + 4 screenshot): struktur navigasi Beranda/Al-Qur'an/Sholat/Progress/Lainnya, Beranda ala dashboard (header sapaan+tanggal Hijriah, Next Prayer countdown+timeline, Daily Journey, Daily Barakah), halaman Sholat dengan tab Hari Ini/Bulanan/Qada, peningkatan Al-Qur'an, Zikir & Doa terpisah, Jurnal Syukur (3 syukr + mood + hadis bersumber), Rizq & Amal, Progress menggantikan nama Statistik. Aturan keras: jangan merusak fitur/data lama, tanpa data dummy produksi, tanpa hadis buatan, tanpa deploy otomatis di tengah pengerjaan (deploy eksplisit di akhir atas permintaan pengguna).
+
+### Pendekatan
+Bekerja di branch `fitur/nur-companion` dari state PRODUKSI (`f4080cf`) — bukan dari main lokal ber-WIP — sehingga hero maskot Task 32/32b yang belum disetujui tidak terbawa; WIP tetap aman di branch `backup/pre-nur-overhaul`.
+
+### Perubahan
+- Data: `types.ts` + slice baru di store (qadaRecords, journal, moods, amalEntries, amalGoals, zikirSessions, dailyGoals, goalDone) lengkap dengan partialize/reset/clear/importCloudData; `CloudDoc` + `mergeDocs` + langganan sync diperluas anti-duplikat (gabung per id, jurnal/mood terbaru menang). Tidak ada data lama disentuh; dokumen lama tetap terbaca.
+- Konten: `hadith.ts` (14 hadis masyhur dengan kitab+nomor: Bukhari/Muslim/Tirmidzi/Abu Dawud; tidak ada teks karangan), `zikir-doa.ts` (set zikir pagi/petang/setelah salat/harian + doa 4 kategori bersumber), `barakah.ts` (Daily Barakah 4 kategori per tanggal), `goals.ts` (status target harian, tepat waktu/terlambat dari savedAt vs jadwal, salat berikutnya per detik).
+- Navigasi: BottomNav 5 menu; page.tsx menambah tab sholat/progress/lainnya + sub-halaman penuh (Jurnal Syukur, Zikir & Doa, Rizq & Amal, Profil) dengan tombol kembali — bukan modal.
+- Beranda: header sapaan + Masehi/Hijriah + avatar, NextPrayerCard (jadwal GPS aktual, countdown, timeline 5 waktu lewat/berjalan/berikutnya), DailyJourney (target otomatis dari data + manual, bisa diatur, mood check-in ringkas), DailyBarakah, aksi cepat, strip progres ringkas, Doa Hari Ini dipertahankan.
+- Sholat: ringkasan (x/5, ring %, chip berjamaah/tepat waktu) + 5 baris salat (jadwal, status penyelesaian TERPISAH dari cara pelaksanaan & waktu: tepat waktu/terlambat bila dapat ditentukan, Jumat→Salat Jumat), tab Bulanan (kalender status + rincian tanggal, tanpa catatan ≠ gagal), tab Qada (kelola manual, cegah duplikat, tandai selesai dengan tanggal, riwayat + buka kembali, hadis pengingat qada). Tawaran "Masukkan ke daftar Qada" muncul saat mencatat salat terlewat — murni pilihan pengguna.
+- Progress: menggantikan Statistik (nama & konsep; data utuh) — tab Hari Ini (progres per kategori: salat, Qur'an, zikir, target harian, amal, jurnal — visual berbeda per jenis), Mingguan (pola 7 hari kronologis + ringkasan kategori), Bulanan (kalender aktivitas, hari aktif, kebiasaan). Bahasa positif; kategori tidak saling tercampur.
+- Jurnal Syukur: 3 isian + Simpan Jurnal, mood check-in 7 pilihan (pilihan sadar pengguna, bukan diagnosis), Hadith for Your Heart (sumber kitab+nomor, salin/bagikan, lihat lainnya), riwayat edit/hapus, catatan privasi.
+- Zikir & Doa: tasbih digital (kini dengan slot sesi: pagi/petang/setelah salat/harian), set zikir lipat dengan Arab+transliterasi+arti+sumber, riwayat sesi; tab Doa dengan Doa Hari Ini (fitur lama, diintegrasikan) + 4 kategori.
+- Rizq & Amal: target kebaikan (default+pribadi), catatan amal/sedekah (tanpa penilaian nilai uang), ringkasan mingguan 7 hari, riwayat.
+- Al-Qur'an: tambah Progres Bacaanmu (total halaman/ayat/hari membaca + batang 7 hari) dan daftar Ayat Ditandai; seluruh fitur lama (target, jelajah, catat, riwayat, pembaca) utuh.
+- Lainnya: Profil dipindah masuk (fitur profil lengkap tidak berubah); LainnyaPage kartu = tombol aksesibel.
+
+### Uji (lulus semua)
+tsc 0; eslint 0; build sukses. Uji fungsional browser lokal (seed data uji, bukan produksi): 5 tombol nav; halaman Sholat 5 baris; alur catat salat (dialog → berjamaah → simpan → prayerDetails tersimpan); qada tambah manual (3→4) + pending 2; jurnal 3 syukr tersimpan + mood tersimpan; zikir & doa tab; rizq & amal tambah catatan (dengan native setter — temuan awal hanya artefak pengujian); tema light & dark; 360px tanpa overflow (docW=winW=360). Perbaikan dari uji: kartu Next Prayer jadi gradasi ungu solid agar teks putih kontras di tema terang.
+
+### Catatan sumber
+Jadwal salat memakai mesin yang sudah ada (GPS + Kemenag, ihtiyat +2 mnt) — tidak ada jadwal karangan. Al-Qur'an tetap AlQuran Cloud. Hadis/doa/zikir hanya dari kutubut-tis'ah & QS dengan nomor eksplisit; doa masyhur tanpa nomor diberi label jujur "tanpa klaim hadis".

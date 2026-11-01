@@ -108,9 +108,11 @@ function NextPrayerCard({ today }: { today: string }) {
 
   return (
     <section aria-label="Salat berikutnya" className="animate-tz-fade-up">
-      <GlassCard variant="violet" className="overflow-hidden p-5">
+      {/* Permukaan gradasi ungu SOLID di kedua tema — teks putih selalu kontras
+          (varian glass-violet kurang kontras untuk teks putih pada tema terang). */}
+      <div className="relative overflow-hidden rounded-[1.65rem] bg-gradient-to-br from-tz-purple via-[#7B4FD6] to-tz-violet p-5 shadow-[0_18px_50px_-18px_rgba(85,51,154,0.75),inset_0_1px_0_rgba(255,255,255,0.18)]">
         {/* Siluet masjid dekoratif */}
-        <svg viewBox="0 0 200 120" fill="none" aria-hidden className="pointer-events-none absolute -right-4 -top-2 h-28 w-40 text-white/[0.09]">
+        <svg viewBox="0 0 200 120" fill="none" aria-hidden className="pointer-events-none absolute -right-4 -top-2 h-28 w-40 text-white/[0.12]">
           <path d="M100 22c8 6 12 12 12 18H88c0-6 4-12 12-18Z" fill="currentColor" />
           <rect x="84" y="44" width="32" height="40" rx="2" fill="currentColor" />
           <path d="M92 84v-9a8 8 0 0 1 16 0v9Z" fill="currentColor" opacity="0.5" />
@@ -121,12 +123,12 @@ function NextPrayerCard({ today }: { today: string }) {
         </svg>
 
         <div className="relative">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-tz-accent">
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/85">
             Salat berikutnya · {nextLabel}
             {state.tomorrow ? " (besok)" : ""}
           </p>
           <div className="mt-1 flex flex-wrap items-end gap-x-3 gap-y-2">
-            <p className="font-display text-[44px] font-extrabold leading-none tracking-tight text-tz-ink">
+            <p className="font-display text-[44px] font-extrabold leading-none tracking-tight text-white">
               {state.nextTime}
             </p>
             <span
@@ -164,12 +166,12 @@ function NextPrayerCard({ today }: { today: string }) {
                     <span
                       className={cn(
                         "text-[9.5px] font-semibold leading-none",
-                        st === "next" ? "text-white" : st === "past" || st === "current" ? "text-white/80" : "text-white/50"
+                        st === "next" ? "text-white" : st === "past" || st === "current" ? "text-white/85" : "text-white/55"
                       )}
                     >
                       {label}
                     </span>
-                    <span className={cn("text-[8.5px] leading-none", done ? "font-bold text-emerald-200" : "text-white/45")}>
+                    <span className={cn("text-[8.5px] leading-none", done ? "font-bold text-emerald-200" : "text-white/60")}>
                       {done ? "✓" : times[id]?.time ?? ""}
                     </span>
                   </div>
@@ -178,7 +180,7 @@ function NextPrayerCard({ today }: { today: string }) {
             </div>
           </div>
 
-          <p className="mt-3 flex items-center gap-1.5 text-[9.5px] text-white/55">
+          <p className="mt-3 flex items-center gap-1.5 text-[9.5px] text-white/60">
             <Sparkles size={10} className="shrink-0" />
             {scheduleSource} ·{" "}
             {state.tomorrow
@@ -186,7 +188,7 @@ function NextPrayerCard({ today }: { today: string }) {
               : `${PRAYER_ORDER.find((p) => p.id === state.current)?.label ?? "-"} sedang berlangsung`}
           </p>
         </div>
-      </GlassCard>
+      </div>
     </section>
   );
 }
