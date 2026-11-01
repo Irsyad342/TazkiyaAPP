@@ -13,15 +13,21 @@
 import {
   EXTRA_IDS,
   PRAYER_IDS,
+  type AmalEntry,
+  type AmalGoal,
   type AyahBookmark,
+  type DailyGoal,
   type DailyLog,
+  type JournalEntry,
   type LastRead,
   type PrayerDetail,
   type PrayerId,
+  type QadaRecord,
   type QuranBookmark,
   type ReadingEntry,
   type Settings,
   type TasbihState,
+  type ZikirSession,
 } from "@/lib/tazkiya/types";
 import { hasAnyDayRecord } from "@/lib/tazkiya/stats";
 
@@ -36,6 +42,15 @@ export interface CloudDoc {
   lastRead?: LastRead | null;
   readingHistory?: ReadingEntry[];
   tasbih?: TasbihState;
+  /* ---- Perluasan Nūr Companion (opsional — dokumen lama tetap terbaca) ---- */
+  qadaRecords?: QadaRecord[];
+  journal?: Record<string, JournalEntry>;
+  moods?: Record<string, { mood: string; savedAt: string }>;
+  amalEntries?: AmalEntry[];
+  amalGoals?: AmalGoal[];
+  zikirSessions?: ZikirSession[];
+  dailyGoals?: DailyGoal[];
+  goalDone?: Record<string, string[]>;
 }
 
 /** Ambil dokumen lengkap (termasuk pengaturan) dari state store saat ini. */
@@ -49,6 +64,14 @@ export function extractFullDoc(state: {
   lastRead: LastRead | null;
   readingHistory: ReadingEntry[];
   tasbih: TasbihState;
+  qadaRecords: QadaRecord[];
+  journal: Record<string, JournalEntry>;
+  moods: Record<string, { mood: string; savedAt: string }>;
+  amalEntries: AmalEntry[];
+  amalGoals: AmalGoal[];
+  zikirSessions: ZikirSession[];
+  dailyGoals: DailyGoal[];
+  goalDone: Record<string, string[]>;
 }): CloudDoc {
   return {
     v: 1,
@@ -61,6 +84,14 @@ export function extractFullDoc(state: {
     lastRead: state.lastRead,
     readingHistory: state.readingHistory,
     tasbih: state.tasbih,
+    qadaRecords: state.qadaRecords,
+    journal: state.journal,
+    moods: state.moods,
+    amalEntries: state.amalEntries,
+    amalGoals: state.amalGoals,
+    zikirSessions: state.zikirSessions,
+    dailyGoals: state.dailyGoals,
+    goalDone: state.goalDone,
   };
 }
 
@@ -79,6 +110,13 @@ export function isEmptyDoc(doc: CloudDoc | null | undefined): boolean {
   if (doc.lastRead) return false;
   if (doc.readingHistory && doc.readingHistory.length > 0) return false;
   if (doc.tasbih && doc.tasbih.count > 0) return false;
+  /* Data perluasan juga dihitung — tidak boleh dianggap kosong lalu ditimpa. */
+  if (doc.qadaRecords && doc.qadaRecords.length > 0) return false;
+  if (doc.journal && Object.keys(doc.journal).length > 0) return false;
+  if (doc.moods && Object.keys(doc.moods).length > 0) return false;
+  if (doc.amalEntries && doc.amalEntries.length > 0) return false;
+  if (doc.zikirSessions && doc.zikirSessions.length > 0) return false;
+  if (doc.goalDone && Object.keys(doc.goalDone).length > 0) return false;
   return true;
 }
 

@@ -9,21 +9,37 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import {
   createDefaultSettings,
   createEmptyLog,
+  DEFAULT_AMAL_GOALS,
+  DEFAULT_DAILY_GOALS,
   DEFAULT_ZIKIR_DHIKR,
   sanitizeTrackedExtras,
+  type AmalEntry,
+  type AmalGoal,
+  type AmalKind,
   type AyahBookmark,
+  type DailyGoal,
   type DailyLog,
   type ExtraId,
+  type JournalEntry,
   type LastRead,
+  type MoodId,
   type PrayerDetail,
   type PrayerId,
+  type QadaRecord,
   type QuranBookmark,
   type QuranTargetType,
   type ReadingEntry,
   type Settings,
   type TasbihState,
+  type ZikirSession,
+  type ZikirSlot,
 } from "./types";
 import type { CloudDoc } from "@/lib/sync/doc";
+
+/** ID unik sederhana untuk catatan baru. */
+function newId(prefix: string): string {
+  return `${prefix}-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e6).toString(36)}`;
+}
 
 interface WorshipActions {
   /** Pencatatan salat lengkap: status + jenis pelaksanaan / alasan. */
@@ -48,7 +64,29 @@ interface WorshipActions {
   tasbihReset: () => void;
   tasbihSetTarget: (n: number) => void;
   tasbihSetDhikr: (s: string) => void;
-  commitZikirToDay: (date: string) => number;
+  /** Simpan hitungan tasbih ke catatan harian + riwayat sesi (slot opsional). */
+  commitZikirToDay: (date: string, slot?: ZikirSlot) => number;
+  /* ---- Qada ---- */
+  /** Tambah catatan qada; mengembalikan null bila duplikat (salat+tanggal sama, belum selesai). */
+  addQada: (prayer: PrayerId, missedDate: string, note?: string) => QadaRecord | null;
+  completeQada: (id: string) => void;
+  reopenQada: (id: string) => void;
+  deleteQada: (id: string) => void;
+  /* ---- Jurnal Syukur & Mood ---- */
+  saveJournal: (date: string, items: [string, string, string], mood?: MoodId) => void;
+  deleteJournal: (date: string) => void;
+  setMood: (date: string, mood: MoodId) => void;
+  /* ---- Rizq & Amal ---- */
+  addAmalEntry: (date: string, kind: AmalKind, title: string, note?: string) => void;
+  deleteAmalEntry: (id: string) => void;
+  addAmalGoal: (label: string) => void;
+  deleteAmalGoal: (id: string) => void;
+  /* ---- Target Harian ---- */
+  toggleDailyGoalEnabled: (id: string) => void;
+  addDailyGoal: (label: string) => void;
+  deleteDailyGoal: (id: string) => void;
+  /** Tandai/selesai target manual pada satu tanggal (target auto diturunkan dari data). */
+  toggleGoalDone: (date: string, goalId: string) => void;
   clearReadingHistory: () => void;
   resetAll: () => void;
   /** Ganti seluruh data dengan dokumen akun (dipakai sinkronisasi cloud). */
@@ -68,6 +106,22 @@ export type WorshipStore = {
   readingHistory: ReadingEntry[];
   tasbih: TasbihState;
   fridayZuhurAlt: Record<string, boolean>;
+  /** Daftar qada — paling baru dibuat di depan. */
+  qadaRecords: QadaRecord[];
+  /** Jurnal syukur per tanggal. */
+  journal: Record<string, JournalEntry>;
+  /** Mood check-in per tanggal (yang terbaru menang). */
+  moods: Record<string, { mood: MoodId; savedAt: string }>;
+  /** Catatan amal kebaikan & sedekah — paling baru di depan. */
+  amalEntries: AmalEntry[];
+  /** Target kebaikan pribadi (default + buatan pengguna). */
+  amalGoals: AmalGoal[];
+  /** Riwayat sesi zikir — paling baru di depan (maks. 500). */
+  zikirSessions: ZikirSession[];
+  /** Target harian (Daily Journey) — default + buatan pengguna. */
+  dailyGoals: DailyGoal[];
+  /** Target manual yang ditandai selesai per tanggal (id target). */
+  goalDone: Record<string, string[]>;
 } & WorshipActions;
 
 function upsertLog(
@@ -91,6 +145,14 @@ export const useWorshipStore = create<WorshipStore>()(
       readingHistory: [],
       tasbih: { count: 0, target: 100, dhikr: DEFAULT_ZIKIR_DHIKR },
       fridayZuhurAlt: {},
+      qadaRecords: [],
+      journal: {},
+      moods: {},
+      amalEntries: [],
+      amalGoals: DEFAULT_AMAL_GOALS,
+      zikirSessions: [],
+      dailyGoals: DEFAULT_DAILY_GOALS,
+      goalDone: {},
 
       /**
        * Simpan catatan lengkap satu salat. `null` atau status "none"
@@ -237,15 +299,140 @@ export const useWorshipStore = create<WorshipStore>()(
 
       tasbihSetDhikr: (dhikr) => set((s) => ({ tasbih: { ...s.tasbih, dhikr } })),
 
-      commitZikirToDay: (date) => {
+      commitZikirToDay: (date, slot = "harian") => {
         const amount = get().tasbih.count;
         if (amount <= 0) return 0;
+        const session: ZikirSession = {
+          id: newId("zk"),
+          date,
+          count: amount,
+          dhikr: get().tasbih.dhikr,
+          slot,
+          savedAt: new Date().toISOString(),
+        };
         set((s) => ({
           logs: upsertLog(s.logs, date, (log) => ({ ...log, zikirCount: log.zikirCount + amount })),
           tasbih: { ...s.tasbih, count: 0 },
+          zikirSessions: [session, ...s.zikirSessions].slice(0, 500),
         }));
         return amount;
       },
+
+      /* ---------- Qada ---------- */
+      addQada: (prayer, missedDate, note) => {
+        const dup = get().qadaRecords.find(
+          (q) => q.prayer === prayer && q.missedDate === missedDate && !q.completedAt
+        );
+        if (dup) return null;
+        const rec: QadaRecord = {
+          id: newId("qd"),
+          prayer,
+          missedDate,
+          createdAt: new Date().toISOString(),
+          note: note?.trim() || undefined,
+        };
+        set((s) => ({ qadaRecords: [rec, ...s.qadaRecords] }));
+        return rec;
+      },
+
+      completeQada: (id) =>
+        set((s) => ({
+          qadaRecords: s.qadaRecords.map((q) =>
+            q.id === id && !q.completedAt ? { ...q, completedAt: new Date().toISOString() } : q
+          ),
+        })),
+
+      reopenQada: (id) =>
+        set((s) => ({
+          qadaRecords: s.qadaRecords.map((q) =>
+            q.id === id ? { ...q, completedAt: undefined } : q
+          ),
+        })),
+
+      deleteQada: (id) =>
+        set((s) => ({ qadaRecords: s.qadaRecords.filter((q) => q.id !== id) })),
+
+      /* ---------- Jurnal Syukur & Mood ---------- */
+      saveJournal: (date, items, mood) =>
+        set((s) => {
+          const prev = s.journal[date];
+          const entry: JournalEntry = {
+            date,
+            items: [items[0].trim(), items[1].trim(), items[2].trim()],
+            mood: mood ?? prev?.mood,
+            savedAt: prev?.savedAt ?? new Date().toISOString(),
+            updatedAt: prev ? new Date().toISOString() : undefined,
+          };
+          return { journal: { ...s.journal, [date]: entry } };
+        }),
+
+      deleteJournal: (date) =>
+        set((s) => {
+          const journal = { ...s.journal };
+          delete journal[date];
+          return { journal };
+        }),
+
+      setMood: (date, mood) =>
+        set((s) => ({
+          moods: { ...s.moods, [date]: { mood, savedAt: new Date().toISOString() } },
+        })),
+
+      /* ---------- Rizq & Amal ---------- */
+      addAmalEntry: (date, kind, title, note) =>
+        set((s) => {
+          const entry: AmalEntry = {
+            id: newId("am"),
+            date,
+            kind,
+            title: title.trim(),
+            note: note?.trim() || undefined,
+            savedAt: new Date().toISOString(),
+          };
+          return { amalEntries: [entry, ...s.amalEntries].slice(0, 1000) };
+        }),
+
+      deleteAmalEntry: (id) =>
+        set((s) => ({ amalEntries: s.amalEntries.filter((e) => e.id !== id) })),
+
+      addAmalGoal: (label) =>
+        set((s) => {
+          const clean = label.trim();
+          if (!clean) return s;
+          if (s.amalGoals.some((g) => g.label.toLowerCase() === clean.toLowerCase())) return s;
+          return { amalGoals: [...s.amalGoals, { id: newId("ag"), label: clean }] };
+        }),
+
+      deleteAmalGoal: (id) =>
+        set((s) => ({ amalGoals: s.amalGoals.filter((g) => g.id !== id) })),
+
+      /* ---------- Target Harian ---------- */
+      toggleDailyGoalEnabled: (id) =>
+        set((s) => ({
+          dailyGoals: s.dailyGoals.map((g) => (g.id === id ? { ...g, enabled: !g.enabled } : g)),
+        })),
+
+      addDailyGoal: (label) =>
+        set((s) => {
+          const clean = label.trim();
+          if (!clean) return s;
+          if (s.dailyGoals.some((g) => g.label.toLowerCase() === clean.toLowerCase())) return s;
+          return {
+            dailyGoals: [...s.dailyGoals, { id: newId("dg"), label: clean, enabled: true, custom: true }],
+          };
+        }),
+
+      deleteDailyGoal: (id) =>
+        set((s) => ({ dailyGoals: s.dailyGoals.filter((g) => g.id !== id) })),
+
+      toggleGoalDone: (date, goalId) =>
+        set((s) => {
+          const cur = s.goalDone[date] ?? [];
+          const next = cur.includes(goalId) ? cur.filter((g) => g !== goalId) : [...cur, goalId];
+          const goalDone = { ...s.goalDone, [date]: next };
+          if (next.length === 0) delete goalDone[date];
+          return { goalDone };
+        }),
 
       clearReadingHistory: () => set(() => ({ readingHistory: [] })),
 
@@ -260,6 +447,14 @@ export const useWorshipStore = create<WorshipStore>()(
           readingHistory: [],
           tasbih: { count: 0, target: 100, dhikr: DEFAULT_ZIKIR_DHIKR },
           fridayZuhurAlt: {},
+          qadaRecords: [],
+          journal: {},
+          moods: {},
+          amalEntries: [],
+          amalGoals: DEFAULT_AMAL_GOALS,
+          zikirSessions: [],
+          dailyGoals: DEFAULT_DAILY_GOALS,
+          goalDone: {},
         })),
 
       /**
@@ -284,6 +479,14 @@ export const useWorshipStore = create<WorshipStore>()(
             lastRead: doc.lastRead ?? null,
             readingHistory: doc.readingHistory ?? [],
             tasbih: doc.tasbih ?? { count: 0, target: 100, dhikr: DEFAULT_ZIKIR_DHIKR },
+            qadaRecords: doc.qadaRecords ?? [],
+            journal: doc.journal ?? {},
+            moods: (doc.moods ?? {}) as Record<string, { mood: MoodId; savedAt: string }>,
+            amalEntries: doc.amalEntries ?? [],
+            amalGoals: (doc.amalGoals ?? DEFAULT_AMAL_GOALS) as AmalGoal[],
+            zikirSessions: doc.zikirSessions ?? [],
+            dailyGoals: (doc.dailyGoals ?? DEFAULT_DAILY_GOALS) as DailyGoal[],
+            goalDone: doc.goalDone ?? {},
           };
         }),
 
@@ -302,6 +505,14 @@ export const useWorshipStore = create<WorshipStore>()(
           lastRead: null,
           readingHistory: [],
           tasbih: { ...s.tasbih, count: 0 },
+          qadaRecords: [],
+          journal: {},
+          moods: {},
+          amalEntries: [],
+          amalGoals: DEFAULT_AMAL_GOALS,
+          zikirSessions: [],
+          dailyGoals: DEFAULT_DAILY_GOALS,
+          goalDone: {},
         })),
     }),
     {
@@ -353,6 +564,14 @@ export const useWorshipStore = create<WorshipStore>()(
         readingHistory: s.readingHistory,
         tasbih: s.tasbih,
         fridayZuhurAlt: s.fridayZuhurAlt,
+        qadaRecords: s.qadaRecords,
+        journal: s.journal,
+        moods: s.moods,
+        amalEntries: s.amalEntries,
+        amalGoals: s.amalGoals,
+        zikirSessions: s.zikirSessions,
+        dailyGoals: s.dailyGoals,
+        goalDone: s.goalDone,
       }),
     }
   )

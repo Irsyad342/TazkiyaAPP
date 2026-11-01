@@ -96,6 +96,14 @@ function subscribeStore() {
     "lastRead",
     "readingHistory",
     "tasbih",
+    "qadaRecords",
+    "journal",
+    "moods",
+    "amalEntries",
+    "amalGoals",
+    "zikirSessions",
+    "dailyGoals",
+    "goalDone",
   ] as const;
   let prevJson = snapshot();
   function snapshot(): string {

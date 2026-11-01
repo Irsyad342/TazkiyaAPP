@@ -198,6 +198,16 @@ export function mergeDocs(local: CloudDoc, cloud: CloudDoc, opts: MergeOptions):
   const settings: Settings | undefined =
     opts.settingsFrom === "cloud" ? cloud.settings ?? local.settings : local.settings ?? cloud.settings;
 
+  /* ---------- Perluasan Nūr Companion ---------- */
+  const qadaRecords = mergeById(local.qadaRecords ?? [], cloud.qadaRecords ?? [], (q) => q.createdAt ?? "");
+  const amalEntries = mergeById(local.amalEntries ?? [], cloud.amalEntries ?? [], (e) => e.savedAt ?? "");
+  const zikirSessions = mergeById(local.zikirSessions ?? [], cloud.zikirSessions ?? [], (z) => z.savedAt ?? "").slice(0, 500);
+  const journal = mergeJournal(local.journal ?? {}, cloud.journal ?? {});
+  const moods = mergeMoods(local.moods ?? {}, cloud.moods ?? {});
+  const amalGoals = mergeGoals(local.amalGoals ?? [], cloud.amalGoals ?? []);
+  const dailyGoals = mergeDailyGoals(local.dailyGoals ?? [], cloud.dailyGoals ?? []);
+  const goalDone = mergeGoalDone(local.goalDone ?? {}, cloud.goalDone ?? {});
+
   return {
     v: 1,
     settings,
@@ -209,7 +219,90 @@ export function mergeDocs(local: CloudDoc, cloud: CloudDoc, opts: MergeOptions):
     lastRead,
     readingHistory,
     tasbih,
+    qadaRecords,
+    journal,
+    moods,
+    amalEntries,
+    amalGoals,
+    zikirSessions,
+    dailyGoals,
+    goalDone,
   };
+}
+
+/* ---------- Penggabungan perluasan (semua idempoten & anti-duplikat) ---------- */
+
+function mergeById<T extends { id: string }>(local: T[], cloud: T[], savedAtOf: (t: T) => string): T[] {
+  const byId = new Map<string, T>();
+  for (const item of local) byId.set(item.id, item);
+  for (const item of cloud) if (!byId.has(item.id)) byId.set(item.id, item);
+  return [...byId.values()].sort((a, b) => Date.parse(savedAtOf(b) || "0") - Date.parse(savedAtOf(a) || "0"));
+}
+
+/** Jurnal per tanggal: entri dengan `updatedAt`/`savedAt` terbaru menang. */
+function mergeJournal(
+  local: NonNullable<CloudDoc["journal"]>,
+  cloud: NonNullable<CloudDoc["journal"]>
+): NonNullable<CloudDoc["journal"]> {
+  const out: NonNullable<CloudDoc["journal"]> = {};
+  const dates = new Set([...Object.keys(local), ...Object.keys(cloud)]);
+  for (const date of dates) {
+    const l = local[date];
+    const c = cloud[date];
+    if (l && c) {
+      const lt = Date.parse(l.updatedAt ?? l.savedAt ?? "0");
+      const ct = Date.parse(c.updatedAt ?? c.savedAt ?? "0");
+      out[date] = lt >= ct ? l : c;
+    } else out[date] = l ?? c;
+  }
+  return out;
+}
+
+function mergeMoods(
+  local: NonNullable<CloudDoc["moods"]>,
+  cloud: NonNullable<CloudDoc["moods"]>
+): NonNullable<CloudDoc["moods"]> {
+  const out: NonNullable<CloudDoc["moods"]> = {};
+  const dates = new Set([...Object.keys(local), ...Object.keys(cloud)]);
+  for (const date of dates) {
+    const l = local[date];
+    const c = cloud[date];
+    if (l && c) out[date] = Date.parse(l.savedAt ?? "0") >= Date.parse(c.savedAt ?? "0") ? l : c;
+    else out[date] = l ?? c;
+  }
+  return out;
+}
+
+function mergeGoals<T extends { id: string }>(local: T[], cloud: T[]): T[] {
+  const byId = new Map<string, T>();
+  for (const g of local) byId.set(g.id, g);
+  for (const g of cloud) if (!byId.has(g.id)) byId.set(g.id, g);
+  return [...byId.values()];
+}
+
+/** Target harian: gabung berdasarkan id; target default yang dimatikan tetap dimatikan (OR enabled). */
+function mergeDailyGoals(local: NonNullable<CloudDoc["dailyGoals"]>, cloud: NonNullable<CloudDoc["dailyGoals"]>): NonNullable<CloudDoc["dailyGoals"]> {
+  const byId = new Map<string, NonNullable<CloudDoc["dailyGoals"]>[number]>();
+  for (const g of local) byId.set(g.id, { ...g });
+  for (const g of cloud) {
+    const cur = byId.get(g.id);
+    if (!cur) byId.set(g.id, { ...g });
+    else cur.enabled = cur.enabled || g.enabled;
+  }
+  return [...byId.values()];
+}
+
+function mergeGoalDone(
+  local: NonNullable<CloudDoc["goalDone"]>,
+  cloud: NonNullable<CloudDoc["goalDone"]>
+): NonNullable<CloudDoc["goalDone"]> {
+  const out: NonNullable<CloudDoc["goalDone"]> = {};
+  const dates = new Set([...Object.keys(local), ...Object.keys(cloud)]);
+  for (const date of dates) {
+    const set = new Set([...(local[date] ?? []), ...(cloud[date] ?? [])]);
+    if (set.size > 0) out[date] = [...set];
+  }
+  return out;
 }
 
 /**

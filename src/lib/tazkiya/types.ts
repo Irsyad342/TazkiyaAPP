@@ -259,6 +259,131 @@ export const ZIKIR_PRESETS = [
   "Laa haula wa laa quwwata illaa billah",
 ];
 
+/* ---------- Qada Tracker ---------- */
+
+/** Satu catatan qada: salat yang terlewat dan ingin dimakbulkan. */
+export interface QadaRecord {
+  id: string;
+  prayer: PrayerId;
+  /** Tanggal salat yang ingin diqada (YYYY-MM-DD) — diisi manual oleh pengguna. */
+  missedDate: string;
+  createdAt: string; // ISO
+  /** Terisi ketika pengguna MENCATAT sendiri penyelesaian qada. */
+  completedAt?: string; // ISO
+  note?: string;
+}
+
+/* ---------- Jurnal Syukur & Mood ---------- */
+
+export type MoodId =
+  | "bahagia"
+  | "tenang"
+  | "bersyukur"
+  | "lelah"
+  | "sedih"
+  | "cemas"
+  | "campur-aduk";
+
+export const MOODS: { id: MoodId; label: string; emoji: string }[] = [
+  { id: "bahagia", label: "Bahagia", emoji: "😊" },
+  { id: "tenang", label: "Tenang", emoji: "😌" },
+  { id: "bersyukur", label: "Bersyukur", emoji: "🤲" },
+  { id: "lelah", label: "Lelah", emoji: "😪" },
+  { id: "sedih", label: "Sedih", emoji: "😔" },
+  { id: "cemas", label: "Cemas", emoji: "😟" },
+  { id: "campur-aduk", label: "Campur aduk", emoji: "🫂" },
+];
+
+export function moodLabel(id?: MoodId): string | undefined {
+  return MOODS.find((m) => m.id === id)?.label;
+}
+
+/** Satu entri jurnal syukur harian — tiga hal yang disyukuri + mood pilihan. */
+export interface JournalEntry {
+  date: string; // YYYY-MM-DD
+  items: [string, string, string];
+  mood?: MoodId;
+  savedAt: string; // ISO
+  updatedAt?: string; // ISO — terisi setelah edit
+}
+
+/* ---------- Rizq & Amal ---------- */
+
+export type AmalKind = "sedekah" | "membantu" | "silaturahmi" | "niat-baik" | "berbagi-ilmu" | "lainnya";
+
+export const AMAL_KINDS: { id: AmalKind; label: string; emoji: string }[] = [
+  { id: "sedekah", label: "Bersedekah", emoji: "🎁" },
+  { id: "membantu", label: "Membantu orang lain", emoji: "🤝" },
+  { id: "silaturahmi", label: "Menjaga silaturahmi", emoji: "💬" },
+  { id: "niat-baik", label: "Bekerja dengan niat baik", emoji: "🌱" },
+  { id: "berbagi-ilmu", label: "Berbagi ilmu atau manfaat", emoji: "📖" },
+  { id: "lainnya", label: "Kebaikan lainnya", emoji: "✨" },
+];
+
+export function amalKindLabel(id?: AmalKind): string | undefined {
+  return AMAL_KINDS.find((k) => k.id === id)?.label;
+}
+
+/** Satu catatan amal kebaikan (termasuk sedekah). Tanpa penilaian apa pun. */
+export interface AmalEntry {
+  id: string;
+  date: string; // YYYY-MM-DD
+  kind: AmalKind;
+  title: string;
+  note?: string;
+  savedAt: string; // ISO
+}
+
+/* ---------- Sesi Zikir ---------- */
+
+export type ZikirSlot = "pagi" | "petang" | "setelah-sholat" | "harian";
+
+/** Riwayat satu sesi zikir (tasbih yang disimpan ke catatan hari). */
+export interface ZikirSession {
+  id: string;
+  date: string; // YYYY-MM-DD
+  count: number;
+  dhikr: string;
+  slot: ZikirSlot;
+  savedAt: string; // ISO
+}
+
+/* ---------- Target Harian (Daily Journey) ---------- */
+
+/** Target default yang selesai-nya OTOMATIS dihitung dari catatan ibadah. */
+export type DailyGoalAuto = "subuh-ontime" | "quran-lembar" | "zikir-pagi" | "zikir-petang" | "amal-hari-ini";
+
+export interface DailyGoal {
+  id: string;
+  label: string;
+  /** Bila terisi, keberselesaian diturunkan dari data nyata; selain itu manual. */
+  auto?: DailyGoalAuto;
+  enabled: boolean;
+  custom?: boolean; // target buatan pengguna — boleh dihapus
+}
+
+export const DEFAULT_DAILY_GOALS: DailyGoal[] = [
+  { id: "g-subuh", label: "Salat Subuh tepat waktu", auto: "subuh-ontime", enabled: true },
+  { id: "g-quran", label: "Baca Al-Qur'an — 1 lembar", auto: "quran-lembar", enabled: true },
+  { id: "g-zikir-pagi", label: "Zikir pagi", auto: "zikir-pagi", enabled: true },
+  { id: "g-zikir-petang", label: "Zikir petang", auto: "zikir-petang", enabled: true },
+  { id: "g-amal", label: "Satu aktivitas kebaikan", auto: "amal-hari-ini", enabled: true },
+];
+
+export const DEFAULT_AMAL_GOALS: AmalGoal[] = [
+  { id: "a-sedekah", label: "Bersedekah" },
+  { id: "a-membantu", label: "Membantu orang lain" },
+  { id: "a-silaturahmi", label: "Menjaga silaturahmi" },
+  { id: "a-niat", label: "Bekerja dengan niat baik" },
+  { id: "a-ilmu", label: "Berbagi ilmu atau manfaat" },
+];
+
+/** Target kebaikan pribadi yang dapat dibuat pengguna. */
+export interface AmalGoal {
+  id: string;
+  label: string;
+}
+
 export function createEmptyLog(date: string): DailyLog {
   return {
     date,
