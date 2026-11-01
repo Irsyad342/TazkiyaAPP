@@ -60,8 +60,9 @@ export function goalStatuses(goals: DailyGoal[], date: string, ctx: GoalContext)
         default:
           done = doneManual.has(goal.id);
       }
-      // Target manual dapat ditandai pengguna; target auto tetap mengikuti data.
-      if (!auto) done = doneManual.has(goal.id);
+      // Target manual ditandai lewat ketukan pengguna; target auto mengikuti
+      // data nyata, dan penandaan manual tetap dihormati sebagai pelengkap.
+      done = auto ? done || doneManual.has(goal.id) : doneManual.has(goal.id);
       return { goal, done, auto };
     });
 }

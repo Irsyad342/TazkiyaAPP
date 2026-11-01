@@ -22,12 +22,21 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useWorshipStore } from "@/lib/tazkiya/store";
-import { ZIKIR_PRESETS } from "@/lib/tazkiya/types";
+import { ZIKIR_PRESETS, type ZikirSlot } from "@/lib/tazkiya/types";
 import { todayKey } from "@/lib/tazkiya/dates";
 import { ProgressRing } from "./ui-bits";
 import { cn } from "@/lib/utils";
 
-export function TasbihSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function TasbihSheet({
+  open,
+  onClose,
+  slot = "harian",
+}: {
+  open: boolean;
+  onClose: () => void;
+  /** Slot zikir untuk sesi yang disimpan (pagi / petang / setelah-sholat / harian). */
+  slot?: ZikirSlot;
+}) {
   const tasbih = useWorshipStore((s) => s.tasbih);
   const tasbihAdd = useWorshipStore((s) => s.tasbihAdd);
   const tasbihMinus = useWorshipStore((s) => s.tasbihMinus);
@@ -197,7 +206,7 @@ export function TasbihSheet({ open, onClose }: { open: boolean; onClose: () => v
           <button
             type="button"
             onClick={() => {
-              const n = commitZikirToDay(todayKey());
+              const n = commitZikirToDay(todayKey(), slot);
               if (n === 0) toast.error("Hitungan masih 0 — berzikir dulu ya");
               else toast.success(`${n.toLocaleString("id-ID")} zikir ditambahkan ke catatan harian`);
             }}

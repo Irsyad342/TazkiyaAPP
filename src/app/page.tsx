@@ -1,9 +1,11 @@
 "use client";
 
 /**
- * Tazkiya — Kerangka aplikasi.
+ * Tazkiya — Kerangka aplikasi (Islamic Daily Companion).
  * Gerbang hidrasi, bingkai ponsel mobile-first, tema (gelap/terang/sistem),
- * mode Liquid Glass, transisi antartab, pembaca Al-Qur'an, dan Tasbih Digital.
+ * mode Liquid Glass, transisi antartab, lima menu utama (Beranda, Al-Qur'an,
+ * Sholat, Progress, Lainnya) + sub-halaman dari menu Lainnya (Jurnal Syukur,
+ * Zikir & Doa, Rizq & Amal, Profil), pembaca Al-Qur'an, dan Tasbih Digital.
  */
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -12,13 +14,19 @@ import { AnimatePresence, LazyMotion, domAnimation, m } from "framer-motion";
 import { LoaderCircle } from "lucide-react";
 import { Toaster } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
-import { BottomNav, type TabId } from "@/components/tazkiya/BottomNav";
+import { BottomNav, type SubPageId, type TabId } from "@/components/tazkiya/BottomNav";
 import { AuthGate } from "@/components/tazkiya/AuthGate";
 import { HomePage } from "@/components/tazkiya/HomePage";
 import { QuranPage } from "@/components/tazkiya/QuranPage";
+import { PrayerPage } from "@/components/tazkiya/PrayerPage";
+import { LainnyaPage } from "@/components/tazkiya/LainnyaPage";
+import { JurnalPage } from "@/components/tazkiya/JurnalPage";
+import { ZikirDoaPage } from "@/components/tazkiya/ZikirDoaPage";
+import { RizqAmalPage } from "@/components/tazkiya/RizqAmalPage";
 import { ProfilePage } from "@/components/tazkiya/ProfilePage";
 import { TasbihSheet } from "@/components/tazkiya/TasbihSheet";
 import { TargetSheet } from "@/components/tazkiya/TargetSheet";
+import type { ZikirSlot } from "@/lib/tazkiya/types";
 
 /*
  * Pembaca Al-Qur'an dimuat terpisah (lazy) — hanya diunduh saat pengguna
@@ -30,13 +38,13 @@ const QuranReader = dynamic(() => import("@/components/tazkiya/QuranReader").the
 });
 
 /*
- * Statistik dimuat terpisah (lazy) — pustaka grafik tidak membebani
+ * Progress dimuat terpisah (lazy) — pustaka grafik tidak membebani
  * bundle awal sehingga aplikasi terasa ringan saat dibuka pertama kali.
  */
-const StatsPage = dynamic(() => import("@/components/tazkiya/StatsPage").then((m) => ({ default: m.StatsPage })), {
+const ProgressPage = dynamic(() => import("@/components/tazkiya/ProgressPage").then((m) => ({ default: m.ProgressPage })), {
   ssr: false,
   loading: () => (
-    <div aria-busy="true" aria-label="Memuat statistik" className="flex h-72 items-center justify-center">
+    <div aria-busy="true" aria-label="Memuat progress" className="flex h-72 items-center justify-center">
       <LoaderCircle size={26} className="animate-spin text-tz-violet" />
     </div>
   ),
@@ -52,7 +60,15 @@ function OuterOrb({ className }: { className?: string }) {
 const TAB_TITLES: Record<TabId, string> = {
   beranda: "Tazkiya — Beranda",
   quran: "Tazkiya — Al-Qur'an",
-  statistik: "Tazkiya — Statistik",
+  sholat: "Tazkiya — Sholat",
+  progress: "Tazkiya — Progress",
+  lainnya: "Tazkiya — Lainnya",
+};
+
+const SUBPAGE_TITLES: Record<SubPageId, string> = {
+  jurnal: "Tazkiya — Jurnal Syukur",
+  "zikir-doa": "Tazkiya — Zikir & Doa",
+  "rizq-amal": "Tazkiya — Rizq & Amal",
   profil: "Tazkiya — Profil",
 };
 
@@ -74,7 +90,9 @@ export default function Page() {
   );
 
   const [tab, setTab] = useState<TabId>("beranda");
+  const [subpage, setSubpage] = useState<SubPageId | null>(null);
   const [tasbihOpen, setTasbihOpen] = useState(false);
+  const [tasbihSlot, setTasbihSlot] = useState<ZikirSlot>("harian");
   const [targetOpen, setTargetOpen] = useState(false);
   const [reader, setReader] = useState<{ surah: number; ayah?: number } | null>(null);
 
@@ -126,10 +144,10 @@ export default function Page() {
     document.documentElement.dataset.glass = liquidGlass ? "liquid" : "classic";
   }, [liquidGlass]);
 
-  // Judul dokumen per tab.
+  // Judul dokumen per tab / sub-halaman.
   useEffect(() => {
-    document.title = TAB_TITLES[tab];
-  }, [tab]);
+    document.title = subpage ? SUBPAGE_TITLES[subpage] : TAB_TITLES[tab];
+  }, [tab, subpage]);
 
   // Tombol kembali perangkat (khusus APK/Capacitor).
   useEffect(() => {
@@ -177,10 +195,16 @@ export default function Page() {
 
   const openReader = useCallback((surah: number, ayah?: number) => setReader({ surah, ayah }), []);
   const closeReader = useCallback(() => setReader(null), []);
-  const openTasbih = useCallback(() => setTasbihOpen(true), []);
+  const openTasbih = useCallback((slot?: ZikirSlot) => {
+    setTasbihSlot(slot ?? "harian");
+    setTasbihOpen(true);
+  }, []);
   const openTargets = useCallback(() => setTargetOpen(true), []);
-  /** "Lanjutkan Tracker" (Fokus Ibadah, halaman Profil) → tracker salat di Beranda. */
-  const goTracker = useCallback(() => setTab("beranda"), []);
+  /** "Lanjutkan Tracker" (Fokus Ibadah, halaman Profil) → halaman Sholat. */
+  const goTracker = useCallback(() => {
+    setSubpage(null);
+    setTab("sholat");
+  }, []);
 
   if (!hydrated) {
     return (
@@ -230,16 +254,31 @@ export default function Page() {
         <div id="konten-tazkiya" className="no-scrollbar relative z-10 flex-1 overflow-y-auto px-5 pb-36 pt-[max(1rem,env(safe-area-inset-top))]">
           <AnimatePresence mode="wait" initial={false}>
             <m.div
-              key={tab}
+              key={subpage ?? tab}
               initial={{ opacity: 0, y: 10 * (animations ? 1 : 0) }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: animations ? -8 : 0 }}
               transition={{ duration: 0.16 * (animations ? 1 : 0), ease: "easeOut" }}
             >
-              {tab === "beranda" && <HomePage onNavigate={setTab} onOpenTasbih={openTasbih} />}
-              {tab === "quran" && <QuranPage onOpenReader={openReader} />}
-              {tab === "statistik" && <StatsPage />}
-              {tab === "profil" && <ProfilePage onOpenTargets={openTargets} onGoTracker={goTracker} />}
+              {subpage === null && tab === "beranda" && (
+                <HomePage
+                  onNavigate={(t) => {
+                    setSubpage(null);
+                    setTab(t);
+                  }}
+                  onOpenTasbih={() => openTasbih()}
+                  onOpenSubpage={setSubpage}
+                />
+              )}
+              {subpage === null && tab === "quran" && <QuranPage onOpenReader={openReader} />}
+              {subpage === null && tab === "sholat" && <PrayerPage />}
+              {subpage === null && tab === "progress" && <ProgressPage />}
+              {subpage === null && tab === "lainnya" && <LainnyaPage onOpen={setSubpage} />}
+
+              {subpage === "jurnal" && <JurnalPage onBack={() => setSubpage(null)} />}
+              {subpage === "zikir-doa" && <ZikirDoaPage onBack={() => setSubpage(null)} onOpenTasbih={openTasbih} />}
+              {subpage === "rizq-amal" && <RizqAmalPage onBack={() => setSubpage(null)} />}
+              {subpage === "profil" && <ProfilePage onOpenTargets={openTargets} onGoTracker={goTracker} />}
             </m.div>
           </AnimatePresence>
         </div>
@@ -250,7 +289,7 @@ export default function Page() {
           )}
         </AnimatePresence>
 
-        <AnimatePresence>{tasbihOpen && <TasbihSheet open={tasbihOpen} onClose={() => setTasbihOpen(false)} />}</AnimatePresence>
+        <AnimatePresence>{tasbihOpen && <TasbihSheet open={tasbihOpen} onClose={() => setTasbihOpen(false)} slot={tasbihSlot} />}</AnimatePresence>
 
         <AnimatePresence>{targetOpen && <TargetSheet onClose={() => setTargetOpen(false)} />}</AnimatePresence>
 

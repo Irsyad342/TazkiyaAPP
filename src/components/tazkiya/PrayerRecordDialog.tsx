@@ -10,7 +10,7 @@
  */
 
 import { useState } from "react";
-import { CalendarDays, CircleDashed, CircleMinus, CheckCircle2, User, Users } from "lucide-react";
+import { CalendarDays, Check, CircleDashed, CircleMinus, CheckCircle2, User, Users } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -53,13 +53,15 @@ export function PrayerRecordDialog({
   date: string;
   isJumat: boolean;
   detail: PrayerDetail;
-  onSave: (detail: PrayerDetail | null) => void;
+  /** `opts.addToQada` = pengguna memilih memasukkan salat ini ke daftar qada. */
+  onSave: (detail: PrayerDetail | null, opts?: { addToQada?: boolean }) => void;
 }) {
   const fullName = meta.fullName ?? `Salat ${meta.label}`;
   const [status, setStatus] = useState<PrayerStatus>(detail.status);
   const [kind, setKind] = useState<PrayerKind | undefined>(detail.kind);
   const [reason, setReason] = useState(detail.reason);
   const [reasonText, setReasonText] = useState(detail.reasonText ?? "");
+  const [addToQada, setAddToQada] = useState(false);
 
   const save = () => {
     if (status === "done") {
@@ -69,11 +71,14 @@ export function PrayerRecordDialog({
       onSave({ status: "done", kind: finalKind });
     } else if (status === "missed") {
       if (!reason) return;
-      onSave({
-        status: "missed",
-        reason,
-        reasonText: reason === "lainnya" ? reasonText.trim() || undefined : undefined,
-      });
+      onSave(
+        {
+          status: "missed",
+          reason,
+          reasonText: reason === "lainnya" ? reasonText.trim() || undefined : undefined,
+        },
+        { addToQada }
+      );
     } else {
       onSave(null); // belum dicatat — hapus detail
     }
@@ -237,6 +242,34 @@ export function PrayerRecordDialog({
                 className="tz-field mt-2 resize-none"
               />
             ) : null}
+
+            {/* Tawaran lembut memasukkan salat ini ke daftar qada — murni pilihan pengguna. */}
+            <button
+              type="button"
+              role="checkbox"
+              aria-checked={addToQada}
+              onClick={() => setAddToQada((v) => !v)}
+              className={cn(
+                "tap mt-2.5 flex w-full items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition-all",
+                addToQada ? "border-tz-violet/60 bg-tz-violet/12" : "border-tz-line bg-tz-panel-strong"
+              )}
+            >
+              <span
+                aria-hidden
+                className={cn(
+                  "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border transition-all",
+                  addToQada ? "border-tz-violet bg-tz-violet text-white" : "border-tz-line-strong text-transparent"
+                )}
+              >
+                <Check size={12} strokeWidth={3.4} />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[12px] font-semibold text-tz-ink">Masukkan ke daftar Qada</span>
+                <span className="block text-[10.5px] leading-relaxed text-tz-muted">
+                  Tidak apa-apa, selalu ada kesempatan untuk memperbaiki diri.
+                </span>
+              </span>
+            </button>
           </div>
         ) : null}
 

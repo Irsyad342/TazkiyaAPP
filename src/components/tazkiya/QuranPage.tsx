@@ -28,7 +28,7 @@ import { toast } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { JUZ_RANGES, SURAH_LIST, getSurah, normalizeArabic } from "@/lib/tazkiya/quran";
 import { surahProgressOnDate } from "@/lib/tazkiya/stats";
-import { relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
+import { relativeDayLabel, lastNDays, todayKey, weekdayShort } from "@/lib/tazkiya/dates";
 import { Chip, EmptyState, GlassCard, SectionHeader } from "./ui-bits";
 import { cn } from "@/lib/utils";
 
@@ -180,6 +180,16 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
   const lastPos = lastRead ?? (manualBookmark ? { surah: manualBookmark.surah, ayah: manualBookmark.ayah } : null);
   const lastSurahMeta = lastPos ? getSurah(lastPos.surah) : undefined;
   const bookmarkedSurahs = useMemo(() => new Set(ayahBookmarks.map((b) => b.surah)), [ayahBookmarks]);
+
+  /* ---------- Progres kumulatif & mingguan (dari catatan nyata) ---------- */
+  const totalPages = useMemo(() => readingHistory.reduce((acc, e) => acc + (e.pages ?? 0), 0), [readingHistory]);
+  const totalVerses = useMemo(() => readingHistory.reduce((acc, e) => acc + (e.verses ?? 0), 0), [readingHistory]);
+  const daysRead = useMemo(
+    () => new Set(readingHistory.filter((e) => e.pages > 0 || e.verses > 0).map((e) => e.date)).size,
+    [readingHistory]
+  );
+  const weekPages = lastNDays(7, today).reduce((acc, k) => acc + (logs[k]?.quranPages ?? 0), 0);
+  const weekVerses = lastNDays(7, today).reduce((acc, k) => acc + (logs[k]?.quranVerses ?? 0), 0);
 
   /* ---------- Sorotan: surah yang paling sering dibaca/dibuka ---------- */
   const spotlight = useMemo(() => {
@@ -376,6 +386,85 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
         </span>
         <ChevronRight size={17} className="shrink-0 text-tz-muted/70" />
       </button>
+
+      {/* ---------- Progres bacaan: total kumulatif + mingguan ---------- */}
+      <section aria-label="Progres bacaan" className="animate-tz-fade-up">
+        <SectionHeader title="Progres Bacaanmu" caption="Dihitung dari catatan bacaan yang benar-benar kamu lakukan" />
+        <GlassCard className="p-4">
+          <div className="grid grid-cols-3 gap-2.5">
+            {[
+              { value: totalPages.toLocaleString("id-ID"), label: "halaman dibaca" },
+              { value: totalVerses.toLocaleString("id-ID"), label: "ayat dibaca" },
+              { value: daysRead.toLocaleString("id-ID"), label: "hari membaca" },
+            ].map(({ value, label }) => (
+              <div key={label} className="rounded-xl border border-tz-line bg-tz-panel-soft p-2.5 text-center">
+                <p className="font-display text-[20px] font-extrabold leading-none tabular-nums text-tz-ink">{value}</p>
+                <p className="mt-1 text-[9.5px] leading-tight text-tz-muted">{label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Batang 7 hari — kronologis kiri ke kanan */}
+          <div className="mt-4 flex items-end justify-between gap-1.5" aria-hidden>
+            {lastNDays(7, today).map((k) => {
+              const pages = logs[k]?.quranPages ?? 0;
+              const verses = logs[k]?.quranVerses ?? 0;
+              const h = Math.max(pages > 0 || verses > 0 ? 10 : 2, Math.min(100, (pages / Math.max(1, settings.quranDailyTarget)) * 100));
+              return (
+                <div key={k} className="flex flex-1 flex-col items-center gap-1.5">
+                  <span className="text-[9px] font-semibold tabular-nums text-tz-muted/80">{pages > 0 ? pages : ""}</span>
+                  <div className="flex h-16 w-full items-end">
+                    <div
+                      className="tz-bar-grow-x mx-auto w-full max-w-[22px] rounded-full bg-gradient-to-t from-tz-purple to-tz-violet"
+                      style={{ height: `${h}%`, opacity: pages > 0 || verses > 0 ? 1 : 0.35 }}
+                    />
+                  </div>
+                  <span className={cn("text-[9.5px]", k === today ? "font-bold text-tz-accent" : "text-tz-muted")}>{weekdayShort(k)}</span>
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-2.5 text-[10.5px] leading-relaxed text-tz-muted">
+            Minggu ini: {weekPages.toLocaleString("id-ID")} halaman · {weekVerses.toLocaleString("id-ID")} ayat. Hari tanpa
+            catatan bukan hari gagal — tinggal lanjutkan besok.
+          </p>
+        </GlassCard>
+      </section>
+
+      {/* ---------- Penanda ayat ---------- */}
+      {ayahBookmarks.length > 0 ? (
+        <section aria-label="Ayat yang ditandai" className="animate-tz-fade-up">
+          <SectionHeader title="Ayat Ditandai" caption={`${ayahBookmarks.length} ayat — ketuk untuk membuka`} />
+          <GlassCard className="thin-scrollbar max-h-64 overflow-y-auto">
+            <ul className="divide-y divide-tz-line-soft">
+              {ayahBookmarks.slice(0, 20).map((b) => {
+                const meta = getSurah(b.surah);
+                return (
+                  <li key={`${b.surah}:${b.ayah}`}>
+                    <button
+                      type="button"
+                      onClick={() => onOpenReader(b.surah, b.ayah)}
+                      className="tap flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-tz-panel-soft"
+                      aria-label={`Buka ${meta?.latin ?? "surah"} ayat ${b.ayah}`}
+                    >
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-tz-violet/25 bg-tz-violet/12 text-tz-violet">
+                        <BookmarkIcon size={13} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[12.5px] font-semibold text-tz-ink">
+                          {meta?.latin ?? `Surah ${b.surah}`} · ayat {b.ayah}
+                        </span>
+                        <span className="block text-[10px] text-tz-muted">{relativeDayLabel(b.savedAt.slice(0, 10), today)}</span>
+                      </span>
+                      <ChevronRight size={15} className="shrink-0 text-tz-muted/70" />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </GlassCard>
+        </section>
+      ) : null}
 
       {/* ---------- Sorotan: paling sering dibaca (gaya kartu Taskello) ---------- */}
       {topEntry && topMeta ? (

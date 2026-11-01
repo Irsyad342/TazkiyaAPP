@@ -127,6 +127,21 @@ export function mondayOf(key: string): string {
   return dateKey(d);
 }
 
+/** Sel kalender satu bulan (Senin-awal): null = sel kosong, string = YYYY-MM-DD. */
+export function monthCalendarDayKeys(todayKeyStr: string, monthOffset = 0): (string | null)[] {
+  const base = keyToDate(todayKeyStr);
+  const first = new Date(base.getFullYear(), base.getMonth() + monthOffset, 1);
+  const last = new Date(first.getFullYear(), first.getMonth() + 1, 0);
+  const cells: (string | null)[] = [];
+  for (let i = 0; i < (first.getDay() + 6) % 7; i++) cells.push(null);
+  for (let day = 1; day <= last.getDate(); day++) {
+    cells.push(
+      `${first.getFullYear()}-${String(first.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+    );
+  }
+  return cells;
+}
+
 export function daysBetween(a: string, b: string): number {
   const da = keyToDate(a).getTime();
   const db = keyToDate(b).getTime();
