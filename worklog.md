@@ -616,3 +616,6 @@ tsc 0; eslint 0; build sukses. Uji fungsional browser lokal (seed data uji, buka
 
 ### Catatan sumber
 Jadwal salat memakai mesin yang sudah ada (GPS + Kemenag, ihtiyat +2 mnt) — tidak ada jadwal karangan. Al-Qur'an tetap AlQuran Cloud. Hadis/doa/zikir hanya dari kutubut-tis'ah & QS dengan nomor eksplisit; doa masyhur tanpa nomor diberi label jujur "tanpa klaim hadis".
+
+### Status deploy & verifikasi produksi (lulus semua)
+`fitur/nur-companion` (33d01cf) di-push ke origin/main → Vercel live. Verifikasi produksi: bundle JS memuat string fitur baru ("Salat berikutnya", "Rizq & Amal", "Daily Barakah", "Jurnal Syukur", qada); uji browser live: 5 tombol nav, halaman Sholat dengan tab Hari Ini/Bulanan/Qada, Qada terbuka, Jurnal Syukur terbuka dari Lainnya, Beranda menyapa + tanggal Hijriah + Next Prayer dengan timeline — Target Harian 0/5 untuk perangkat tanpa data (jujur, tanpa data dummy). Skrip: scripts/deploy-nur.sh, scripts/verify-prod-nur.sh, scripts/verify-nur-local.sh, scripts/seed-nur-companion.js.
