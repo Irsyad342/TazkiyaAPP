@@ -29,7 +29,7 @@ import { useWorshipStore } from "@/lib/tazkiya/store";
 import { JUZ_RANGES, SURAH_LIST, getSurah, normalizeArabic } from "@/lib/tazkiya/quran";
 import { surahProgressOnDate } from "@/lib/tazkiya/stats";
 import { relativeDayLabel, lastNDays, todayKey, weekdayShort } from "@/lib/tazkiya/dates";
-import { Chip, EmptyState, GlassCard, SectionHeader } from "./ui-bits";
+import { Chip, ConfirmButton, EmptyState, GlassCard, SectionHeader } from "./ui-bits";
 import { cn } from "@/lib/utils";
 
 const inputCls = "tz-field";
@@ -559,9 +559,9 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                 type="button"
                 onClick={() => setQuery("")}
                 aria-label="Bersihkan pencarian"
-                className="tap absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-tz-violet/15 text-tz-muted transition-colors hover:text-tz-accent"
+                className="tap absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-tz-violet/15 text-tz-muted transition-colors hover:text-tz-accent"
               >
-                <X size={13} />
+                <X size={14} />
               </button>
             ) : null}
           </div>
@@ -797,17 +797,18 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                         ) : null}
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
+                    <ConfirmButton
+                      label="Hapus catatan bacaan"
+                      title="Hapus catatan bacaan ini?"
+                      description="Catatan ini akan dikeluarkan dari riwayat bacaan. Penanda ayat dan posisi terakhir tidak terpengaruh."
+                      onConfirm={() => {
                         deleteReadingEntry(e.id);
                         toast.info("Catatan bacaan dihapus");
                       }}
-                      aria-label="Hapus catatan bacaan"
-                      className="tap flex h-8 w-8 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-300"
+                      className="tap flex h-9 w-9 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-300"
                     >
                       <Trash2 size={15} />
-                    </button>
+                    </ConfirmButton>
                   </li>
                 );
               })}

@@ -407,13 +407,13 @@ export function QuranReader({
                     onClick={() => toggleAyahBookmark(surah, ayah.number)}
                     aria-label={bookmarkSet.has(ayah.number) ? `Hapus penanda ayat ${ayah.number}` : `Tandai ayat ${ayah.number}`}
                     className={cn(
-                      "tap flex h-7 w-7 items-center justify-center rounded-full border transition-colors",
+                      "tap flex h-8 w-8 items-center justify-center rounded-full border transition-colors",
                       bookmarkSet.has(ayah.number)
                         ? "border-tz-violet/60 bg-tz-violet/25 text-tz-accent"
                         : "border-tz-line bg-tz-panel text-tz-muted hover:text-tz-accent"
                     )}
                   >
-                    <BookmarkIcon size={12} />
+                    <BookmarkIcon size={13} />
                   </button>
                   <span className="flex min-h-[22px] items-center rounded-full border border-tz-violet/25 bg-tz-violet/10 px-2.5 text-[11px] font-semibold text-tz-accent">
                     {String(ayah.number).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[Number(d)])} · {ayah.number}

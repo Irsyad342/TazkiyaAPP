@@ -49,7 +49,7 @@ import { formatHijri, isFriday, monthCalendarDayKeys, todayKey } from "@/lib/taz
 import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { prayerTiming } from "@/lib/tazkiya/goals";
 import { HADITH_QADA } from "@/lib/tazkiya/hadith";
-import { Chip, GlassCard, SectionHeader } from "./ui-bits";
+import { Chip, ConfirmButton, GlassCard, SectionHeader } from "./ui-bits";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { DayDetailSheet, prayerMetaFor } from "./DayDetailSheet";
 import { MotivationPopup, type MotivationVariant } from "./MotivationPopup";
@@ -562,17 +562,18 @@ function QadaTab({ today }: { today: string }) {
                     >
                       <Check size={12} strokeWidth={3} /> Sudah diqada
                     </button>
-                    <button
-                      type="button"
-                      aria-label="Hapus catatan qada"
-                      onClick={() => {
+                    <ConfirmButton
+                      label="Hapus catatan qada"
+                      title="Hapus catatan qada ini?"
+                      description="Catatan akan dikeluarkan dari daftar qada. Bila kelak perlu, kamu bisa menambahkannya lagi lewat formulir di bawah."
+                      onConfirm={() => {
                         deleteQada(q.id);
                         toast.info("Catatan qada dihapus");
                       }}
-                      className="tap flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-tz-muted/70 hover:bg-rose-400/10 hover:text-rose-400"
+                      className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-400"
                     >
                       <Trash2 size={14} />
-                    </button>
+                    </ConfirmButton>
                   </div>
                 ))}
               </div>

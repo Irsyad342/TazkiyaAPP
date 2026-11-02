@@ -161,7 +161,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
             ))}
           </div>
           <p className="mt-2.5 text-[11px] leading-relaxed text-tz-muted">
-            Progresnya dipantau otomatis melalui tracker salat di Beranda. Pada hari Jumat, slot Zuhur digantikan Salat
+            Progresnya dipantau otomatis melalui tracker salat di halaman Sholat. Pada hari Jumat, slot Zuhur digantikan Salat
             Jumat, dan Salat Zuhur dapat dicatat sebagai alternatif bila tidak melaksanakannya.
           </p>
         </SectionCard>

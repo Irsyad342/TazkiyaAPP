@@ -36,7 +36,7 @@ import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { formatCountdown, goalStatuses, nextPrayerState } from "@/lib/tazkiya/goals";
 import { barakahOfTheDay } from "@/lib/tazkiya/barakah";
 import { duaOfTheDay } from "@/lib/tazkiya/duas";
-import { Chip, GlassCard, IconBox, ProgressBar, SectionHeader } from "./ui-bits";
+import { Chip, ConfirmButton, GlassCard, IconBox, ProgressBar, SectionHeader } from "./ui-bits";
 import { MoodSection } from "./MoodSection";
 import { JelajahiAktivitas } from "./JelajahiAktivitas";
 import type { SubPageId, TabId } from "./BottomNav";
@@ -254,6 +254,13 @@ function DailyJourney({ today }: { today: string }) {
                 aria-checked={done}
                 aria-label={`Target: ${goal.label} — ${done ? "tercapai" : "belum tercapai"}`}
                 onClick={() => {
+                  // Target otomatis yang sudah tercapai dari catatan nyata tidak
+                  // bisa "dibatalkan" lewat ketukan — beri penjelasan, jangan
+                  // biarkan tombol terasa mati.
+                  if (goal.auto && done) {
+                    toast.info("Target ini tercapai otomatis dari catatan ibadahmu hari ini");
+                    return;
+                  }
                   toggleGoalDone(today, goal.id);
                   if (!done && goal.auto === "amal-hari-ini") {
                     toast.success("MasyaAllah, satu kebaikan hari ini 🌱");
@@ -317,14 +324,15 @@ function DailyJourney({ today }: { today: string }) {
                     {g.label}
                   </span>
                   {g.custom ? (
-                    <button
-                      type="button"
-                      aria-label={`Hapus target ${g.label}`}
-                      onClick={() => deleteDailyGoal(g.id)}
-                      className="tap flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-tz-muted/70 hover:bg-rose-400/10 hover:text-rose-400"
+                    <ConfirmButton
+                      label={`Hapus target ${g.label}`}
+                      title={`Hapus target "${g.label}"?`}
+                      description="Target pribadi ini akan dihapus dari daftar. Catatan ibadah yang sudah ada tidak terpengaruh."
+                      onConfirm={() => deleteDailyGoal(g.id)}
+                      className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-400"
                     >
                       <Trash2 size={13} />
-                    </button>
+                    </ConfirmButton>
                   ) : null}
                 </li>
               ))}

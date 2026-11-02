@@ -7,6 +7,17 @@
  */
 
 import { useId, type ReactNode } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
 /* ---------------- GlassCard ---------------- */
@@ -34,18 +45,76 @@ export function GlassCard({
           : variant === "strong"
             ? "glass-strong"
             : "glass";
+  const cls = cn(
+    "relative overflow-hidden rounded-[1.65rem]",
+    variantClass,
+    onClick && "cursor-pointer tap active:scale-[0.985]",
+    className
+  );
+  // Kartu yang bisa ditekan dirender sebagai <button> sungguhan agar bisa
+  // diakses keyboard, punya semantik tombol, dan area sentuh yang jelas.
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} className={cn(cls, "block w-full text-left")}>
+        {children}
+      </button>
+    );
+  }
+  return <div className={cls}>{children}</div>;
+}
+
+/* ---------------- ConfirmButton ---------------- */
+
+/**
+ * Tombol aksi yang menghapus data — selalu meminta konfirmasi lebih dulu
+ * (Radix AlertDialog). Trigger dirender apa adanya sehingga tampilan daftar
+ * tidak berubah; aksi hanya jalan setelah pengguna menekan "Ya, hapus".
+ */
+export function ConfirmButton({
+  children,
+  className,
+  label,
+  title = "Hapus catatan ini?",
+  description = "Catatan yang dihapus tidak dapat dikembalikan.",
+  confirmLabel = "Ya, hapus",
+  onConfirm,
+}: {
+  children: ReactNode;
+  className?: string;
+  /** Accessible name tombol pemicu (mis. "Hapus catatan amal"). */
+  label: string;
+  title?: string;
+  description?: string;
+  confirmLabel?: string;
+  onConfirm: () => void;
+}) {
   return (
-    <div
-      onClick={onClick}
-      className={cn(
-        "relative overflow-hidden rounded-[1.65rem]",
-        variantClass,
-        onClick && "cursor-pointer tap active:scale-[0.985]",
-        className
-      )}
-    >
-      {children}
-    </div>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <button type="button" aria-label={label} className={className}>
+          {children}
+        </button>
+      </AlertDialogTrigger>
+      <AlertDialogContent className="glass-strong max-w-[320px]! rounded-[1.4rem]! border-tz-line p-5!">
+        <AlertDialogHeader className="gap-1.5!">
+          <AlertDialogTitle className="font-display! text-[16px]! text-tz-ink">{title}</AlertDialogTitle>
+          <AlertDialogDescription className="text-[12px]! leading-relaxed! text-tz-muted">
+            {description}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="flex-row! gap-2!">
+          <AlertDialogCancel className="mt-0! min-h-[42px] flex-1 rounded-xl border-tz-line bg-tz-panel-soft text-[13px] font-semibold text-tz-muted">
+            Batal
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={onConfirm}
+            className="mt-0! min-h-[42px] flex-1 rounded-xl bg-rose-500 text-[13px] font-semibold text-white hover:bg-rose-500/90"
+          >
+            {confirmLabel}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 

@@ -17,7 +17,7 @@ import { useWorshipStore } from "@/lib/tazkiya/store";
 import { MOODS, moodLabel, type MoodId } from "@/lib/tazkiya/types";
 import { hadithForMood } from "@/lib/tazkiya/hadith";
 import { formatDayFull, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
-import { Chip, EmptyState, GlassCard, SectionHeader } from "./ui-bits";
+import { Chip, ConfirmButton, EmptyState, GlassCard, SectionHeader } from "./ui-bits";
 import { SubPageHeader } from "./SubPageHeader";
 import { cn } from "@/lib/utils";
 
@@ -248,23 +248,25 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                             setMoodSel(e.mood);
                             setSavedAt(e.savedAt);
                             toast.info("Jurnal dimuat ke atas — ubah lalu simpan kembali");
-                            window.scrollTo({ top: 0, behavior: "smooth" });
+                            // Konten aplikasi bergulir di dalam bingkai, bukan di window.
+                            document.getElementById("konten-tazkiya")?.scrollTo({ top: 0, behavior: "smooth" });
                           }}
                           className="tap rounded-lg border border-tz-line bg-tz-panel-soft px-2 py-1 text-[10px] font-semibold text-tz-accent"
                         >
                           Edit
                         </button>
-                        <button
-                          type="button"
-                          aria-label={`Hapus jurnal ${formatDayFull(d)}`}
-                          onClick={() => {
+                        <ConfirmButton
+                          label={`Hapus jurnal ${formatDayFull(d)}`}
+                          title={`Hapus jurnal ${relativeDayLabel(d, today)}?`}
+                          description={`Jurnal syukur ${relativeDayLabel(d, today).toLowerCase()} akan dihapus permanen dari riwayat.`}
+                          onConfirm={() => {
                             deleteJournal(d);
                             toast.info("Jurnal dihapus");
                           }}
-                          className="tap flex h-7 w-7 items-center justify-center rounded-full text-tz-muted/70 hover:bg-rose-400/10 hover:text-rose-400"
+                          className="tap flex h-9 w-9 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-400"
                         >
                           <Trash2 size={13} />
-                        </button>
+                        </ConfirmButton>
                       </div>
                     </div>
                     <ul className="mt-1 space-y-0.5">

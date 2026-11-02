@@ -641,3 +641,22 @@ Nav 5 menu benar & tanpa Lainnya; tab Profil membuka halaman Profil yang sama; k
 
 ### Status deploy & verifikasi produksi (lulus semua)
 `fitur/nur-companion` (b4355bc) di-push ke origin/main → Vercel live ±50 detik. Verifikasi produksi: chunk JS memuat "Jelajahi Aktivitas"; uji browser live: nav 5 menu (Beranda, Al-Qur'an, Sholat, Progress, Profil) tanpa Lainnya, tab Profil membuka halaman Profil, mood check-in & Jelajahi Aktivitas tampil di Beranda, pemilihan mood tersimpan ke store. Checkpoint sebelum perubahan: branch `backup/pre-nur-polish` (76376e1).
+
+## Task 36 — FINALISASI: audit & perbaikan seluruh tombol/modal, konfirmasi hapus, uji menyeluruh, deploy production
+
+### Permintaan
+Finalisasi aplikasi Tazkiya: audit kondisi proyek (checkpoint), pastikan nav 5 menu (sudah dari Task 35), audit & perbaiki SEMUA tombol di seluruh aplikasi (prioritas utama), audit modal/popup, audit form & penyimpanan, uji responsif + tema, uji otomatis 14 alur interaksi, build production, lalu deploy production (diizinkan eksplisit) ke project Vercel yang sama (domain utama tetap).
+
+### Kondisi awal
+Local `main` stale di Task 33; pekerjaan berlanjut di `fitur/nur-companion` (= origin/main Task 35, produksi live). Checkpoint: branch `backup/pre-finalisasi`. File orphan `useLongPress.ts` (sisa awal turn, tanpa referensi) dihapus.
+
+### Perbaikan yang diterapkan (hasil audit 16 komponen)
+- **Konfirmasi hapus (wajib §4C)** — komponen baru `ConfirmButton` (AlertDialog Radix, tombol Batal + "Ya, hapus") dipasang di 6 titik: hapus catatan qada, hapus target pribadi (Target Harian), hapus target kebaikan pribadi (Rizq & Amal), hapus catatan amal (2 tempat: hari ini + riwayat), hapus riwayat bacaan Al-Qur'an, hapus riwayat jurnal syukur. Uji: dialog muncul, Batal mempertahankan data, Ya menghapus.
+- **Kartu yang bisa ditekan jadi `<button>` semantik** — `GlassCard` dengan `onClick` kini merender button sungguhan (keyboard-accessible, area sentuh utuh); dipakai di 3 kartu Progres Beranda + kartu Tasbih.
+- **Target harian otomatis yang sudah tercapai** — ketukan kini memberi toast penjelasan ("tercapai otomatis dari catatan ibadahmu hari ini") alih-alih terasa mati (flag manual tak lagi ditulis tak terlihat); target manual tetap toggle dua arah.
+- **Tombol Edit jurnal** — `window.scrollTo` tidak menggulir konten (kontainer asli `#konten-tazkiya`) → diganti; terverifikasi scrollTop < 40.
+- **Copy TargetSheet** — "tracker salat di Beranda" → "di halaman Sholat" (mengikuti lokasi tracker Task 34/35).
+- **Target sentuh** — tombol ikon kecil dinaikkan: hapus (h-7/h-8 → h-9), bersihkan pencarian (24→32px), bookmark ayat (28→32px); judul dialog hapus jurnal memakai label relatif ("Kemarin") selaras dengan deskripsi.
+
+### Pengujian (agent-browser, produksi build lokal; skrip di scripts/uji-final-*)
+14 alur lulus semua: (1) 5 menu utama tanpa Lainnya; (2) 3 highlight Beranda; (3) mood pilih→timpa→1 entri/hari→CTA; (4) simpan jurnal (+edit & scroll); (5) catat salat done+berjamaah (popup MasyaAllah); (6) ubah status mandiri (popup Alhamdulillah); (7) qada tambah→selesai→buka kembali→hapus (konfirmasi batal/ya); (8) Al-Qur'an bookmark ayat toggle + sesi otomatis (ayat 1–6) + penanda otomatis; (9) tasbih hitung→simpan harian (zikir 5 + sesi)→reset (konfirmasi, batal aman); (10) Progress 3 periode + DayDetailSheet; (11) edit nama profil tersimpan; (12) tema gelap↔terang; (13) modal buka/tutup (dialog salat Batal tak mengubah, TargetSheet, TasbihSheet, alert konfirmasi); (14) kartu akun & tautan /auth terverifikasi (login riil tidak dilakukan — tidak ada kredensial uji). Responsif 360/420/768/1280: tanpa scroll horizontal, nav & modal dalam layar, tombol simpan terjangkau. Light 360px baik. Konsol: 0 error. Temuan proses: server standalone lama menahan port 3000 sehingga bundle baru tak tersaji (dua kali) — diatasi kill proses + verifikasi chunk tersaji memuat string baru; skrip uji butuh native value setter React untuk input terkontrol.

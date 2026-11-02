@@ -15,7 +15,7 @@ import { useWorshipStore } from "@/lib/tazkiya/store";
 import { AMAL_KINDS, amalKindLabel, type AmalKind } from "@/lib/tazkiya/types";
 import { DEFAULT_AMAL_GOALS } from "@/lib/tazkiya/types";
 import { formatDayFull, lastNDays, relativeDayLabel, todayKey, weekdayShort } from "@/lib/tazkiya/dates";
-import { Chip, EmptyState, GlassCard, ProgressBar, SectionHeader } from "./ui-bits";
+import { Chip, ConfirmButton, EmptyState, GlassCard, ProgressBar, SectionHeader } from "./ui-bits";
 import { SubPageHeader } from "./SubPageHeader";
 import { cn } from "@/lib/utils";
 
@@ -103,14 +103,15 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                   <li key={g.id} className="flex items-center gap-2">
                     <span className="min-w-0 flex-1 truncate text-[12px] text-tz-ink">{g.label}</span>
                     {!defaultIds.has(g.id) ? (
-                      <button
-                        type="button"
-                        aria-label={`Hapus target ${g.label}`}
-                        onClick={() => deleteAmalGoal(g.id)}
-                        className="tap flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-tz-muted/70 hover:bg-rose-400/10 hover:text-rose-400"
+                      <ConfirmButton
+                        label={`Hapus target ${g.label}`}
+                        title={`Hapus target "${g.label}"?`}
+                        description="Target kebaikan pribadi ini akan dihapus dari daftar. Catatan amal yang sudah ada tidak terpengaruh."
+                        onConfirm={() => deleteAmalGoal(g.id)}
+                        className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-400"
                       >
                         <Trash2 size={13} />
-                      </button>
+                      </ConfirmButton>
                     ) : null}
                   </li>
                 ))}
@@ -223,17 +224,18 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                     {e.note ? ` · ${e.note}` : ""}
                   </span>
                 </span>
-                <button
-                  type="button"
-                  aria-label="Hapus catatan amal"
-                  onClick={() => {
+                <ConfirmButton
+                  label="Hapus catatan amal"
+                  title="Hapus catatan amal ini?"
+                  description="Catatan kebaikan hari ini akan dihapus dari riwayat."
+                  onConfirm={() => {
                     deleteAmalEntry(e.id);
                     toast.info("Catatan dihapus");
                   }}
-                  className="tap flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-tz-muted/70 hover:bg-rose-400/10 hover:text-rose-400"
+                  className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-400"
                 >
                   <Trash2 size={14} />
-                </button>
+                </ConfirmButton>
               </div>
             ))}
           </div>
@@ -286,17 +288,18 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                       {relativeDayLabel(e.date, today)} · {amalKindLabel(e.kind)}
                     </span>
                   </span>
-                  <button
-                    type="button"
-                    aria-label="Hapus catatan"
-                    onClick={() => {
+                  <ConfirmButton
+                    label="Hapus catatan"
+                    title="Hapus catatan amal ini?"
+                    description="Catatan kebaikan ini akan dihapus dari riwayat."
+                    onConfirm={() => {
                       deleteAmalEntry(e.id);
                       toast.info("Catatan dihapus");
                     }}
-                    className="tap flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-tz-muted/70 hover:bg-rose-400/10 hover:text-rose-400"
+                    className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-400"
                   >
                     <Trash2 size={13} />
-                  </button>
+                  </ConfirmButton>
                 </li>
               ))}
             </ul>
