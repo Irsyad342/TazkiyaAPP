@@ -702,9 +702,12 @@ export function ProfilePage({
             const doneN = PRAYERS.filter((p) => selectPrayerDetail(prayerDetails, logs, day, p.id).status === "done").length;
             const unrecordedN = PRAYERS.filter((p) => selectPrayerDetail(prayerDetails, logs, day, p.id).status === "none").length;
             const hasAnyRecord = !!dayLog || !!prayerDetails[day];
+            // Guard data lama/parsial: log bisa hanya punya salah satu dari dua field ini.
+            const quranPagesN = dayLog?.quranPages ?? 0;
+            const quranVersesN = dayLog?.quranVerses ?? 0;
             const quranTxt =
-              dayLog && (dayLog.quranPages > 0 || dayLog.quranVerses > 0)
-                ? `${dayLog.quranPages.toLocaleString("id-ID")} hlgr · ${dayLog.quranVerses.toLocaleString("id-ID")} ayat`
+              dayLog && (quranPagesN > 0 || quranVersesN > 0)
+                ? `${quranPagesN.toLocaleString("id-ID")} hlgr · ${quranVersesN.toLocaleString("id-ID")} ayat`
                 : null;
             const zikirTxt = dayLog && dayLog.zikirCount > 0 ? `${dayLog.zikirCount.toLocaleString("id-ID")} zikir` : null;
             const summaryParts = [`${doneN}/5 salat terlaksana`, quranTxt, zikirTxt].filter(Boolean) as string[];

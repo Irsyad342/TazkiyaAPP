@@ -1,15 +1,16 @@
 "use client";
 
 /**
- * Tazkiya — Halaman Beranda (Islamic Daily Companion, terinspirasi struktur
- * dashboard Nūr dengan identitas ungu Tazkiya):
+ * Tazkiya — Halaman Beranda (Islamic Daily Companion):
  * A. Header sapaan + nama + tanggal Masehi & Hijriah + avatar + notifikasi.
  * B. Next Prayer: salat berikutnya, jadwal aktual (GPS/manual), countdown,
  *    dan timeline lima waktu dengan penanda lewat / berjalan / berikutnya.
  * C. Daily Journey: target harian (otomatis dari catatan + manual, bisa diatur).
- * D. Daily Barakah: niat baik, pengingat setelah Subuh, motivasi, target kecil.
- * Plus aksi cepat, strip progres ringkas (tanpa pencatatan salat di sini —
- * pencatatan pindah ke halaman Sholat), dan kartu Doa Hari Ini.
+ * D. Mood Check-in: pilihan mood berilustrasi, satu catatan per hari.
+ * E. Jelajahi Aktivitas: pintasan editorial ke Jurnal Syukur, Zikir & Doa,
+ *    Rizq & Amal.
+ * F. Ringkasan yang masih berguna: Progres Hari Ini, Daily Barakah, Doa Hari Ini.
+ * Pencatatan salat ada di halaman Sholat — Beranda tidak menduplikasinya.
  */
 
 import { useEffect, useMemo, useState } from "react";
@@ -18,11 +19,8 @@ import {
   BookOpen,
   CalendarDays,
   ChevronRight,
-  CircleDot,
   Check,
-  HandCoins,
   MoonStar,
-  BookHeart,
   Plus,
   Settings2,
   Sparkles,
@@ -33,13 +31,14 @@ import {
 import { toast } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import type { PrayerId } from "@/lib/tazkiya/types";
-import { MOODS } from "@/lib/tazkiya/types";
 import { formatGregorian, formatHijri, todayKey } from "@/lib/tazkiya/dates";
 import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { formatCountdown, goalStatuses, nextPrayerState } from "@/lib/tazkiya/goals";
 import { barakahOfTheDay } from "@/lib/tazkiya/barakah";
 import { duaOfTheDay } from "@/lib/tazkiya/duas";
 import { Chip, GlassCard, IconBox, ProgressBar, SectionHeader } from "./ui-bits";
+import { MoodSection } from "./MoodSection";
+import { JelajahiAktivitas } from "./JelajahiAktivitas";
 import type { SubPageId, TabId } from "./BottomNav";
 import { cn } from "@/lib/utils";
 
@@ -206,8 +205,6 @@ function DailyJourney({ today }: { today: string }) {
   const toggleDailyGoalEnabled = useWorshipStore((s) => s.toggleDailyGoalEnabled);
   const addDailyGoal = useWorshipStore((s) => s.addDailyGoal);
   const deleteDailyGoal = useWorshipStore((s) => s.deleteDailyGoal);
-  const setMood = useWorshipStore((s) => s.setMood);
-  const moods = useWorshipStore((s) => s.moods);
 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
@@ -381,36 +378,6 @@ function DailyJourney({ today }: { today: string }) {
           </button>
         </div>
       </GlassCard>
-
-      {/* Mood check-in ringkas — pintasan ke Jurnal Syukur */}
-      <div className="mt-2 flex flex-wrap items-center gap-1.5 px-1">
-        <span className="text-[10px] font-semibold text-tz-muted">Mood hari ini:</span>
-        {MOODS.map((m) => {
-          const active = moods[today]?.mood === m.id;
-          return (
-            <button
-              key={m.id}
-              type="button"
-              aria-pressed={active}
-              aria-label={`Mood ${m.label}`}
-              title={m.label}
-              onClick={() => {
-                setMood(today, m.id);
-                toast.success(`Mood "${m.label}" tercatat`);
-              }}
-              className={cn(
-                "tap flex h-7 w-7 items-center justify-center rounded-full border text-[13px] transition-all",
-                active
-                  ? "border-tz-violet bg-tz-violet/20 shadow-[0_0_10px_-2px_rgba(156,114,239,0.7)]"
-                  : "border-tz-line bg-tz-panel-soft opacity-80 hover:opacity-100"
-              )}
-            >
-              {m.emoji}
-            </button>
-          );
-        })}
-        <span className="text-[9.5px] text-tz-muted/70">— detail di Jurnal Syukur</span>
-      </div>
     </section>
   );
 }
@@ -455,11 +422,9 @@ function DailyBarakah() {
 
 export function HomePage({
   onNavigate,
-  onOpenTasbih,
   onOpenSubpage,
 }: {
   onNavigate: (tab: TabId) => void;
-  onOpenTasbih: () => void;
   onOpenSubpage: (sub: SubPageId) => void;
 }) {
   const settings = useWorshipStore((s) => s.settings);
@@ -506,7 +471,7 @@ export function HomePage({
               <Bell size={17} />
               <span aria-hidden className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-tz-violet shadow-[0_0_6px_2px_rgba(156,114,239,0.7)]" />
             </button>
-            <button type="button" aria-label="Buka profil" onClick={() => onOpenSubpage("profil")} className="tap relative">
+            <button type="button" aria-label="Buka profil" onClick={() => onNavigate("profil")} className="tap relative">
               {settings.avatarDataUrl ? (
                 <img
                   src={settings.avatarDataUrl}
@@ -529,27 +494,13 @@ export function HomePage({
       {/* ---------- C. Target Harian ---------- */}
       <DailyJourney today={today} />
 
-      {/* ---------- D. Daily Barakah ---------- */}
-      <DailyBarakah />
+      {/* ---------- D. Mood Check-in ---------- */}
+      <MoodSection today={today} onOpenSubpage={onOpenSubpage} />
 
-      {/* ---------- Aksi cepat ---------- */}
-      <section aria-label="Aksi cepat" className="grid grid-cols-4 gap-2.5">
-        {[
-          { label: "Tasbih", icon: CircleDot, onClick: onOpenTasbih },
-          { label: "Sholat", icon: MoonStar, onClick: () => onNavigate("sholat") },
-          { label: "Jurnal", icon: BookHeart, onClick: () => onOpenSubpage("jurnal") },
-          { label: "Rizq & Amal", icon: HandCoins, onClick: () => onOpenSubpage("rizq-amal") },
-        ].map(({ label, icon: Icon, onClick }) => (
-          <button key={label} type="button" onClick={onClick} className="tap group flex flex-col items-center gap-2 rounded-2xl py-1">
-            <span className="glass relative flex h-[54px] w-[54px] items-center justify-center rounded-[1.15rem] text-tz-violet transition-all duration-200 group-active:scale-95">
-              <Icon size={21} strokeWidth={1.9} className="relative" />
-            </span>
-            <span className="text-[10.5px] font-medium leading-tight text-tz-muted transition-colors group-hover:text-tz-accent">{label}</span>
-          </button>
-        ))}
-      </section>
+      {/* ---------- E. Jelajahi Aktivitas ---------- */}
+      <JelajahiAktivitas today={today} onOpen={onOpenSubpage} />
 
-      {/* ---------- Progres hari ini (ringkas, tanpa pencatatan) ---------- */}
+      {/* ---------- F1. Progres hari ini (ringkas, tanpa pencatatan) ---------- */}
       <section aria-label="Progres ibadah hari ini">
         <SectionHeader
           title="Progres Hari Ini"
@@ -597,6 +548,9 @@ export function HomePage({
         </div>
       </section>
 
+      {/* ---------- F2. Daily Barakah ---------- */}
+      <DailyBarakah />
+
       {/* ---------- Doa Hari Ini ---------- */}
       <GlassCard variant="clean" className="p-5">
         <div className="flex items-center gap-2.5">
@@ -621,10 +575,6 @@ export function HomePage({
           <p className="text-[10px] text-tz-muted/70">Berganti setiap hari</p>
         </div>
       </GlassCard>
-
-      <p className="pb-1 text-center text-[10px] text-tz-muted/60">
-        Pencatatan salat kini ada di halaman Sholat · data tersimpan di perangkat &amp; akunmu
-      </p>
     </div>
   );
 }

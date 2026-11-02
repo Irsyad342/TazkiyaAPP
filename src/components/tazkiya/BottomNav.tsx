@@ -2,24 +2,25 @@
 
 /**
  * Tazkiya — Navigasi bawah dengan 5 menu utama:
- * Beranda · Al-Qur'an · Sholat · Progress · Lainnya.
- * Ikon konsisten, menu aktif diberi aksen ungu, dua tema, tinggi ringkas.
+ * Beranda · Al-Qur'an · Sholat · Progress · Profil.
+ * Ikon konsisten (Lucide, satu gaya), menu aktif berupa pil ungu solid,
+ * indikator jelas, transisi halus, dua tema.
  */
 
-import { BookOpen, ChartColumn, Ellipsis, House, MoonStar } from "lucide-react";
+import { BookOpen, ChartColumn, CircleUserRound, House, MoonStar } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type TabId = "beranda" | "quran" | "sholat" | "progress" | "lainnya";
+export type TabId = "beranda" | "quran" | "sholat" | "progress" | "profil";
 
-/** Sub-halaman penuh yang dibuka dari menu Lainnya (bukan modal). */
-export type SubPageId = "jurnal" | "zikir-doa" | "rizq-amal" | "profil";
+/** Sub-halaman penuh yang dibuka dari Beranda (bukan modal). */
+export type SubPageId = "jurnal" | "zikir-doa" | "rizq-amal";
 
 const TABS: { id: TabId; label: string; icon: typeof House }[] = [
   { id: "beranda", label: "Beranda", icon: House },
   { id: "quran", label: "Al-Qur'an", icon: BookOpen },
   { id: "sholat", label: "Sholat", icon: MoonStar },
   { id: "progress", label: "Progress", icon: ChartColumn },
-  { id: "lainnya", label: "Lainnya", icon: Ellipsis },
+  { id: "profil", label: "Profil", icon: CircleUserRound },
 ];
 
 export function BottomNav({
@@ -49,23 +50,20 @@ export function BottomNav({
               aria-label={`Buka menu ${label}`}
               onClick={() => onChange(id)}
               className={cn(
-                "tap relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 transition-all",
+                "tap relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 transition-all duration-200 active:scale-95",
                 isActive
-                  ? "border border-tz-violet/40 bg-gradient-to-b from-tz-violet/38 to-tz-purple/22 shadow-[0_0_26px_-6px_rgba(156,114,239,0.75),inset_0_1px_0_rgba(255,255,255,0.18)]"
+                  ? "bg-tz-violet shadow-[0_10px_24px_-12px_rgba(85,51,154,0.85)]"
                   : "border border-transparent"
               )}
             >
               <Icon
                 size={19}
                 strokeWidth={isActive ? 2.2 : 1.8}
-                className={cn(
-                  "transition-all duration-200",
-                  isActive ? "text-white drop-shadow-[0_0_8px_rgba(156,114,239,0.9)]" : "text-tz-muted"
-                )}
+                className={cn("transition-colors duration-200", isActive ? "text-white" : "text-tz-muted")}
               />
               <span
                 className={cn(
-                  "text-[9.5px] font-medium leading-none transition-colors",
+                  "text-[9.5px] font-medium leading-none transition-colors duration-200",
                   isActive ? "text-white" : "text-tz-muted"
                 )}
               >
@@ -75,7 +73,7 @@ export function BottomNav({
                 aria-hidden
                 className={cn(
                   "absolute bottom-[3px] h-1 w-1 rounded-full transition-all duration-200",
-                  isActive ? "bg-tz-lavender shadow-[0_0_8px_2px_rgba(216,197,255,0.7)]" : "bg-transparent"
+                  isActive ? "bg-white/85" : "bg-transparent"
                 )}
               />
             </button>

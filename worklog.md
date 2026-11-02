@@ -619,3 +619,22 @@ Jadwal salat memakai mesin yang sudah ada (GPS + Kemenag, ihtiyat +2 mnt) — ti
 
 ### Status deploy & verifikasi produksi (lulus semua)
 `fitur/nur-companion` (33d01cf) di-push ke origin/main → Vercel live. Verifikasi produksi: bundle JS memuat string fitur baru ("Salat berikutnya", "Rizq & Amal", "Daily Barakah", "Jurnal Syukur", qada); uji browser live: 5 tombol nav, halaman Sholat dengan tab Hari Ini/Bulanan/Qada, Qada terbuka, Jurnal Syukur terbuka dari Lainnya, Beranda menyapa + tanggal Hijriah + Next Prayer dengan timeline — Target Harian 0/5 untuk perangkat tanpa data (jujur, tanpa data dummy). Skrip: scripts/deploy-nur.sh, scripts/verify-prod-nur.sh, scripts/verify-nur-local.sh, scripts/seed-nur-companion.js.
+
+## Task 35 — Penyempurnaan UI/UX: nav Profil, Jelajahi Aktivitas, Mood Check-in besar (anti AI-slop)
+
+### Permintaan
+Ganti menu Lainnya → Profil di bottom navigation; pindahkan akses Jurnal Syukur/Zikir & Doa/Rizq & Amal ke Beranda sebagai highlight "Jelajahi Aktivitas" berdesain editorial; perbaiki hierarki Beranda; perbesar Mood Check-in dengan ilustrasi; hindari tampilan generik (card seragam, gradient berlebihan, glow di mana-mana). Tanpa membangun ulang aplikasi, tanpa menghapus halaman/data, tanpa menyentuh auth/database/logika ibadah. Checkpoint sebelum mengubah kode. Deploy otomatis di akhir (instruksi penutup user; instruksi "jangan deploy otomatis" di awal ditafsirkan sebagai larangan deploy di tengah pengerjaan — pola sama seperti Task 34).
+
+### Checkpoint
+Branch `backup/pre-nur-polish` dari `fitur/nur-companion` (76376e1). Pekerjaan lanjut di `fitur/nur-companion`.
+
+### Perubahan
+- `BottomNav.tsx`: TabId `lainnya` → `profil`, ikon Ellipsis → CircleUserRound; pil aktif jadi ungu SOLID tanpa glow berlebihan (indikator lebih jelas, transisi halus + active:scale-95). SubPageId kini hanya jurnal/zikir-doa/rizq-amal.
+- `page.tsx`: tab `profil` merender ProfilePage yang SUDAH ADA (tanpa halaman baru); LainnyaPage dihapus dari routing & dihapus filenya; BottomNav.onChange menutup sub-halaman terbuka (memperbaiki bug lama: sub-halaman Profil tanpa tombol kembali membuat navigasi "nyangkut"); SUBPAGE_TITLES/TAB_TITLES disesuaikan.
+- `MoodSection.tsx` (baru): judul "Bagaimana perasaanmu hari ini?" + subjudul sesuai permintaan; 7 mood berilustrasi wajah SVG satu gaya (garis membulat, aksen per karakter mood: amber/teal/pink/slate/sky/indigo/violet), horizontal scroll snap; simpan SATU entri per tanggal (menimpa — menekan berkali-kali tidak membuat entri ganda); mood hari ini tampil terpilih setelah reload + bisa diganti; feedback singkat + CTA "Lanjut ke Jurnal Syukur"; disclaimer bukan diagnosis.
+- `JelajahiAktivitas.tsx` (baru): tiga komposisi berbeda (blok utama ungu untuk Jurnal Syukur dengan status riil "Ditulis hari ini ✓", band teal cermin untuk Zikir & Doa, baris tenang amber untuk Rizq & Amal) — bukan grid kartu seragam.
+- `HomePage.tsx`: hierarki baru — Header → Next Prayer → Target Harian → Mood Check-in → Jelajahi Aktivitas → Progres Hari Ini → Daily Barakah → Doa Hari Ini; strip mood kecil lama & grid aksi cepat redundan dihapus; avatar header kini membuka tab Profil; catatan transisional di footer dihapus.
+- `ProfilePage.tsx`: perbaikan crash lama yang kini terpicu data parsial/log lama — `dayLog.quranPages/quranVerses` tanpa guard menyebabkan TypeError toLocaleString di riwayat (guard `?? 0`, tanpa perubahan logika).
+
+### Uji (12/12 lulus, lokal + visual)
+Nav 5 menu benar & tanpa Lainnya; tab Profil membuka halaman Profil yang sama; ketiga highlight membuka halaman benar; mood section ±310px dengan 7 pilihan; pilih→tersimpan (1 entri); ganti→menimpa tidak ganda; reload→tampil kembali terpilih + CTA; data lama tampil (salat 1/5, Qur'an 1 hlm, zikir 33, nama header); dark & light baik; 360px tanpa overflow; tsc/eslint/build bersih. Temuan proses: server lama menahan port 3000 sehingga build baru tidak terpakai (menyesatkan diagnosis crash) — diselesaikan dengan fuser -k lalu uji ulang.

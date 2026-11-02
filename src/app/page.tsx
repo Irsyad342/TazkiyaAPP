@@ -4,8 +4,8 @@
  * Tazkiya — Kerangka aplikasi (Islamic Daily Companion).
  * Gerbang hidrasi, bingkai ponsel mobile-first, tema (gelap/terang/sistem),
  * mode Liquid Glass, transisi antartab, lima menu utama (Beranda, Al-Qur'an,
- * Sholat, Progress, Lainnya) + sub-halaman dari menu Lainnya (Jurnal Syukur,
- * Zikir & Doa, Rizq & Amal, Profil), pembaca Al-Qur'an, dan Tasbih Digital.
+ * Sholat, Progress, Profil) + sub-halaman refleksi dari Beranda (Jurnal
+ * Syukur, Zikir & Doa, Rizq & Amal), pembaca Al-Qur'an, dan Tasbih Digital.
  */
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -19,7 +19,6 @@ import { AuthGate } from "@/components/tazkiya/AuthGate";
 import { HomePage } from "@/components/tazkiya/HomePage";
 import { QuranPage } from "@/components/tazkiya/QuranPage";
 import { PrayerPage } from "@/components/tazkiya/PrayerPage";
-import { LainnyaPage } from "@/components/tazkiya/LainnyaPage";
 import { JurnalPage } from "@/components/tazkiya/JurnalPage";
 import { ZikirDoaPage } from "@/components/tazkiya/ZikirDoaPage";
 import { RizqAmalPage } from "@/components/tazkiya/RizqAmalPage";
@@ -62,14 +61,13 @@ const TAB_TITLES: Record<TabId, string> = {
   quran: "Tazkiya — Al-Qur'an",
   sholat: "Tazkiya — Sholat",
   progress: "Tazkiya — Progress",
-  lainnya: "Tazkiya — Lainnya",
+  profil: "Tazkiya — Profil",
 };
 
 const SUBPAGE_TITLES: Record<SubPageId, string> = {
   jurnal: "Tazkiya — Jurnal Syukur",
   "zikir-doa": "Tazkiya — Zikir & Doa",
   "rizq-amal": "Tazkiya — Rizq & Amal",
-  profil: "Tazkiya — Profil",
 };
 
 /* Deteksi runtime Capacitor (APK) tanpa dependensi langsung. */
@@ -266,19 +264,17 @@ export default function Page() {
                     setSubpage(null);
                     setTab(t);
                   }}
-                  onOpenTasbih={() => openTasbih()}
                   onOpenSubpage={setSubpage}
                 />
               )}
               {subpage === null && tab === "quran" && <QuranPage onOpenReader={openReader} />}
               {subpage === null && tab === "sholat" && <PrayerPage />}
               {subpage === null && tab === "progress" && <ProgressPage />}
-              {subpage === null && tab === "lainnya" && <LainnyaPage onOpen={setSubpage} />}
+              {subpage === null && tab === "profil" && <ProfilePage onOpenTargets={openTargets} onGoTracker={goTracker} />}
 
               {subpage === "jurnal" && <JurnalPage onBack={() => setSubpage(null)} />}
               {subpage === "zikir-doa" && <ZikirDoaPage onBack={() => setSubpage(null)} onOpenTasbih={openTasbih} />}
               {subpage === "rizq-amal" && <RizqAmalPage onBack={() => setSubpage(null)} />}
-              {subpage === "profil" && <ProfilePage onOpenTargets={openTargets} onGoTracker={goTracker} />}
             </m.div>
           </AnimatePresence>
         </div>
@@ -296,7 +292,14 @@ export default function Page() {
         {/* Gerbang akun: inisialisasi sesi + dialog keputusan data (migrasi/gabung). */}
         <AuthGate />
 
-        <BottomNav active={tab} onChange={setTab} />
+        {/* Ganti tab menutup sub-halaman yang terbuka agar navigasi tidak "nyangkut". */}
+        <BottomNav
+          active={tab}
+          onChange={(t) => {
+            setSubpage(null);
+            setTab(t);
+          }}
+        />
       </div>
 
       <Toaster
