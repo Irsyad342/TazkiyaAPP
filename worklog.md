@@ -638,3 +638,6 @@ Branch `backup/pre-nur-polish` dari `fitur/nur-companion` (76376e1). Pekerjaan l
 
 ### Uji (12/12 lulus, lokal + visual)
 Nav 5 menu benar & tanpa Lainnya; tab Profil membuka halaman Profil yang sama; ketiga highlight membuka halaman benar; mood section ±310px dengan 7 pilihan; pilih→tersimpan (1 entri); ganti→menimpa tidak ganda; reload→tampil kembali terpilih + CTA; data lama tampil (salat 1/5, Qur'an 1 hlm, zikir 33, nama header); dark & light baik; 360px tanpa overflow; tsc/eslint/build bersih. Temuan proses: server lama menahan port 3000 sehingga build baru tidak terpakai (menyesatkan diagnosis crash) — diselesaikan dengan fuser -k lalu uji ulang.
+
+### Status deploy & verifikasi produksi (lulus semua)
+`fitur/nur-companion` (b4355bc) di-push ke origin/main → Vercel live ±50 detik. Verifikasi produksi: chunk JS memuat "Jelajahi Aktivitas"; uji browser live: nav 5 menu (Beranda, Al-Qur'an, Sholat, Progress, Profil) tanpa Lainnya, tab Profil membuka halaman Profil, mood check-in & Jelajahi Aktivitas tampil di Beranda, pemilihan mood tersimpan ke store. Checkpoint sebelum perubahan: branch `backup/pre-nur-polish` (76376e1).
