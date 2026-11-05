@@ -663,3 +663,27 @@ Local `main` stale di Task 33; pekerjaan berlanjut di `fitur/nur-companion` (= o
 
 ### Status deploy & verifikasi produksi (lulus semua)
 `fitur/nur-companion` (3b62fe8) di-push ke origin/main → Vercel live ±60 detik; chunk produksi memuat marker "Ya, hapus". Verifikasi produksi: nav 5 menu, mood & Jelajahi tampil, dialog salat buka-tutup bersih, alur qada di produksi — tambah → dialog konfirmasi muncul → Batal mempertahankan → "Ya, hapus" menghapus; konsol tanpa error. Deployment stabil sebelumnya (Task 35, b4355bc) tetap tersedia di riwayat Vercel untuk rollback. Checkpoint sebelum perubahan: branch `backup/pre-finalisasi` (0b8b189).
+
+## Task 37 — FULL UI/UX REDESIGN "Fresh Green" (referensi gambar Nur) + deploy
+
+### Permintaan
+Redesign menyeluruh seluruh halaman Tazkiya mengikuti 3 gambar referensi (aplikasi Nur): kanvas terang #F8FAFC, kartu putih soft-shadow, gradien hijau emerald dengan siluet masjid, kartu premium hijau hutan, aksen lime/biru/lavender/oranye, font modern satu keluarga. 100% fitur & business logic dipertahankan; hanya UI/UX.
+
+### Basis & keamanan
+Branch kerja `fitur/uiux-redesign` dari `fitur/nur-companion` (8a9d05e, produksi live). Checkpoint `backup/pre-uiux-redesign`. Lokal `main` stale (era Task 33 + commit UUID berisi 2 PNG captcha sisa) — dibiarkan; deploy lewat `fitur/uiux-redesign:main`.
+
+### Design system baru (globals.css ditulis ulang)
+- Token: nama lama dipertahankan sebagai API (tz-violet→hijau merek, tz-purple→hijau gradien, dst.) agar seluruh kelas utilitas ikut berganti konsisten; token baru: tz-lime #C7F464, tz-blue #4263EB, tz-blue-soft #EEF2FF, tz-mint #F0F9D9, tz-forest #0C3B2E.
+- Light: kanvas #F8FAFC, kartu putih + soft shadow (tanpa blur), teks #171923/#858A9B, border #EEF0F5. Dark: forest (#0B1512/#12211B) — bukan ungu.
+- `.glass-hero` gradien emerald (#4ADE80→#22C55E→#15A04F); `.tz-task-card` kartu premium hutan (Qur'an/Qada) di kedua tema; `.tz-tasbih-disc` mint; beam hijau→lime; `text-gradient-violet` dialiaskan jadi hijau solid.
+- Font: Plus Jakarta Sans menjadi SATU keluarga (Sora dihapus dari layout), Amiri Quran khusus Arab. --primary hijau → Switch/badge shadcn ikut hijau.
+- Komponen dasar: GlassCard (radius 1.5rem), SegmentedTabs baru (tab pil seragam), SectionHeader hijau, IconBox, ProgressRing hijau→lime, Chip netral, EmptyState mint, ConfirmButton putih.
+
+### Halaman yang di-redesign (semua)
+Shell (splash hijau, bingkai, toaster), BottomNav (putih, pil hijau + titik lime), SubPageHeader, Beranda (hero salat hijau + siluet masjid + chip countdown lime, ceklis hijau, aksen Progres: salat hijau/Qur'an biru/zikir amber), JelajahiAktivitas (jurnal hijau, zikir lavender, rizq amber), Sholat (ringkasan "0/5" kartu hijau ring putih→lime, baris ikon oranye + chip status, kalender emerald/biru/amber, Qada kartu hutan "belum selesai" + bar lime), dialog salat & popup motivasi & sheet rinci, Al-Qur'an (kartu target hutan, aksen biru surah/ayat, tab segmen, tombol hijau), Reader (chip nomor ayat biru), Progress (kartu %, kategori ikon warna, pola mingguan emerald/lavender/amber, kalender), Profil (kartu putih + strip lime, preview tema forest, tombol hijau), Jurnal (nomor hijau), Zikir & Doa, Rizq & Amal, Tasbih (piringan mint/hutan), TargetSheet, AuthGate, halaman /auth (kartu putih tombol hijau), AreaChartLite (garis hijau).
+
+### Kepatuhan logika (non-negotiable §7)
+Tidak ada perubahan store/handler/rumus: Jumat (SALAT_JUMAT/ZUHUR_ALTERNATIF/fridayZuhurAlt), qada, mood 1/hari, sesi baca otomatis, tasbih, statistik, auth — semua fungsi disentuh nol; hanya className/struktur visual. Liquid Glass & saklar animasi tetap berfungsi (varian baru).
+
+### Pengujian (build produksi lokal, agent-browser)
+Alur lulus: catat Subuh berjamaah (popup MasyaAllah, timing "Terlambat" benar terhitung), tab Qada, mood, simpan jurnal, qada tambah→konfirmasi (Batal mempertahankan, Ya menghapus), tema via UI (terang↔gelap). Visual: Beranda/Sholat/Qur'an/Progress/Profil terang & dark, /auth — sesuai referensi. Responsif 360/420/1280 tanpa overflow horizontal, bingkai desktop 430px. Konsol 0 error. tsc+eslint+build bersih.

@@ -126,7 +126,7 @@ export function PrayerRecordDialog({
                 className={cn(
                   "tap flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition-all",
                   active
-                    ? "border-tz-violet/60 bg-tz-violet/12 shadow-[0_0_18px_-6px_rgba(156,114,239,0.55)]"
+                    ? "border-tz-violet/55 bg-tz-violet/12 shadow-[0_10px_24px_-14px_rgba(22,163,74,0.6)]"
                     : "border-tz-line bg-tz-panel-soft hover:border-tz-violet/35"
                 )}
               >
@@ -288,7 +288,7 @@ export function PrayerRecordDialog({
             className={cn(
               "tap min-h-[42px] flex-1 rounded-xl px-4 text-sm font-semibold text-white transition-all",
               canSave
-                ? "bg-gradient-to-r from-tz-purple to-tz-violet shadow-[0_6px_18px_-6px_rgba(85,51,154,0.9),inset_0_1px_0_rgba(255,255,255,0.22)]"
+                ? "bg-gradient-to-r from-[#4ade80] to-[#16a34a] shadow-[0_8px_20px_-8px_rgba(22,163,74,0.7),inset_0_1px_0_rgba(255,255,255,0.22)]"
                 : "cursor-not-allowed opacity-40"
             )}
           >

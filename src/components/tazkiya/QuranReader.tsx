@@ -375,7 +375,7 @@ export function QuranReader({
             <button
               type="button"
               onClick={() => void reload(true)}
-              className="tap mt-1 flex min-h-[42px] items-center gap-2 rounded-xl border border-tz-violet/50 bg-gradient-to-r from-tz-purple to-tz-violet px-4 text-sm font-semibold text-white"
+              className="tap mt-1 flex min-h-[42px] items-center gap-2 rounded-xl bg-gradient-to-r from-[#4ade80] to-[#16a34a] px-4 text-sm font-semibold text-white"
             >
               <RotateCcw size={15} /> Coba lagi
             </button>
@@ -415,7 +415,7 @@ export function QuranReader({
                   >
                     <BookmarkIcon size={13} />
                   </button>
-                  <span className="flex min-h-[22px] items-center rounded-full border border-tz-violet/25 bg-tz-violet/10 px-2.5 text-[11px] font-semibold text-tz-accent">
+                  <span className="flex min-h-[22px] items-center rounded-full border border-[#4263eb]/20 bg-[#eef2ff] px-2.5 text-[11px] font-semibold text-[#3b55d6] dark:border-[#7c86ff]/25 dark:bg-[#7c86ff]/15 dark:text-[#aeb6ff]">
                     {String(ayah.number).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[Number(d)])} · {ayah.number}
                   </span>
                 </div>

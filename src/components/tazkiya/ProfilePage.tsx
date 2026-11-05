@@ -78,9 +78,9 @@ import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { cn } from "@/lib/utils";
 
 const THEME_OPTIONS: { id: ThemeMode; label: string; hint: string; bg: string; dot: string }[] = [
-  { id: "dark", label: "Gelap", hint: "Ungu malam", bg: "linear-gradient(140deg,#211735,#171321)", dot: "#9C72EF" },
-  { id: "light", label: "Terang", hint: "Lavender bersih", bg: "linear-gradient(140deg,#ffffff,#f5f1f5)", dot: "#7546C8" },
-  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#211735 50%,#f5f1f5 50%)", dot: "#B693FF" },
+  { id: "dark", label: "Gelap", hint: "Hijau malam", bg: "linear-gradient(140deg,#12211b,#0b1512)", dot: "#4ADE80" },
+  { id: "light", label: "Terang", hint: "Kanvas bersih", bg: "linear-gradient(140deg,#ffffff,#f8fafc)", dot: "#16A34A" },
+  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#12211b 50%,#f8fafc 50%)", dot: "#7CD992" },
 ];
 
 /** Jam perangkat HH:mm — aksen kanan-atas kartu profil. */
@@ -283,23 +283,23 @@ export function ProfilePage({
 
   return (
     <div className="space-y-6">
-      {/* ---------- Kartu profil utama — charcoal-ungu terangkat, kartu violet menyembul (tema aktif) ---------- */}
+      {/* ---------- Kartu profil utama — putih bersih dengan aksen hijau, strip lime menyembul ---------- */}
       <section aria-label="Kartu profil" className="animate-tz-fade-up relative">
-        {/* Cahaya violet lembut di bawah komposisi — statis & terkontrol */}
-        <div aria-hidden className="absolute inset-x-10 -bottom-2 h-16 rounded-full bg-tz-violet/25 blur-2xl light:bg-tz-violet/20" />
+        {/* Cahaya hijau lembut di bawah komposisi — statis & terkontrol */}
+        <div aria-hidden className="absolute inset-x-10 -bottom-2 h-16 rounded-full bg-tz-violet/20 blur-2xl" />
 
         {/* Kartu utama — lapis depan */}
-        <div className="relative z-10 overflow-hidden rounded-[1.9rem] border border-tz-violet/25 bg-[#191225] shadow-[0_30px_70px_-30px_rgba(22,12,44,0.9)] light:border-tz-violet/20 light:bg-white light:shadow-[0_24px_50px_-30px_rgba(90,60,160,0.35)]">
-          <div aria-hidden className="absolute inset-0 bg-[radial-gradient(130%_100%_at_18%_0%,#2b2040_0%,#1d142e_46%,#150e22_100%)] light:bg-[linear-gradient(150deg,#ffffff_0%,#faf7fe_55%,#f3ecfb_100%)]" />
+        <div className="glass relative z-10 overflow-hidden rounded-[1.9rem]">
+          <div aria-hidden className="absolute inset-0 bg-[radial-gradient(130%_100%_at_18%_0%,rgba(74,222,128,0.1)_0%,rgba(255,255,255,0)_55%)] dark:bg-[radial-gradient(130%_100%_at_18%_0%,rgba(74,222,128,0.12)_0%,rgba(255,255,255,0)_55%)]" />
 
           <div className="relative flex flex-col gap-5 p-5">
             {/* Status (kiri) + jam perangkat (kanan) */}
             <div className="flex items-center justify-between gap-2">
-              <span className="flex min-w-0 items-center gap-2 text-[11.5px] font-semibold text-tz-accent light:text-[#6b46c1]">
-                <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-tz-violet shadow-[0_0_8px_1px_rgba(156,114,239,0.75)] light:shadow-[0_0_8px_1px_rgba(117,70,200,0.4)]" />
+              <span className="flex min-w-0 items-center gap-2 text-[11.5px] font-semibold text-tz-accent">
+                <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-tz-violet shadow-[0_0_8px_1px_rgba(22,163,74,0.5)]" />
                 Perjalanan Ibadah Aktif
               </span>
-              <span className="flex shrink-0 items-center gap-1.5 tabular-nums text-[11.5px] font-medium text-white/60 light:text-tz-muted">
+              <span className="flex shrink-0 items-center gap-1.5 tabular-nums text-[11.5px] font-medium text-tz-muted">
                 <Clock size={13} aria-hidden />
                 {clock}
               </span>
@@ -314,7 +314,7 @@ export function ProfilePage({
                   maxLength={40}
                   aria-label="Nama pengguna"
                   placeholder="Nama pengguna"
-                  className="min-h-[44px] w-full rounded-xl border border-tz-violet/30 bg-white/[0.08] px-3 text-[14px] font-semibold text-white outline-none backdrop-blur-md placeholder:font-normal placeholder:text-white/40 focus:border-tz-violet/60 light:border-tz-violet/25 light:bg-white light:text-tz-ink light:placeholder:text-tz-muted/60"
+                  className="tz-field min-h-[44px] w-full text-[14px] font-semibold"
                   autoFocus
                 />
                 <button
@@ -330,7 +330,7 @@ export function ProfilePage({
                     setEditingName(false);
                     toast.success("Nama diperbarui");
                   }}
-                  className="tap flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-tz-violet to-tz-purple text-white shadow-[0_0_16px_-3px_rgba(156,114,239,0.7)]"
+                  className="tap flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white shadow-[0_8px_20px_-10px_rgba(22,163,74,0.7)]"
                 >
                   <Check size={17} />
                 </button>
@@ -338,15 +338,14 @@ export function ProfilePage({
             ) : (
               <div className="flex items-center gap-3.5">
                 <div className="relative shrink-0">
-                  <div aria-hidden className="absolute -inset-1 rounded-full bg-gradient-to-br from-tz-violet/45 via-tz-purple/15 to-transparent blur-[6px]" />
                   {settings.avatarDataUrl ? (
                     <img
                       src={settings.avatarDataUrl}
                       alt={`Foto profil ${settings.name}`}
-                      className="relative h-14 w-14 rounded-full border-2 border-white/70 object-cover shadow-lg light:border-white"
+                      className="relative h-14 w-14 rounded-full border-2 border-tz-violet/40 object-cover"
                     />
                   ) : (
-                    <div className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-white/70 bg-gradient-to-br from-tz-violet to-tz-purple font-display text-xl font-bold text-white light:border-white">
+                    <div className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-xl font-bold text-white shadow-[0_10px_24px_-10px_rgba(22,163,74,0.7)] dark:border-white/15">
                       {settings.name.trim().charAt(0).toUpperCase() || "T"}
                     </div>
                   )}
@@ -354,24 +353,24 @@ export function ProfilePage({
                     type="button"
                     aria-label="Ubah foto profil"
                     onClick={() => fileRef.current?.click()}
-                    className="tap absolute -bottom-0.5 -right-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#191225] bg-tz-violet text-white transition-colors hover:bg-tz-purple light:border-white light:bg-[#7546c8]"
+                    className="tap absolute -bottom-0.5 -right-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#16a34a] text-white transition-colors hover:bg-[#15803d] dark:border-[#12211b]"
                   >
                     <Camera size={13} />
                   </button>
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <p className="truncate font-display text-[19px] font-bold leading-tight text-white light:text-tz-ink">{settings.name}</p>
-                    <BadgeCheck size={16} className="shrink-0 text-tz-violet light:text-[#7546c8]" aria-label="Anggota Tazkiya" />
+                    <p className="truncate text-[19px] font-bold leading-tight text-tz-ink">{settings.name}</p>
+                    <BadgeCheck size={16} className="shrink-0 text-tz-violet" aria-label="Anggota Tazkiya" />
                   </div>
-                  <p className="mt-0.5 truncate text-[12px] font-medium text-white/55 light:text-tz-muted">
+                  <p className="mt-0.5 truncate text-[12px] font-medium text-tz-muted">
                     {authStatus === "signedIn" && authUser ? authUser.email : "Belum masuk akun · data di perangkat"}
                   </p>
                 </div>
               </div>
             )}
 
-            {/* Dua tombol setara — penuh selebar kartu, aksen ungu */}
+            {/* Dua tombol setara — penuh selebar kartu */}
             <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"
@@ -379,7 +378,7 @@ export function ProfilePage({
                   setNameDraft(settings.name);
                   setEditingName(true);
                 }}
-                className="tap flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-tz-violet/30 bg-tz-violet/[0.14] text-[13px] font-semibold text-tz-accent transition-colors hover:bg-tz-violet/[0.22] active:bg-tz-violet/[0.28] light:border-tz-violet/25 light:bg-tz-violet/[0.08] light:text-[#5b3aa6] light:hover:bg-tz-violet/[0.15]"
+                className="tap flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-tz-violet/30 bg-tz-violet/10 text-[13px] font-semibold text-tz-accent transition-colors hover:bg-tz-violet/18"
               >
                 <Pencil size={14} aria-hidden />
                 Edit Profil
@@ -387,7 +386,7 @@ export function ProfilePage({
               <button
                 type="button"
                 onClick={goSettings}
-                className="tap flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-tz-violet/30 bg-tz-violet/[0.14] text-[13px] font-semibold text-tz-accent transition-colors hover:bg-tz-violet/[0.22] active:bg-tz-violet/[0.28] light:border-tz-violet/25 light:bg-tz-violet/[0.08] light:text-[#5b3aa6] light:hover:bg-tz-violet/[0.15]"
+                className="tap flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-tz-violet/30 bg-tz-violet/10 text-[13px] font-semibold text-tz-accent transition-colors hover:bg-tz-violet/18"
               >
                 <Settings2 size={14} aria-hidden />
                 Pengaturan
@@ -396,11 +395,11 @@ export function ProfilePage({
           </div>
         </div>
 
-        {/* Kartu violet — lapis belakang, menyembul di bawah kartu utama */}
-        <div className="relative z-0 -mt-[58px] rounded-[1.9rem] bg-gradient-to-b from-[#7950C8] via-[#8a5fe0] to-[#9B70E8] px-4 pt-[58px] shadow-[0_18px_40px_-20px_rgba(121,80,200,0.85)] light:from-[#BCA4F5] light:via-[#ae90ee] light:to-[#9B70E8] light:shadow-[0_18px_40px_-22px_rgba(121,80,200,0.5)]">
+        {/* Strip lime — lapis belakang, menyembul di bawah kartu utama */}
+        <div className="relative z-0 -mt-[58px] rounded-[1.9rem] bg-gradient-to-b from-[#a3d94a] via-[#b7e55c] to-[#c7f464] px-4 pt-[58px] shadow-[0_18px_40px_-20px_rgba(163,217,74,0.7)]">
           <div className="flex h-[52px] items-center justify-center gap-2">
-            <Zap size={14} className="shrink-0 text-[#f3edff] light:text-[#2b1a4d]" aria-hidden />
-            <p className="truncate text-center text-[13px] font-bold tracking-wide text-[#f7f2ff] light:text-[#2b1a4d]">
+            <Zap size={14} className="shrink-0 text-[#2b4a10]" aria-hidden />
+            <p className="truncate text-center text-[13px] font-bold tracking-wide text-[#2b4a10]">
               Terus bertumbuh dalam istiqamah
             </p>
           </div>
@@ -482,16 +481,16 @@ export function ProfilePage({
             </div>
 
             {/* Progress bar — terisi kiri ke kanan sesuai jumlah salat terlaksana */}
-            <div
-              className="mt-3.5 h-2 w-full overflow-hidden rounded-full bg-tz-track"
-              role="img"
-              aria-label={`Salat terlaksana hari ini ${focusDone} dari 5`}
-            >
               <div
-                className="tz-bar-grow-x h-full rounded-full bg-gradient-to-r from-tz-purple to-tz-violet"
-                style={{ width: `${barsIn ? (focusDone / 5) * 100 : 0}%` }}
-              />
-            </div>
+                className="mt-3.5 h-2 w-full overflow-hidden rounded-full bg-tz-track"
+                role="img"
+                aria-label={`Salat terlaksana hari ini ${focusDone} dari 5`}
+              >
+                <div
+                  className="tz-bar-grow-x h-full rounded-full bg-gradient-to-r from-[#4ade80] to-[#16a34a]"
+                  style={{ width: `${barsIn ? (focusDone / 5) * 100 : 0}%` }}
+                />
+              </div>
 
             {/* Catatan netral bila ada salat terlewat — tanpa menghakimi */}
             {focusMissed > 0 ? (
@@ -523,7 +522,7 @@ export function ProfilePage({
             <button
               type="button"
               onClick={onGoTracker}
-              className="tap mt-3.5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-tz-purple to-tz-violet text-[13.5px] font-bold text-white shadow-[0_12px_26px_-12px_rgba(121,80,200,0.8)] transition-opacity hover:opacity-95 active:opacity-90"
+              className="tap mt-3.5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4ade80] to-[#16a34a] text-[13.5px] font-bold text-white shadow-[0_12px_26px_-12px_rgba(22,163,74,0.7)] transition-opacity hover:opacity-95 active:opacity-90"
             >
               <ListChecks size={15} aria-hidden />
               Lanjutkan Tracker
@@ -623,7 +622,7 @@ export function ProfilePage({
               <div className="mt-3.5 grid grid-cols-2 gap-2">
                 <Link
                   href="/auth"
-                  className="tap flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-tz-violet to-tz-purple text-[13px] font-bold text-white shadow-[0_10px_26px_-12px_rgba(117,70,200,0.95)] transition-all hover:brightness-110"
+                  className="tap flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-[13px] font-bold text-white shadow-[0_10px_26px_-12px_rgba(22,163,74,0.8)] transition-all hover:brightness-110"
                 >
                   <LogIn size={15} />
                   Masuk
@@ -740,7 +739,7 @@ export function ProfilePage({
                           className={cn(
                             "h-[9px] w-[9px] rounded-full border",
                             d.status === "done"
-                              ? "border-transparent bg-tz-violet shadow-[0_0_6px_1px_rgba(156,114,239,0.6)]"
+                              ? "border-transparent bg-tz-violet shadow-[0_0_6px_1px_rgba(22,163,74,0.6)]"
                               : d.status === "missed"
                                 ? "border-transparent bg-rose-400 light:bg-rose-500"
                                 : "border-dashed border-tz-line-strong bg-transparent"
@@ -1021,7 +1020,7 @@ export function ProfilePage({
                   }}
                   className={cn(
                     "tap rounded-2xl border p-2 text-left transition-all",
-                    settings.theme === t.id ? "border-tz-violet/70 shadow-[0_0_0_3px_rgba(117,70,200,0.18)]" : "border-tz-line hover:border-tz-violet/40"
+                    settings.theme === t.id ? "border-tz-violet/70 shadow-[0_0_0_3px_rgba(22,163,74,0.18)]" : "border-tz-line hover:border-tz-violet/40"
                   )}
                 >
                   <span aria-hidden className="mb-1.5 block h-12 w-full rounded-xl border border-tz-line" style={{ background: t.bg }}>
@@ -1114,7 +1113,7 @@ export function ProfilePage({
       {/* ---------- Tentang ---------- */}
       <section aria-label="Tentang aplikasi" className="pb-2">
         <GlassCard className="flex items-center gap-3 p-4">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-tz-purple to-tz-violet font-display text-lg font-bold text-white glow-violet-sm">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-lg font-bold text-white glow-violet-sm">
             ت
           </span>
           <div className="flex-1">

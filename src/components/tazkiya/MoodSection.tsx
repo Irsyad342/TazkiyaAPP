@@ -48,7 +48,7 @@ const TONE: Record<MoodId, { text: string; selBg: string; selBorder: string }> =
     selBorder: "border-indigo-300/60 light:border-indigo-500/50",
   },
   "campur-aduk": {
-    text: "text-tz-violet light:text-[#7546c8]",
+    text: "text-tz-violet light:text-[#16a34a]",
     selBg: "bg-tz-violet/[0.13] light:bg-tz-violet/15",
     selBorder: "border-tz-violet/55",
   },
@@ -185,7 +185,7 @@ export function MoodSection({
               className={cn(
                 "tap flex w-[86px] shrink-0 snap-start flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 transition-all duration-200 active:scale-95",
                 active
-                  ? cn("shadow-[0_10px_22px_-14px_rgba(85,51,154,0.6)]", tone.selBg, tone.selBorder)
+                  ? cn("shadow-[0_10px_22px_-14px_rgba(22,163,74,0.6)]", tone.selBg, tone.selBorder)
                   : "border-tz-line bg-tz-panel hover:border-tz-line-strong"
               )}
             >

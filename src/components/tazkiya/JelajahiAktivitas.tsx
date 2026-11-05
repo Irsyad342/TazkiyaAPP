@@ -31,7 +31,7 @@ export function JelajahiAktivitas({
       </div>
 
       <div className="space-y-2.5">
-        {/* A. Jurnal Syukur — blok utama, permukaan ungu lembut */}
+        {/* A. Jurnal Syukur — blok utama, permukaan hijau lembut */}
         <button
           type="button"
           onClick={() => onOpen("jurnal")}
@@ -41,7 +41,7 @@ export function JelajahiAktivitas({
           <div className="flex items-center gap-3.5">
             <span
               aria-hidden
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-tz-violet text-white"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white shadow-[0_10px_22px_-10px_rgba(22,163,74,0.7)]"
             >
               <BookHeart size={21} strokeWidth={1.9} />
             </span>
@@ -58,12 +58,12 @@ export function JelajahiAktivitas({
           </div>
         </button>
 
-        {/* B. Zikir & Doa — band cermin (ikon di kanan), permukaan teal lembut */}
+        {/* B. Zikir & Doa — band cermin (ikon di kanan), permukaan lavender lembut */}
         <button
           type="button"
           onClick={() => onOpen("zikir-doa")}
           aria-label="Buka halaman Zikir & Doa"
-          className="tap block w-full rounded-[1.4rem] border border-tz-line bg-teal-400/[0.07] p-4 text-left transition-all hover:border-teal-400/40 light:bg-teal-400/[0.12] active:scale-[0.985]"
+          className="tap block w-full rounded-[1.4rem] border border-tz-line bg-tz-lavender/[0.08] p-4 text-left transition-all hover:border-tz-lavender/45 light:bg-tz-lavender/[0.12] active:scale-[0.985]"
         >
           <div className="flex items-center gap-3.5">
             <span className="min-w-0 flex-1">
@@ -74,7 +74,7 @@ export function JelajahiAktivitas({
             </span>
             <span
               aria-hidden
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-teal-400/15 text-teal-300 light:bg-teal-400/20 light:text-teal-600"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-tz-lavender/15 text-tz-lavender light:bg-tz-lavender/20"
             >
               <HandHeart size={20} strokeWidth={1.9} />
             </span>

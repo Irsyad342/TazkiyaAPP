@@ -8,7 +8,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-jakarta);
-  --font-display: var(--font-sora);
+  --font-display: var(--font-jakarta);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -46,142 +46,157 @@
 }
 
 @theme {
-  /* Palet Tazkiya — Dark Purple Glassmorphism + Violet Glow (dark = default) */
-  --color-tz-ink: #f2eefb;
-  --color-tz-deep: #100c19;
-  --color-tz-purple: #55339a;
-  --color-tz-violet: #9c72ef;
-  --color-tz-lavender: #d8c5ff;
-  --color-tz-muted: #a79bc6;
-  --color-tz-line: rgba(255, 255, 255, 0.1);
-  --color-tz-accent: #d8c5ff;
-  --color-tz-frame: #171321;
-  --color-tz-stage: #0d0a14;
+  /* ============================================================
+     TAZKIYA REDESIGN — "Fresh Green" (referensi Nur)
+     Light-first: kanvas #F8FAFC, kartu putih soft-shadow, hijau
+     emerald sebagai warna merek, lime untuk progres positif,
+     biru & lavender sebagai aksen sekunder, oranye untuk ikon
+     waktu salat. Nama token lama (tz-violet, tz-purple, dst.)
+     DIPERTAHANKAN sebagai API agar seluruh kelas utilitas lama
+     ikut berubah warna secara konsisten.
+     ============================================================ */
+  --color-tz-ink: #e7f1ea;
+  --color-tz-deep: #0b2e23;
+  --color-tz-purple: #22c55e;
+  --color-tz-violet: #4ade80;
+  --color-tz-lavender: #b9b7f7;
+  --color-tz-muted: #93a89d;
+  --color-tz-line: rgba(255, 255, 255, 0.09);
+  --color-tz-accent: #6ee7a0;
+  --color-tz-frame: #0b1512;
+  --color-tz-stage: #060d0a;
   --color-tz-panel: rgba(255, 255, 255, 0.05);
   --color-tz-panel-soft: rgba(255, 255, 255, 0.04);
-  --color-tz-panel-strong: rgba(255, 255, 255, 0.1);
-  --color-tz-line-soft: rgba(255, 255, 255, 0.06);
-  --color-tz-line-strong: rgba(255, 255, 255, 0.25);
+  --color-tz-panel-strong: rgba(255, 255, 255, 0.09);
+  --color-tz-line-soft: rgba(255, 255, 255, 0.05);
+  --color-tz-line-strong: rgba(255, 255, 255, 0.22);
   --color-tz-track: rgba(255, 255, 255, 0.12);
-  --color-tz-aurora-a: rgba(34, 25, 56, 0.55);
-  --color-tz-aurora-b: rgba(20, 15, 31, 0.85);
-  --color-tz-orb-deep: #3b2372;
+  --color-tz-aurora-a: rgba(20, 46, 35, 0.5);
+  --color-tz-aurora-b: rgba(10, 22, 17, 0.85);
+  --color-tz-orb-deep: #143528;
   /* Lavender dekoratif (pantulan kaca) — dipakai di kedua tema */
-  --color-tz-lav-deco: #a98ae8;
+  --color-tz-lav-deco: #b9b7f7;
+  /* Aksen redesign: lime (progres/positif), biru (penekanan), mint lembut */
+  --color-tz-lime: #c7f464;
+  --color-tz-blue: #4263eb;
+  --color-tz-blue-soft: #eef2ff;
+  --color-tz-mint: #f0f9d9;
+  --color-tz-forest: #0c3b2e;
 }
 
 :root {
   --radius: 1.1rem;
-  --background: #14101e;
-  --foreground: #f2eefb;
-  --card: #1d1630;
-  --card-foreground: #f2eefb;
-  --popover: #241b3a;
-  --popover-foreground: #f2eefb;
-  --primary: #9c72ef;
-  --primary-foreground: #1a1028;
-  --secondary: rgba(156, 114, 239, 0.14);
-  --secondary-foreground: #d8c5ff;
+  --background: #0b1512;
+  --foreground: #e7f1ea;
+  --card: #12211b;
+  --card-foreground: #e7f1ea;
+  --popover: #16261f;
+  --popover-foreground: #e7f1ea;
+  --primary: #4ade80;
+  --primary-foreground: #06251a;
+  --secondary: rgba(74, 222, 128, 0.14);
+  --secondary-foreground: #a7f3c7;
   --muted: rgba(255, 255, 255, 0.06);
-  --muted-foreground: #a79bc6;
-  --accent: rgba(156, 114, 239, 0.16);
-  --accent-foreground: #e9dffc;
+  --muted-foreground: #8fa89d;
+  --accent: rgba(74, 222, 128, 0.16);
+  --accent-foreground: #b9f5cd;
   --destructive: #fb7185;
   --border: rgba(255, 255, 255, 0.09);
-  --input: rgba(255, 255, 255, 0.12);
-  --ring: #9c72ef;
-  --chart-1: #9c72ef;
-  --chart-2: #d8c5ff;
-  --chart-3: #55339a;
-  --chart-4: #c4a7ff;
-  --chart-5: #7a4fd4;
-  --sidebar: #211735;
-  --sidebar-foreground: #f2eefb;
-  --sidebar-primary: #9c72ef;
-  --sidebar-primary-foreground: #1a1028;
-  --sidebar-accent: rgba(156, 114, 239, 0.16);
-  --sidebar-accent-foreground: #e9dffc;
+  --input: rgba(255, 255, 255, 0.14);
+  --ring: #4ade80;
+  --chart-1: #4ade80;
+  --chart-2: #c7f464;
+  --chart-3: #22c55e;
+  --chart-4: #7c86ff;
+  --chart-5: #fbbf24;
+  --sidebar: #12211b;
+  --sidebar-foreground: #e7f1ea;
+  --sidebar-primary: #4ade80;
+  --sidebar-primary-foreground: #06251a;
+  --sidebar-accent: rgba(74, 222, 128, 0.16);
+  --sidebar-accent-foreground: #b9f5cd;
   --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #9c72ef;
+  --sidebar-ring: #4ade80;
   /* Token turunan tema (bayangan input, fokus, grafik) */
-  --tz-inset: rgba(0, 0, 0, 0.25);
-  --tz-ring-soft: rgba(156, 114, 239, 0.16);
+  --tz-inset: rgba(0, 0, 0, 0.3);
+  --tz-ring-soft: rgba(74, 222, 128, 0.18);
   --tz-chart-grid: rgba(255, 255, 255, 0.06);
-  --tz-chart-axis: #a79bc6;
+  --tz-chart-axis: #8fa89d;
   --tz-empty-cell: rgba(255, 255, 255, 0.045);
 }
 
 .dark {
-  --background: #14101e;
-  --foreground: #f2eefb;
-  --card: #1d1630;
-  --card-foreground: #f2eefb;
-  --popover: #241b3a;
-  --popover-foreground: #f2eefb;
-  --primary: #9c72ef;
-  --primary-foreground: #1a1028;
-  --secondary: rgba(156, 114, 239, 0.14);
-  --secondary-foreground: #d8c5ff;
+  --background: #0b1512;
+  --foreground: #e7f1ea;
+  --card: #12211b;
+  --card-foreground: #e7f1ea;
+  --popover: #16261f;
+  --popover-foreground: #e7f1ea;
+  --primary: #4ade80;
+  --primary-foreground: #06251a;
+  --secondary: rgba(74, 222, 128, 0.14);
+  --secondary-foreground: #a7f3c7;
   --muted: rgba(255, 255, 255, 0.06);
-  --muted-foreground: #a79bc6;
-  --accent: rgba(156, 114, 239, 0.16);
-  --accent-foreground: #e9dffc;
+  --muted-foreground: #8fa89d;
+  --accent: rgba(74, 222, 128, 0.16);
+  --accent-foreground: #b9f5cd;
   --destructive: #fb7185;
   --border: rgba(255, 255, 255, 0.09);
-  --input: rgba(255, 255, 255, 0.12);
-  --ring: #9c72ef;
+  --input: rgba(255, 255, 255, 0.14);
+  --ring: #4ade80;
 }
 
-/* ---------- Tema terang — palet lavender bersih Tazkiya ----------
-   Background #F5F1F5 · alt #EEE7F0 · kartu #FFFFFF · permukaan #F8F4FA
-   Teks #292331 / #706778 · border #E4DCE9 · ungu #7546C8 · lavender #A98AE8 */
+/* ---------- Tema terang — kanvas bersih ala dashboard referensi ----------
+   Background #F8FAFC · kartu #FFFFFF · teks #171923 / #858A9B
+   Border #EEF0F5 · hijau merek #16A34A · lime #C7F464 · biru #4263EB
+   Lavender #B9B7F7 · mint #F0F9D9 */
 html[data-theme="light"] {
-  --background: #f5f1f5;
-  --foreground: #292331;
+  --background: #f8fafc;
+  --foreground: #171923;
   --card: #ffffff;
-  --card-foreground: #292331;
+  --card-foreground: #171923;
   --popover: #ffffff;
-  --popover-foreground: #292331;
-  --primary: #7546c8;
+  --popover-foreground: #171923;
+  --primary: #16a34a;
   --primary-foreground: #ffffff;
-  --secondary: rgba(117, 70, 200, 0.12);
-  --secondary-foreground: #5c3aa4;
-  --muted: rgba(41, 35, 49, 0.05);
-  --muted-foreground: #706778;
-  --accent: rgba(117, 70, 200, 0.12);
-  --accent-foreground: #5c3aa4;
-  --destructive: #d92d3f;
-  --border: #e4dce9;
-  --input: rgba(41, 35, 49, 0.16);
-  --ring: #7546c8;
-  --chart-1: #7546c8;
-  --chart-2: #a98ae8;
-  --chart-3: #55339a;
-  --chart-4: #c4a7ff;
-  --chart-5: #7a4fd4;
+  --secondary: rgba(22, 163, 74, 0.1);
+  --secondary-foreground: #15803d;
+  --muted: rgba(23, 25, 35, 0.05);
+  --muted-foreground: #858a9b;
+  --accent: rgba(22, 163, 74, 0.1);
+  --accent-foreground: #15803d;
+  --destructive: #e11d48;
+  --border: #eef0f5;
+  --input: rgba(23, 25, 35, 0.16);
+  --ring: #16a34a;
+  --chart-1: #16a34a;
+  --chart-2: #a3d94a;
+  --chart-3: #22c55e;
+  --chart-4: #4263eb;
+  --chart-5: #f59e0b;
   /* Token Tazkiya versi terang */
-  --color-tz-ink: #292331;
-  --color-tz-muted: #706778;
-  --color-tz-violet: #7546c8;
-  --color-tz-lavender: #6d43b8;
-  --color-tz-accent: #7546c8;
-  --color-tz-frame: #f5f1f5;
-  --color-tz-stage: #e9e2ee;
-  --color-tz-panel: rgba(255, 255, 255, 0.78);
-  --color-tz-panel-soft: #f8f4fa;
+  --color-tz-ink: #171923;
+  --color-tz-muted: #858a9b;
+  --color-tz-violet: #16a34a;
+  --color-tz-lavender: #7c6fe4;
+  --color-tz-accent: #168a44;
+  --color-tz-frame: #f8fafc;
+  --color-tz-stage: #eaf3ee;
+  --color-tz-panel: #ffffff;
+  --color-tz-panel-soft: #f6f8f6;
   --color-tz-panel-strong: #ffffff;
-  --color-tz-line: #e4dce9;
-  --color-tz-line-soft: rgba(228, 220, 233, 0.55);
-  --color-tz-line-strong: #d3c5e2;
-  --color-tz-track: rgba(41, 35, 49, 0.08);
+  --color-tz-line: #eef0f5;
+  --color-tz-line-soft: rgba(238, 240, 245, 0.72);
+  --color-tz-line-strong: #dde3e8;
+  --color-tz-track: rgba(23, 25, 35, 0.08);
   --color-tz-aurora-a: rgba(255, 255, 255, 0.6);
-  --color-tz-aurora-b: rgba(238, 231, 240, 0.85);
-  --color-tz-orb-deep: #cdb5f0;
-  --tz-inset: rgba(41, 35, 49, 0.07);
-  --tz-ring-soft: rgba(117, 70, 200, 0.16);
-  --tz-chart-grid: rgba(41, 35, 49, 0.08);
-  --tz-chart-axis: #706778;
-  --tz-empty-cell: rgba(41, 35, 49, 0.05);
+  --color-tz-aurora-b: rgba(233, 243, 236, 0.85);
+  --color-tz-orb-deep: #c9e8d4;
+  --tz-inset: rgba(23, 25, 35, 0.05);
+  --tz-ring-soft: rgba(22, 163, 74, 0.16);
+  --tz-chart-grid: rgba(23, 25, 35, 0.08);
+  --tz-chart-axis: #858a9b;
+  --tz-empty-cell: rgba(23, 25, 35, 0.045);
 }
 
 @layer base {
@@ -190,60 +205,35 @@ html[data-theme="light"] {
     -webkit-tap-highlight-color: transparent;
   }
   html {
-    background-color: #0c0913;
+    background-color: #060d0a;
   }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "ss01" on;
   }
   ::selection {
-    color: #fff;
-    background: rgba(156, 114, 239, 0.45);
+    color: #06251a;
+    background: rgba(74, 222, 128, 0.4);
   }
   html[data-theme="light"] {
-    background-color: #f5f1f5;
+    background-color: #f8fafc;
   }
   html[data-theme="light"] ::selection {
-    color: #292331;
-    background: rgba(117, 70, 200, 0.22);
+    color: #171923;
+    background: rgba(22, 163, 74, 0.2);
   }
 }
 
 @layer utilities {
-  /* Kaca dasar (v2 — tepi gradasi via :before) */
+  /* ---------- Kartu dasar (glass = kartu putih soft-shadow) ----------
+     Permukaan solid tanpa blur: ringan di GPU, bersih ala referensi.
+     Bayangan ganda halus: kontak 1px + sebungan hijau keabu lembut. */
   .glass {
-    -webkit-backdrop-filter: blur(22px) saturate(1.25);
-    backdrop-filter: blur(22px) saturate(1.25);
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.067), rgba(255, 255, 255, 0.02) 55%, rgba(120, 82, 200, 0.05));
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    position: relative;
+    background: var(--color-tz-panel);
+    border: 1px solid var(--color-tz-line);
     box-shadow:
-      0 18px 44px -18px rgba(8, 5, 15, 0.65),
-      0 4px 14px -8px rgba(8, 5, 15, 0.4),
-      inset 0 1px rgba(255, 255, 255, 0.08);
-  }
-  .glass::before {
-    content: "";
-    border-radius: inherit;
-    pointer-events: none;
-    background: linear-gradient(165deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.02) 38%, rgba(156, 114, 239, 0.12) 100%);
-    padding: 1px;
-    position: absolute;
-    inset: 0;
-    -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
-    mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
-    -webkit-mask-clip: content-box, border-box;
-    mask-clip: content-box, border-box;
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-  }
-  .glass-strong {
-    -webkit-backdrop-filter: blur(30px) saturate(1.3);
-    backdrop-filter: blur(30px) saturate(1.3);
-    background: linear-gradient(160deg, rgba(48, 34, 78, 0.88), rgba(24, 17, 41, 0.94));
-    border: 1px solid rgba(255, 255, 255, 0.11);
-    position: relative;
-    box-shadow: 0 24px 60px -20px rgba(8, 5, 15, 0.75), inset 0 1px rgba(255, 255, 255, 0.09);
+      0 1px 2px rgba(16, 24, 32, 0.04),
+      0 20px 44px -30px rgba(12, 59, 46, 0.28);
   }
   /* Pagar: kelas kaca tidak boleh menimpa position:fixed milik konten dialog
      Radix (AlertDialog/Dialog/Sheet) — tanpa ini dialog jatuh ke alur dokumen
@@ -253,115 +243,43 @@ html[data-theme="light"] {
   [data-slot="sheet-content"] {
     position: fixed !important;
   }
-  .glass-strong::before {
-    content: "";
-    border-radius: inherit;
-    pointer-events: none;
-    background: linear-gradient(165deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.03) 40%, rgba(156, 114, 239, 0.16) 100%);
-    padding: 1px;
-    position: absolute;
-    inset: 0;
-    -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
-    mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
-    -webkit-mask-clip: content-box, border-box;
-    mask-clip: content-box, border-box;
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
+  /* Modal / sheet / overlay penting: permukaan sama, bayangan lebih hadir */
+  .glass-strong {
+    background: var(--color-tz-panel);
+    border: 1px solid var(--color-tz-line);
+    box-shadow:
+      0 1px 2px rgba(16, 24, 32, 0.05),
+      0 28px 70px -28px rgba(12, 59, 46, 0.38);
   }
+  /* Kartu tint mint — section sekunder (Daily Barakah, hadis, dsb.) */
   .glass-violet {
-    -webkit-backdrop-filter: blur(22px) saturate(1.25);
-    backdrop-filter: blur(22px) saturate(1.25);
-    background: linear-gradient(145deg, rgba(156, 114, 239, 0.17), rgba(85, 51, 154, 0.1) 52%, rgba(33, 23, 53, 0.32));
-    border: 1px solid rgba(156, 114, 239, 0.26);
-    position: relative;
-    box-shadow: 0 16px 44px -16px rgba(85, 51, 154, 0.45), inset 0 1px rgba(255, 255, 255, 0.1);
+    background: linear-gradient(165deg, rgba(240, 249, 217, 0.6), rgba(255, 255, 255, 0.92) 70%);
+    border: 1px solid rgba(22, 163, 74, 0.16);
+    box-shadow: 0 1px 2px rgba(16, 24, 32, 0.03), 0 16px 36px -26px rgba(12, 59, 46, 0.25);
   }
-  .glass-violet::before {
-    content: "";
-    border-radius: inherit;
-    pointer-events: none;
-    background: linear-gradient(165deg, rgba(216, 197, 255, 0.28), rgba(255, 255, 255, 0.02) 42%, rgba(156, 114, 239, 0.2) 100%);
-    padding: 1px;
-    position: absolute;
-    inset: 0;
-    -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
-    mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
-    -webkit-mask-clip: content-box, border-box;
-    mask-clip: content-box, border-box;
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-  }
+  /* Kartu hero hijau — gradien emerald dengan siluet terang (Beranda, ringkasan) */
   .glass-hero {
     background:
-      radial-gradient(120% 160% at 90% -20%, rgba(216, 197, 255, 0.38), rgba(156, 114, 239, 0) 52%),
-      radial-gradient(90% 120% at -10% 115%, rgba(64, 210, 235, 0.1), rgba(64, 210, 235, 0) 55%),
-      linear-gradient(140deg, #66419f 0%, #4a2d8a 40%, #2c1d55 78%, #241746 100%);
-    border: 1px solid rgba(178, 143, 255, 0.45);
-    position: relative;
+      radial-gradient(120% 150% at 88% -12%, rgba(199, 244, 100, 0.28), rgba(199, 244, 100, 0) 52%),
+      linear-gradient(140deg, #4ade80 0%, #22c55e 44%, #15a04f 78%, #0f8a44 100%);
+    border: 1px solid rgba(255, 255, 255, 0.32);
     box-shadow:
-      0 30px 80px -24px rgba(85, 51, 154, 0.65),
-      0 0 60px -12px rgba(156, 114, 239, 0.5),
-      inset 0 1px rgba(255, 255, 255, 0.22),
-      inset 0 -1px rgba(13, 9, 22, 0.35);
+      0 22px 48px -22px rgba(21, 160, 79, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.28);
   }
-  .glass-hero::before {
-    content: "";
-    border-radius: inherit;
-    pointer-events: none;
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.04) 34%, rgba(216, 197, 255, 0.24) 100%);
-    padding: 1px;
-    position: absolute;
-    inset: 0;
-    -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
-    mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
-    -webkit-mask-clip: content-box, border-box;
-    mask-clip: content-box, border-box;
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-  }
-  /* ---------- Kartu bersih ala dashboard modern (Task 33 — referensi Iconiy) ----------
-     Permukaan solid datar + bayangan menyebar lembut, BUKAN kaca: light = kartu
-     putih bersih di atas kanvas lavender (persis referensi), dark = charcoal-ungu
-     satu keluarga dengan kartu profil (Task 30). Tanpa backdrop-filter — murah di
-     GPU dan tidak tersentuh blok "Kartu 2D datar" Task 16 (kelas berbeda). */
   .tz-card-clean {
-    background: #191225;
-    border: 1px solid rgba(156, 114, 239, 0.2);
-    box-shadow: 0 26px 60px -34px rgba(22, 12, 44, 0.9);
-  }
-  html[data-theme="light"] .tz-card-clean {
-    background: #ffffff;
-    border: 1px solid rgba(41, 35, 49, 0.05);
+    background: var(--color-tz-panel);
+    border: 1px solid var(--color-tz-line);
     box-shadow:
-      0 1px 2px rgba(41, 35, 49, 0.04),
-      0 22px 44px -28px rgba(90, 60, 160, 0.3);
+      0 1px 2px rgba(16, 24, 32, 0.04),
+      0 20px 44px -30px rgba(12, 59, 46, 0.28);
   }
-  .glow-violet {
-    box-shadow: 0 0 34px -8px rgba(156, 114, 239, 0.6);
-  }
-  .glow-violet-sm {
-    box-shadow: 0 0 20px -5px rgba(156, 114, 239, 0.55);
-  }
-  .text-gradient-violet {
-    color: transparent;
-    background: linear-gradient(115deg, #ffffff 5%, #e4d6ff 48%, #b693ff 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-  }
-  .text-gradient-hero {
-    color: transparent;
-    background: linear-gradient(115deg, #ffffff 5%, #e4d6ff 48%, #b693ff 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-  }
-  .text-glow {
-    text-shadow: 0 0 22px rgba(156, 114, 239, 0.65);
-  }
+  /* Aura latar: sapuan mint sangat lembut di belakang bingkai */
   .tz-aurora {
     background:
-      radial-gradient(58% 42% at 82% -8%, rgba(156, 114, 239, 0.34), rgba(156, 114, 239, 0) 68%),
-      radial-gradient(46% 34% at 12% 4%, rgba(85, 51, 154, 0.42), rgba(85, 51, 154, 0) 70%),
-      radial-gradient(40% 30% at 55% 108%, rgba(124, 77, 212, 0.2), rgba(124, 77, 212, 0) 72%);
+      radial-gradient(56% 40% at 84% -6%, rgba(74, 222, 128, 0.1), rgba(74, 222, 128, 0) 66%),
+      radial-gradient(44% 34% at 8% 6%, rgba(199, 244, 100, 0.08), rgba(199, 244, 100, 0) 68%),
+      radial-gradient(40% 30% at 52% 106%, rgba(74, 222, 128, 0.07), rgba(74, 222, 128, 0) 70%);
   }
   .no-scrollbar {
     scrollbar-width: none;
@@ -371,13 +289,13 @@ html[data-theme="light"] {
   }
   .thin-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(156, 114, 239, 0.35) transparent;
+    scrollbar-color: rgba(22, 163, 74, 0.35) transparent;
   }
   .thin-scrollbar::-webkit-scrollbar {
     width: 5px;
   }
   .thin-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(156, 114, 239, 0.35);
+    background: rgba(22, 163, 74, 0.35);
     border-radius: 999px;
   }
   .tap {
@@ -389,6 +307,19 @@ html[data-theme="light"] {
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+  /* Alias kelas lama → bahasa visual baru: judul hijau merek, bukan gradien */
+  .text-gradient-violet {
+    color: var(--color-tz-accent);
+  }
+  .text-glow {
+    text-shadow: none;
+  }
+  .glow-violet {
+    box-shadow: 0 10px 26px -12px rgba(22, 163, 74, 0.55);
+  }
+  .glow-violet-sm {
+    box-shadow: 0 8px 20px -10px rgba(22, 163, 74, 0.5);
+  }
 }
 
 /* ---------- Kolom formulir tema-sadar (dipakai semua input aplikasi) ----------
@@ -399,23 +330,26 @@ html[data-theme="light"] {
 @layer components {
   .tz-field {
     width: 100%;
-    border-radius: 0.75rem;
-    border: 1px solid var(--color-tz-line);
+    border-radius: 0.85rem;
+    border: 1px solid var(--color-tz-line-strong);
     background: var(--color-tz-panel-strong);
     padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
     line-height: 1.4;
     color: var(--color-tz-ink);
-    box-shadow: inset 0 1px 3px var(--tz-inset);
+    box-shadow: none;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   }
+  html[data-theme="dark"] .tz-field {
+    background: var(--color-tz-panel-strong);
+  }
   .tz-field::placeholder {
-    color: color-mix(in srgb, var(--color-tz-muted) 65%, transparent);
+    color: color-mix(in srgb, var(--color-tz-muted) 70%, transparent);
   }
   .tz-field:focus {
-    border-color: color-mix(in srgb, var(--color-tz-violet) 55%, transparent);
-    box-shadow: 0 0 0 3px var(--tz-ring-soft), inset 0 1px 3px var(--tz-inset);
+    border-color: color-mix(in srgb, var(--color-tz-violet) 60%, transparent);
+    box-shadow: 0 0 0 3px var(--tz-ring-soft);
   }
   .tz-field:disabled {
     opacity: 0.6;
@@ -423,92 +357,27 @@ html[data-theme="light"] {
   }
 }
 
-/* ---------- Kaca pada tema terang: pekat, jernih, minim blur ----------
-   Kartu terbaca sebagai permukaan putih bersih dengan border tipis dan
-   bayangan lembut — bukan mode gelap yang sekadar dibalik. */
-html[data-theme="light"] .glass {
-  -webkit-backdrop-filter: blur(12px) saturate(1.1);
-  backdrop-filter: blur(12px) saturate(1.1);
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.84) 55%, rgba(248, 244, 250, 0.92));
-  border-color: #e4dce9;
-  box-shadow:
-    0 16px 36px -18px rgba(85, 51, 154, 0.18),
-    0 3px 10px -6px rgba(41, 35, 49, 0.08),
-    inset 0 1px rgba(255, 255, 255, 0.95);
+/* ---------- Mode Liquid Glass (setelan pengguna dipertahankan) ----------
+   Permukaan agak transparan + blur ringan; kedua tema. */
+html[data-glass="liquid"] .glass {
+  background: color-mix(in srgb, var(--color-tz-panel) 82%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  backdrop-filter: blur(14px) saturate(1.15);
 }
-html[data-theme="light"] .glass::before {
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.3) 38%, rgba(169, 138, 232, 0.28));
+html[data-glass="liquid"] .glass-strong {
+  background: color-mix(in srgb, var(--color-tz-panel) 90%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
 }
-html[data-theme="light"] .glass-strong {
-  -webkit-backdrop-filter: blur(16px) saturate(1.15);
-  backdrop-filter: blur(16px) saturate(1.15);
-  background: linear-gradient(160deg, #ffffff, rgba(252, 250, 254, 0.97));
-  border-color: #e4dce9;
-  box-shadow: 0 22px 48px -20px rgba(85, 51, 154, 0.22), inset 0 1px #ffffff;
-}
-html[data-theme="light"] .glass-strong::before {
-  background: linear-gradient(165deg, #ffffff, rgba(255, 255, 255, 0.35) 40%, rgba(169, 138, 232, 0.3));
-}
-html[data-theme="light"] .glass-violet {
-  -webkit-backdrop-filter: blur(12px) saturate(1.1);
-  backdrop-filter: blur(12px) saturate(1.1);
-  background: linear-gradient(145deg, rgba(169, 138, 232, 0.2), rgba(117, 70, 200, 0.1) 52%, rgba(255, 255, 255, 0.92));
-  border-color: rgba(117, 70, 200, 0.26);
-  box-shadow: 0 16px 40px -18px rgba(117, 70, 200, 0.25), inset 0 1px rgba(255, 255, 255, 0.9);
-}
-html[data-theme="light"] .glass-violet::before {
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2) 42%, rgba(169, 138, 232, 0.35) 100%);
-}
-html[data-theme="light"] .glass-hero {
-  background:
-    radial-gradient(120% 160% at 90% -20%, rgba(216, 197, 255, 0.55), rgba(156, 114, 239, 0) 52%),
-    linear-gradient(140deg, #8a5fd6 0%, #7546c8 40%, #5c35ad 80%, #4f2d97 100%);
-  border-color: rgba(255, 255, 255, 0.55);
-  box-shadow:
-    0 30px 70px -26px rgba(85, 51, 154, 0.42),
-    0 0 44px -14px rgba(117, 70, 200, 0.3),
-    inset 0 1px rgba(255, 255, 255, 0.42),
-    inset 0 -1px rgba(41, 35, 49, 0.06);
-}
-html[data-theme="light"] .text-gradient-violet {
-  background: linear-gradient(115deg, #3a2a6b 0%, #5c3aa4 55%, #7546c8 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-/* Di dalam kartu hero (latar ungu), teks gradient TETAP TERANG pada tema
-   terang — teks gelap di atas ungu tidak terbaca (umpan pengguna 29-10-2026).
-   Pemakaian di luar hero (mis. judul "Statistik") tetap versi gelap. */
-html[data-theme="light"] .glass-hero .text-gradient-violet {
-  background: linear-gradient(115deg, #ffffff 5%, #e4d6ff 48%, #b693ff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-html[data-theme="light"] .text-glow {
-  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.65);
-}
-html[data-theme="light"] .glow-violet {
-  box-shadow: 0 0 30px -8px rgba(117, 70, 200, 0.35);
-}
-html[data-theme="light"] .glow-violet-sm {
-  box-shadow: 0 0 18px -5px rgba(117, 70, 200, 0.32);
-}
-html[data-theme="light"] .tz-aurora {
-  background:
-    radial-gradient(58% 42% at 82% -8%, rgba(156, 114, 239, 0.16), rgba(156, 114, 239, 0) 68%),
-    radial-gradient(46% 34% at 12% 4%, rgba(124, 79, 224, 0.12), rgba(124, 79, 224, 0) 70%),
-    radial-gradient(40% 30% at 55% 108%, rgba(216, 197, 255, 0.3), rgba(216, 197, 255, 0) 72%);
-}
-html[data-theme="light"] .thin-scrollbar {
-  scrollbar-color: rgba(117, 70, 200, 0.4) transparent;
-}
-html[data-theme="light"] .thin-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(117, 70, 200, 0.4);
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  html[data-glass="liquid"] .glass,
+  html[data-glass="liquid"] .glass-strong {
+    background: var(--color-tz-panel);
+  }
 }
 
 /* ---------- Keyframes animasi (versi ringan) ----------
-   Prinsip hemat GPU: hanya menganimasikan transform/opacity yang dikerjakan
-   kompositor. Animasi box-shadow/filter (memicu repaint tiap frame) dihapus —
-   efek glow dipertahankan sebagai bayangan/filter statis. */
+   Hanya transform/opacity — dikerjakan kompositor, hormat reduced-motion. */
 @keyframes tz-soft-pulse {
   0%,
   100% {
@@ -559,291 +428,60 @@ html[data-theme="light"] .thin-scrollbar::-webkit-scrollbar-thumb {
   animation: tz-spin-slow 14s linear infinite;
 }
 
-/* Pantulan statis (kartu profil) — tanpa gerak & tanpa filter blur */
-.tz-shimmer {
-  position: relative;
-  overflow: hidden;
-}
-.tz-shimmer > .tz-shimmer-bar {
-  pointer-events: none;
-  background: linear-gradient(100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1) 45%, rgba(255, 255, 255, 0.16) 58%, rgba(255, 255, 255, 0));
-  width: 42%;
-  position: absolute;
-  top: -30%;
-  bottom: -30%;
-  left: 8%;
-}
-
-/* ---------- Cahaya kartu hero Beranda (versi ringan) ----------
-   Semua lapisan gradien dipertahankan; hanya satu lapisan yang bergeser
-   sangat pelan (transform/opacity). Aura, orb, dan shimmer menjadi statis —
-   tanpa filter blur beranimasi, tanpa animasi box-shadow. */
-@keyframes tz-hero-flow {
-  0%,
-  100% {
-    opacity: 0.72;
-    transform: translate(-4%, -3%);
-  }
-  50% {
-    opacity: 0.95;
-    transform: translate(4%, 3%);
-  }
-}
-.tz-hero-glow {
-  position: relative;
-  overflow: hidden;
-}
-.tz-hero-glow > .tz-hero-flow {
-  pointer-events: none;
-  will-change: transform, opacity;
-  background:
-    radial-gradient(40% 44% at 28% 30%, rgba(156, 114, 239, 0.5), rgba(156, 114, 239, 0) 70%),
-    radial-gradient(32% 36% at 70% 62%, rgba(216, 197, 255, 0.36), rgba(216, 197, 255, 0) 72%),
-    radial-gradient(36% 40% at 58% 18%, rgba(118, 80, 216, 0.5), rgba(118, 80, 216, 0) 74%);
-  animation: tz-hero-flow 16s ease-in-out infinite;
-  position: absolute;
-  inset: -45%;
-}
-.tz-hero-glow > .tz-hero-flow-2 {
-  pointer-events: none;
-  background:
-    radial-gradient(34% 38% at 74% 26%, rgba(216, 197, 255, 0.32), rgba(216, 197, 255, 0) 70%),
-    radial-gradient(38% 42% at 22% 76%, rgba(156, 114, 239, 0.4), rgba(156, 114, 239, 0) 72%);
-  position: absolute;
-  inset: -45%;
-}
-.tz-hero-glow > .tz-hero-aura {
-  pointer-events: none;
-  background:
-    radial-gradient(46% 42% at 30% 26%, rgba(156, 114, 239, 0.26), rgba(156, 114, 239, 0) 72%),
-    radial-gradient(38% 36% at 72% 70%, rgba(216, 197, 255, 0.2), rgba(216, 197, 255, 0) 74%);
-  position: absolute;
-  inset: -20%;
-}
-.tz-hero-glow > .tz-hero-shimmer {
-  display: none;
-}
-.tz-hero-breathe {
-  animation: tz-fade-up 0.45s ease both;
-}
-
-/* ---------- Cahaya kartu Al-Qur'an (versi ringan) ----------
-   Hanya veil yang bergeser pelan (transform/opacity); shimmer disembunyikan,
-   orb & seam statis, glow kartu/icon menjadi bayangan statis. */
-@keyframes tz-quran-veil {
-  0%,
-  100% {
-    opacity: 0.75;
-    transform: translate(-8%);
-  }
-  50% {
-    opacity: 1;
-    transform: translate(8%);
-  }
-}
-.tz-quran-glow {
-  position: relative;
-  overflow: hidden;
-}
-.tz-quran-glow > .tz-quran-veil {
-  pointer-events: none;
-  will-change: transform, opacity;
-  background: linear-gradient(105deg, rgba(156, 114, 239, 0) 22%, rgba(156, 114, 239, 0.26) 38%, rgba(216, 197, 255, 0.22) 50%, rgba(118, 80, 216, 0.2) 62%, rgba(156, 114, 239, 0) 78%);
-  animation: tz-quran-veil 16s ease-in-out infinite;
-  position: absolute;
-  inset: -30% -35%;
-}
-.tz-quran-glow > .tz-quran-shimmer {
-  display: none;
-}
-.tz-quran-glow > .tz-quran-seam {
-  pointer-events: none;
-  background: linear-gradient(rgba(216, 197, 255, 0), rgba(216, 197, 255, 0.55) 45%, rgba(156, 114, 239, 0.4) 65%, rgba(216, 197, 255, 0));
-  border-radius: 999px;
-  width: 2px;
-  position: absolute;
-  top: 16%;
-  bottom: 16%;
-  right: 12px;
-  box-shadow: 0 0 14px 2px rgba(156, 114, 239, 0.35);
-}
-.tz-quran-breathe {
-  animation: tz-fade-up 0.45s ease both;
-}
-.tz-quran-icon {
-  box-shadow: 0 0 16px -4px rgba(156, 114, 239, 0.4);
-}
-
-/* Beam progres khas kartu Al-Qur'an */
+/* ---------- Beam progres (kartu target Al-Qur'an) ---------- */
 .tz-beam {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--color-tz-track);
   border-radius: 999px;
   width: 100%;
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35), 0 0 10px -2px rgba(156, 114, 239, 0.3);
 }
 .tz-beam-fill {
-  background: linear-gradient(90deg, #55339a, #9c72ef 60%, #d8c5ff);
+  background: linear-gradient(90deg, #22c55e, #4ade80 60%, #c7f464);
   border-radius: 999px;
   min-width: 0;
   height: 100%;
   transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 14px rgba(156, 114, 239, 0.75);
 }
 .tz-beam-runner {
-  pointer-events: none;
-  will-change: transform;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(237, 230, 255, 0.55) 30%, rgba(237, 230, 255, 0.75) 50%, rgba(237, 230, 255, 0.55) 70%, rgba(255, 255, 255, 0));
-  border-radius: 999px;
-  width: 24%;
-  animation: tz-beam-run 5.2s ease-in-out infinite;
-  position: absolute;
-  top: -2px;
-  bottom: -2px;
-  left: 0;
-}
-@keyframes tz-beam-run {
-  0% {
-    transform: translate(-110%);
-  }
-  100% {
-    transform: translate(420%);
-  }
+  display: none;
 }
 
-/* ---------- Varian terang untuk animasi (versi ringan) ---------- */
-@keyframes tz-hero-flow-light {
-  0%,
-  100% {
-    opacity: 0.3;
-    transform: translate(-4%, -3%);
-  }
-  50% {
-    opacity: 0.62;
-    transform: translate(4%, 3%);
-  }
-}
-@keyframes tz-quran-veil-light {
-  0%,
-  100% {
-    opacity: 0.4;
-    transform: translate(-8%);
-  }
-  50% {
-    opacity: 0.7;
-    transform: translate(8%);
-  }
-}
-html[data-theme="light"] .tz-hero-glow > .tz-hero-flow {
-  animation-name: tz-hero-flow-light;
-}
-html[data-theme="light"] .tz-hero-glow > .tz-hero-aura {
-  background:
-    radial-gradient(46% 42% at 30% 26%, rgba(216, 197, 255, 0.42), rgba(216, 197, 255, 0) 72%),
-    radial-gradient(38% 36% at 72% 70%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 74%);
-}
-html[data-theme="light"] .tz-quran-glow > .tz-quran-veil {
-  animation-name: tz-quran-veil-light;
-}
-html[data-theme="light"] .tz-quran-glow > .tz-quran-seam {
-  background: linear-gradient(rgba(117, 70, 200, 0), rgba(117, 70, 200, 0.5) 45%, rgba(156, 114, 239, 0.35) 65%, rgba(117, 70, 200, 0));
-  box-shadow: 0 0 12px 2px rgba(117, 70, 200, 0.22);
-}
-html[data-theme="light"] .tz-quran-icon {
-  box-shadow: 0 0 14px -4px rgba(117, 70, 200, 0.25);
-}
-html[data-theme="light"] .tz-beam {
-  background: rgba(41, 35, 49, 0.1);
-  box-shadow: inset 0 1px 2px rgba(41, 35, 49, 0.12), 0 0 10px -2px rgba(117, 70, 200, 0.2);
-}
-html[data-theme="light"] .tz-beam-fill {
-  background: linear-gradient(90deg, #55339a, #7546c8 60%, #a98ae8);
-  box-shadow: 0 0 12px rgba(117, 70, 200, 0.45);
-}
-html[data-theme="light"] .tz-tasbih-disc {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(248, 244, 250, 0.96) 55%, rgba(169, 138, 232, 0.55));
-  box-shadow: inset 0 2px 24px rgba(255, 255, 255, 1), inset 0 -8px 26px rgba(85, 51, 154, 0.1), 0 24px 60px -14px rgba(85, 51, 154, 0.28), 0 0 44px -10px rgba(117, 70, 200, 0.28);
-}
-
-/* ---------- Kartu "Taskello" Al-Qur'an ----------
-   Glassmorphism: artwork cahaya ungu-emas memenuhi seluruh kartu, lalu
-   panel bertab (judul + subjudul) dan baris statistik membacanya lewat
-   kaca buram (backdrop-blur) — persis gaya kartu referensi. Kartu mengikuti
-   tema: gelap pada mode gelap, terang pada mode terang (efek artwork &
-   drift tetap jalan di kedua tema). */
+/* ---------- Kartu premium hijau hutan (Al-Qur'an, Qada) ----------
+   Satu identitas di kedua tema — kartu gelap premium khas referensi
+   ("Prayers to make up", hadis malam): hutan #0B2E23, artwork blob
+   mint & lime, teks putih. */
 .tz-task-card {
-  --task-bezel: #120d1b;
+  --task-bezel: #08251b;
   --task-art-h: 132px;
-  /* Kaca panel: warna panel dibuat transparan agar artwork di belakangnya
-     terbacablur oleh backdrop-filter (inti efek glassmorphism) */
-  --task-glass: rgba(32, 26, 44, 0.52);
-  --task-glass-border: rgba(255, 255, 255, 0.14);
-  /* Tinta kartu (default gelap) — ditimpa per tema agar teks ikut mode terang */
+  --task-glass: rgba(10, 40, 30, 0.42);
+  --task-glass-border: rgba(255, 255, 255, 0.12);
   --task-ink: #ffffff;
-  --task-ink-70: rgba(255, 255, 255, 0.75);
-  --task-ink-55: rgba(255, 255, 255, 0.55);
-  --task-ink-45: rgba(255, 255, 255, 0.45);
-  --task-deco: #a98ae8;
-  --task-pill-bg: rgba(255, 255, 255, 0.12);
-  --task-chip-border: rgba(255, 255, 255, 0.14);
-  --task-chip-bg: rgba(255, 255, 255, 0.06);
+  --task-ink-70: rgba(255, 255, 255, 0.78);
+  --task-ink-55: rgba(255, 255, 255, 0.58);
+  --task-ink-45: rgba(255, 255, 255, 0.48);
+  --task-deco: #c7f464;
+  --task-pill-bg: rgba(255, 255, 255, 0.14);
+  --task-chip-border: rgba(255, 255, 255, 0.16);
+  --task-chip-bg: rgba(255, 255, 255, 0.08);
   background: var(--task-bezel);
   border-radius: 30px;
   padding: 7px;
   box-shadow:
-    0 26px 54px -26px rgba(10, 6, 20, 0.6),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    0 26px 54px -26px rgba(8, 37, 27, 0.65),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 .tz-task-inner {
   position: relative;
   overflow: hidden;
   border-radius: 24px;
-  /* Latar artwork kini memenuhi seluruh kartu — panel kaca di bawah
-     membacanya lewat blur, bukan menutupinya dengan warna pekat */
   background:
-    radial-gradient(120% 90% at 88% -10%, rgba(216, 197, 255, 0.2), rgba(216, 197, 255, 0) 55%),
-    radial-gradient(115% 82% at 8% 0%, rgba(85, 51, 154, 0.72), rgba(85, 51, 154, 0) 62%),
-    linear-gradient(168deg, #241645 0%, #170f2e 42%, #1a1230 100%);
+    radial-gradient(120% 90% at 88% -10%, rgba(199, 244, 100, 0.16), rgba(199, 244, 100, 0) 55%),
+    radial-gradient(115% 82% at 8% 0%, rgba(34, 197, 94, 0.5), rgba(34, 197, 94, 0) 62%),
+    linear-gradient(168deg, #10402f 0%, #0b2e23 46%, #0c332a 100%);
 }
-/* ---- Varian mode terang: kartu ikut terang, efek artwork & drift tetap jalan ---- */
-html[data-theme="light"] .tz-task-card {
-  --task-bezel: #fdfbff;
-  --task-glass: rgba(250, 246, 255, 0.55);
-  --task-glass-border: rgba(117, 70, 200, 0.16);
-  --task-ink: #33254d;
-  --task-ink-70: rgba(51, 37, 77, 0.78);
-  --task-ink-55: rgba(51, 37, 77, 0.62);
-  --task-ink-45: rgba(51, 37, 77, 0.48);
-  --task-deco: #7546c8;
-  --task-pill-bg: rgba(117, 70, 200, 0.14);
-  --task-chip-border: rgba(117, 70, 200, 0.22);
-  --task-chip-bg: rgba(117, 70, 200, 0.08);
-  box-shadow:
-    0 24px 48px -24px rgba(85, 51, 154, 0.3),
-    inset 0 0 0 1px rgba(117, 70, 200, 0.12);
-}
-html[data-theme="light"] .tz-task-inner {
-  background:
-    radial-gradient(120% 90% at 88% -10%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 55%),
-    radial-gradient(115% 82% at 8% 0%, rgba(156, 114, 239, 0.38), rgba(156, 114, 239, 0) 62%),
-    linear-gradient(168deg, #eee2fd 0%, #faf6ff 46%, #e9dbf8 100%);
-}
-html[data-theme="light"] .tz-task-blob-violet {
-  background: radial-gradient(closest-side, rgba(156, 114, 239, 0.55), rgba(156, 114, 239, 0));
-}
-html[data-theme="light"] .tz-task-blob-gold {
-  background: radial-gradient(closest-side, rgba(240, 179, 94, 0.5), rgba(240, 179, 94, 0));
-}
-html[data-theme="light"] .tz-task-blob-hot {
-  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
-}
-
-/* Artwork cahaya: ungu Tazkiya + aksen emas hangat (ganti oranye referensi).
-   Kini selebar kartu (full-bleed) — blob di bagian atas akan terbaca buram
-   di balik panel kaca pada paruh bawah kartu. */
 .tz-task-art {
   position: absolute;
   inset: 0;
@@ -853,33 +491,28 @@ html[data-theme="light"] .tz-task-blob-hot {
   position: absolute;
   border-radius: 9999px;
   filter: blur(24px);
-  will-change: transform;
 }
 .tz-task-blob-violet {
   left: -12%;
   top: -28%;
   width: 55%;
   height: 54%;
-  background: radial-gradient(closest-side, rgba(156, 114, 239, 0.95), rgba(156, 114, 239, 0));
-  animation: tz-art-drift-a 13s ease-in-out infinite alternate;
+  background: radial-gradient(closest-side, rgba(74, 222, 128, 0.55), rgba(74, 222, 128, 0));
 }
 .tz-task-blob-gold {
   right: -8%;
   top: -34%;
   width: 50%;
   height: 50%;
-  background: radial-gradient(closest-side, rgba(240, 179, 94, 0.7), rgba(240, 179, 94, 0));
-  animation: tz-art-drift-b 16s ease-in-out infinite alternate;
+  background: radial-gradient(closest-side, rgba(199, 244, 100, 0.4), rgba(199, 244, 100, 0));
 }
 .tz-task-blob-hot {
   left: 36%;
   top: -18%;
   width: 32%;
   height: 38%;
-  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0));
-  animation: tz-art-drift-c 19s ease-in-out infinite alternate;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0));
 }
-/* Varian sorotan: emas di kiri, ungu di kanan — sekadar membalik komposisi */
 .tz-task-art--spot .tz-task-blob-gold {
   left: -10%;
   right: auto;
@@ -888,43 +521,13 @@ html[data-theme="light"] .tz-task-blob-hot {
   left: auto;
   right: -12%;
 }
-@keyframes tz-art-drift-a {
-  from {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  to {
-    transform: translate3d(9%, 6%, 0) scale(1.12);
-  }
-}
-@keyframes tz-art-drift-b {
-  from {
-    transform: translate3d(0, 0, 0) scale(1.08);
-  }
-  to {
-    transform: translate3d(-8%, 8%, 0) scale(1);
-  }
-}
-@keyframes tz-art-drift-c {
-  from {
-    transform: translate3d(-6%, 0, 0);
-    opacity: 0.72;
-  }
-  to {
-    transform: translate3d(7%, 5%, 0);
-    opacity: 1;
-  }
-}
-
-/* Panel kaca dengan tab berbentuk folder + takik cekung di kanan tab.
-   Latar kaca transparan + backdrop-blur: artwork di baliknya terbaca buram
-   (glassmorphism khas kartu referensi). */
 .tz-task-panel {
   position: relative;
   z-index: 1;
   margin-top: var(--task-art-h);
   background: var(--task-glass);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  backdrop-filter: blur(14px) saturate(1.3);
   border-radius: 0 0 24px 24px;
   padding: 9px 18px 20px;
 }
@@ -937,8 +540,8 @@ html[data-theme="light"] .tz-task-blob-hot {
   align-items: flex-start;
   max-width: 92%;
   background: var(--task-glass);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  backdrop-filter: blur(14px) saturate(1.3);
   border-radius: 14px 22px 0 0;
   padding: 12px 18px 8px;
 }
@@ -951,156 +554,28 @@ html[data-theme="light"] .tz-task-blob-hot {
   height: 14px;
   background: radial-gradient(circle at 100% 0, rgba(0, 0, 0, 0) 14px, var(--task-glass) 14.5px);
 }
-
-/* Beam progres: versi gelap untuk kartu gelap (default), versi terang untuk tema terang */
 .tz-task-card .tz-beam {
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.35),
-    0 0 10px -2px rgba(156, 114, 239, 0.3);
+  background: rgba(255, 255, 255, 0.14);
 }
 .tz-task-card .tz-beam-fill {
-  background: linear-gradient(90deg, #55339a, #9c72ef 60%, #d8c5ff);
-  box-shadow: 0 0 14px rgba(156, 114, 239, 0.75);
-}
-html[data-theme="light"] .tz-task-card .tz-beam {
-  background: rgba(51, 37, 77, 0.1);
-  box-shadow:
-    inset 0 1px 2px rgba(51, 37, 77, 0.14),
-    0 0 10px -2px rgba(156, 114, 239, 0.3);
-}
-html[data-theme="light"] .tz-task-card .tz-beam-fill {
-  background: linear-gradient(90deg, #7a4fd0, #9c72ef 60%, #c9b2f5);
-  box-shadow: 0 0 14px rgba(156, 114, 239, 0.5);
+  background: linear-gradient(90deg, #4ade80, #c7f464);
 }
 
-/* ---------- Mode Liquid Glass ---------- */
-html[data-glass="liquid"] .glass {
-  -webkit-backdrop-filter: blur(26px) saturate(1.7);
-  backdrop-filter: blur(26px) saturate(1.7);
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.055) 42%, rgba(156, 114, 239, 0.1) 100%);
-  border-color: rgba(255, 255, 255, 0.2);
+/* ---------- Piringan tasbih ---------- */
+.tz-tasbih-disc {
+  background: linear-gradient(150deg, rgba(74, 222, 128, 0.32), rgba(16, 58, 42, 0.9) 62%, rgba(8, 37, 27, 0.96));
+}
+html[data-theme="light"] .tz-tasbih-disc {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.96), rgba(240, 249, 217, 0.9) 58%, rgba(163, 217, 74, 0.55));
   box-shadow:
-    0 24px 60px -24px rgba(8, 5, 15, 0.75),
-    inset 0 1px 1px rgba(255, 255, 255, 0.3),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.05),
-    inset 0 0 30px rgba(156, 114, 239, 0.07);
-}
-html[data-glass="liquid"] .glass::before {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.06) 30%, rgba(156, 114, 239, 0.22) 62%, rgba(216, 197, 255, 0.3) 100%);
-}
-html[data-glass="liquid"] .glass-strong {
-  -webkit-backdrop-filter: blur(30px) saturate(1.8);
-  backdrop-filter: blur(30px) saturate(1.8);
-  background: linear-gradient(155deg, rgba(70, 52, 110, 0.72), rgba(38, 27, 64, 0.85));
-  border-color: rgba(255, 255, 255, 0.22);
-  box-shadow:
-    0 30px 70px -24px rgba(8, 5, 15, 0.85),
-    inset 0 1px 1px rgba(255, 255, 255, 0.32),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.06),
-    inset 0 0 36px rgba(156, 114, 239, 0.1);
-}
-html[data-glass="liquid"] .glass-violet {
-  background: linear-gradient(150deg, rgba(156, 114, 239, 0.24), rgba(85, 51, 154, 0.14) 55%, rgba(255, 255, 255, 0.07));
-  border-color: rgba(190, 156, 255, 0.38);
-  box-shadow:
-    0 20px 54px -20px rgba(85, 51, 154, 0.6),
-    inset 0 1px 1px rgba(255, 255, 255, 0.28),
-    inset 0 0 30px rgba(156, 114, 239, 0.12);
-}
-html[data-glass="liquid"] .glass-hero {
-  background:
-    radial-gradient(120% 160% at 90% -20%, rgba(216, 197, 255, 0.42), rgba(156, 114, 239, 0) 52%),
-    linear-gradient(140deg, rgba(124, 82, 190, 0.85) 0%, rgba(90, 55, 160, 0.9) 40%, rgba(52, 34, 100, 0.95) 80%, rgba(42, 28, 82, 0.96) 100%);
-  border-color: rgba(200, 168, 255, 0.5);
-  box-shadow:
-    0 30px 80px -24px rgba(85, 51, 154, 0.7),
-    0 0 60px -12px rgba(156, 114, 239, 0.5),
-    inset 0 1px 1px rgba(255, 255, 255, 0.35),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.06),
-    inset 0 0 40px rgba(156, 114, 239, 0.12);
-}
-html[data-glass="liquid"] .glass-hero::after,
-html[data-glass="liquid"] .glass-strong::after {
-  content: "";
-  pointer-events: none;
-  background: linear-gradient(115deg, rgba(0, 0, 0, 0) 40%, rgba(255, 255, 255, 0.075) 50%, rgba(0, 0, 0, 0) 60%);
-  animation: tz-liquid-sheen 14s ease-in-out infinite;
-  position: absolute;
-  inset: -30% -20%;
-  transform: translate(-80%);
-}
-@keyframes tz-liquid-sheen {
-  0%,
-  55% {
-    transform: translate(-85%);
-  }
-  90%,
-  100% {
-    transform: translate(85%);
-  }
-}
-html[data-theme="light"][data-glass="liquid"] .glass {
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  backdrop-filter: blur(18px) saturate(1.4);
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.74) 45%, rgba(169, 138, 232, 0.16) 100%);
-  border-color: rgba(255, 255, 255, 0.95);
-  box-shadow:
-    0 22px 50px -22px rgba(85, 51, 154, 0.25),
-    inset 0 1px 1px #ffffff,
-    inset 0 -1px 1px rgba(85, 51, 154, 0.06),
-    inset 0 0 26px rgba(169, 138, 232, 0.14);
-}
-html[data-theme="light"][data-glass="liquid"] .glass::before {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.45) 30%, rgba(169, 138, 232, 0.35) 62%, rgba(255, 255, 255, 0.9) 100%);
-}
-html[data-theme="light"][data-glass="liquid"] .glass-strong {
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.98), rgba(250, 247, 253, 0.99));
-  border-color: #ffffff;
-  box-shadow:
-    0 30px 70px -24px rgba(85, 51, 154, 0.28),
-    inset 0 1px 1px #ffffff,
-    inset 0 0 36px rgba(169, 138, 232, 0.16);
-}
-html[data-theme="light"][data-glass="liquid"] .glass-violet {
-  background: linear-gradient(150deg, rgba(169, 138, 232, 0.3), rgba(117, 70, 200, 0.14) 55%, rgba(255, 255, 255, 0.94));
-  border-color: rgba(117, 70, 200, 0.32);
-  box-shadow:
-    0 20px 50px -20px rgba(117, 70, 200, 0.32),
-    inset 0 1px 1px #ffffff,
-    inset 0 0 30px rgba(169, 138, 232, 0.18);
-}
-html[data-theme="light"][data-glass="liquid"] .glass-hero {
-  background:
-    radial-gradient(120% 160% at 90% -20%, rgba(216, 197, 255, 0.6), rgba(156, 114, 239, 0) 52%),
-    linear-gradient(140deg, rgba(146, 108, 220, 0.95) 0%, rgba(117, 70, 200, 0.97) 40%, rgba(85, 51, 154, 0.98) 80%, rgba(74, 45, 138, 0.98) 100%);
-  box-shadow:
-    0 30px 70px -26px rgba(85, 51, 154, 0.45),
-    0 0 44px -14px rgba(117, 70, 200, 0.32),
-    inset 0 1px 1px rgba(255, 255, 255, 0.45),
-    inset 0 0 40px rgba(255, 255, 255, 0.08);
-}
-@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  html[data-glass="liquid"] .glass {
-    background: linear-gradient(155deg, rgba(52, 38, 86, 0.96), rgba(30, 21, 52, 0.98));
-  }
-  html[data-theme="light"][data-glass="liquid"] .glass {
-    background: linear-gradient(155deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 250, 0.99));
-  }
+    inset 0 2px 22px rgba(255, 255, 255, 0.95),
+    0 24px 54px -16px rgba(22, 163, 74, 0.35);
 }
 
-/* ---------- Mode hemat animasi (saklar "Animasi transisi" = mati) ----------
-   Menghentikan sisa animasi dekoratif berkelanjutan (drift cahaya, aurora,
-   kilap liquid glass, runner beam) agar perangkat lambat tetap ringan. */
+/* ---------- Mode hemat animasi (saklar "Animasi transisi" = mati) ---------- */
 html[data-anim="off"] .animate-tz-aurora,
 html[data-anim="off"] .animate-tz-pulse,
-html[data-anim="off"] .animate-tz-spin-slow,
-html[data-anim="off"] .tz-hero-glow > .tz-hero-flow,
-html[data-anim="off"] .tz-quran-glow > .tz-quran-veil,
-html[data-anim="off"] .tz-beam-runner,
-html[data-anim="off"] .tz-task-art > .tz-task-blob,
-html[data-anim="off"] .glass-hero::after,
-html[data-anim="off"] .glass-strong::after {
+html[data-anim="off"] .animate-tz-spin-slow {
   animation: none !important;
 }
 
@@ -1109,12 +584,6 @@ html[data-anim="off"] .glass-strong::after {
   html .animate-tz-aurora,
   html .animate-tz-pulse,
   html .animate-tz-spin-slow,
-  html .tz-hero-glow > .tz-hero-flow,
-  html .tz-quran-glow > .tz-quran-veil,
-  html .tz-beam-runner,
-  html .tz-task-art > .tz-task-blob,
-  html .glass-hero::after,
-  html .glass-strong::after,
   html .tz-sparkle {
     animation: none !important;
   }
@@ -1133,70 +602,6 @@ html[data-anim="off"] .glass-strong::after {
   font-family: var(--font-amiri), "Amiri Quran", Amiri, serif;
 }
 
-/* ---------- Mode ringan HP (layar ≤640px) ----------
-   Visual TIDAK berubah — kaca tetap kaca, glow tetap ada. Yang dikurangi
-   hanya biaya GPU: (1) radius backdrop-filter diperkecil (biaya blur naik
-   kuadratik terhadap radius dan dihitung ulang tiap frame saat konten di
-   baliknya bergulir — di HP ada belasan kartu kaca per layar), (2) animasi
-   dekoratif tanpa batas waktu dihentikan agar kompositor HP tidak bekerja
-   terus-menerus, (3) will-change dilepas agar lapisan GPU berlebih tidak
-   menggantung. Desktop tidak terpengaruh. */
-@media (max-width: 640px) {
-  .glass {
-    -webkit-backdrop-filter: blur(9px) saturate(1.1);
-    backdrop-filter: blur(9px) saturate(1.1);
-  }
-  .glass-strong {
-    -webkit-backdrop-filter: blur(12px) saturate(1.15);
-    backdrop-filter: blur(12px) saturate(1.15);
-  }
-  .glass-violet {
-    -webkit-backdrop-filter: blur(9px) saturate(1.1);
-    backdrop-filter: blur(9px) saturate(1.1);
-  }
-  html[data-glass="liquid"] .glass {
-    -webkit-backdrop-filter: blur(10px) saturate(1.25);
-    backdrop-filter: blur(10px) saturate(1.25);
-  }
-  html[data-glass="liquid"] .glass-strong {
-    -webkit-backdrop-filter: blur(14px) saturate(1.3);
-    backdrop-filter: blur(14px) saturate(1.3);
-  }
-  html[data-theme="light"][data-glass="liquid"] .glass {
-    -webkit-backdrop-filter: blur(9px) saturate(1.1);
-    backdrop-filter: blur(9px) saturate(1.1);
-  }
-
-  html .animate-tz-aurora,
-  html .animate-tz-spin-slow,
-  html .tz-hero-glow > .tz-hero-flow,
-  html .tz-quran-glow > .tz-quran-veil,
-  html .tz-beam-runner,
-  html .tz-task-art > .tz-task-blob,
-  html .glass-hero::after,
-  html .glass-strong::after {
-    animation: none !important;
-  }
-  html .tz-task-art > .tz-task-blob {
-    will-change: auto;
-  }
-  /* Posisi diam yang menyerupai fasa animasi paling terang */
-  html .tz-hero-glow > .tz-hero-flow {
-    opacity: 0.9;
-    transform: translate(0);
-    will-change: auto;
-  }
-  html .tz-quran-glow > .tz-quran-veil {
-    opacity: 0.85;
-    transform: translate(0);
-    will-change: auto;
-  }
-  html .tz-beam-runner {
-    will-change: auto;
-    opacity: 0.9;
-  }
-}
-
 /* ---------- Hemat paint daftar panjang ----------
    114 baris surah / 30 baris juz: baris di luar viewport tidak dilayout &
    tidak dirender sampai mendekat (scroll tetap mulus, tab Al-Qur'an ringan). */
@@ -1205,11 +610,7 @@ html[data-anim="off"] .glass-strong::after {
   contain-intrinsic-size: auto 88px;
 }
 
-/* ---------- Pop-up apresiasi salat: kilau halus sekali-jalan ----------
-   Partikel kecil memancar dari ikon selama <1 detik lalu berhenti —
-   tanpa animasi berkelanjutan. Dekoratif murni: bila animasi dimatikan
-   (setelan aplikasi, hemat daya OS, atau preferensi reduced motion),
-   partikel tidak tampil sama sekali. */
+/* ---------- Pop-up apresiasi salat: kilau halus sekali-jalan ---------- */
 @keyframes tz-sparkle {
   0% {
     transform: translate(-50%, -50%) scale(0.3);
@@ -1231,13 +632,8 @@ html[data-anim="off"] .tz-sparkle {
   animation: none !important;
 }
 
-/* ---------- Hormati preferensi transparansi OS ----------
-   Perangkat yang meminta transparansi minim (mode hemat daya / penglihatan)
-   melewatkan blur sepenuhnya — latar gradien kaca tetap terbaca. */
+/* ---------- Hormati preferensi transparansi OS ---------- */
 @media (prefers-reduced-transparency: reduce) {
-  .glass,
-  .glass-strong,
-  .glass-violet,
   html[data-glass="liquid"] .glass,
   html[data-glass="liquid"] .glass-strong {
     -webkit-backdrop-filter: none !important;
@@ -1245,77 +641,10 @@ html[data-anim="off"] .tz-sparkle {
   }
 }
 
-/* ---------- Kartu 2D datar (Task 16 — permintaan pengguna) ----------
-   Semua kartu di semua halaman tampil datar (2D), tanpa kesan 3D dan lebih
-   ringan di HP. Menimpa SEMUA varian kaca (gelap/terang/liquid, mobile):
-   - backdrop-filter dimatikan (penghemat GPU terbesar — blur dihitung ulang
-     tiap frame saat konten di balik kartu bergulir)
-   - bayangan besar & inner-highlight dihilangkan (sumber utama kesan 3D)
-   - tepi gloss ::before dan sheen ::after disembunyikan
-   - utilitas glow (glow-violet, ikon Qur'an) dinetralkan
-   - lapisan cahaya ambien kartu hero disembunyikan
-   Border 1px dan latar kartu tetap ada — kartu tetap terbaca rapi sebagai
-   permukaan datar. Blok ini sengaja paling akhir agar menang atas semua
-   varian di atasnya; animasi tetap hormat pada data-anim="off" dan
-   prefers-reduced-motion seperti sebelumnya. */
-.glass,
-.glass-strong,
-.glass-violet,
-.glass-hero,
-html[data-theme="light"] .glass,
-html[data-theme="light"] .glass-strong,
-html[data-theme="light"] .glass-violet,
-html[data-theme="light"] .glass-hero,
-html[data-glass="liquid"] .glass,
-html[data-glass="liquid"] .glass-strong,
-html[data-glass="liquid"] .glass-violet,
-html[data-glass="liquid"] .glass-hero,
-html[data-theme="light"][data-glass="liquid"] .glass,
-html[data-theme="light"][data-glass="liquid"] .glass-strong,
-html[data-theme="light"][data-glass="liquid"] .glass-violet,
-html[data-theme="light"][data-glass="liquid"] .glass-hero {
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  box-shadow: none;
-}
-
-.glass::before,
-.glass-strong::before,
-.glass-violet::before,
-.glass-hero::before,
-html[data-glass="liquid"] .glass-hero::after,
-html[data-glass="liquid"] .glass-strong::after {
-  content: none;
-  display: none;
-}
-
-.glow-violet,
-.glow-violet-sm,
-html[data-theme="light"] .glow-violet,
-html[data-theme="light"] .glow-violet-sm,
-.tz-quran-icon {
-  box-shadow: none;
-}
-
-/* Lapisan cahaya ambien kartu hero (glow radial berlapis) — penyumbang
-   kesan kedalaman sekaligus biaya kompositor; disembunyikan agar kartu
-   benar-benar datar. */
-.tz-hero-glow > .tz-hero-flow,
-.tz-hero-glow > .tz-hero-flow-2,
-.tz-hero-glow > .tz-hero-aura,
-.tz-quran-glow > .tz-quran-veil {
-  display: none;
-}
-
-/* penanda recompile task16 */
-
-/* ---------- Animasi ringan redesign Profil & Statistik ----------
-   Hanya transform/opacity/height pendek (hemat daya). Hormati
-   prefers-reduced-motion dan setelan "Animasi transisi" (data-anim="off"). */
+/* ---------- Animasi ringan redesign (bar, pop, fade) ---------- */
 .tz-bar-grow {
   transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
-/* Varian horizontal (progress bar) — mengisi dari KIRI ke KANAN. */
 .tz-bar-grow-x {
   transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }

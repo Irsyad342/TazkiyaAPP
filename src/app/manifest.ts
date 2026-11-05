@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Pelacak Ibadah Harian",
     start_url: "/",
     display: "standalone",
-    background_color: "#171321",
-    theme_color: "#171321",
+    background_color: "#0B1512",
+    theme_color: "#16A34A",
     icons: [
       {
         src: "/icons/icon-192.png",

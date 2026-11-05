@@ -49,7 +49,7 @@ import { formatHijri, isFriday, monthCalendarDayKeys, todayKey } from "@/lib/taz
 import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { prayerTiming } from "@/lib/tazkiya/goals";
 import { HADITH_QADA } from "@/lib/tazkiya/hadith";
-import { Chip, ConfirmButton, GlassCard, SectionHeader } from "./ui-bits";
+import { Chip, ConfirmButton, GlassCard, SectionHeader, SegmentedTabs } from "./ui-bits";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { DayDetailSheet, prayerMetaFor } from "./DayDetailSheet";
 import { MotivationPopup, type MotivationVariant } from "./MotivationPopup";
@@ -101,18 +101,18 @@ function PrayerRow({
   if (isDone) {
     statusChips.push(
       timing === "ontime"
-        ? { text: "Tepat waktu", cls: "border-emerald-300/35 bg-emerald-400/10 text-emerald-700 light:border-emerald-500/40 light:bg-emerald-50 light:text-emerald-700" }
+        ? { text: "Tepat waktu", cls: "border-emerald-300/40 bg-emerald-400/12 text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-400/15 dark:text-emerald-300" }
         : timing === "late"
-          ? { text: "Terlambat · dilaksanakan", cls: "border-amber-300/40 bg-amber-400/10 text-amber-700 light:border-amber-500/40 light:bg-amber-50 light:text-amber-700" }
+          ? { text: "Terlambat · dilaksanakan", cls: "border-amber-300/45 bg-amber-400/12 text-amber-700 dark:border-amber-400/30 dark:bg-amber-400/15 dark:text-amber-300" }
           : { text: "Dilaksanakan", cls: "border-tz-violet/40 bg-tz-violet/12 text-tz-accent" }
     );
     if (detail.kind === "berjamaah") {
-      statusChips.push({ text: "Berjamaah", cls: "border-teal-300/35 bg-teal-400/10 text-teal-700 light:border-teal-500/40 light:bg-teal-50 light:text-teal-700" });
+      statusChips.push({ text: "Berjamaah", cls: "border-emerald-300/40 bg-emerald-400/12 text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-400/15 dark:text-emerald-300" });
     } else if (detail.kind === "mandiri") {
-      statusChips.push({ text: "Mandiri", cls: "border-sky-300/35 bg-sky-400/10 text-sky-700 light:border-sky-500/40 light:bg-sky-50 light:text-sky-700" });
+      statusChips.push({ text: "Mandiri", cls: "border-[#4263eb]/30 bg-[#eef2ff] text-[#3b55d6] dark:border-[#7c86ff]/35 dark:bg-[#7c86ff]/15 dark:text-[#aeb6ff]" });
     }
   } else if (isMissed) {
-    statusChips.push({ text: "Tidak dilaksanakan", cls: "border-rose-300/35 bg-rose-400/[0.08] text-rose-600 light:border-rose-400 light:bg-rose-50 light:text-rose-700" });
+    statusChips.push({ text: "Tidak dilaksanakan", cls: "border-rose-300/35 bg-rose-400/[0.08] text-rose-600 dark:border-rose-400/30 dark:bg-rose-400/12 dark:text-rose-300" });
   } else {
     statusChips.push({ text: "Belum dicatat", cls: "border-tz-line bg-tz-panel-soft text-tz-muted" });
   }
@@ -123,19 +123,19 @@ function PrayerRow({
       onClick={onPress}
       aria-label={`Catat ${meta.label} — ${isDone ? "dilaksanakan" : isMissed ? "tidak dilaksanakan" : "belum dicatat"}`}
       className={cn(
-        "tap flex w-full items-center gap-3 rounded-[1.1rem] border p-3 text-left transition-all hover:border-tz-violet/45",
-        isDone ? "border-tz-violet/35 bg-tz-violet/[0.08]" : "border-tz-line bg-tz-panel-soft"
+        "tap flex w-full items-center gap-3 rounded-[1.2rem] border p-3 text-left transition-all hover:border-tz-violet/45",
+        isDone ? "border-tz-violet/30 bg-tz-violet/[0.07]" : "border-tz-line bg-tz-panel-soft"
       )}
     >
       <span
         aria-hidden
         className={cn(
-          "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border",
+          "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
           isDone
-            ? "border-transparent bg-gradient-to-br from-tz-purple to-tz-violet text-white shadow-[0_0_14px_-4px_rgba(156,114,239,0.8)]"
+            ? "border border-transparent bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white shadow-[0_6px_14px_-6px_rgba(22,163,74,0.8)]"
             : isMissed
-              ? "border-rose-300/30 bg-rose-400/10 text-rose-500 light:text-rose-600"
-              : "border-tz-line bg-tz-panel text-tz-muted"
+              ? "border border-rose-300/30 bg-rose-400/10 text-rose-500 dark:text-rose-300"
+              : "bg-gradient-to-br from-amber-100 to-amber-50 text-amber-600 dark:from-amber-400/15 dark:to-amber-400/5 dark:text-amber-300"
         )}
       >
         <Icon size={17} strokeWidth={1.9} />
@@ -148,8 +148,8 @@ function PrayerRow({
               <Clock size={10} /> {time}
             </span>
           ) : null}
-          {isDone && detail.kind ? (
-            <span className="inline-flex items-center gap-0.5 text-[10px] text-tz-accent/90">
+                {isDone && detail.kind ? (
+            <span className="inline-flex items-center gap-0.5 text-[10px] text-tz-accent">
               <KindIcon size={10} /> {detail.kind === "berjamaah" ? "Berjamaah" : "Mandiri"}
             </span>
           ) : null}
@@ -207,16 +207,16 @@ function TodayTab({
 
   return (
     <div className="space-y-5">
-      {/* Ringkasan */}
-      <GlassCard variant="clean" className="p-5">
+      {/* Ringkasan "4 of 5" — kartu hijau emerald dengan ring lime ala referensi */}
+      <div className="glass-hero relative overflow-hidden rounded-[1.5rem] p-5">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-tz-muted">Salat hari ini</p>
-            <p className="mt-1 font-display text-[38px] font-extrabold leading-none tabular-nums text-tz-ink">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/90">Salat hari ini</p>
+            <p className="mt-1 text-[38px] font-extrabold leading-none tabular-nums text-white">
               {doneCount}
-              <span className="text-[20px] font-bold text-tz-muted"> / 5</span>
+              <span className="text-[20px] font-bold text-white/75"> / 5</span>
             </p>
-            <p className="mt-1.5 text-[11px] leading-snug text-tz-muted">
+            <p className="mt-1.5 text-[11px] leading-snug text-white/80">
               {nextEntry
                 ? `Berikutnya: ${nextEntry.label} pukul ${schedule[nextEntry.id]?.time}`
                 : "Kelima waktu telah berlalu — terima kasih telah menjaga hari ini"}
@@ -225,7 +225,7 @@ function TodayTab({
           {/* Ring progres */}
           <div className="relative h-[84px] w-[84px] shrink-0" role="img" aria-label={`Ringkasan salat hari ini ${pct}%`}>
             <svg viewBox="0 0 84 84" className="h-full w-full -rotate-90">
-              <circle cx="42" cy="42" r="36" fill="none" strokeWidth="8" className="stroke-tz-track" />
+              <circle cx="42" cy="42" r="36" fill="none" strokeWidth="8" className="stroke-white/25" />
               <circle
                 cx="42"
                 cy="42"
@@ -239,26 +239,24 @@ function TodayTab({
               />
               <defs>
                 <linearGradient id="prayer-ring" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#9C72EF" />
-                  <stop offset="100%" stopColor="#D8C5FF" />
+                  <stop offset="0%" stopColor="#FFFFFF" />
+                  <stop offset="100%" stopColor="#C7F464" />
                 </linearGradient>
               </defs>
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center font-display text-[17px] font-extrabold text-tz-ink">
+            <span className="absolute inset-0 flex items-center justify-center text-[17px] font-extrabold text-white">
               {pct}%
             </span>
           </div>
         </div>
         <div className="mt-3 flex flex-wrap gap-1.5">
-          <Chip className="border-tz-violet/30 bg-tz-violet/10 text-tz-accent">Berjamaah {jamaah}</Chip>
+          <Chip className="border-white/25 bg-white/15 text-white">Berjamaah {jamaah}</Chip>
           {ontime > 0 ? (
-            <Chip className="border-emerald-300/35 bg-emerald-400/10 text-emerald-700 light:border-emerald-500/40 light:bg-emerald-50 light:text-emerald-700">
-              Tepat waktu {ontime}
-            </Chip>
+            <Chip className="border-white/25 bg-white/15 text-white">Tepat waktu {ontime}</Chip>
           ) : null}
-          <Chip className="border-tz-line">{formatHijri(new Date()) || formatDayFullOf(today)}</Chip>
+          <Chip className="border-white/25 bg-white/15 text-white/90">{formatHijri(new Date()) || formatDayFullOf(today)}</Chip>
         </div>
-      </GlassCard>
+      </div>
 
       {/* Lima waktu */}
       <section aria-label="Daftar salat wajib hari ini">
@@ -323,15 +321,15 @@ function SunnahChip({
         toast[done ? "info" : "success"](done ? `${label} ditandai belum selesai` : `${label} tercatat selesai`);
       }}
       className={cn(
-        "tap flex items-center gap-3 rounded-[1.1rem] border p-3 text-left transition-all",
-        done ? "border-tz-violet/45 bg-tz-violet/12" : "border-tz-line bg-tz-panel-soft"
+        "tap flex items-center gap-3 rounded-[1.2rem] border p-3 text-left transition-all",
+        done ? "border-tz-violet/35 bg-tz-violet/[0.08]" : "border-tz-line bg-tz-panel-soft"
       )}
     >
       <span
         aria-hidden
         className={cn(
-          "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
-          done ? "border-transparent bg-tz-violet text-white" : "border-tz-line bg-tz-panel text-tz-muted"
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+          done ? "bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white" : "bg-tz-panel-strong text-tz-muted"
         )}
       >
         {done ? <Check size={16} strokeWidth={3} /> : <Icon size={16} />}
@@ -423,9 +421,9 @@ function MonthTab({ today }: { today: string }) {
             const st = isFuture ? { jamaah: 0, mandiri: 0, missed: 0, done: 0, hasData: false } : statusFor(key);
             const intensity = st.done / 5;
             let bg: string | undefined;
-            if (!isFuture && st.jamaah > 0) bg = `rgba(45,212,191,${(0.17 + intensity * 0.58).toFixed(3)})`;
-            else if (!isFuture && st.mandiri > 0) bg = `rgba(56,189,248,${(0.15 + intensity * 0.52).toFixed(3)})`;
-            else if (!isFuture && st.missed > 0) bg = `rgba(251,191,36,${(0.15 + (st.missed / 5) * 0.35).toFixed(3)})`;
+            if (!isFuture && st.jamaah > 0) bg = `rgba(34,197,94,${(0.18 + intensity * 0.6).toFixed(3)})`;
+            else if (!isFuture && st.mandiri > 0) bg = `rgba(66,99,235,${(0.14 + intensity * 0.5).toFixed(3)})`;
+            else if (!isFuture && st.missed > 0) bg = `rgba(245,158,11,${(0.15 + (st.missed / 5) * 0.35).toFixed(3)})`;
             else if (!isFuture) bg = "var(--tz-empty-cell)";
             return (
               <button
@@ -449,13 +447,13 @@ function MonthTab({ today }: { today: string }) {
 
         <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[10px] text-tz-muted">
           <span className="flex items-center gap-1">
-            <span aria-hidden className="h-2 w-2 rounded-full bg-teal-400/90" /> Berjamaah
+            <span aria-hidden className="h-2 w-2 rounded-full bg-emerald-500 dark:bg-emerald-400" /> Berjamaah
           </span>
           <span className="flex items-center gap-1">
-            <span aria-hidden className="h-2 w-2 rounded-full bg-sky-400/90" /> Mandiri
+            <span aria-hidden className="h-2 w-2 rounded-full bg-[#4263eb] dark:bg-[#7c86ff]" /> Mandiri
           </span>
           <span className="flex items-center gap-1">
-            <span aria-hidden className="h-2 w-2 rounded-full bg-amber-400/80" /> Ada yang tidak dilaksanakan
+            <span aria-hidden className="h-2 w-2 rounded-full bg-amber-400/90" /> Ada yang tidak dilaksanakan
           </span>
           <span className="flex items-center gap-1">
             <span aria-hidden className="h-2 w-2 rounded-full border border-dashed border-tz-line-strong" /> Tanpa catatan (bukan gagal)
@@ -510,18 +508,26 @@ function QadaTab({ today }: { today: string }) {
 
   return (
     <div className="space-y-5">
-      {/* Ringkasan lembut */}
-      <GlassCard variant="clean" className="p-5">
-        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-tz-muted">Qada — salat yang ingin dimakbulkan</p>
-        <p className="mt-1 font-display text-[34px] font-extrabold leading-none tabular-nums text-tz-ink">
-          {pending.length} <span className="text-[15px] font-bold text-tz-muted">belum selesai</span>
+      {/* Ringkasan lembut — kartu premium hijau hutan ala referensi Qada */}
+      <div className="relative overflow-hidden rounded-[1.5rem] bg-[#0b2e23] p-5 shadow-[0_22px_48px_-24px_rgba(8,37,27,0.7)]">
+        <div aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-[#c7f464]/15 blur-2xl" />
+        <p className="relative text-[10px] font-bold uppercase tracking-[0.16em] text-[#c7f464]">Qada — salat yang ingin dimakbulkan</p>
+        <p className="relative mt-1 text-[34px] font-extrabold leading-none tabular-nums text-white">
+          {pending.length} <span className="text-[15px] font-bold text-white/65">belum selesai</span>
         </p>
-        <p className="mt-1.5 text-[11px] leading-relaxed text-tz-muted">
+        <p className="relative mt-1.5 text-[11px] leading-relaxed text-white/75">
           {completedThisMonth > 0
             ? `Bulan ini kamu sudah mencatat ${completedThisMonth} qada selesai. Terus bertumbuh, satu per satu.`
             : "Tidak apa-apa, selalu ada kesempatan untuk memperbaiki diri."}
         </p>
-      </GlassCard>
+        {/* Bar kemajuan bulan ini */}
+        <div className="relative mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/15">
+          <div
+            className="tz-bar-grow-x h-full rounded-full bg-gradient-to-r from-[#4ade80] to-[#c7f464]"
+            style={{ width: `${Math.min(100, completedThisMonth * 12)}%` }}
+          />
+        </div>
+      </div>
 
       {/* Pengingat hadis — sumber eksplisit */}
       <GlassCard variant="violet" className="p-4">
@@ -558,7 +564,7 @@ function QadaTab({ today }: { today: string }) {
                         completeQada(q.id);
                         toast.success("Alhamdulillah, qada tercatat selesai");
                       }}
-                      className="tap flex shrink-0 items-center gap-1 rounded-full bg-gradient-to-r from-tz-purple to-tz-violet px-3 py-1.5 text-[10.5px] font-bold text-white"
+                      className="tap flex shrink-0 items-center gap-1 rounded-full bg-gradient-to-r from-[#4ade80] to-[#16a34a] px-3 py-1.5 text-[10.5px] font-bold text-white shadow-[0_6px_16px_-8px_rgba(22,163,74,0.8)]"
                     >
                       <Check size={12} strokeWidth={3} /> Sudah diqada
                     </button>
@@ -635,7 +641,7 @@ function QadaTab({ today }: { today: string }) {
           <button
             type="button"
             onClick={submit}
-            className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-tz-purple to-tz-violet text-sm font-semibold text-white shadow-[0_6px_18px_-6px_rgba(85,51,154,0.9)]"
+            className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4ade80] to-[#16a34a] text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(22,163,74,0.7)]"
           >
             <Plus size={16} /> Tambah ke Daftar Qada
           </button>
@@ -726,36 +732,17 @@ export function PrayerPage() {
         <p className="mt-1 text-sm text-tz-muted">Catat lima waktu salat dan kelola qada dengan tenang</p>
       </header>
 
-      {/* Tab */}
-      <div
-        className="grid grid-cols-3 gap-1.5 rounded-xl border border-tz-line bg-tz-panel-soft p-1.5"
-        role="tablist"
-        aria-label="Bagian halaman sholat"
-      >
-        {(
-          [
-            { id: "hari-ini", label: "Hari Ini" },
-            { id: "bulanan", label: "Bulanan" },
-            { id: "qada", label: "Qada" },
-          ] as { id: Tab; label: string }[]
-        ).map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className={cn(
-              "tap min-h-[38px] rounded-lg text-[12.5px] font-semibold transition-all",
-              tab === t.id
-                ? "bg-gradient-to-r from-tz-purple to-tz-violet text-white shadow-[0_4px_14px_-4px_rgba(85,51,154,0.8)]"
-                : "text-tz-muted hover:text-tz-accent"
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      {/* Tab segmen */}
+      <SegmentedTabs
+        ariaLabel="Bagian halaman sholat"
+        items={[
+          { id: "hari-ini" as const, label: "Hari Ini" },
+          { id: "bulanan" as const, label: "Bulanan" },
+          { id: "qada" as const, label: "Qada" },
+        ]}
+        value={tab}
+        onChange={setTab}
+      />
 
       <div key={tab} className="tz-fade-in">
         {tab === "hari-ini" ? <TodayTab today={today} onRecord={setRecording} /> : null}

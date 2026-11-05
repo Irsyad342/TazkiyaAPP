@@ -96,7 +96,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                   className={cn(
                     "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-[12px] font-bold",
                     items[i]?.trim()
-                      ? "border-transparent bg-gradient-to-br from-tz-purple to-tz-violet text-white"
+                      ? "border-transparent bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white"
                       : "border-tz-line bg-tz-panel text-tz-muted"
                   )}
                 >
@@ -126,7 +126,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
             className={cn(
               "tap mt-4 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white transition-all",
               canSave
-                ? "bg-gradient-to-r from-tz-purple to-tz-violet shadow-[0_8px_22px_-8px_rgba(85,51,154,0.9)]"
+                ? "bg-gradient-to-r from-[#4ade80] to-[#16a34a] shadow-[0_8px_22px_-8px_rgba(22,163,74,0.9)]"
                 : "cursor-not-allowed opacity-40"
             )}
           >
@@ -159,7 +159,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                   className={cn(
                     "tap flex flex-col items-center gap-1.5 rounded-2xl border px-1 py-3 transition-all",
                     active
-                      ? "border-tz-violet/60 bg-tz-violet/12 shadow-[0_0_16px_-6px_rgba(156,114,239,0.7)]"
+                      ? "border-tz-violet/60 bg-tz-violet/12 shadow-[0_0_16px_-6px_rgba(22,163,74,0.7)]"
                       : "border-tz-line bg-tz-panel-soft hover:border-tz-violet/35"
                   )}
                 >
@@ -198,7 +198,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
             <button
               type="button"
               onClick={() => void shareQuote(`"${hadith.text}"\n— ${hadith.source}`)}
-              className="tap flex min-h-[40px] items-center gap-1.5 rounded-xl bg-gradient-to-r from-tz-purple to-tz-violet px-3.5 text-[12px] font-semibold text-white"
+              className="tap flex min-h-[40px] items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#4ade80] to-[#16a34a] px-3.5 text-[12px] font-semibold text-white"
             >
               <Share2 size={14} /> Simpan / Bagikan
             </button>

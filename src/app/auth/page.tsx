@@ -189,7 +189,7 @@ function AuthForm() {
         <div className="glass rounded-[1.65rem] p-6 shadow-[0_30px_80px_-30px_rgba(10,6,20,0.7)]">
           {/* Logo */}
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] border border-tz-violet/40 bg-gradient-to-br from-tz-purple to-tz-violet font-display text-2xl font-bold text-white glow-violet-sm">
+            <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] border border-tz-violet/40 bg-gradient-to-br from-[#4ade80] to-[#16a34a] font-display text-2xl font-bold text-white glow-violet-sm">
               ت
             </div>
             <h1 className="mt-3 font-display text-[22px] font-bold tracking-tight text-tz-ink">Tazkiya</h1>
@@ -257,7 +257,7 @@ function AuthForm() {
               <button
                 type="submit"
                 disabled={unconfigured || busy || loading}
-                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-tz-violet to-tz-purple text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(117,70,200,0.95)] transition-all hover:brightness-110 disabled:opacity-60"
+                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(22,163,74,0.95)] transition-all hover:brightness-110 disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={17} className="animate-spin" /> : <KeyRound size={16} />}
                 {busy ? "Menyimpan…" : "Simpan kata sandi baru"}
@@ -288,7 +288,7 @@ function AuthForm() {
               <button
                 type="submit"
                 disabled={unconfigured || busy || loading}
-                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-tz-violet to-tz-purple text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(117,70,200,0.95)] transition-all hover:brightness-110 disabled:opacity-60"
+                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(22,163,74,0.95)] transition-all hover:brightness-110 disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={17} className="animate-spin" /> : <Mail size={16} />}
                 {busy ? "Mengirim…" : "Kirim tautan atur ulang"}
@@ -330,7 +330,7 @@ function AuthForm() {
                     className={cn(
                       "tap flex min-h-[38px] items-center justify-center gap-1.5 rounded-lg text-[12.5px] font-bold transition-all",
                       mode === t.id
-                        ? "bg-gradient-to-br from-tz-violet to-tz-purple text-white shadow-[0_8px_20px_-8px_rgba(117,70,200,0.9)]"
+                        ? "bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white shadow-[0_8px_20px_-8px_rgba(22,163,74,0.9)]"
                         : "text-tz-muted hover:text-tz-accent"
                     )}
                   >
@@ -434,7 +434,7 @@ function AuthForm() {
                 <button
                   type="submit"
                   disabled={unconfigured || busy || loading}
-                  className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-tz-violet to-tz-purple text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(117,70,200,0.95)] transition-all hover:brightness-110 disabled:opacity-60"
+                  className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(22,163,74,0.95)] transition-all hover:brightness-110 disabled:opacity-60"
                 >
                   {busy ? <LoaderCircle size={17} className="animate-spin" /> : mode === "login" ? <LogIn size={16} /> : <UserPlus size={16} />}
                   {busy ? (mode === "login" ? "Memproses…" : "Mendaftarkan…") : mode === "login" ? "Masuk" : "Buat Akun"}

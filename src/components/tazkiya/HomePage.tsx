@@ -107,11 +107,10 @@ function NextPrayerCard({ today }: { today: string }) {
 
   return (
     <section aria-label="Salat berikutnya" className="animate-tz-fade-up">
-      {/* Permukaan gradasi ungu SOLID di kedua tema — teks putih selalu kontras
-          (varian glass-violet kurang kontras untuk teks putih pada tema terang). */}
-      <div className="relative overflow-hidden rounded-[1.65rem] bg-gradient-to-br from-tz-purple via-[#7B4FD6] to-tz-violet p-5 shadow-[0_18px_50px_-18px_rgba(85,51,154,0.75),inset_0_1px_0_rgba(255,255,255,0.18)]">
+      {/* Kartu hero hijau emerald — gradien + siluet masjid, teks putih di kedua tema */}
+      <div className="glass-hero relative overflow-hidden rounded-[1.65rem] p-5">
         {/* Siluet masjid dekoratif */}
-        <svg viewBox="0 0 200 120" fill="none" aria-hidden className="pointer-events-none absolute -right-4 -top-2 h-28 w-40 text-white/[0.12]">
+        <svg viewBox="0 0 200 120" fill="none" aria-hidden className="pointer-events-none absolute -right-4 -top-2 h-28 w-40 text-white/[0.14]">
           <path d="M100 22c8 6 12 12 12 18H88c0-6 4-12 12-18Z" fill="currentColor" />
           <rect x="84" y="44" width="32" height="40" rx="2" fill="currentColor" />
           <path d="M92 84v-9a8 8 0 0 1 16 0v9Z" fill="currentColor" opacity="0.5" />
@@ -122,20 +121,20 @@ function NextPrayerCard({ today }: { today: string }) {
         </svg>
 
         <div className="relative">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/85">
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/90">
             Salat berikutnya · {nextLabel}
             {state.tomorrow ? " (besok)" : ""}
           </p>
           <div className="mt-1 flex flex-wrap items-end gap-x-3 gap-y-2">
-            <p className="font-display text-[44px] font-extrabold leading-none tracking-tight text-white">
+            <p className="text-[44px] font-extrabold leading-none tracking-tight text-white">
               {state.nextTime}
             </p>
             <span
               className={cn(
-                "mb-1 rounded-full border px-3 py-1 text-[11px] font-bold",
+                "mb-1 rounded-full px-3 py-1 text-[11px] font-bold",
                 animations
-                  ? "border-white/30 bg-white/15 text-white shadow-[0_0_16px_-4px_rgba(216,197,255,0.8)]"
-                  : "border-white/25 bg-white/10 text-white"
+                  ? "bg-tz-lime text-[#1d3a10] shadow-[0_6px_16px_-6px_rgba(199,244,100,0.8)]"
+                  : "border border-white/25 bg-white/15 text-white"
               )}
             >
               {formatCountdown(state.secondsLeft)} lagi
@@ -170,7 +169,7 @@ function NextPrayerCard({ today }: { today: string }) {
                     >
                       {label}
                     </span>
-                    <span className={cn("text-[8.5px] leading-none", done ? "font-bold text-emerald-200" : "text-white/60")}>
+                    <span className={cn("text-[8.5px] leading-none", done ? "font-bold text-[#e9ffd4]" : "text-white/65")}>
                       {done ? "✓" : times[id]?.time ?? ""}
                     </span>
                   </div>
@@ -234,7 +233,7 @@ function DailyJourney({ today }: { today: string }) {
           <Chip
             className={cn(
               doneCount === statuses.length && statuses.length > 0
-                ? "border-emerald-300/30 bg-emerald-400/10 text-emerald-700 light:border-emerald-500/40 light:bg-emerald-100 light:text-emerald-700"
+                ? "border-tz-violet/30 bg-tz-violet/12 text-tz-accent"
                 : "border-tz-line"
             )}
           >
@@ -276,7 +275,7 @@ function DailyJourney({ today }: { today: string }) {
                   className={cn(
                     "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all",
                     done
-                      ? "border-transparent bg-gradient-to-br from-tz-purple to-tz-violet text-white shadow-[0_0_12px_-2px_rgba(156,114,239,0.8)]"
+                      ? "border-transparent bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white shadow-[0_4px_12px_-4px_rgba(22,163,74,0.7)]"
                       : "border-dashed border-tz-line-strong text-transparent"
                   )}
                 >
@@ -362,7 +361,7 @@ function DailyJourney({ today }: { today: string }) {
                   setDraft("");
                   toast.success("Target pribadi ditambahkan");
                 }}
-                className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-tz-purple to-tz-violet text-white"
+                className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white"
               >
                 <Plus size={16} />
               </button>
@@ -380,7 +379,7 @@ function DailyJourney({ today }: { today: string }) {
             type="button"
             aria-expanded={editing}
             onClick={() => setEditing((v) => !v)}
-            className="tap flex shrink-0 items-center gap-1 rounded-full border border-tz-violet/25 bg-tz-violet/10 px-2.5 py-1 text-[10.5px] font-semibold text-tz-accent"
+            className="tap flex shrink-0 items-center gap-1 rounded-full border border-tz-violet/30 bg-tz-violet/10 px-2.5 py-1 text-[10.5px] font-semibold text-tz-accent"
           >
             <Settings2 size={12} /> Atur
           </button>
@@ -474,20 +473,20 @@ export function HomePage({
               type="button"
               aria-label="Notifikasi"
               onClick={() => toast.info("Belum ada notifikasi baru")}
-              className="tap glass relative flex h-10 w-10 items-center justify-center rounded-full text-tz-accent"
+              className="tap glass relative flex h-10 w-10 items-center justify-center rounded-full text-tz-muted"
             >
               <Bell size={17} />
-              <span aria-hidden className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-tz-violet shadow-[0_0_6px_2px_rgba(156,114,239,0.7)]" />
+              <span aria-hidden className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-tz-violet shadow-[0_0_6px_2px_rgba(22,163,74,0.5)]" />
             </button>
             <button type="button" aria-label="Buka profil" onClick={() => onNavigate("profil")} className="tap relative">
               {settings.avatarDataUrl ? (
                 <img
                   src={settings.avatarDataUrl}
                   alt={`Foto profil ${settings.name}`}
-                  className="h-12 w-12 rounded-full border border-tz-line-strong object-cover"
+                  className="h-12 w-12 rounded-full border-2 border-tz-violet/40 object-cover"
                 />
               ) : (
-                <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/25 bg-gradient-to-br from-tz-purple to-tz-violet font-display text-lg font-bold text-white">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-lg font-bold text-white shadow-[0_8px_20px_-8px_rgba(22,163,74,0.7)] dark:border-white/15">
                   {settings.name.trim().charAt(0).toUpperCase() || "T"}
                 </span>
               )}
@@ -517,7 +516,7 @@ export function HomePage({
             <button
               type="button"
               onClick={() => onNavigate("progress")}
-              className="tap flex items-center gap-0.5 rounded-full border border-tz-violet/25 bg-tz-violet/10 py-1 pl-3 pr-2 text-xs font-semibold text-tz-accent transition-all hover:bg-tz-violet/18"
+              className="tap flex items-center gap-0.5 rounded-full border border-tz-violet/30 bg-tz-violet/10 py-1 pl-3 pr-2 text-xs font-semibold text-tz-accent transition-all hover:bg-tz-violet/18"
             >
               Detail <ChevronRight size={14} />
             </button>
@@ -530,26 +529,26 @@ export function HomePage({
               value: `${prayersDone}/5`,
               pct: (prayersDone / 5) * 100,
               onClick: () => onNavigate("sholat"),
-              accent: "text-tz-violet light:text-[#7546c8]",
+              accent: "text-tz-accent",
             },
             {
               label: "Al-Qur'an",
               value: `${quran} hlm`,
               pct: Math.min(100, (quran / Math.max(1, settings.quranDailyTarget)) * 100),
               onClick: () => onNavigate("quran"),
-              accent: "text-teal-300 light:text-teal-600",
+              accent: "text-tz-blue light:text-tz-blue dark:text-[#8b96ff]",
             },
             {
               label: "Zikir",
               value: zikir.toLocaleString("id-ID"),
               pct: Math.min(100, (zikir / Math.max(1, settings.zikirTarget)) * 100),
               onClick: () => onOpenSubpage("zikir-doa"),
-              accent: "text-amber-300 light:text-amber-600",
+              accent: "text-amber-500 light:text-amber-600 dark:text-amber-300",
             },
           ].map(({ label, value, pct, onClick, accent }) => (
             <GlassCard key={label} variant="clean" className="tap cursor-pointer p-3.5" onClick={onClick}>
               <p className="text-[10.5px] font-semibold text-tz-muted">{label}</p>
-              <p className={cn("mt-1 font-display text-[22px] font-extrabold leading-none tabular-nums", accent)}>{value}</p>
+              <p className={cn("mt-1 text-[22px] font-extrabold leading-none tabular-nums", accent)}>{value}</p>
               <ProgressBar value={pct} className="mt-2.5 h-1" />
             </GlassCard>
           ))}

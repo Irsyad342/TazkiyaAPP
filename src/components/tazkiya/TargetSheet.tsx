@@ -114,7 +114,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
   };
 
   const saveBtn =
-    "tap flex min-h-[42px] shrink-0 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-tz-purple to-tz-violet px-4 text-[12.5px] font-semibold text-white shadow-[0_4px_14px_-4px_rgba(156,114,239,0.8)]";
+    "tap flex min-h-[42px] shrink-0 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#4ade80] to-[#16a34a] px-4 text-[12.5px] font-semibold text-white shadow-[0_4px_14px_-4px_rgba(22,163,74,0.8)]";
 
   return (
     <m.div
@@ -180,7 +180,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
                 className={cn(
                   "tap flex-1 rounded-lg py-1.5 text-[12px] font-semibold transition-all",
                   unit === u.id
-                    ? "bg-gradient-to-r from-tz-purple to-tz-violet text-white shadow-[0_4px_12px_-4px_rgba(156,114,239,0.8)]"
+                    ? "bg-gradient-to-r from-[#4ade80] to-[#16a34a] text-white shadow-[0_4px_12px_-4px_rgba(22,163,74,0.8)]"
                     : "text-tz-muted"
                 )}
               >

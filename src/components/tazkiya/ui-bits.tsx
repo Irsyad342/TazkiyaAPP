@@ -1,12 +1,15 @@
 "use client";
 
 /**
- * Tazkiya — Komponen visual dasar bergaya Dark Purple Glassmorphism.
- * Variant "clean" (Task 33): kartu solid bersih ala dashboard modern
- * (referensi Iconiy) — permukaan datar + bayangan lembut, dua tema.
+ * Tazkiya — Komponen visual dasar (redesign "Fresh Green").
+ * Kartu putih soft-shadow di kanvas #F8FAFC, hijau emerald sebagai warna
+ * merek, lime untuk progres positif, biru & lavender sebagai aksen sekunder.
+ * API komponen dipertahankan dari versi sebelumnya agar seluruh halaman
+ * tetap terhubung; hanya bahasa visualnya yang berganti.
  */
 
 import { useId, type ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,7 +49,7 @@ export function GlassCard({
             ? "glass-strong"
             : "glass";
   const cls = cn(
-    "relative overflow-hidden rounded-[1.65rem]",
+    "relative overflow-hidden rounded-[1.5rem]",
     variantClass,
     onClick && "cursor-pointer tap active:scale-[0.985]",
     className
@@ -97,13 +100,13 @@ export function ConfirmButton({
       </AlertDialogTrigger>
       <AlertDialogContent className="glass-strong max-w-[320px]! rounded-[1.4rem]! border-tz-line p-5!">
         <AlertDialogHeader className="gap-1.5!">
-          <AlertDialogTitle className="font-display! text-[16px]! text-tz-ink">{title}</AlertDialogTitle>
+          <AlertDialogTitle className="text-[16px]! font-bold! text-tz-ink">{title}</AlertDialogTitle>
           <AlertDialogDescription className="text-[12px]! leading-relaxed! text-tz-muted">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-row! gap-2!">
-          <AlertDialogCancel className="mt-0! min-h-[42px] flex-1 rounded-xl border-tz-line bg-tz-panel-soft text-[13px] font-semibold text-tz-muted">
+          <AlertDialogCancel className="mt-0! min-h-[42px] flex-1 rounded-xl border-tz-line-strong bg-tz-panel-soft text-[13px] font-semibold text-tz-muted">
             Batal
           </AlertDialogCancel>
           <AlertDialogAction
@@ -136,13 +139,68 @@ export function SectionHeader({
       <div className="flex min-w-0 items-center gap-2.5">
         <span aria-hidden className="w-1 shrink-0 self-stretch rounded-full bg-tz-violet" />
         <div className="min-w-0">
-          <h2 className="font-display text-[16px] font-semibold tracking-tight text-tz-ink">{title}</h2>
+          <h2 className="text-[16px] font-bold tracking-tight text-tz-ink">{title}</h2>
           {caption ? <p className="mt-0.5 text-[11px] leading-snug text-tz-muted">{caption}</p> : null}
         </div>
       </div>
       {action ? (
         <div className="flex shrink-0 items-center whitespace-nowrap">{action}</div>
       ) : null}
+    </div>
+  );
+}
+
+/* ---------------- SegmentedTabs ---------------- */
+
+/**
+ * Tab pil segmen (Hari Ini / Bulanan / Qada, Zikir / Doa, dst.) — satu gaya
+ * untuk seluruh aplikasi: trek lembut, segmen aktif putih terangkat di tema
+ * terang / hijau mint di tema gelap, ala referensi "Today · Month · Qada".
+ */
+export function SegmentedTabs<T extends string>({
+  items,
+  value,
+  onChange,
+  ariaLabel,
+  className,
+}: {
+  items: { id: T; label: string; icon?: LucideIcon }[];
+  value: T;
+  onChange: (id: T) => void;
+  ariaLabel: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "grid gap-1 rounded-2xl border border-tz-line bg-tz-panel-soft p-1.5",
+        className
+      )}
+      role="tablist"
+      aria-label={ariaLabel}
+      style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
+    >
+      {items.map(({ id, label, icon: Icon }) => {
+        const active = value === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(id)}
+            className={cn(
+              "tap flex min-h-[40px] items-center justify-center gap-1.5 rounded-xl text-[12.5px] font-semibold transition-all",
+              active
+                ? "bg-tz-panel-strong text-tz-ink shadow-[0_2px_10px_-4px_rgba(16,24,32,0.18)] dark:bg-tz-violet/25 dark:text-tz-accent"
+                : "text-tz-muted hover:text-tz-ink/80"
+            )}
+          >
+            {Icon ? <Icon size={15} className={active ? "text-tz-violet dark:text-tz-accent" : ""} /> : null}
+            {label}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -172,12 +230,12 @@ export function IconBox({
               ? "h-12 w-12 rounded-2xl [&>svg]:h-[22px] [&>svg]:w-[22px]"
               : "h-10 w-10 rounded-[0.8rem] [&>svg]:h-[18px] [&>svg]:w-[18px]",
         tone === "solid"
-          ? "border border-tz-violet bg-tz-violet text-white"
+          ? "border border-tz-violet bg-tz-violet text-white dark:text-[#06251a]"
           : tone === "ghost"
-            ? "border border-tz-line bg-tz-panel text-tz-muted"
+            ? "border border-tz-line bg-tz-panel-soft text-tz-muted"
             : tone === "lavender"
-              ? "border border-tz-lavender/25 bg-tz-lavender/12 text-tz-lavender"
-              : "border border-tz-violet/25 bg-tz-violet/12 text-tz-violet",
+              ? "border border-tz-lavender/30 bg-tz-lavender/12 text-tz-lavender"
+              : "border border-tz-violet/25 bg-tz-violet/12 text-tz-accent",
         className
       )}
     >
@@ -195,8 +253,8 @@ export function ProgressRing({
   children,
   className,
   trackClass = "stroke-tz-track",
-  from = "#9C72EF",
-  to = "#D8C5FF",
+  from = "#4ADE80",
+  to = "#C7F464",
 }: {
   value: number; // 0..100
   size?: number;
@@ -248,7 +306,7 @@ export function ProgressBar({ value, className, fillClass }: { value: number; cl
   return (
     <div className={cn("h-2 w-full overflow-hidden rounded-full bg-tz-track", className)}>
       <div
-        className={cn("h-full rounded-full bg-gradient-to-r from-tz-purple via-tz-violet to-tz-lavender", fillClass)}
+        className={cn("h-full rounded-full bg-gradient-to-r from-tz-purple via-tz-violet to-tz-lime", fillClass)}
         style={{
           width: `${clamped}%`,
           transition: "width 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
@@ -264,7 +322,7 @@ export function Chip({ children, className }: { children: ReactNode; className?:
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border border-tz-line bg-tz-panel-strong px-2.5 py-1 text-[11px] font-medium text-tz-accent",
+        "inline-flex items-center gap-1 rounded-full border border-tz-line bg-tz-panel-soft px-2.5 py-1 text-[11px] font-semibold text-tz-muted",
         className
       )}
     >
@@ -277,11 +335,11 @@ export function Chip({ children, className }: { children: ReactNode; className?:
 
 export function EmptyState({ icon, title, caption }: { icon: ReactNode; title: string; caption?: string }) {
   return (
-    <div className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[1.25rem] border border-dashed border-tz-violet/25 bg-tz-violet/[0.05] px-4 py-7 text-center">
-      <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-tz-violet/25 bg-tz-violet/12 text-tz-violet">
+    <div className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[1.25rem] border border-dashed border-tz-violet/30 bg-tz-violet/[0.06] px-4 py-7 text-center">
+      <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-tz-violet/25 bg-tz-violet/12 text-tz-accent">
         {icon}
       </div>
-      <p className="text-sm font-medium text-tz-ink/90">{title}</p>
+      <p className="text-sm font-semibold text-tz-ink/90">{title}</p>
       {caption ? <p className="max-w-[270px] text-xs leading-relaxed text-tz-muted">{caption}</p> : null}
     </div>
   );
@@ -290,8 +348,8 @@ export function EmptyState({ icon, title, caption }: { icon: ReactNode; title: s
 /* ---------------- Orb dekoratif ---------------- */
 
 export function GlowOrb({ className }: { className?: string }) {
-  // Mode 2D datar (Task 16): ornamen blur yang memberi kesan 3D/berat
-  // tidak dirender lagi. API komponen dipertahankan agar pemakaian lama
+  // Redesign Fresh Green: ornamen blur yang memberi kesan berat tidak
+  // dirender lagi. API komponen dipertahankan agar pemakaian lama
   // di semua halaman tidak perlu diubah.
   void className;
   return null;

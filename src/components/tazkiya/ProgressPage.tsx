@@ -57,7 +57,7 @@ import {
 } from "@/lib/tazkiya/dates";
 import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { goalStatuses } from "@/lib/tazkiya/goals";
-import { Chip, GlassCard, IconBox, ProgressBar, ProgressRing, SectionHeader } from "./ui-bits";
+import { Chip, GlassCard, IconBox, ProgressBar, ProgressRing, SectionHeader, SegmentedTabs } from "./ui-bits";
 import { DayDetailSheet } from "./DayDetailSheet";
 import { cn } from "@/lib/utils";
 
@@ -223,32 +223,17 @@ export function ProgressPage() {
         </div>
       </header>
 
-      {/* Tab */}
-      <div className="grid grid-cols-3 gap-1.5 rounded-xl border border-tz-line bg-tz-panel-soft p-1.5" role="tablist" aria-label="Periode progress">
-        {(
-          [
-            { id: "harian" as const, label: "Hari Ini" },
-            { id: "mingguan" as const, label: "Mingguan" },
-            { id: "bulanan" as const, label: "Bulanan" },
-          ]
-        ).map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={period === t.id}
-            onClick={() => setPeriod(t.id)}
-            className={cn(
-              "tap min-h-[38px] rounded-lg text-[12.5px] font-semibold transition-all",
-              period === t.id
-                ? "bg-gradient-to-r from-tz-purple to-tz-violet text-white shadow-[0_4px_14px_-4px_rgba(85,51,154,0.8)]"
-                : "text-tz-muted hover:text-tz-accent"
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      {/* Tab segmen periode */}
+      <SegmentedTabs
+        ariaLabel="Periode progress"
+        items={[
+          { id: "harian" as const, label: "Hari Ini" },
+          { id: "mingguan" as const, label: "Mingguan" },
+          { id: "bulanan" as const, label: "Bulanan" },
+        ]}
+        value={period}
+        onChange={setPeriod}
+      />
 
       {/* ================= HARI INI ================= */}
       {period === "harian" ? (
@@ -272,16 +257,16 @@ export function ProgressPage() {
                 <span className="ml-0.5 text-[15px] font-bold text-tz-muted">%</span>
               </p>
             </div>
-            <div
-              className="mt-4 h-2 w-full overflow-hidden rounded-full bg-tz-track"
-              role="img"
-              aria-label={`Ibadah hari ini ${todayScore.pct}% dari target`}
-            >
               <div
-                className="tz-bar-grow-x h-full rounded-full bg-gradient-to-r from-tz-purple to-tz-violet"
-                style={{ width: `${barsIn ? todayScore.pct : 0}%` }}
-              />
-            </div>
+                className="mt-4 h-2 w-full overflow-hidden rounded-full bg-tz-track"
+                role="img"
+                aria-label={`Ibadah hari ini ${todayScore.pct}% dari target`}
+              >
+                <div
+                  className="tz-bar-grow-x h-full rounded-full bg-gradient-to-r from-[#4ade80] to-[#16a34a]"
+                  style={{ width: `${barsIn ? todayScore.pct : 0}%` }}
+                />
+              </div>
             <p className="mt-2.5 text-[10.5px] leading-tight text-tz-muted">
               Terus bertumbuh dalam istiqamah — setiap catatan hari ini berarti.
             </p>
@@ -307,7 +292,7 @@ export function ProgressPage() {
 
               {/* Al-Qur'an */}
               <GlassCard className="flex items-center gap-3 p-4">
-                <IconBox size="sm" className="border-transparent bg-teal-400/15 text-teal-300 shadow-none light:bg-teal-400/20 light:text-teal-600">
+                <IconBox size="sm" className="border-transparent bg-tz-blue-soft text-tz-blue shadow-none dark:bg-[#7c86ff]/15 dark:text-[#aeb6ff]">
                   <BookOpen />
                 </IconBox>
                 <div className="min-w-0 flex-1">
@@ -339,7 +324,7 @@ export function ProgressPage() {
 
               {/* Target harian */}
               <GlassCard className="flex items-center gap-3 p-4">
-                <IconBox size="sm" className="border-transparent bg-violet-400/15 text-violet-300 shadow-none light:bg-violet-400/20 light:text-violet-600">
+                <IconBox size="sm" className="border-transparent bg-tz-lavender/15 text-tz-lavender shadow-none">
                   <Target />
                 </IconBox>
                 <div className="min-w-0 flex-1">
@@ -367,7 +352,7 @@ export function ProgressPage() {
                   <p className="mt-1 text-[10.5px] leading-tight text-tz-muted">kebaikan dicatat hari ini</p>
                 </GlassCard>
                 <GlassCard className="p-4">
-                  <IconBox size="sm" className="border-transparent bg-sky-400/15 text-sky-300 shadow-none light:bg-sky-400/20 light:text-sky-600">
+                  <IconBox size="sm" className="border-transparent bg-tz-blue-soft text-tz-blue shadow-none dark:bg-[#7c86ff]/15 dark:text-[#aeb6ff]">
                     <BookHeart />
                   </IconBox>
                   <p className="mt-2.5 font-display text-[24px] font-extrabold leading-none tabular-nums text-tz-ink">
@@ -392,7 +377,7 @@ export function ProgressPage() {
               <p className="mt-1 text-[9.5px] leading-relaxed text-tz-muted/80">Salah satu ukuran — bukan satu-satunya.</p>
             </GlassCard>
             <GlassCard variant="clean" className="animate-tz-fade-up p-4">
-              <IconBox size="sm" className="border-transparent bg-teal-400/15 text-teal-300 shadow-none light:bg-teal-400/20 light:text-teal-600">
+              <IconBox size="sm" className="border-transparent bg-tz-blue-soft text-tz-blue shadow-none dark:bg-[#7c86ff]/15 dark:text-[#aeb6ff]">
                 <Trophy />
               </IconBox>
               <p className="mt-3 font-display text-[30px] font-extrabold leading-none tabular-nums text-tz-ink">{weekStreak}</p>
@@ -436,9 +421,9 @@ export function ProgressPage() {
                               className="tz-bar-grow flex w-full flex-col justify-end"
                               style={{ height: barsIn ? `${Math.max(6, totalH)}%` : "0%", transitionDelay: `${idx * 55}ms` }}
                             >
-                              {jamaahH > 0.5 ? <span className="w-full shrink-0 bg-gradient-to-t from-tz-purple to-tz-violet" style={{ height: `${(jamaahH / totalH) * 100}%` }} /> : null}
+                              {jamaahH > 0.5 ? <span className="w-full shrink-0 bg-gradient-to-t from-[#16a34a] to-[#4ade80]" style={{ height: `${(jamaahH / totalH) * 100}%` }} /> : null}
                               {mandiriH > 0.5 ? <span className="w-full shrink-0 bg-tz-lavender/75" style={{ height: `${(mandiriH / totalH) * 100}%` }} /> : null}
-                              {missedH > 0.5 ? <span className="w-full shrink-0 bg-rose-400/45 light:bg-rose-300" style={{ height: `${(missedH / totalH) * 100}%` }} /> : null}
+                              {missedH > 0.5 ? <span className="w-full shrink-0 bg-amber-400/55 light:bg-amber-300" style={{ height: `${(missedH / totalH) * 100}%` }} /> : null}
                               {unrecH > 0.5 ? <span className="w-full shrink-0 border-t border-dashed border-tz-line-strong bg-tz-track" style={{ height: `${(unrecH / totalH) * 100}%` }} /> : null}
                             </div>
                           ) : (
@@ -456,13 +441,13 @@ export function ProgressPage() {
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[9.5px] text-tz-muted">
                 <span className="flex items-center gap-1">
-                  <span aria-hidden className="h-2 w-2 rounded-full bg-gradient-to-t from-tz-purple to-tz-violet" /> Berjamaah
+                  <span aria-hidden className="h-2 w-2 rounded-full bg-gradient-to-t from-[#16a34a] to-[#4ade80]" /> Berjamaah
                 </span>
                 <span className="flex items-center gap-1">
                   <span aria-hidden className="h-2 w-2 rounded-full bg-tz-lavender/80" /> Mandiri
                 </span>
                 <span className="flex items-center gap-1">
-                  <span aria-hidden className="h-2 w-2 rounded-full bg-rose-400/60 light:bg-rose-300" /> Tidak dilaksanakan
+                  <span aria-hidden className="h-2 w-2 rounded-full bg-amber-400/70 light:bg-amber-300" /> Tidak dilaksanakan
                 </span>
                 <span className="flex items-center gap-1">
                   <span aria-hidden className="h-2 w-2 rounded-full border border-dashed border-tz-line-strong" /> Belum dicatat
@@ -530,10 +515,10 @@ export function ProgressPage() {
                   const dotCls = !d.hasData
                     ? "border border-dashed border-tz-line-strong"
                     : d.jamaah > 0
-                      ? "bg-teal-400 light:bg-teal-500"
+                      ? "bg-emerald-500 dark:bg-emerald-400"
                       : d.mandiri > 0
-                        ? "bg-sky-400 light:bg-sky-500"
-                        : "bg-amber-400 light:bg-amber-500";
+                        ? "bg-[#4263eb] dark:bg-[#7c86ff]"
+                        : "bg-amber-400 dark:bg-amber-500";
                   return (
                     <button
                       key={d.key}
@@ -617,11 +602,11 @@ export function ProgressPage() {
                   const intensity = cell.done / 5;
                   let bg: string | undefined;
                   if (!cell.isFuture && cell.isToday) {
-                    bg = cell.jamaah > 0 ? "#14b8a6" : cell.mandiri > 0 ? "#0ea5e9" : cell.missed > 0 ? "#f59e0b" : "#0ea5e9";
+                    bg = cell.jamaah > 0 ? "#16a34a" : cell.mandiri > 0 ? "#4263eb" : cell.missed > 0 ? "#f59e0b" : "#4263eb";
                   } else if (cell.hasData) {
-                    if (cell.jamaah > 0) bg = `rgba(45,212,191,${(0.17 + intensity * 0.58).toFixed(3)})`;
-                    else if (cell.mandiri > 0) bg = `rgba(56,189,248,${(0.15 + intensity * 0.52).toFixed(3)})`;
-                    else bg = `rgba(251,191,36,${(0.15 + (cell.missed / 5) * 0.35).toFixed(3)})`;
+                    if (cell.jamaah > 0) bg = `rgba(34,197,94,${(0.18 + intensity * 0.6).toFixed(3)})`;
+                    else if (cell.mandiri > 0) bg = `rgba(66,99,235,${(0.14 + intensity * 0.5).toFixed(3)})`;
+                    else bg = `rgba(245,158,11,${(0.15 + (cell.missed / 5) * 0.35).toFixed(3)})`;
                   } else if (!cell.isFuture) {
                     bg = "var(--tz-empty-cell)";
                   }
@@ -658,10 +643,10 @@ export function ProgressPage() {
                       <p className="text-[10px] text-tz-muted">{formatDayFull(selectedDate)}</p>
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1.5">
-                      <Chip className="border-teal-400/30 bg-teal-400/10 text-teal-300 light:text-teal-700">Berjamaah {selStatus.jamaah}</Chip>
-                      <Chip className="border-sky-400/30 bg-sky-400/10 text-sky-300 light:text-sky-700">Mandiri {selStatus.mandiri}</Chip>
+                      <Chip className="border-emerald-300/40 bg-emerald-400/12 text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-400/15 dark:text-emerald-300">Berjamaah {selStatus.jamaah}</Chip>
+                      <Chip className="border-[#4263eb]/30 bg-[#eef2ff] text-[#3b55d6] dark:border-[#7c86ff]/35 dark:bg-[#7c86ff]/15 dark:text-[#aeb6ff]">Mandiri {selStatus.mandiri}</Chip>
                       {selStatus.missed > 0 ? (
-                        <Chip className="border-amber-400/30 bg-amber-400/10 text-amber-300 light:text-amber-700">Tidak dilaksanakan {selStatus.missed}</Chip>
+                        <Chip className="border-amber-300/45 bg-amber-400/12 text-amber-700 dark:border-amber-400/30 dark:bg-amber-400/15 dark:text-amber-300">Tidak dilaksanakan {selStatus.missed}</Chip>
                       ) : null}
                     </div>
                     <p className="mt-2 text-[10.5px] leading-relaxed text-tz-muted">
