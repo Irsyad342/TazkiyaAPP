@@ -7,7 +7,7 @@
  * pencapaian, lalu SELURUH pengaturan sebagai grouped list minimalis —
  * pemisah hairline tipis, ikon garis sederhana tanpa kotak berwarna,
  * panel luas (Riwayat, Pengingat, Lokasi) membuka inline di dalam grup.
- * Semua logika (nama, foto, GPS otomatis, pengingat, tema/Liquid Glass,
+ * Semua logika (nama, foto, GPS otomatis, pengingat, tema,
  * akun Supabase, riwayat expand/edit, Target Ibadah) dipertahankan apa adanya.
  *
  * CATATAN KETERBATASAN (jujur kepada pengguna):
@@ -1025,12 +1025,6 @@ export function ProfilePage({
               title: "Animasi transisi",
               caption: "Efek gerak halus antarhalaman",
               key: "animations" as const,
-            },
-            {
-              icon: Droplets,
-              title: "Mode Liquid Glass",
-              caption: "Permukaan transparan tipis dengan blur ringan",
-              key: "liquidGlass" as const,
             },
             {
               icon: Vibrate,

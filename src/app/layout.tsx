@@ -60,7 +60,7 @@ export const viewport: Viewport = {
  * tema yang salah. Membaca langsung dari localStorage yang sama dengan
  * store Tazkiya; tanpa preferensi tersimpan → DARK (identitas v7).
  */
-const themeInitScript = `(function(){try{var r=localStorage.getItem("tazkiya-store-v1");if(!r)return;var s=JSON.parse(r).state&&JSON.parse(r).state.settings;if(!s)return;var t=s.theme||"dark";if(t==="system"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.dataset.theme=t;document.documentElement.dataset.glass=s.liquidGlass?"liquid":"classic";document.documentElement.dataset.anim=s.animations===false?"off":"on";var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#F2F2F4":"#1B1B1E");}catch(e){}})();`;
+const themeInitScript = `(function(){try{var r=localStorage.getItem("tazkiya-store-v1");if(!r)return;var s=JSON.parse(r).state&&JSON.parse(r).state.settings;if(!s)return;var t=s.theme||"dark";if(t==="system"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.dataset.theme=t;document.documentElement.dataset.anim=s.animations===false?"off":"on";var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#F2F2F4":"#1B1B1E");}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -68,8 +68,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    /* data-v="9": penanda generasi desain untuk verifikasi deployment. */
-    <html lang="id" data-theme="dark" data-v="9" suppressHydrationWarning>
+    /* data-v="10": penanda generasi desain untuk verifikasi deployment. */
+    <html lang="id" data-theme="dark" data-v="10" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>

@@ -6,7 +6,7 @@
  * layar — di perangkat mobile penuh, di desktop terbingkai rapi di atas
  * panggung yang lebih gelap/terang. Navigasi selalu BottomNav kapsul;
  * tata letak desktop/sidebar dihapus total (v7 ke bawah).
- * Gerbang hidrasi, tema (gelap/terang/sistem), mode Liquid Glass, transisi
+ * Gerbang hidrasi, tema (gelap/terang/sistem), transisi
  * antartab, lima menu utama + sub-halaman, pembaca Al-Qur'an, dan Tasbih
  * Digital tetap di satu kerangka ini.
  */
@@ -92,7 +92,6 @@ export default function Page() {
 
   const animations = useWorshipStore((s) => s.settings.animations);
   const theme = useWorshipStore((s) => s.settings.theme);
-  const liquidGlass = useWorshipStore((s) => s.settings.liquidGlass);
   const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">("dark");
 
   const readerRef = useRef<{ surah: number; ayah?: number } | null>(null);
@@ -132,11 +131,6 @@ export default function Page() {
   useEffect(() => {
     document.documentElement.dataset.anim = animations ? "on" : "off";
   }, [animations]);
-
-  // Liquid Glass: data-glass pada <html>.
-  useEffect(() => {
-    document.documentElement.dataset.glass = liquidGlass ? "liquid" : "classic";
-  }, [liquidGlass]);
 
   // Judul dokumen per tab / sub-halaman.
   useEffect(() => {
@@ -223,8 +217,6 @@ export default function Page() {
       <main className="relative min-h-dvh w-full bg-[#101013] light:bg-[#e8e8ec]" aria-label="Aplikasi Tazkiya">
         {/* Kolom aplikasi — selalu selebar HP, di tengah, semua viewport. */}
         <div className="relative mx-auto min-h-dvh w-full max-w-[430px] bg-tk-stage desktop:shadow-[0_0_0_1px_var(--color-tk-line),0_40px_90px_-40px_rgba(0,0,0,0.6)]">
-          {/* Cahaya ambien di belakang konten — dasar efek Liquid Glass. */}
-          <div aria-hidden className="tk-ambience" />
           <div
             id="konten-tazkiya"
             className="no-scrollbar relative z-10 mx-auto w-full px-4 pb-44 pt-[max(1.25rem,env(safe-area-inset-top))]"
