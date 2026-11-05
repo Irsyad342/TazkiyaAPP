@@ -31,10 +31,10 @@ export function JelajahiAktivitas({
   const zikirPct = Math.min(100, (zikirCount / Math.max(1, zikirTarget)) * 100);
 
   return (
-    <section aria-label="Jelajahi aktivitas" className="animate-tz-fade-up flex h-full flex-col">
+    <section aria-label="Jelajahi aktivitas" className="animate-tk-fade-up flex h-full flex-col">
       <div className="mb-4 px-0.5">
-        <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tz-ink">Jelajahi Aktivitas</h2>
-        <p className="mt-1 text-[12px] leading-snug text-tz-muted">Ruang refleksi dan kebaikan di luar tracker utama.</p>
+        <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Jelajahi Aktivitas</h2>
+        <p className="mt-1 text-[12px] leading-snug text-tk-muted">Ruang refleksi dan kebaikan di luar tracker utama.</p>
       </div>
 
       <div className="flex flex-1 flex-col gap-5">
@@ -43,18 +43,18 @@ export function JelajahiAktivitas({
           type="button"
           onClick={() => onOpen("jurnal")}
           aria-label="Buka halaman Jurnal Syukur"
-          className="tap group block w-full border-t border-tz-line pt-4 text-left"
+          className="tap group block w-full border-t border-tk-line pt-4 text-left"
         >
           <span className="flex items-start gap-3.5">
-            <span aria-hidden className="v5-display select-none text-[38px] font-extrabold leading-[0.8] text-tz-lav-deco">
+            <span aria-hidden className="gs-display select-none text-[38px] font-extrabold leading-[0.8] text-tk-lav-deco">
               &ldquo;
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-[15.5px] font-bold tracking-[-0.01em] text-tz-ink">Jurnal Syukur</span>
-              <span className="mt-0.5 block text-[12px] leading-relaxed text-tz-muted">
+              <span className="block text-[15.5px] font-bold tracking-[-0.01em] text-tk-ink">Jurnal Syukur</span>
+              <span className="mt-0.5 block text-[12px] leading-relaxed text-tk-muted">
                 {sudahMenulis ? "Sudah kamu tulis hari ini — terima kasih sudah berhenti sejenak." : "Tiga hal kecil yang kamu syukuri hari ini — butuh 2 menit saja."}
               </span>
-              <span className="mt-2 inline-flex items-center gap-1 text-[12px] font-bold text-tz-violet">
+              <span className="mt-2 inline-flex items-center gap-1 text-[12px] font-bold text-tk-violet">
                 {sudahMenulis ? "Buka kembali" : "Mulai menulis"} <ChevronRight size={14} />
               </span>
             </span>
@@ -101,16 +101,16 @@ export function JelajahiAktivitas({
           type="button"
           onClick={() => onOpen("rizq-amal")}
           aria-label="Buka halaman Rizq & Amal"
-          className="tap flex items-center gap-4 rounded-[1.5rem] bg-tz-panel-soft p-4 text-left"
+          className="tap flex items-center gap-4 rounded-[1.5rem] bg-tk-panel-soft p-4 text-left"
         >
-          <span aria-hidden className="h-12 w-[3px] shrink-0 rounded-full bg-tz-lime" />
+          <span aria-hidden className="h-12 w-[3px] shrink-0 rounded-full bg-tk-lime" />
           <span className="min-w-0 flex-1">
-            <span className="block text-[14.5px] font-bold text-tz-ink">Rizq &amp; Amal</span>
-            <span className="mt-0.5 block text-[11.5px] text-tz-muted">Kebaikan tercatat hari ini</span>
+            <span className="block text-[14.5px] font-bold text-tk-ink">Rizq &amp; Amal</span>
+            <span className="mt-0.5 block text-[11.5px] text-tk-muted">Kebaikan tercatat hari ini</span>
           </span>
           <span className="flex shrink-0 items-center gap-1.5">
-            <span className="v5-display text-[30px] font-extrabold leading-none text-tz-ink">{amalCount}</span>
-            <ArrowUpRight size={16} className="text-tz-muted" />
+            <span className="gs-display text-[30px] font-extrabold leading-none text-tk-ink">{amalCount}</span>
+            <ArrowUpRight size={16} className="text-tk-muted" />
           </span>
         </button>
       </div>

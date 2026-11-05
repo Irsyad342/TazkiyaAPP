@@ -45,10 +45,10 @@ export function MoodSection({
   };
 
   return (
-    <section aria-label="Mood check-in" className="animate-tz-fade-up flex h-full flex-col">
+    <section aria-label="Mood check-in" className="animate-tk-fade-up flex h-full flex-col">
       <div className="mb-4">
-        <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tz-ink">Bagaimana perasaanmu hari ini?</h2>
-        <p className="mt-1 text-[12px] text-tz-muted">Luangkan waktu sejenak untuk memahami dirimu.</p>
+        <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Bagaimana perasaanmu hari ini?</h2>
+        <p className="mt-1 text-[12px] text-tk-muted">Luangkan waktu sejenak untuk memahami dirimu.</p>
       </div>
 
       <div
@@ -75,12 +75,12 @@ export function MoodSection({
                 transition={{ type: "spring", stiffness: 420, damping: 22 }}
                 className={cn(
                   "flex h-[58px] w-[58px] items-center justify-center rounded-full transition-colors duration-200",
-                  active ? cn(tone.activeBg, "ring-2 ring-tz-violet") : "bg-tz-panel-soft"
+                  active ? cn(tone.activeBg, "ring-2 ring-tk-violet") : "bg-tk-panel-soft"
                 )}
               >
                 <MoodFace id={mo.id} className={cn("h-[44px] w-[44px]", tone.face)} />
               </m.span>
-              <span className={cn("text-[10.5px] leading-none", active ? "font-bold text-tz-ink" : "font-medium text-tz-muted")}>
+              <span className={cn("text-[10.5px] leading-none", active ? "font-bold text-tk-ink" : "font-medium text-tk-muted")}>
                 {mo.label}
               </span>
             </button>
@@ -90,15 +90,15 @@ export function MoodSection({
 
       <div className="mt-auto min-h-[74px] pt-4">
         {moodToday ? (
-          <div className="tz-fade-in rounded-[1.25rem] bg-tz-panel-soft p-4">
-            <p className="text-[13px] leading-relaxed text-tz-ink/95">
+          <div className="tk-fade-in rounded-[1.25rem] bg-tk-panel-soft p-4">
+            <p className="text-[13px] leading-relaxed text-tk-ink/95">
               <span className="font-bold">{moodLabel(moodToday)}</span>
-              <span className="text-tz-muted"> — {REFLEKSI[moodToday]}</span>
+              <span className="text-tk-muted"> — {REFLEKSI[moodToday]}</span>
             </p>
             <button
               type="button"
               onClick={() => onOpenSubpage("jurnal")}
-              className="tap mt-2 flex items-center gap-1 text-[12px] font-bold text-tz-violet"
+              className="tap mt-2 flex items-center gap-1 text-[12px] font-bold text-tk-violet"
             >
               <BookHeart size={14} />
               Lanjut ke Jurnal Syukur
@@ -106,13 +106,13 @@ export function MoodSection({
             </button>
           </div>
         ) : (
-          <p className="text-[11.5px] leading-relaxed text-tz-muted/80">
+          <p className="text-[11.5px] leading-relaxed text-tk-muted/80">
             Pilih yang paling mendekati — boleh diganti kapan saja. Satu catatan per hari.
           </p>
         )}
       </div>
 
-      <p className="mt-2.5 text-[9.5px] leading-relaxed text-tz-muted/60">
+      <p className="mt-2.5 text-[9.5px] leading-relaxed text-tk-muted/60">
         Mood membantu refleksi diri — bukan alat diagnosis psikologis.
       </p>
     </section>

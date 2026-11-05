@@ -78,15 +78,15 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
   const tipY = 140 + R * Math.sin(angle);
 
   return (
-    <section aria-label="Tasbih digital" className="animate-tz-fade-up flex flex-col items-center">
+    <section aria-label="Tasbih digital" className="animate-tk-fade-up flex flex-col items-center">
       {/* Nama zikir + Arab */}
       <div className="text-center">
-        <p className="v5-overline">Tasbih Digital</p>
-        <p className="mt-2.5 text-[19px] font-bold tracking-[-0.01em] text-tz-ink">{tasbih.dhikr}</p>
+        <p className="gs-overline">Tasbih Digital</p>
+        <p className="mt-2.5 text-[19px] font-bold tracking-[-0.01em] text-tk-ink">{tasbih.dhikr}</p>
         {arabic ? (
           <>
-            <p className="quran-arabic mt-3 text-[26px] leading-[1.7] text-tz-ink">{arabic.arabic}</p>
-            <p className="mt-1 text-[12px] font-medium text-tz-muted">{arabic.meaning}</p>
+            <p className="quran-arabic mt-3 text-[26px] leading-[1.7] text-tk-ink">{arabic.arabic}</p>
+            <p className="mt-1 text-[12px] font-medium text-tk-muted">{arabic.meaning}</p>
           </>
         ) : null}
       </div>
@@ -98,10 +98,10 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
         whileTap={{ scale: 0.955 }}
         transition={{ type: "spring", stiffness: 500, damping: 26 }}
         aria-label={`Tambah hitungan, saat ini ${tasbih.count}`}
-        className={cn("relative mt-7 flex h-[248px] w-[248px] items-center justify-center rounded-full sm:h-[264px] sm:w-[264px]", reached && animations && "animate-tz-pulse")}
+        className={cn("relative mt-7 flex h-[248px] w-[248px] items-center justify-center rounded-full sm:h-[264px] sm:w-[264px]", reached && animations && "animate-tk-pulse")}
       >
         <svg aria-hidden viewBox="0 0 280 280" className="absolute inset-0 h-full w-full -rotate-90">
-          <circle cx="140" cy="140" r={R} fill="none" strokeWidth="7" className="stroke-tz-track" />
+          <circle cx="140" cy="140" r={R} fill="none" strokeWidth="7" className="stroke-tk-track" />
           <circle
             cx="140"
             cy="140"
@@ -109,7 +109,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
             fill="none"
             strokeWidth="7"
             strokeLinecap="round"
-            className="stroke-tz-violet"
+            className="stroke-tk-violet"
             strokeDasharray={`${dash} ${CIRC}`}
             style={{ transition: "stroke-dasharray 0.5s cubic-bezier(0.22, 1, 0.36, 1)" }}
           />
@@ -118,7 +118,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
         {pct > 2 && pct < 100 ? (
           <span
             aria-hidden
-            className="absolute h-3 w-3 rounded-full bg-tz-lime ring-4 ring-tz-lime/25"
+            className="absolute h-3 w-3 rounded-full bg-tk-lime ring-4 ring-tk-lime/25"
             style={{
               left: `calc(${(tipX / 280) * 100}% - 6px)`,
               top: `calc(${(tipY / 280) * 100}% - 6px)`,
@@ -126,18 +126,18 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
           />
         ) : null}
         {/* piringan putih */}
-        <span aria-hidden className="tz-tasbih-disc absolute inset-[30px] rounded-full border border-tz-line" />
+        <span aria-hidden className="tk-tasbih-disc absolute inset-[30px] rounded-full border border-tk-line" />
         <m.span key={tasbih.count} initial={{ scale: animations ? 0.94 : 1 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 550, damping: 24 }} className="relative flex flex-col items-center">
-          <span className="v5-display text-[58px] font-extrabold leading-none text-tz-ink sm:text-[64px]">
+          <span className="gs-display text-[58px] font-extrabold leading-none text-tk-ink sm:text-[64px]">
             {tasbih.count.toLocaleString("id-ID")}
           </span>
-          <span className="mt-1.5 text-[11.5px] font-medium text-tz-muted">
+          <span className="mt-1.5 text-[11.5px] font-medium text-tk-muted">
             dari {tasbih.target.toLocaleString("id-ID")} target
           </span>
           <span
             className={cn(
               "mt-2.5 rounded-full px-3 py-1 text-[10px] font-bold",
-              reached ? "bg-tz-lime text-tz-lime-ink" : "bg-tz-lavender text-tz-violet"
+              reached ? "bg-tk-lime text-tk-lime-ink" : "bg-tk-lavender text-tk-violet"
             )}
           >
             {reached ? "Target tercapai" : `${pct}%`}
@@ -151,7 +151,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
           type="button"
           onClick={tasbihMinus}
           aria-label="Kurangi satu hitungan"
-          className="tap flex h-12 w-12 items-center justify-center rounded-full bg-tz-panel-soft text-tz-ink"
+          className="tap flex h-12 w-12 items-center justify-center rounded-full bg-tk-panel-soft text-tk-ink"
         >
           <span aria-hidden className="block h-[2px] w-[14px] rounded-full bg-current" />
         </button>
@@ -162,7 +162,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
             toast.info("Hitungan tasbih direset");
           }}
           aria-label="Reset hitungan tasbih"
-          className="tap flex h-12 w-12 items-center justify-center rounded-full bg-tz-panel-soft text-tz-muted"
+          className="tap flex h-12 w-12 items-center justify-center rounded-full bg-tk-panel-soft text-tk-muted"
         >
           <RotateCcw size={17} />
         </button>
@@ -173,7 +173,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
             if (n === 0) toast.error("Hitungan masih 0 — berzikir dulu ya");
             else toast.success(`${n.toLocaleString("id-ID")} zikir ditambahkan ke catatan harian`);
           }}
-          className="tap flex h-12 items-center justify-center gap-2 rounded-full v5-ink-btn px-5 text-[13.5px] font-bold"
+          className="tap flex h-12 items-center justify-center gap-2 rounded-full gs-ink-btn px-5 text-[13.5px] font-bold"
         >
           Simpan Harian
         </button>
@@ -181,7 +181,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
           type="button"
           onClick={onOpenFull}
           aria-label="Buka tasbih layar penuh"
-          className="tap flex h-12 w-12 items-center justify-center rounded-full bg-tz-panel-soft text-tz-muted"
+          className="tap flex h-12 w-12 items-center justify-center rounded-full bg-tk-panel-soft text-tk-muted"
         >
           <Expand size={16} />
         </button>
@@ -196,14 +196,14 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
             onClick={() => tasbihSetTarget(n)}
             className={cn(
               "tap rounded-full px-3 py-1.5 text-[11px] font-bold transition-all",
-              tasbih.target === n ? "v5-ink-btn" : "bg-tz-panel-soft text-tz-muted hover:text-tz-ink"
+              tasbih.target === n ? "gs-ink-btn" : "bg-tk-panel-soft text-tk-muted hover:text-tk-ink"
             )}
           >
             {n}
           </button>
         ))}
       </div>
-      <p className="mt-3 text-center text-[10.5px] leading-relaxed text-tz-muted/80">
+      <p className="mt-3 text-center text-[10.5px] leading-relaxed text-tk-muted/80">
         Ketuk lingkaran untuk berzikir · “Simpan Harian” mencatat ke riwayat
       </p>
     </section>
@@ -223,36 +223,36 @@ function ZikirSetCard({ set, onOpenTasbih }: { set: ZikirSet; onOpenTasbih: (slo
         className="tap flex w-full items-center gap-3 px-4 py-4 text-left"
       >
         <span className="min-w-0 flex-1">
-          <span className="block text-[14.5px] font-bold text-tz-ink">{set.title}</span>
-          <span className="block truncate text-[11.5px] text-tz-muted">{set.caption}</span>
+          <span className="block text-[14.5px] font-bold text-tk-ink">{set.title}</span>
+          <span className="block truncate text-[11.5px] text-tk-muted">{set.caption}</span>
         </span>
-        <ChevronDown size={16} className={cn("shrink-0 text-tz-muted/70 transition-transform", open && "rotate-180")} />
+        <ChevronDown size={16} className={cn("shrink-0 text-tk-muted/70 transition-transform", open && "rotate-180")} />
       </button>
       {open ? (
-        <div className="border-t border-tz-line-soft">
-          <ul className="divide-y divide-tz-line-soft">
+        <div className="border-t border-tk-line-soft">
+          <ul className="divide-y divide-tk-line-soft">
             {set.items.map((it) => (
               <li key={it.id} className="px-4 py-4">
-                {it.name ? <p className="v5-overline" style={{ color: "var(--color-tz-violet)" }}>{it.name}</p> : null}
-                {it.arabic ? <p className="quran-arabic mt-2.5 text-right text-[21px] leading-[1.95] text-tz-ink">{it.arabic}</p> : null}
-                <p className="mt-2.5 text-[12px] font-semibold italic leading-relaxed text-tz-muted">{it.latin}</p>
-                {it.meaning ? <p className="mt-1.5 text-[12px] leading-relaxed text-tz-ink/90">{it.meaning}</p> : null}
+                {it.name ? <p className="gs-overline" style={{ color: "var(--color-tk-violet)" }}>{it.name}</p> : null}
+                {it.arabic ? <p className="quran-arabic mt-2.5 text-right text-[21px] leading-[1.95] text-tk-ink">{it.arabic}</p> : null}
+                <p className="mt-2.5 text-[12px] font-semibold italic leading-relaxed text-tk-muted">{it.latin}</p>
+                {it.meaning ? <p className="mt-1.5 text-[12px] leading-relaxed text-tk-ink/90">{it.meaning}</p> : null}
                 <div className="mt-2.5 flex flex-wrap gap-1.5">
-                  {it.count ? <Chip className="bg-tz-lavender text-tz-violet">{it.count}</Chip> : null}
+                  {it.count ? <Chip className="bg-tk-lavender text-tk-violet">{it.count}</Chip> : null}
                   {it.source ? <Chip>{it.source}</Chip> : null}
                 </div>
               </li>
             ))}
           </ul>
-          <div className="border-t border-tz-line-soft p-3.5">
+          <div className="border-t border-tk-line-soft p-3.5">
             <button
               type="button"
               onClick={() => onOpenTasbih(set.slot)}
-              className="tap flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-tz-lavender text-[13px] font-bold text-tz-violet"
+              className="tap flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-tk-lavender text-[13px] font-bold text-tk-violet"
             >
               <CircleDot size={15} /> Buka tasbih — {set.title.toLowerCase()}
             </button>
-            <p className="mt-1.5 text-center text-[9.5px] text-tz-muted/80">
+            <p className="mt-1.5 text-center text-[9.5px] text-tk-muted/80">
               Hitungan yang disimpan akan tercatat sebagai {SLOT_LABEL[set.slot].toLowerCase()}.
             </p>
           </div>
@@ -273,10 +273,10 @@ function DoaCard({ title, arabic, transliteration, meaning, source }: {
 }) {
   return (
     <div className="glass rounded-[1.5rem] p-4">
-      <p className="text-[13.5px] font-bold text-tz-ink">{title}</p>
-      {arabic ? <p className="quran-arabic mt-2.5 text-right text-[20px] leading-[1.95] text-tz-ink">{arabic}</p> : null}
-      {transliteration ? <p className="mt-2 text-[11.5px] italic leading-relaxed text-tz-muted">&ldquo;{transliteration}&rdquo;</p> : null}
-      <p className="mt-1.5 text-[12px] leading-relaxed text-tz-ink/90">{meaning}</p>
+      <p className="text-[13.5px] font-bold text-tk-ink">{title}</p>
+      {arabic ? <p className="quran-arabic mt-2.5 text-right text-[20px] leading-[1.95] text-tk-ink">{arabic}</p> : null}
+      {transliteration ? <p className="mt-2 text-[11.5px] italic leading-relaxed text-tk-muted">&ldquo;{transliteration}&rdquo;</p> : null}
+      <p className="mt-1.5 text-[12px] leading-relaxed text-tk-ink/90">{meaning}</p>
       {source ? (
         <div className="mt-2.5">
           <Chip>{source}</Chip>
@@ -324,7 +324,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
       />
 
       {tab === "zikir" ? (
-        <div key="zikir" className="tz-fade-in lg:grid lg:grid-cols-12 lg:gap-x-8">
+        <div key="zikir" className="tk-fade-in lg:grid lg:grid-cols-12 lg:gap-x-8">
           <div className="space-y-9 lg:col-span-5">
             {/* Penghitung — fokus visual */}
             <TasbihCounter onOpenFull={() => onOpenTasbih("harian")} />
@@ -340,17 +340,17 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
                 />
               ) : (
                 <div className="glass thin-scrollbar max-h-80 overflow-y-auto rounded-[1.5rem]">
-                  <ul className="divide-y divide-tz-line-soft">
+                  <ul className="divide-y divide-tk-line-soft">
                     {zikirSessions.slice(0, 25).map((s) => (
                       <li key={s.id} className="flex items-center gap-3 px-4 py-3">
-                        <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet">
+                        <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tk-lavender text-tk-violet">
                           <CircleDot size={14} />
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[12.5px] font-semibold text-tz-ink">
+                          <span className="block truncate text-[12.5px] font-semibold text-tk-ink">
                             {s.count.toLocaleString("id-ID")}× {s.dhikr}
                           </span>
-                          <span className="block text-[10.5px] text-tz-muted">
+                          <span className="block text-[10.5px] text-tk-muted">
                             {SLOT_LABEL[s.slot] ?? "Zikir"} · {relativeDayLabel(s.date, today)}
                           </span>
                         </span>
@@ -371,15 +371,15 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
           </section>
         </div>
       ) : (
-        <div key="doa" className="tz-fade-in lg:grid lg:grid-cols-12 lg:gap-x-8">
+        <div key="doa" className="tk-fade-in lg:grid lg:grid-cols-12 lg:gap-x-8">
           {/* Doa Hari Ini — blok editorial lavender */}
           <div className="lg:col-span-5">
             <SectionHeader title="Doa Hari Ini" caption={dua.title} />
-            <div className="rounded-[1.75rem] bg-tz-lavender p-5">
-              {dua.arabic ? <p className="quran-arabic text-right text-[22px] leading-[1.95] text-tz-ink">{dua.arabic}</p> : null}
-              {dua.transliteration ? <p className="mt-3 text-[11.5px] italic leading-relaxed text-tz-muted">&ldquo;{dua.transliteration}&rdquo;</p> : null}
-              <p className="mt-2.5 text-[12.5px] leading-relaxed text-tz-ink/95">{dua.meaning}</p>
-              {dua.source ? <p className="mt-3 text-[11px] font-semibold text-tz-violet">{dua.source}</p> : null}
+            <div className="rounded-[1.75rem] bg-tk-lavender p-5">
+              {dua.arabic ? <p className="quran-arabic text-right text-[22px] leading-[1.95] text-tk-ink">{dua.arabic}</p> : null}
+              {dua.transliteration ? <p className="mt-3 text-[11.5px] italic leading-relaxed text-tk-muted">&ldquo;{dua.transliteration}&rdquo;</p> : null}
+              <p className="mt-2.5 text-[12.5px] leading-relaxed text-tk-ink/95">{dua.meaning}</p>
+              {dua.source ? <p className="mt-3 text-[11px] font-semibold text-tk-violet">{dua.source}</p> : null}
             </div>
           </div>
 
@@ -395,7 +395,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
                   onClick={() => setCat(k.id)}
                   className={cn(
                     "tap shrink-0 rounded-full px-3.5 py-1.5 text-[11.5px] font-semibold transition-all",
-                    cat === k.id ? "v5-ink-btn" : "bg-tz-panel-soft text-tz-muted hover:text-tz-ink"
+                    cat === k.id ? "gs-ink-btn" : "bg-tk-panel-soft text-tk-muted hover:text-tk-ink"
                   )}
                 >
                   {k.label}
@@ -405,7 +405,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
 
             <div className="mt-3 space-y-3 sm:grid sm:grid-cols-2 sm:gap-3 sm:space-y-0">
               {doaList.length === 0 ? (
-                <p className="rounded-[1.5rem] bg-tz-panel-soft px-4 py-5 text-center text-[12.5px] text-tz-muted sm:col-span-2">
+                <p className="rounded-[1.5rem] bg-tk-panel-soft px-4 py-5 text-center text-[12.5px] text-tk-muted sm:col-span-2">
                   Belum ada doa pada kategori ini.
                 </p>
               ) : (
@@ -413,7 +413,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
               )}
             </div>
 
-            <p className="mt-4 pb-1 text-center text-[10px] leading-relaxed text-tz-muted/60">
+            <p className="mt-4 pb-1 text-center text-[10px] leading-relaxed text-tk-muted/60">
               Bacaan dikurasi dari Al-Qur&apos;an dan riwayat masyhur dengan sumber tertulis — tanpa teks karangan.
             </p>
           </div>

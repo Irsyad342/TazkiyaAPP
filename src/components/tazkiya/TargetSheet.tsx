@@ -39,12 +39,12 @@ function SectionCard({
   return (
     <section className="glass rounded-[1.5rem] p-4">
       <div className="flex items-center gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent">
           {icon}
         </span>
         <div className="min-w-0">
-          <h3 className="font-display text-[14.5px] font-bold text-tz-ink">{title}</h3>
-          <p className="text-[10.5px] leading-snug text-tz-muted">{caption}</p>
+          <h3 className="font-display text-[14.5px] font-bold text-tk-ink">{title}</h3>
+          <p className="text-[10.5px] leading-snug text-tk-muted">{caption}</p>
         </div>
       </div>
       {children ? <div className="mt-3.5">{children}</div> : null}
@@ -114,7 +114,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
   };
 
   const saveBtn =
-    "tap flex min-h-[42px] shrink-0 items-center justify-center gap-1.5 rounded-full v5-ink-btn px-4 text-[12.5px] font-bold";
+    "tap flex min-h-[42px] shrink-0 items-center justify-center gap-1.5 rounded-full gs-ink-btn px-4 text-[12.5px] font-bold";
 
   return (
     <m.div
@@ -122,7 +122,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 24 }}
       transition={{ duration: 0.22, ease: "easeOut" }}
-      className="absolute inset-0 z-40 flex flex-col overflow-hidden bg-tz-stage"
+      className="absolute inset-0 z-40 flex flex-col overflow-hidden bg-tk-stage"
       role="dialog"
       aria-modal="true"
       aria-label="Target Ibadah"
@@ -133,15 +133,15 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
           type="button"
           aria-label="Kembali ke Profil"
           onClick={onClose}
-          className="tap glass flex h-10 w-10 items-center justify-center rounded-full text-tz-ink"
+          className="tap glass flex h-10 w-10 items-center justify-center rounded-full text-tk-ink"
         >
           <ChevronLeft size={19} />
         </button>
         <div>
-          <h2 className="font-display text-lg font-bold tracking-[-0.01em] text-tz-ink">
-            Target Ibadah<span className="text-tz-violet">.</span>
+          <h2 className="font-display text-lg font-bold tracking-[-0.01em] text-tk-ink">
+            Target Ibadah<span className="text-tk-violet">.</span>
           </h2>
-          <p className="text-[11px] text-tz-muted">Atur sasaran harian sesuai kemampuanmu</p>
+          <p className="text-[11px] text-tk-muted">Atur sasaran harian sesuai kemampuanmu</p>
         </div>
       </div>
 
@@ -149,18 +149,18 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
       <div className="thin-scrollbar relative z-10 flex-1 space-y-3.5 overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2">
         {/* A. Salat Wajib */}
         <SectionCard icon={<MoonStar size={17} />} title="Salat Wajib" caption="Target tetap — tidak perlu diatur">
-          <p className="font-display text-[19px] font-bold text-tz-ink">5 waktu salat per hari</p>
+          <p className="font-display text-[19px] font-bold text-tk-ink">5 waktu salat per hari</p>
           <div className="mt-2.5 flex flex-wrap gap-1.5">
             {["Subuh", fridayLabel(), "Asar", "Magrib", "Isya"].map((label) => (
               <span
                 key={label}
-                className="rounded-full border border-tz-line bg-tz-panel-soft px-2.5 py-1 text-[11px] font-medium text-tz-muted"
+                className="rounded-full border border-tk-line bg-tk-panel-soft px-2.5 py-1 text-[11px] font-medium text-tk-muted"
               >
                 {label}
               </span>
             ))}
           </div>
-          <p className="mt-2.5 text-[11px] leading-relaxed text-tz-muted">
+          <p className="mt-2.5 text-[11px] leading-relaxed text-tk-muted">
             Progresnya dipantau otomatis melalui tracker salat di halaman Sholat. Pada hari Jumat, slot Zuhur digantikan Salat
             Jumat, dan Salat Zuhur dapat dicatat sebagai alternatif bila tidak melaksanakannya.
           </p>
@@ -168,8 +168,8 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
 
         {/* B. Bacaan Al-Qur'an */}
         <SectionCard icon={<BookOpen size={17} />} title="Bacaan Al-Qur'an" caption="Pilih satuan dan jumlah target harian">
-          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-tz-muted">Satuan target</p>
-          <div className="rounded-full border border-tz-line bg-tz-panel-soft p-1" role="radiogroup" aria-label="Satuan target bacaan">
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-tk-muted">Satuan target</p>
+          <div className="rounded-full border border-tk-line bg-tk-panel-soft p-1" role="radiogroup" aria-label="Satuan target bacaan">
             {UNIT_OPTIONS.map((u) => (
               <button
                 key={u.id}
@@ -180,8 +180,8 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
                 className={cn(
                   "tap flex-1 rounded-full py-1.5 text-[12px] font-bold transition-all",
                   unit === u.id
-                    ? "v5-ink-btn"
-                    : "text-tz-muted"
+                    ? "gs-ink-btn"
+                    : "text-tk-muted"
                 )}
               >
                 {u.label}
@@ -191,14 +191,14 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
 
           {unit === "surah" ? (
             <div className="mt-3">
-              <label htmlFor="target-surah" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-tz-muted">
+              <label htmlFor="target-surah" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-tk-muted">
                 Surah pilihan
               </label>
               <select
                 id="target-surah"
                 value={surahDraft}
                 onChange={(e) => setSurahDraft(parseInt(e.target.value, 10))}
-                className="tz-field"
+                className="tk-field"
               >
                 {SURAHS.map((s) => (
                   <option key={s.number} value={s.number}>
@@ -206,14 +206,14 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
                   </option>
                 ))}
               </select>
-              <p className="mt-2 text-[11px] leading-relaxed text-tz-muted">
+              <p className="mt-2 text-[11px] leading-relaxed text-tk-muted">
                 Target: 1 surah pilihan per hari. Progres dihitung dari jumlah ayat yang benar-benar tercatat dibaca —
                 membuka surah saja belum dihitung selesai.
               </p>
             </div>
           ) : (
             <div className="mt-3">
-              <label htmlFor="target-quran" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-tz-muted">
+              <label htmlFor="target-quran" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-tk-muted">
                 Jumlah per hari
               </label>
               <div className="flex gap-2">
@@ -224,7 +224,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
                   inputMode="numeric"
                   value={quranDraft}
                   onChange={(e) => setQuranDraft(e.target.value)}
-                  className="tz-field"
+                  className="tk-field"
                   aria-label={`Target bacaan per hari dalam ${unit}`}
                 />
                 <button type="button" onClick={saveQuran} className={saveBtn}>
@@ -242,7 +242,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
 
         {/* C. Zikir & Tasbih */}
         <SectionCard icon={<CircleDot size={17} />} title="Zikir & Tasbih" caption="Dua target terpisah, masing-masing dihitung sendiri">
-          <label htmlFor="target-zikir" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-tz-muted">
+          <label htmlFor="target-zikir" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-tk-muted">
             Target zikir harian
           </label>
           <div className="flex gap-2">
@@ -253,17 +253,17 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
               inputMode="numeric"
               value={zikirDraft}
               onChange={(e) => setZikirDraft(e.target.value)}
-              className="tz-field"
+              className="tk-field"
             />
             <button type="button" onClick={saveZikir} className={saveBtn}>
               <Save size={14} /> Simpan
             </button>
           </div>
-          <p className="mt-1.5 text-[10.5px] leading-relaxed text-tz-muted">
+          <p className="mt-1.5 text-[10.5px] leading-relaxed text-tk-muted">
             Dihitung dari zikir yang disimpan ke catatan harian lewat Tasbih Digital.
           </p>
 
-          <label htmlFor="target-tasbih" className="mb-1.5 mt-3.5 block text-[11px] font-semibold uppercase tracking-wide text-tz-muted">
+          <label htmlFor="target-tasbih" className="mb-1.5 mt-3.5 block text-[11px] font-semibold uppercase tracking-wide text-tk-muted">
             Target Tasbih Digital
           </label>
           <div className="flex gap-2">
@@ -274,13 +274,13 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
               inputMode="numeric"
               value={tasbihDraft}
               onChange={(e) => setTasbihDraft(e.target.value)}
-              className="tz-field"
+              className="tk-field"
             />
             <button type="button" onClick={saveTasbih} className={saveBtn}>
               <Save size={14} /> Simpan
             </button>
           </div>
-          <p className="mt-1.5 text-[10.5px] leading-relaxed text-tz-muted">
+          <p className="mt-1.5 text-[10.5px] leading-relaxed text-tk-muted">
             Hitungan tasbih yang sudah disimpan ke catatan harian otomatis direset — tidak dihitung dua kali.
           </p>
         </SectionCard>
@@ -293,11 +293,11 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
               return (
                 <div
                   key={e.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 py-2.5"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-tk-line bg-tk-panel-soft px-3.5 py-2.5"
                 >
                   <div className="min-w-0">
-                    <p className="text-[13px] font-medium text-tz-ink">{e.label}</p>
-                    <p className="text-[10.5px] text-tz-muted">{e.caption}</p>
+                    <p className="text-[13px] font-medium text-tk-ink">{e.label}</p>
+                    <p className="text-[10.5px] text-tk-muted">{e.caption}</p>
                   </div>
                   <Switch
                     checked={active}
@@ -308,7 +308,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
               );
             })}
           </div>
-          <p className="mt-2.5 text-[11px] leading-relaxed text-tz-muted">
+          <p className="mt-2.5 text-[11px] leading-relaxed text-tk-muted">
             Aktivitas yang tidak dilacak tidak muncul di Beranda dan tidak dihitung dalam progres harian. Semua perubahan
             tersimpan otomatis.
           </p>

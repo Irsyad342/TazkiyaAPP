@@ -3,7 +3,7 @@
 /**
  * Tazkiya v6 — Halaman autentikasi (Masuk / Daftar / Lupa sandi / Atur sandi baru).
  *
- * Desain "Ember": kartu arang #252525 terpusat di kanvas #161616 (tema utama),
+ * Desain v7: kartu #242429 terpusat di kanvas #1B1B1E (tema utama),
  * tipografi Plus Jakarta Sans + Manrope, aksen orange. Dukungan tema
  * gelap–terang mengikuti data-theme dari localStorage. Bila deployment belum
  * memiliki konfigurasi Supabase, halaman ini jujur menampilkan keterangan
@@ -155,9 +155,9 @@ function AuthForm() {
     fieldErrors[k] ? <p className="mt-1 text-[10.5px] font-medium text-[#B3424C] dark:text-[#F09AA0]">{fieldErrors[k]}</p> : null;
 
   // Kelas input seragam: tinggi nyaman disentuh + border merah saat validasi gagal.
-  // (utility menang atas .tz-field karena tz-field kini di @layer components)
+  // (utility menang atas .tk-field karena tk-field kini di @layer components)
   const fieldCls = (k: string, extra?: string) =>
-    cn("tz-field min-h-[46px]", extra, fieldErrors[k] && "border-[#E5484D]/60 focus:border-[#E5484D]/80");
+    cn("tk-field min-h-[46px]", extra, fieldErrors[k] && "border-[#E5484D]/60 focus:border-[#E5484D]/80");
 
   const title = resetMode ? "Atur Kata Sandi Baru" : forgotOpen ? "Atur Ulang Kata Sandi" : mode === "login" ? "Selamat Datang Kembali" : "Buat Akun Baru";
   const subtitle = resetMode
@@ -169,11 +169,11 @@ function AuthForm() {
         : "Catat ibadah dengan akun yang aman milikmu sendiri";
 
   return (
-    <main className="relative flex min-h-dvh w-full flex-col items-center justify-center overflow-hidden bg-tz-stage px-4 py-8">
+    <main className="relative flex min-h-dvh w-full flex-col items-center justify-center overflow-hidden bg-tk-stage px-4 py-8">
       <div className="relative w-full max-w-[400px]">
         <Link
           href="/"
-          className="tap mb-5 inline-flex items-center gap-1.5 text-[12px] font-semibold text-tz-muted transition-colors hover:text-tz-ink"
+          className="tap mb-5 inline-flex items-center gap-1.5 text-[12px] font-semibold text-tk-muted transition-colors hover:text-tk-ink"
         >
           <ArrowLeft size={14} />
           Kembali ke aplikasi
@@ -183,20 +183,20 @@ function AuthForm() {
         <div className="glass rounded-[1.75rem] p-6 shadow-[0_24px_64px_-24px_rgba(34,33,42,0.16)]">
           {/* Logo */}
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] bg-tz-violet text-2xl font-bold text-white">
+            <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] bg-tk-violet text-2xl font-bold text-white">
               ت
             </div>
-            <h1 className="mt-3 text-[22px] font-extrabold tracking-[-0.02em] text-tz-ink">Tazkiya</h1>
-            <p className="v5-overline mt-1">A Better Daily Journey</p>
+            <h1 className="mt-3 text-[22px] font-extrabold tracking-[-0.02em] text-tk-ink">Tazkiya</h1>
+            <p className="gs-overline mt-1">A Better Daily Journey</p>
           </div>
 
-          <div className="mt-6 border-t border-tz-line pt-5">
-            <h2 className="text-[16.5px] font-bold tracking-[-0.01em] text-tz-ink">{title}</h2>
-            <p className="mt-0.5 text-[12px] text-tz-muted">{subtitle}</p>
+          <div className="mt-6 border-t border-tk-line pt-5">
+            <h2 className="text-[16.5px] font-bold tracking-[-0.01em] text-tk-ink">{title}</h2>
+            <p className="mt-0.5 text-[12px] text-tk-muted">{subtitle}</p>
           </div>
 
           {unconfigured ? (
-            <div className="mt-4 flex items-start gap-2 rounded-xl bg-tz-amber-soft px-3.5 py-3 text-[11.5px] leading-relaxed text-tz-amber">
+            <div className="mt-4 flex items-start gap-2 rounded-xl bg-tk-amber-soft px-3.5 py-3 text-[11.5px] leading-relaxed text-tk-amber">
               <Info size={14} className="mt-0.5 shrink-0" />
               <span>
                 Fitur akun belum diaktifkan pada deployment ini. Admin perlu mengatur environment variable{" "}
@@ -213,7 +213,7 @@ function AuthForm() {
             </div>
           ) : null}
           {info ? (
-            <div role="status" className="mt-4 flex items-start gap-2 rounded-xl bg-tz-lavender/60 px-3.5 py-2.5 text-[12px] font-medium leading-relaxed text-tz-violet dark:bg-tz-accent/10 dark:text-tz-accent">
+            <div role="status" className="mt-4 flex items-start gap-2 rounded-xl bg-tk-lavender/60 px-3.5 py-2.5 text-[12px] font-medium leading-relaxed text-tk-violet dark:bg-tk-accent/10 dark:text-tk-accent">
               <MailCheck size={14} className="mt-0.5 shrink-0" />
               <span>{info}</span>
             </div>
@@ -223,9 +223,9 @@ function AuthForm() {
             /* ---------- Mode: atur kata sandi baru (dari tautan email) ---------- */
             <form onSubmit={onSubmit} className="mt-4 space-y-3.5" noValidate>
               <label className="block">
-                <span className="mb-1.5 block text-[11.5px] font-semibold text-tz-ink/90">Kata sandi baru</span>
+                <span className="mb-1.5 block text-[11.5px] font-semibold text-tk-ink/90">Kata sandi baru</span>
                 <div className="relative">
-                  <Lock size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tz-muted" />
+                  <Lock size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tk-muted" />
                   <input
                     type={showPw ? "text" : "password"}
                     value={password}
@@ -241,7 +241,7 @@ function AuthForm() {
                     type="button"
                     onClick={() => setShowPw((v) => !v)}
                     aria-label={showPw ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
-                    className="tap absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-tz-muted transition-colors hover:text-tz-ink"
+                    className="tap absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-tk-muted transition-colors hover:text-tk-ink"
                   >
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -251,7 +251,7 @@ function AuthForm() {
               <button
                 type="submit"
                 disabled={unconfigured || busy || loading}
-                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn font-display text-sm font-bold transition-all disabled:opacity-60"
+                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full gs-ink-btn font-display text-sm font-bold transition-all disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={17} className="animate-spin" /> : <KeyRound size={16} />}
                 {busy ? "Menyimpan…" : "Simpan kata sandi baru"}
@@ -261,9 +261,9 @@ function AuthForm() {
             /* ---------- Mode: lupa kata sandi ---------- */
             <form onSubmit={onSendReset} className="mt-4 space-y-3.5" noValidate>
               <label className="block">
-                <span className="mb-1.5 block text-[11.5px] font-semibold text-tz-ink/90">Email akun</span>
+                <span className="mb-1.5 block text-[11.5px] font-semibold text-tk-ink/90">Email akun</span>
                 <div className="relative">
-                  <Mail size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tz-muted" />
+                  <Mail size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tk-muted" />
                   <input
                     type="email"
                     value={email}
@@ -282,7 +282,7 @@ function AuthForm() {
               <button
                 type="submit"
                 disabled={unconfigured || busy || loading}
-                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn font-display text-sm font-bold transition-all disabled:opacity-60"
+                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full gs-ink-btn font-display text-sm font-bold transition-all disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={17} className="animate-spin" /> : <Mail size={16} />}
                 {busy ? "Mengirim…" : "Kirim tautan atur ulang"}
@@ -294,7 +294,7 @@ function AuthForm() {
                   setError(null);
                   setFieldErrors({});
                 }}
-                className="tap w-full text-center text-[11.5px] font-semibold text-tz-muted transition-colors hover:text-tz-ink"
+                className="tap w-full text-center text-[11.5px] font-semibold text-tk-muted transition-colors hover:text-tk-ink"
               >
                 Kembali ke halaman masuk
               </button>
@@ -303,7 +303,7 @@ function AuthForm() {
             /* ---------- Mode: masuk / daftar ---------- */
             <>
               {/* Sakelar mode */}
-              <div className="mt-4 grid grid-cols-2 gap-1 rounded-xl border border-tz-line bg-tz-panel-soft p-1" role="tablist" aria-label="Pilih mode autentikasi">
+              <div className="mt-4 grid grid-cols-2 gap-1 rounded-xl border border-tk-line bg-tk-panel-soft p-1" role="tablist" aria-label="Pilih mode autentikasi">
                 {(
                   [
                     { id: "login", label: "Masuk", icon: LogIn },
@@ -324,8 +324,8 @@ function AuthForm() {
                     className={cn(
                       "tap flex min-h-[38px] items-center justify-center gap-1.5 rounded-lg text-[12.5px] font-bold transition-all",
                       mode === t.id
-                        ? "v5-ink-btn"
-                        : "text-tz-muted hover:text-tz-ink"
+                        ? "gs-ink-btn"
+                        : "text-tk-muted hover:text-tk-ink"
                     )}
                   >
                     <t.icon size={14} />
@@ -337,9 +337,9 @@ function AuthForm() {
               <form onSubmit={onSubmit} className="mt-4 space-y-3.5" noValidate>
                 {mode === "register" ? (
                   <label className="block">
-                    <span className="mb-1.5 block text-[11.5px] font-semibold text-tz-ink/90">Nama panggilan</span>
+                    <span className="mb-1.5 block text-[11.5px] font-semibold text-tk-ink/90">Nama panggilan</span>
                     <div className="relative">
-                      <User size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tz-muted" />
+                      <User size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tk-muted" />
                       <input
                         type="text"
                         value={name}
@@ -358,9 +358,9 @@ function AuthForm() {
                 ) : null}
 
                 <label className="block">
-                  <span className="mb-1.5 block text-[11.5px] font-semibold text-tz-ink/90">Email</span>
+                  <span className="mb-1.5 block text-[11.5px] font-semibold text-tk-ink/90">Email</span>
                   <div className="relative">
-                    <Mail size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tz-muted" />
+                    <Mail size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tk-muted" />
                     <input
                       type="email"
                       value={email}
@@ -378,9 +378,9 @@ function AuthForm() {
                 </label>
 
                 <label className="block">
-                  <span className="mb-1.5 block text-[11.5px] font-semibold text-tz-ink/90">Kata sandi</span>
+                  <span className="mb-1.5 block text-[11.5px] font-semibold text-tk-ink/90">Kata sandi</span>
                   <div className="relative">
-                    <Lock size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tz-muted" />
+                    <Lock size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tk-muted" />
                     <input
                       type={showPw ? "text" : "password"}
                       value={password}
@@ -396,7 +396,7 @@ function AuthForm() {
                       type="button"
                       onClick={() => setShowPw((v) => !v)}
                       aria-label={showPw ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
-                      className="tap absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-tz-muted transition-colors hover:text-tz-ink"
+                      className="tap absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-tk-muted transition-colors hover:text-tk-ink"
                     >
                       {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -406,9 +406,9 @@ function AuthForm() {
 
                 {mode === "register" ? (
                   <label className="block">
-                    <span className="mb-1.5 block text-[11.5px] font-semibold text-tz-ink/90">Konfirmasi kata sandi</span>
+                    <span className="mb-1.5 block text-[11.5px] font-semibold text-tk-ink/90">Konfirmasi kata sandi</span>
                     <div className="relative">
-                      <Lock size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tz-muted" />
+                      <Lock size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tk-muted" />
                       <input
                         type={showPw ? "text" : "password"}
                         value={confirm}
@@ -428,7 +428,7 @@ function AuthForm() {
                 <button
                   type="submit"
                   disabled={unconfigured || busy || loading}
-                  className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn font-display text-sm font-bold transition-all disabled:opacity-60"
+                  className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full gs-ink-btn font-display text-sm font-bold transition-all disabled:opacity-60"
                 >
                   {busy ? <LoaderCircle size={17} className="animate-spin" /> : mode === "login" ? <LogIn size={16} /> : <UserPlus size={16} />}
                   {busy ? (mode === "login" ? "Memproses…" : "Mendaftarkan…") : mode === "login" ? "Masuk" : "Buat Akun"}
@@ -443,7 +443,7 @@ function AuthForm() {
                       setInfo(null);
                       setFieldErrors({});
                     }}
-                    className="tap w-full text-center text-[11.5px] font-semibold text-tz-muted transition-colors hover:text-tz-ink"
+                    className="tap w-full text-center text-[11.5px] font-semibold text-tk-muted transition-colors hover:text-tk-ink"
                   >
                     Lupa kata sandi?
                   </button>
@@ -453,7 +453,7 @@ function AuthForm() {
           )}
         </div>
 
-        <p className="mt-5 text-center text-[10.5px] leading-relaxed text-tz-muted/85">
+        <p className="mt-5 text-center text-[10.5px] leading-relaxed text-tk-muted/85">
           Data ibadah tersimpan terpisah untuk setiap akun — hanya kamu yang dapat membacanya. Kata sandi tidak pernah
           disimpan dalam bentuk teks biasa.
         </p>
@@ -466,8 +466,8 @@ export default function AuthPage() {
   return (
     <Suspense
       fallback={
-        <main className="flex min-h-dvh items-center justify-center bg-tz-stage">
-          <LoaderCircle size={26} className="animate-spin text-tz-violet" aria-label="Memuat" />
+        <main className="flex min-h-dvh items-center justify-center bg-tk-stage">
+          <LoaderCircle size={26} className="animate-spin text-tk-violet" aria-label="Memuat" />
         </main>
       }
     >

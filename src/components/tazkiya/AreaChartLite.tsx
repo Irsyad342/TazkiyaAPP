@@ -90,8 +90,8 @@ export function AreaChartLite({
   const pw = Math.max(0, width - PAD.left - PAD.right);
   const ph = H - PAD.top - PAD.bottom;
   const n = data.length;
-  const lineColor = isLight ? "#E64A00" : "#FF6A1F";
-  const dotFill = isLight ? "#FF5A00" : "#FF8A50";
+  const lineColor = isLight ? "#E04A00" : "#FA5200";
+  const dotFill = isLight ? "#FA5200" : "#FF6B26";
   const gridColor = isLight ? "rgba(26,26,30,0.08)" : "rgba(255,255,255,0.07)";
   const axisColor = isLight ? "#8E8E96" : "#8F8F8F";
 
@@ -208,7 +208,7 @@ export function AreaChartLite({
           )}
           style={{ left: tipLeft, top: Math.max(-6, tipY - 58) }}
         >
-          <p className="font-semibold" style={{ color: isLight ? "#E64A00" : "#FF8A50" }}>
+          <p className="font-semibold" style={{ color: isLight ? "#E04A00" : "#FF6B26" }}>
             {tip.label} · {tip.date.slice(-2)}/{tip.date.slice(5, 7)}
           </p>
           <p>{tip.pct}% Penyelesaian</p>

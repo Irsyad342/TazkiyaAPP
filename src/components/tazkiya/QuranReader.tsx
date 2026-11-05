@@ -217,12 +217,12 @@ export function QuranReader({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 60 * (animated ? 1 : 0) }}
       transition={{ duration: 0.24 * (animated ? 1 : 0), ease: "easeOut" }}
-      className="absolute inset-0 z-40 flex flex-col bg-tz-stage"
+      className="absolute inset-0 z-40 flex flex-col bg-tk-stage"
       role="dialog"
       aria-label={`Pembaca surah ${meta?.latin ?? ""}`}
     >
       {/* ---------- Kepala pembaca: putih bersih + bilah progres tipis ---------- */}
-      <header className="glass-strong relative z-20 rounded-none border-0 border-b border-tz-line px-3 pb-2.5 pt-[max(0.75rem,env(safe-area-inset-top))]">
+      <header className="glass-strong relative z-20 rounded-none border-0 border-b border-tk-line px-3 pb-2.5 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <div className="mx-auto flex max-w-[760px] items-center gap-2">
           <button
             type="button"
@@ -231,16 +231,16 @@ export function QuranReader({
               onClose();
             }}
             aria-label="Kembali ke daftar surah"
-            className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tz-line bg-tz-panel text-tz-ink transition-colors hover:border-tz-violet/40"
+            className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-ink transition-colors hover:border-tk-violet/40"
           >
             <X size={18} />
           </button>
           <div className="min-w-0 flex-1 text-center">
-            <p className="truncate font-display text-[15px] font-bold leading-tight tracking-[-0.01em] text-tz-ink">
+            <p className="truncate font-display text-[15px] font-bold leading-tight tracking-[-0.01em] text-tk-ink">
               {meta?.latin}
-              {settings.showArabic ? <span className="quran-arabic ml-2 text-[15px] font-normal text-tz-violet dark:text-tz-accent">{meta?.arabic}</span> : null}
+              {settings.showArabic ? <span className="quran-arabic ml-2 text-[15px] font-normal text-tk-violet dark:text-tk-accent">{meta?.arabic}</span> : null}
             </p>
-            <p className="text-[10.5px] text-tz-muted">
+            <p className="text-[10.5px] text-tk-muted">
               Surah {surah} · {meta?.verses} ayat · {meta?.place}
             </p>
           </div>
@@ -251,7 +251,7 @@ export function QuranReader({
               toast.success(`Penanda disimpan: ${meta?.latin} ayat ${currentAyah}`);
             }}
             aria-label="Simpan penanda posisi ini"
-            className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tz-line bg-tz-panel text-tz-violet transition-colors hover:border-tz-violet/50 dark:text-tz-accent"
+            className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-violet transition-colors hover:border-tk-violet/50 dark:text-tk-accent"
           >
             <BookmarkIcon size={17} />
           </button>
@@ -262,7 +262,7 @@ export function QuranReader({
             aria-expanded={settingsOpen}
             className={cn(
               "tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors",
-              settingsOpen ? "border-tz-violet/60 bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent" : "border-tz-line bg-tz-panel text-tz-ink"
+              settingsOpen ? "border-tk-violet/60 bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent" : "border-tk-line bg-tk-panel text-tk-ink"
             )}
           >
             <Settings2 size={17} />
@@ -270,17 +270,17 @@ export function QuranReader({
         </div>
 
         {/* Bilah progres baca */}
-        <div aria-hidden className="mx-auto mt-2.5 h-[3px] max-w-[760px] overflow-hidden rounded-full bg-tz-track">
+        <div aria-hidden className="mx-auto mt-2.5 h-[3px] max-w-[760px] overflow-hidden rounded-full bg-tk-track">
           <div
-            className="tz-bar-grow-x h-full rounded-full bg-tz-violet"
+            className="tk-bar-grow-x h-full rounded-full bg-tk-violet"
             style={{ width: `${readPct}%` }}
           />
         </div>
 
         {settingsOpen ? (
-          <div className="tz-fade-in mx-auto mt-2.5 max-w-[760px] space-y-2.5 rounded-2xl border border-tz-line bg-tz-panel p-3">
+          <div className="tk-fade-in mx-auto mt-2.5 max-w-[760px] space-y-2.5 rounded-2xl border border-tk-line bg-tk-panel p-3">
             <div className="flex items-center justify-between gap-2">
-              <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-tz-muted">
+              <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-tk-muted">
                 <Type size={12} /> Ukuran teks Arab
               </p>
               <div className="flex items-center gap-1.5">
@@ -288,23 +288,23 @@ export function QuranReader({
                   type="button"
                   aria-label="Perkecil teks Arab"
                   onClick={() => updateSettings({ readerArabicSize: Math.max(20, settings.readerArabicSize - 2) })}
-                  className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tz-line bg-tz-panel text-tz-ink"
+                  className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-ink"
                 >
                   <Minus size={13} />
                 </button>
-                <span className="w-10 text-center text-xs font-semibold text-tz-ink">{settings.readerArabicSize}px</span>
+                <span className="w-10 text-center text-xs font-semibold text-tk-ink">{settings.readerArabicSize}px</span>
                 <button
                   type="button"
                   aria-label="Perbesar teks Arab"
                   onClick={() => updateSettings({ readerArabicSize: Math.min(46, settings.readerArabicSize + 2) })}
-                  className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tz-line bg-tz-panel text-tz-ink"
+                  className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-ink"
                 >
                   <Plus size={13} />
                 </button>
               </div>
             </div>
             <div className="flex items-center justify-between gap-2">
-              <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-tz-muted">
+              <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-tk-muted">
                 <Type size={12} /> Ukuran terjemahan
               </p>
               <div className="flex items-center gap-1.5">
@@ -312,33 +312,33 @@ export function QuranReader({
                   type="button"
                   aria-label="Perkecil terjemahan"
                   onClick={() => updateSettings({ readerTransSize: Math.max(11, settings.readerTransSize - 1) })}
-                  className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tz-line bg-tz-panel text-tz-ink"
+                  className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-ink"
                 >
                   <Minus size={13} />
                 </button>
-                <span className="w-10 text-center text-xs font-semibold text-tz-ink">{settings.readerTransSize}px</span>
+                <span className="w-10 text-center text-xs font-semibold text-tk-ink">{settings.readerTransSize}px</span>
                 <button
                   type="button"
                   aria-label="Perbesar terjemahan"
                   onClick={() => updateSettings({ readerTransSize: Math.min(20, settings.readerTransSize + 1) })}
-                  className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tz-line bg-tz-panel text-tz-ink"
+                  className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-ink"
                 >
                   <Plus size={13} />
                 </button>
               </div>
             </div>
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-tz-muted">Jarak antarbaris</p>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-tk-muted">Jarak antarbaris</p>
               <button
                 type="button"
                 onClick={() => updateSettings({ readerLineHeight: LINE_HEIGHTS[(lhIdx + 1) % LINE_HEIGHTS.length] })}
-                className="tap rounded-full border border-tz-line bg-tz-panel px-3 py-1.5 text-xs font-semibold text-tz-ink"
+                className="tap rounded-full border border-tk-line bg-tk-panel px-3 py-1.5 text-xs font-semibold text-tk-ink"
               >
                 {settings.readerLineHeight === 1.7 ? "Rapat" : settings.readerLineHeight === 1.9 ? "Sedang" : "Lega"}
               </button>
             </div>
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-tz-muted">Tampilkan terjemahan</p>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-tk-muted">Tampilkan terjemahan</p>
               <button
                 type="button"
                 role="switch"
@@ -346,7 +346,7 @@ export function QuranReader({
                 onClick={() => updateSettings({ readerShowTranslation: !settings.readerShowTranslation })}
                 className={cn(
                   "tap relative h-6 w-11 rounded-full border transition-colors",
-                  settings.readerShowTranslation ? "border-tz-violet/60 bg-tz-violet" : "border-tz-line bg-tz-panel-soft"
+                  settings.readerShowTranslation ? "border-tk-violet/60 bg-tk-violet" : "border-tk-line bg-tk-panel-soft"
                 )}
               >
                 <span
@@ -358,7 +358,7 @@ export function QuranReader({
                 />
               </button>
             </div>
-            <p className="text-[10.5px] leading-relaxed text-tz-muted">
+            <p className="text-[10.5px] leading-relaxed text-tk-muted">
               Bacaan dicatat otomatis saat pembaca ditutup — dari ayat awal sampai ayat terakhir yang kamu baca — lalu
               penanda ikut berpindah. Semua pengaturan juga tersimpan otomatis di perangkat Anda.
             </p>
@@ -371,20 +371,20 @@ export function QuranReader({
         <div className="mx-auto max-w-[720px]">
           {loading ? (
             <div className="flex flex-col items-center gap-3 pt-24 text-center">
-              <LoaderCircle size={30} className="animate-spin text-tz-violet" />
-              <p className="text-sm text-tz-muted">Mengambil {meta?.latin}…</p>
+              <LoaderCircle size={30} className="animate-spin text-tk-violet" />
+              <p className="text-sm text-tk-muted">Mengambil {meta?.latin}…</p>
             </div>
           ) : error ? (
             <div className="flex flex-col items-center gap-3 pt-20 text-center">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-tz-amber-soft text-tz-amber">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-tk-amber-soft text-tk-amber">
                 <TriangleAlert size={22} />
               </span>
-              <p className="max-w-[280px] font-display text-sm font-bold text-tz-ink">Gagal memuat surah</p>
-              <p className="max-w-[280px] text-xs leading-relaxed text-tz-muted">{error}</p>
+              <p className="max-w-[280px] font-display text-sm font-bold text-tk-ink">Gagal memuat surah</p>
+              <p className="max-w-[280px] text-xs leading-relaxed text-tk-muted">{error}</p>
               <button
                 type="button"
                 onClick={() => void reload(true)}
-                className="tap mt-1 flex min-h-[42px] items-center gap-2 rounded-full v5-ink-btn px-5 text-sm font-bold"
+                className="tap mt-1 flex min-h-[42px] items-center gap-2 rounded-full gs-ink-btn px-5 text-sm font-bold"
               >
                 <RotateCcw size={15} /> Coba lagi
               </button>
@@ -392,13 +392,13 @@ export function QuranReader({
           ) : data ? (
             <>
               {/* Panel pembuka surah */}
-              <div className="mb-6 rounded-[1.75rem] bg-tz-panel-soft px-5 py-6 text-center">
-                <p className="quran-arabic text-[26px] leading-[1.7] text-tz-ink">{data.surah.arabic}</p>
+              <div className="mb-6 rounded-[1.75rem] bg-tk-panel-soft px-5 py-6 text-center">
+                <p className="quran-arabic text-[26px] leading-[1.7] text-tk-ink">{data.surah.arabic}</p>
                 {data.bismillah ? (
-                  <p className="quran-bismillah mt-2 text-[22px] leading-[1.9] text-tz-violet">{data.bismillah}</p>
+                  <p className="quran-bismillah mt-2 text-[22px] leading-[1.9] text-tk-violet">{data.bismillah}</p>
                 ) : null}
                 {data.fromCache ? (
-                  <p className="mt-2 text-[10px] text-tz-muted">Dibaca dari simpanan perangkat (offline)</p>
+                  <p className="mt-2 text-[10px] text-tk-muted">Dibaca dari simpanan perangkat (offline)</p>
                 ) : null}
               </div>
 
@@ -414,21 +414,21 @@ export function QuranReader({
                     }}
                     className={cn(
                       "mb-3 rounded-[1.4rem] border px-4 py-4 transition-colors sm:px-5",
-                      active ? "border-tz-lav-deco bg-tz-lavender" : "border-transparent"
+                      active ? "border-tk-lav-deco bg-tk-lavender" : "border-transparent"
                     )}
                   >
                     <div className="mb-2.5 flex items-center justify-between gap-2">
                       <span
                         className={cn(
                           "tnum flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-[11px] font-bold",
-                          active ? "bg-tz-violet text-white" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
+                          active ? "bg-tk-violet text-white" : "bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent"
                         )}
                       >
                         {ayah.number}
                       </span>
                       <div className="flex items-center gap-2">
                         {active ? (
-                          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-tz-violet" />
+                          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-tk-violet" />
                         ) : null}
                         <button
                           type="button"
@@ -437,8 +437,8 @@ export function QuranReader({
                           className={cn(
                             "tap flex h-8 w-8 items-center justify-center rounded-full border transition-colors",
                             bookmarkSet.has(ayah.number)
-                              ? "border-tz-violet/50 bg-tz-lavender text-tz-violet dark:bg-tz-accent/20 dark:text-tz-accent"
-                              : "border-tz-line bg-tz-panel text-tz-muted hover:text-tz-violet"
+                              ? "border-tk-violet/50 bg-tk-lavender text-tk-violet dark:bg-tk-accent/20 dark:text-tk-accent"
+                              : "border-tk-line bg-tk-panel text-tk-muted hover:text-tk-violet"
                           )}
                         >
                           <BookmarkIcon size={13} />
@@ -446,14 +446,14 @@ export function QuranReader({
                       </div>
                     </div>
                     <p
-                      className="quran-arabic text-right text-tz-ink"
+                      className="quran-arabic text-right text-tk-ink"
                       style={{ fontSize: settings.readerArabicSize, lineHeight: settings.readerLineHeight }}
                     >
                       {ayah.text}
                     </p>
                     {settings.readerShowTranslation && ayah.translation ? (
                       <p
-                        className="mt-3 rounded-xl bg-tz-panel-soft px-3 py-2.5 leading-relaxed text-tz-ink/85"
+                        className="mt-3 rounded-xl bg-tk-panel-soft px-3 py-2.5 leading-relaxed text-tk-ink/85"
                         style={{ fontSize: settings.readerTransSize }}
                       >
                         {ayah.translation}
@@ -462,7 +462,7 @@ export function QuranReader({
                   </div>
                 );
               })}
-              <p className="pb-2 pt-3 text-center text-[10.5px] text-tz-muted">
+              <p className="pb-2 pt-3 text-center text-[10.5px] text-tk-muted">
                 Sumber: AlQuran Cloud — teks Uthmani (Tanzil) &amp; terjemahan Kemenag RI
               </p>
             </>
@@ -471,12 +471,12 @@ export function QuranReader({
       </div>
 
       {/* ---------- Bilah status posisi baca ---------- */}
-      <div className="glass-strong relative z-20 rounded-none border-0 border-t border-tz-line px-4 pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2">
+      <div className="glass-strong relative z-20 rounded-none border-0 border-t border-tk-line px-4 pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2">
         <div className="mx-auto flex max-w-[760px] items-center justify-between gap-3">
-          <p className="tnum text-[11px] font-semibold text-tz-muted">
-            Ayat <span className="font-bold text-tz-ink">{currentAyah}</span> dari {meta?.verses ?? "—"}
+          <p className="tnum text-[11px] font-semibold text-tk-muted">
+            Ayat <span className="font-bold text-tk-ink">{currentAyah}</span> dari {meta?.verses ?? "—"}
           </p>
-          <p className="truncate text-[10px] text-tz-muted/80">Progres bacaan tercatat otomatis saat ditutup</p>
+          <p className="truncate text-[10px] text-tk-muted/80">Progres bacaan tercatat otomatis saat ditutup</p>
         </div>
       </div>
     </m.div>

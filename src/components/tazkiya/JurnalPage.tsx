@@ -81,14 +81,14 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
 
       <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
         {/* ---------- A. Refleksi hari ini ---------- */}
-        <section aria-label="Jurnal hari ini" className="animate-tz-fade-up lg:col-span-7">
+        <section aria-label="Jurnal hari ini" className="animate-tk-fade-up lg:col-span-7">
           <GlassCard className="p-5 sm:p-6">
             <div className="flex items-baseline justify-between gap-2">
-              <p className="font-display text-[19px] font-bold tracking-[-0.015em] text-tz-ink">
+              <p className="font-display text-[19px] font-bold tracking-[-0.015em] text-tk-ink">
                 Hal apa yang kamu syukuri hari ini?
               </p>
             </div>
-            <p className="mt-1 text-[11.5px] leading-relaxed text-tz-muted">
+            <p className="mt-1 text-[11.5px] leading-relaxed text-tk-muted">
               Tulis dengan bebas. Sesederhana apa pun tetap berharga.
             </p>
 
@@ -99,7 +99,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                     aria-hidden
                     className={cn(
                       "tnum mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.9rem] font-display text-[14px] font-bold transition-colors",
-                      items[i]?.trim() ? "v5-ink-btn" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
+                      items[i]?.trim() ? "gs-ink-btn" : "bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent"
                     )}
                   >
                     {items[i]?.trim() ? <Check size={15} strokeWidth={3} /> : i + 1}
@@ -115,7 +115,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                     }}
                     placeholder={i === 0 ? "Hal pertama yang saya syukuri…" : i === 1 ? "Hal kedua yang saya syukuri…" : "Hal ketiga — yang kecil pun boleh…"}
                     aria-label={`Hal ${i + 1} yang disyukuri`}
-                    className="tz-field flex-1 resize-none py-3 leading-relaxed"
+                    className="tk-field flex-1 resize-none py-3 leading-relaxed"
                   />
                 </div>
               ))}
@@ -126,13 +126,13 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
               onClick={save}
               disabled={!canSave}
               className={cn(
-                "tap v5-ink-btn mt-5 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-full font-display text-[14.5px] font-bold transition-all",
+                "tap gs-ink-btn mt-5 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-full font-display text-[14.5px] font-bold transition-all",
                 !canSave && "cursor-not-allowed opacity-40"
               )}
             >
               <BookHeart size={16} /> Simpan Jurnal
             </button>
-            <p className="mt-2.5 flex items-center justify-center gap-1.5 text-[10px] text-tz-muted/80">
+            <p className="mt-2.5 flex items-center justify-center gap-1.5 text-[10px] text-tk-muted/80">
               <Lock size={10} />
               {savedAt ? "Tersimpan hari ini — kamu bisa mengeditnya kapan saja." : "Privat — hanya kamu yang bisa membacanya."}
             </p>
@@ -140,7 +140,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
         </section>
 
         {/* ---------- B. Mood check-in ---------- */}
-        <section aria-label="Mood check-in" className="animate-tz-fade-up mt-6 lg:col-span-5 lg:mt-0">
+        <section aria-label="Mood check-in" className="animate-tk-fade-up mt-6 lg:col-span-5 lg:mt-0">
           <SectionHeader title="Mood Check-in" caption="Pilihanmu sepenuhnya milikmu" />
           <GlassCard className="p-4">
             <div className="grid grid-cols-4 gap-2">
@@ -163,66 +163,66 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                       aria-hidden
                       className={cn(
                         "flex h-[52px] w-[52px] items-center justify-center rounded-full transition-all",
-                        active ? cn(tone.activeBg, "ring-2 ring-tz-violet") : "bg-tz-panel-soft"
+                        active ? cn(tone.activeBg, "ring-2 ring-tk-violet") : "bg-tk-panel-soft"
                       )}
                     >
                       <MoodFace id={mo.id} className={cn("h-[38px] w-[38px]", tone.face)} />
                     </span>
-                    <span className={cn("text-[10px] font-bold leading-tight", active ? "text-tz-ink" : "text-tz-muted")}>
+                    <span className={cn("text-[10px] font-bold leading-tight", active ? "text-tk-ink" : "text-tk-muted")}>
                       {mo.label}
                     </span>
                   </button>
                 );
               })}
             </div>
-            <p className="mt-3 border-t border-tz-line pt-2.5 text-[10px] leading-relaxed text-tz-muted/80">
+            <p className="mt-3 border-t border-tk-line pt-2.5 text-[10px] leading-relaxed text-tk-muted/80">
               Mood membantu memilih pengingat yang sesuai — bukan penilaian atau diagnosis psikologis.
             </p>
           </GlassCard>
         </section>
 
         {/* ---------- C. Hadis editorial ---------- */}
-        <section aria-label="Hadis untuk hatimu" className="animate-tz-fade-up mt-6 lg:col-span-5">
+        <section aria-label="Hadis untuk hatimu" className="animate-tk-fade-up mt-6 lg:col-span-5">
           <SectionHeader
             title="Hadith for Your Heart"
             caption={activeMood ? `Selaras dengan mood "${moodLabel(activeMood)}"` : "Pengingat untuk hatimu hari ini"}
           />
           <GlassCard className="p-5">
-            <span aria-hidden className="pointer-events-none absolute right-4 top-1 font-display text-[52px] leading-none text-tz-lavender select-none">
+            <span aria-hidden className="pointer-events-none absolute right-4 top-1 font-display text-[52px] leading-none text-tk-lavender select-none">
               &rdquo;
             </span>
-            <Chip className="relative border-tz-violet/25 bg-tz-lavender/60 text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">{hadith.tag}</Chip>
-            <p className="quran-arabic relative mt-3.5 text-right text-[21px] leading-[1.95] text-tz-ink">{hadith.arabic}</p>
-            <p className="relative mt-3 text-[13px] leading-relaxed text-tz-ink/95">&ldquo;{hadith.text}&rdquo;</p>
+            <Chip className="relative border-tk-violet/25 bg-tk-lavender/60 text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent">{hadith.tag}</Chip>
+            <p className="quran-arabic relative mt-3.5 text-right text-[21px] leading-[1.95] text-tk-ink">{hadith.arabic}</p>
+            <p className="relative mt-3 text-[13px] leading-relaxed text-tk-ink/95">&ldquo;{hadith.text}&rdquo;</p>
             <div className="relative mt-3 flex flex-wrap items-center gap-1.5">
-              <Chip className="border-tz-violet/25 bg-tz-lavender/60 text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">{hadith.source}</Chip>
-              <Chip className="border-tz-line">Dinukil apa adanya</Chip>
+              <Chip className="border-tk-violet/25 bg-tk-lavender/60 text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent">{hadith.source}</Chip>
+              <Chip className="border-tk-line">Dinukil apa adanya</Chip>
             </div>
 
             <div className="relative mt-4 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => void shareQuote(`"${hadith.text}"\n— ${hadith.source}`)}
-                className="tap flex min-h-[40px] items-center gap-1.5 rounded-full v5-ink-btn px-4 text-[12px] font-bold"
+                className="tap flex min-h-[40px] items-center gap-1.5 rounded-full gs-ink-btn px-4 text-[12px] font-bold"
               >
                 <Share2 size={14} /> Simpan / Bagikan
               </button>
               <button
                 type="button"
                 onClick={() => setHadithOffset((o) => o + 1)}
-                className="tap flex min-h-[40px] items-center gap-1.5 rounded-full border border-tz-line-strong bg-tz-panel px-4 text-[12px] font-semibold text-tz-ink"
+                className="tap flex min-h-[40px] items-center gap-1.5 rounded-full border border-tk-line-strong bg-tk-panel px-4 text-[12px] font-semibold text-tk-ink"
               >
-                <Sparkles size={14} className="text-tz-violet" /> Hadis lainnya
+                <Sparkles size={14} className="text-tk-violet" /> Hadis lainnya
               </button>
             </div>
-            <p className="relative mt-2.5 text-[10px] leading-relaxed text-tz-muted/80">
+            <p className="relative mt-2.5 text-[10px] leading-relaxed text-tk-muted/80">
               Kutipan diambil dari koleksi riwayat masyhur dengan sumber tertulis. Tidak ada teks yang dihasilkan otomatis.
             </p>
           </GlassCard>
         </section>
 
         {/* ---------- D. Riwayat jurnal ---------- */}
-        <section aria-label="Riwayat jurnal syukur" className="animate-tz-fade-up mt-6 lg:col-span-7">
+        <section aria-label="Riwayat jurnal syukur" className="animate-tk-fade-up mt-6 lg:col-span-7">
           <SectionHeader title="Riwayat Jurnal" caption={`${historyDates.length} hari tercatat`} />
           {historyDates.length === 0 ? (
             <EmptyState
@@ -232,13 +232,13 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
             />
           ) : (
             <GlassCard className="thin-scrollbar max-h-[26rem] overflow-y-auto">
-              <ul className="divide-y divide-tz-line-soft">
+              <ul className="divide-y divide-tk-line-soft">
                 {historyDates.map((d) => {
                   const e = journal[d];
                   return (
                     <li key={d} className="px-4 py-3.5">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="flex items-center gap-2 font-display text-[13px] font-bold text-tz-ink">
+                        <p className="flex items-center gap-2 font-display text-[13px] font-bold text-tk-ink">
                           {relativeDayLabel(d, today)}
                           {e.mood ? (
                             <span aria-label={`Mood ${moodLabel(e.mood)}`} className="inline-flex h-6 w-6 items-center justify-center">
@@ -258,7 +258,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                               // Konten aplikasi bergulir di dalam kontainer utama, bukan di window.
                               document.getElementById("konten-tazkiya")?.scrollTo({ top: 0, behavior: "smooth" });
                             }}
-                            className="tap rounded-full border border-tz-line-strong bg-tz-panel px-2.5 py-1 text-[10px] font-semibold text-tz-ink"
+                            className="tap rounded-full border border-tk-line-strong bg-tk-panel px-2.5 py-1 text-[10px] font-semibold text-tk-ink"
                           >
                             Edit
                           </button>
@@ -270,7 +270,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                               deleteJournal(d);
                               toast.info("Jurnal dihapus");
                             }}
-                            className="tap flex h-9 w-9 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-[#E5484D]/10 hover:text-[#E5484D]"
+                            className="tap flex h-9 w-9 items-center justify-center rounded-full text-tk-muted/70 transition-colors hover:bg-[#E5484D]/10 hover:text-[#E5484D]"
                           >
                             <Trash2 size={13} />
                           </ConfirmButton>
@@ -278,8 +278,8 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                       </div>
                       <ul className="mt-1.5 space-y-0.5">
                         {e.items.filter(Boolean).map((it, i) => (
-                          <li key={i} className="flex items-start gap-1.5 text-[11.5px] leading-relaxed text-tz-ink/85">
-                            <Heart size={10} className="mt-1 shrink-0 text-tz-violet dark:text-tz-accent" aria-hidden />
+                          <li key={i} className="flex items-start gap-1.5 text-[11.5px] leading-relaxed text-tk-ink/85">
+                            <Heart size={10} className="mt-1 shrink-0 text-tk-violet dark:text-tk-accent" aria-hidden />
                             <span>{it}</span>
                           </li>
                         ))}
@@ -293,7 +293,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
         </section>
       </div>
 
-      <p className="flex items-center justify-center gap-1.5 pb-1 text-center text-[10px] leading-relaxed text-tz-muted/60">
+      <p className="flex items-center justify-center gap-1.5 pb-1 text-center text-[10px] leading-relaxed text-tk-muted/60">
         <Lock size={10} />
         Jurnal tersimpan di perangkat &amp; akunmu — tidak dikirim ke layanan analisis mana pun.
       </p>

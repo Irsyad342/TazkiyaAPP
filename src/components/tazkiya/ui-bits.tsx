@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * Tazkiya v6 — "Ember" — kosakata visual dasar.
- * Prinsip: kartu arang #252525 dengan hairline halus; ORANGE #FF5A00
- * hanya untuk aksi utama / status aktif / progres penting; angka besar
- * memakai Manrope tabular (.v5-display); label kecil uppercase
- * (.v5-overline). API komponen dipertahankan agar seluruh halaman tetap
+ * Tazkiya v7 — kosakata visual dasar, dibangun ulang terhadap referensi
+ * task-planner premium: kartu #242429 + hairline, trio kartu putih/abu
+ * terang/orange, ORANGE #FA5200 untuk aksi utama & progres penting,
+ * angka besar General Sans tabular (.gs-display), label uppercase
+ * (.gs-overline). API komponen dipertahankan agar seluruh halaman tetap
  * terhubung; struktur visualnya baru.
  */
 
@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 
 /* ---------------- GlassCard ---------------- */
 
-type GlassVariant = "plain" | "violet" | "strong" | "hero" | "clean";
+type GlassVariant = "plain" | "violet" | "strong" | "hero" | "clean" | "white" | "light";
 
 export function GlassCard({
   children,
@@ -44,14 +44,18 @@ export function GlassCard({
     variant === "hero"
       ? "glass-hero"
       : variant === "clean"
-        ? "tz-card-clean"
-        : variant === "violet"
-          ? "glass-violet"
-          : variant === "strong"
-            ? "glass-strong"
-            : "glass";
+        ? "tk-card-clean"
+        : variant === "white"
+          ? "tk-card-white"
+          : variant === "light"
+            ? "tk-card-light"
+            : variant === "violet"
+              ? "glass-violet"
+              : variant === "strong"
+                ? "glass-strong"
+                : "glass";
   const cls = cn(
-    "relative overflow-hidden rounded-[1.75rem]",
+    "relative overflow-hidden rounded-[1.4rem]",
     variantClass,
     onClick && "cursor-pointer tap active:scale-[0.985]",
     className
@@ -100,15 +104,15 @@ export function ConfirmButton({
           {children}
         </button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="glass-strong max-w-[320px]! rounded-[1.4rem]! border-tz-line p-5!">
+      <AlertDialogContent className="glass-strong max-w-[320px]! rounded-[1.4rem]! border-tk-line p-5!">
         <AlertDialogHeader className="gap-1.5!">
-          <AlertDialogTitle className="text-[16px]! font-bold! text-tz-ink">{title}</AlertDialogTitle>
-          <AlertDialogDescription className="text-[12px]! leading-relaxed! text-tz-muted">
+          <AlertDialogTitle className="text-[16px]! font-bold! text-tk-ink">{title}</AlertDialogTitle>
+          <AlertDialogDescription className="text-[12px]! leading-relaxed! text-tk-muted">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-row! gap-2!">
-          <AlertDialogCancel className="mt-0! min-h-[42px] flex-1 rounded-full border-tz-line-strong bg-tz-panel-soft text-[13px] font-semibold text-tz-muted">
+          <AlertDialogCancel className="mt-0! min-h-[42px] flex-1 rounded-full border-tk-line-strong bg-tk-panel-soft text-[13px] font-semibold text-tk-muted">
             Batal
           </AlertDialogCancel>
           <AlertDialogAction
@@ -144,8 +148,8 @@ export function SectionHeader({
   return (
     <div className={cn("mb-3.5 flex items-end justify-between gap-3 px-0.5", className)}>
       <div className="min-w-0">
-        <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tz-ink">{title}</h2>
-        {caption ? <p className="mt-1 text-[12px] leading-snug text-tz-muted">{caption}</p> : null}
+        <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">{title}</h2>
+        {caption ? <p className="mt-1 text-[12px] leading-snug text-tk-muted">{caption}</p> : null}
       </div>
       {action ? <div className="flex shrink-0 items-center whitespace-nowrap">{action}</div> : null}
     </div>
@@ -173,7 +177,7 @@ export function SegmentedTabs<T extends string>({
 }) {
   return (
     <div
-      className={cn("flex items-stretch gap-1 border-b border-tz-line", className)}
+      className={cn("flex items-stretch gap-1 border-b border-tk-line", className)}
       role="tablist"
       aria-label={ariaLabel}
     >
@@ -188,16 +192,16 @@ export function SegmentedTabs<T extends string>({
             onClick={() => onChange(id)}
             className={cn(
               "tap relative flex min-h-[46px] flex-1 items-center justify-center gap-1.5 px-3 text-[13.5px] transition-colors sm:flex-none sm:min-w-[120px]",
-              active ? "font-bold text-tz-ink" : "font-medium text-tz-muted hover:text-tz-ink/80"
+              active ? "font-bold text-tk-ink" : "font-medium text-tk-muted hover:text-tk-ink/80"
             )}
           >
-            {Icon ? <Icon size={15} className={active ? "text-tz-violet" : ""} /> : null}
+            {Icon ? <Icon size={15} className={active ? "text-tk-violet" : ""} /> : null}
             {label}
             <span
               aria-hidden
               className={cn(
                 "absolute inset-x-3 bottom-0 h-[2px] rounded-full transition-all duration-200",
-                active ? "bg-tz-violet" : "bg-transparent"
+                active ? "bg-tk-violet" : "bg-transparent"
               )}
             />
           </button>
@@ -232,12 +236,12 @@ export function IconBox({
               ? "h-12 w-12 rounded-2xl [&>svg]:h-[22px] [&>svg]:w-[22px]"
               : "h-10 w-10 rounded-[0.95rem] [&>svg]:h-[18px] [&>svg]:w-[18px]",
         tone === "solid"
-          ? "bg-tz-violet text-white"
+          ? "bg-tk-violet text-white"
           : tone === "ghost"
-            ? "bg-tz-panel-soft text-tz-muted"
+            ? "bg-tk-panel-soft text-tk-muted"
             : tone === "lavender"
-              ? "bg-tz-lav-deco text-tz-violet"
-              : "bg-tz-lavender text-tz-violet",
+              ? "bg-tk-lav-deco text-tk-violet"
+              : "bg-tk-lavender text-tk-violet",
         className
       )}
     >
@@ -255,9 +259,9 @@ export function ProgressRing({
   stroke = 8,
   children,
   className,
-  trackClass = "stroke-tz-track",
-  from = "#FF5A00",
-  to = "#FF8A50",
+  trackClass = "stroke-tk-track",
+  from = "#FA5200",
+  to = "#FF6B26",
 }: {
   value: number; // 0..100
   size?: number;
@@ -300,9 +304,9 @@ export function ProgressRing({
 export function ProgressBar({ value, className, fillClass }: { value: number; className?: string; fillClass?: string }) {
   const clamped = Math.max(0, Math.min(100, value));
   return (
-    <div className={cn("h-1.5 w-full overflow-hidden rounded-full bg-tz-track", className)}>
+    <div className={cn("h-1.5 w-full overflow-hidden rounded-full bg-tk-track", className)}>
       <div
-        className={cn("h-full rounded-full bg-tz-violet", fillClass)}
+        className={cn("h-full rounded-full bg-tk-violet", fillClass)}
         style={{
           width: `${clamped}%`,
           transition: "width 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
@@ -328,8 +332,8 @@ export function StatBlock({
 }) {
   return (
     <div className={cn("min-w-0", align === "center" ? "text-center" : "text-left", className)}>
-      <p className="v5-display truncate text-[26px] font-extrabold leading-none text-tz-ink sm:text-[30px]">{value}</p>
-      <p className="mt-1.5 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-tz-muted">{label}</p>
+      <p className="gs-display truncate text-[26px] font-extrabold leading-none text-tk-ink sm:text-[30px]">{value}</p>
+      <p className="mt-1.5 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-tk-muted">{label}</p>
     </div>
   );
 }
@@ -350,7 +354,7 @@ export function GroupList({
     <div
       role="group"
       aria-label={ariaLabel}
-      className={cn("glass divide-y divide-tz-line-soft overflow-hidden rounded-[1.5rem]", className)}
+      className={cn("glass divide-y divide-tk-line-soft overflow-hidden rounded-[1.5rem]", className)}
     >
       {children}
     </div>
@@ -383,16 +387,16 @@ export function GroupRow({
 }) {
   const inner = (
     <>
-      {Icon ? <Icon size={18} strokeWidth={1.8} className="shrink-0 text-tz-muted" /> : null}
+      {Icon ? <Icon size={18} strokeWidth={1.8} className="shrink-0 text-tk-muted" /> : null}
       <span className="min-w-0 flex-1 py-3.5">
-        <span className="block truncate text-[14px] font-medium text-tz-ink">{title}</span>
-        {caption ? <span className="mt-0.5 block truncate text-[11.5px] leading-snug text-tz-muted">{caption}</span> : null}
+        <span className="block truncate text-[14px] font-medium text-tk-ink">{title}</span>
+        {caption ? <span className="mt-0.5 block truncate text-[11.5px] leading-snug text-tk-muted">{caption}</span> : null}
         {children}
       </span>
       {value !== undefined ? (
-        <span className="shrink-0 text-[12.5px] font-medium text-tz-muted">{value}</span>
+        <span className="shrink-0 text-[12.5px] font-medium text-tk-muted">{value}</span>
       ) : null}
-      {onClick && !control ? <ChevronRight size={16} className="shrink-0 text-tz-muted/60" /> : null}
+      {onClick && !control ? <ChevronRight size={16} className="shrink-0 text-tk-muted/60" /> : null}
     </>
   );
   const base = cn("flex w-full items-center gap-3.5 px-4 text-left", className);
@@ -412,7 +416,7 @@ export function Chip({ children, className }: { children: ReactNode; className?:
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full bg-tz-panel-soft px-2.5 py-1 text-[11px] font-semibold text-tz-muted",
+        "inline-flex items-center gap-1 rounded-full bg-tk-panel-soft px-2.5 py-1 text-[11px] font-semibold text-tk-muted",
         className
       )}
     >
@@ -425,12 +429,12 @@ export function Chip({ children, className }: { children: ReactNode; className?:
 
 export function EmptyState({ icon, title, caption }: { icon: ReactNode; title: string; caption?: string }) {
   return (
-    <div className="relative flex flex-col items-center gap-2.5 rounded-[1.5rem] bg-tz-panel-soft px-4 py-9 text-center">
-      <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-tz-lavender text-tz-violet">
+    <div className="relative flex flex-col items-center gap-2.5 rounded-[1.5rem] bg-tk-panel-soft px-4 py-9 text-center">
+      <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-tk-lavender text-tk-violet">
         {icon}
       </div>
-      <p className="text-sm font-bold text-tz-ink/90">{title}</p>
-      {caption ? <p className="max-w-[270px] text-xs leading-relaxed text-tz-muted">{caption}</p> : null}
+      <p className="text-sm font-bold text-tk-ink/90">{title}</p>
+      {caption ? <p className="max-w-[270px] text-xs leading-relaxed text-tk-muted">{caption}</p> : null}
     </div>
   );
 }
