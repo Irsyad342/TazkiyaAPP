@@ -386,7 +386,7 @@ export function QuranReader({
                 onClick={() => void reload(true)}
                 className="tap mt-1 flex min-h-[42px] items-center gap-2 rounded-full v5-ink-btn px-5 text-sm font-bold"
               >
-                <RotateCcw size={15} className="text-tz-lime" /> Coba lagi
+                <RotateCcw size={15} /> Coba lagi
               </button>
             </div>
           ) : data ? (
@@ -428,7 +428,7 @@ export function QuranReader({
                       </span>
                       <div className="flex items-center gap-2">
                         {active ? (
-                          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-tz-lime" />
+                          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-tz-violet" />
                         ) : null}
                         <button
                           type="button"

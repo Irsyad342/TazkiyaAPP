@@ -99,7 +99,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                     aria-hidden
                     className={cn(
                       "tnum mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.9rem] font-display text-[14px] font-bold transition-colors",
-                      items[i]?.trim() ? "v5-ink-btn text-tz-lime" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
+                      items[i]?.trim() ? "v5-ink-btn" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
                     )}
                   >
                     {items[i]?.trim() ? <Check size={15} strokeWidth={3} /> : i + 1}
@@ -126,11 +126,11 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
               onClick={save}
               disabled={!canSave}
               className={cn(
-                "tap mt-5 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-full font-display text-[14.5px] font-bold text-white transition-all",
-                canSave ? "bg-tz-ink" : "cursor-not-allowed bg-tz-ink/40"
+                "tap v5-ink-btn mt-5 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-full font-display text-[14.5px] font-bold transition-all",
+                !canSave && "cursor-not-allowed opacity-40"
               )}
             >
-              <BookHeart size={16} className={canSave ? "text-tz-lime" : ""} /> Simpan Jurnal
+              <BookHeart size={16} /> Simpan Jurnal
             </button>
             <p className="mt-2.5 flex items-center justify-center gap-1.5 text-[10px] text-tz-muted/80">
               <Lock size={10} />
@@ -205,7 +205,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                 onClick={() => void shareQuote(`"${hadith.text}"\n— ${hadith.source}`)}
                 className="tap flex min-h-[40px] items-center gap-1.5 rounded-full v5-ink-btn px-4 text-[12px] font-bold"
               >
-                <Share2 size={14} className="text-tz-lime" /> Simpan / Bagikan
+                <Share2 size={14} /> Simpan / Bagikan
               </button>
               <button
                 type="button"

@@ -3,10 +3,10 @@ import { Manrope, Plus_Jakarta_Sans, Amiri_Quran } from "next/font/google";
 import "./globals.css";
 
 /*
- * Tazkiya v5 "Minimalist Premium" — dua keluarga font latin:
+ * Tazkiya v6 "Ember" — dua keluarga font latin:
  * Plus Jakarta Sans sebagai font utama (body & antarmuka), Manrope
  * untuk angka besar / judul display (countdown, statistik). Amiri Quran
- * khusus teks Arab.
+ * khusus teks Arab. Dark adalah pengalaman utama aplikasi.
  */
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F8F9FC",
+  themeColor: "#161616",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -56,10 +56,10 @@ export const viewport: Viewport = {
 
 /**
  * Terapkan tema & Liquid Glass lebih awal (sebelum hidrasi React) agar tidak
- * ada kilatan tema gelap pada pengguna tema terang. Membaca langsung dari
- * localStorage yang sama dengan store Tazkiya; gagal parse → biarkan default.
+ * ada kilatan tema yang salah. Membaca langsung dari localStorage yang sama
+ * dengan store Tazkiya; tanpa preferensi tersimpan → DARK (identitas v6).
  */
-const themeInitScript = `(function(){try{var r=localStorage.getItem("tazkiya-store-v1");if(!r)return;var s=JSON.parse(r).state&&JSON.parse(r).state.settings;if(!s)return;var t=s.theme||"light";if(t==="system"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.dataset.theme=t;document.documentElement.dataset.glass=s.liquidGlass?"liquid":"classic";document.documentElement.dataset.anim=s.animations===false?"off":"on";var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#F8F9FC":"#101014");}catch(e){}})();`;
+const themeInitScript = `(function(){try{var r=localStorage.getItem("tazkiya-store-v1");if(!r)return;var s=JSON.parse(r).state&&JSON.parse(r).state.settings;if(!s)return;var t=s.theme||"dark";if(t==="system"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.dataset.theme=t;document.documentElement.dataset.glass=s.liquidGlass?"liquid":"classic";document.documentElement.dataset.anim=s.animations===false?"off":"on";var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#F6F6F7":"#161616");}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -67,8 +67,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    /* data-v="5": penanda generasi desain untuk verifikasi deployment. */
-    <html lang="id" data-theme="light" data-v="5" suppressHydrationWarning>
+    /* data-v="6": penanda generasi desain untuk verifikasi deployment. */
+    <html lang="id" data-theme="dark" data-v="6" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>

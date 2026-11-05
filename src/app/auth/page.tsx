@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * Tazkiya v5 — Halaman autentikasi (Masuk / Daftar / Lupa sandi / Atur sandi baru).
+ * Tazkiya v6 — Halaman autentikasi (Masuk / Daftar / Lupa sandi / Atur sandi baru).
  *
- * Desain Minimalist Premium: kartu putih terpusat di kanvas #F8F9FC dengan
- * lingkaran tonal lavender/lime, tipografi Plus Jakarta Sans + Manrope,
- * dukungan tema gelap–terang (mengikuti data-theme dari localStorage).
- * Bila deployment belum memiliki konfigurasi Supabase, halaman ini jujur
- * menampilkan keterangan "belum dikonfigurasi" — tanpa login palsu.
+ * Desain "Ember": kartu arang #252525 terpusat di kanvas #161616 (tema utama),
+ * tipografi Plus Jakarta Sans + Manrope, aksen orange. Dukungan tema
+ * gelap–terang mengikuti data-theme dari localStorage. Bila deployment belum
+ * memiliki konfigurasi Supabase, halaman ini jujur menampilkan keterangan
+ * "belum dikonfigurasi" — tanpa login palsu.
  */
 
 import { Suspense, useEffect, useState, type FormEvent } from "react";
@@ -170,14 +170,6 @@ function AuthForm() {
 
   return (
     <main className="relative flex min-h-dvh w-full flex-col items-center justify-center overflow-hidden bg-tz-stage px-4 py-8">
-      {/* Dekorasi geometris flat — lingkaran tonal & cincin garis */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-tz-lavender dark:bg-tz-accent/8" />
-        <div className="absolute -right-20 top-1/3 h-56 w-56 rounded-full border-[1.5px] border-tz-lav-deco" />
-        <div className="absolute -bottom-24 left-1/4 h-64 w-64 rounded-full bg-tz-lime/20 dark:bg-tz-lime/6" />
-        <div className="absolute bottom-10 right-1/4 h-2.5 w-2.5 rounded-full bg-tz-violet" />
-      </div>
-
       <div className="relative w-full max-w-[400px]">
         <Link
           href="/"

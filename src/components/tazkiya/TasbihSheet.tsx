@@ -223,7 +223,7 @@ export function TasbihSheet({
             }}
             className="tap flex h-12 items-center justify-center gap-2 rounded-full v5-ink-btn px-5 font-display text-sm font-bold"
           >
-            <Save size={16} className="text-tz-lime" /> Simpan Harian
+            <Save size={16} /> Simpan Harian
           </button>
         </div>
       </div>

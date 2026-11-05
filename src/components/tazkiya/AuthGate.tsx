@@ -35,7 +35,7 @@ export function AuthGate() {
       aria-label="Keputusan data akun"
       className="absolute inset-0 z-40 flex items-center justify-center bg-black/55 p-5 backdrop-blur-sm"
     >
-      <div className="animate-tz-fade-up w-full max-w-[360px] rounded-[1.6rem] border border-tz-line bg-tz-panel p-5 shadow-[0_2px_6px_rgba(25,25,35,0.05),0_40px_90px_-40px_rgba(46,38,104,0.5)]">
+      <div className="animate-tz-fade-up w-full max-w-[360px] rounded-[1.6rem] border border-tz-line bg-tz-panel p-5 shadow-[0_2px_6px_rgba(0,0,0,0.06),0_40px_90px_-40px_rgba(0,0,0,0.55)]">
         <div className="flex items-center gap-3">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
             {prompt.kind === "migrate" ? <CloudUpload size={20} /> : <GitMerge size={20} />}

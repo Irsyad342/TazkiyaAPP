@@ -191,7 +191,7 @@ export function MotivationPopup({
             accent.button
           )}
         >
-          <span className={variant !== "missed" ? "text-tz-lime" : ""}>{MESSAGES[variant].button}</span>
+          <span>{MESSAGES[variant].button}</span>
         </button>
       </DialogContent>
     </Dialog>
