@@ -715,3 +715,27 @@ tsc bersih · eslint src bersih · build sukses (6/6) · alur lulus (mood tersim
 
 ### Deploy
 Branch `redesign/reconstruction-v4` di-push, lalu di-merge ke `main` (produksi) sesuai instruksi deploy langsung; deployment diverifikasi via status Vercel pada commit + polling chunk produksi.
+
+## Task 40 — "Minimalist Premium" v5 (branch `redesign/minimal-premium-v5`, deploy produksi bertahap)
+
+Pembongkaran total bahasa visual atas revisi pengguna: v4 dinilai masih mempertahankan pola kartu lama. v5 = putih dominan (#F8F9FC), kartu flat tanpa bayangan (bayangan hanya untuk lapisan mengambang), lavender #8D7BE8 identitas + #F0EDFF/#E6E0FF permukaan, lime #D9F477 hanya aksen, tipografi Plus Jakarta Sans + Manrope (angka display) + Amiri Quran, dark mode arang #101014 yang didesain ulang (bukan balikan), marker generasi `data-v="5"` pada <html>.
+
+### Kelompok 1 (commit 8d686ee, deploy terverifikasi)
+- Design system globals.css v5 + layout.tsx (Outfit→Manrope, theme-color #F8F9FC/#101014).
+- ui-bits v5: SectionHeader editorial, StatBlock tanpa kartu, GroupList/GroupRow (settings), Chip borderless, IconBox tanpa kotak.
+- BottomNav capsule putih (pil lavender aktif) + SidebarNav minimal; shell bersih (tanpa pola titik).
+- Beranda DARI NOL: header personal (sapaan+nama+tanggal, avatar 48), featured sholat blok lavender (countdown Manrope 56px + timeline 5 titik), Ibadah Hari Ini tanpa kartu (ring+hairline), mood ilustratif (MoodFace), pekan ini bar tipis tanpa kartu, Jelajahi 3 komposisi (editorial/cincin/statistik), target harian baris hairline, doa & barakah editorial.
+- Sholat: featured countdown + TIMELINE VERTIKAL lima waktu (garis+titik status, chip Catat/Ubah), kalender pil minimal, Qada blok lavender (pengganti kartu tinta gelap).
+- Profil: avatar 84px + kamera, nama + BadgeCheck + edit inline, "Aktif sejak" dari data nyata, statistik tanpa kartu, ringkasan pencapaian, grouped list (Akun/Ibadah&Target/Preferensi/Tentang) dengan panel inline Riwayat/Pengingat/Lokasi.
+- Tasbih: counter lingkaran besar (248px) fokus halaman + cincin lavender ujung lime + animasi spring per hitungan + reset/minus/expand + target chips; TasbihSheet ikut diselaraskan.
+- Bug diperbaiki: horizontal overflow 390px (min-content scroller mood → `min-w-0` pada flex item shell + scroller).
+
+### Kelompok 2 (commit berikutnya)
+- Al-Qur'an: hero featured lavender, statistik tanpa kartu, favorit bersih; Reader: panel bismillah lembut, ayat aktif lavender.
+- Progress: header baru + blok streak editorial (pengganti kartu ikon).
+- Jurnal: mood memakai MoodFace (bukan emoji); Rizq: hero statistik aksen garis lime + bar lavender + ikon Lucide seragam (emoji dihapus); Auth: kartu minimal + shadow ambien tunggal.
+- MoodFace.tsx komponen bersama (7 ekspresi garis konsisten) dipakai Beranda+Jurnal.
+- Bug kontras dark mode diperbaiki: tombol `bg-tz-ink text-white` tidak terbaca saat gelap → utility `v5-ink-btn` (terang: #22212A; gelap: #2E2D38 terangkat) di 11 file.
+
+### QA
+tsc 0 · eslint bersih · build sukses · alur: mood, catat salat selesai+berjamaah+popup, tasbih hitung→simpan→riwayat, jurnal simpan, reader buka→gulir→tutup→tercatat otomatis, auth validasi register, tema live; overflow 360/390/430 = 0 di semua halaman uji; screenshot 20+ file (light+dark) + 2 contact sheet di download/screenshots/v5/.

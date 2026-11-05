@@ -19,6 +19,7 @@ import { hadithForMood } from "@/lib/tazkiya/hadith";
 import { formatDayFull, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
 import { Chip, ConfirmButton, EmptyState, GlassCard, SectionHeader } from "./ui-bits";
 import { SubPageHeader } from "./SubPageHeader";
+import { MoodFace, MOOD_TONE } from "./MoodFace";
 import { cn } from "@/lib/utils";
 
 /** Bagikan/salin kutipan ke perangkat (tanpa layanan eksternal). */
@@ -98,7 +99,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                     aria-hidden
                     className={cn(
                       "tnum mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.9rem] font-display text-[14px] font-bold transition-colors",
-                      items[i]?.trim() ? "bg-tz-ink text-tz-lime" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
+                      items[i]?.trim() ? "v5-ink-btn text-tz-lime" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
                     )}
                   >
                     {items[i]?.trim() ? <Check size={15} strokeWidth={3} /> : i + 1}
@@ -143,33 +144,32 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
           <SectionHeader title="Mood Check-in" caption="Pilihanmu sepenuhnya milikmu" />
           <GlassCard className="p-4">
             <div className="grid grid-cols-4 gap-2">
-              {MOODS.map((m) => {
-                const active = activeMood === m.id;
+              {MOODS.map((mo) => {
+                const active = activeMood === mo.id;
+                const tone = MOOD_TONE[mo.id];
                 return (
                   <button
-                    key={m.id}
+                    key={mo.id}
                     type="button"
                     aria-pressed={active}
-                    aria-label={`Mood ${m.label}`}
+                    aria-label={`Mood ${mo.label}`}
                     onClick={() => {
-                      setMoodSel(m.id);
-                      setMood(today, m.id);
+                      setMoodSel(mo.id);
+                      setMood(today, mo.id);
                     }}
                     className="tap flex flex-col items-center gap-2 rounded-[1.2rem] px-1 py-3 transition-all"
                   >
                     <span
                       aria-hidden
                       className={cn(
-                        "flex h-[52px] w-[52px] items-center justify-center rounded-full text-[24px] transition-all",
-                        active
-                          ? "bg-tz-lavender ring-2 ring-tz-violet dark:bg-tz-accent/20"
-                          : "bg-tz-panel-soft"
+                        "flex h-[52px] w-[52px] items-center justify-center rounded-full transition-all",
+                        active ? cn(tone.activeBg, "ring-2 ring-tz-violet") : "bg-tz-panel-soft"
                       )}
                     >
-                      {m.emoji}
+                      <MoodFace id={mo.id} className={cn("h-[38px] w-[38px]", tone.face)} />
                     </span>
                     <span className={cn("text-[10px] font-bold leading-tight", active ? "text-tz-ink" : "text-tz-muted")}>
-                      {m.label}
+                      {mo.label}
                     </span>
                   </button>
                 );
@@ -203,7 +203,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
               <button
                 type="button"
                 onClick={() => void shareQuote(`"${hadith.text}"\n— ${hadith.source}`)}
-                className="tap flex min-h-[40px] items-center gap-1.5 rounded-full bg-tz-ink px-4 text-[12px] font-bold text-white"
+                className="tap flex min-h-[40px] items-center gap-1.5 rounded-full v5-ink-btn px-4 text-[12px] font-bold"
               >
                 <Share2 size={14} className="text-tz-lime" /> Simpan / Bagikan
               </button>
@@ -241,8 +241,8 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                         <p className="flex items-center gap-2 font-display text-[13px] font-bold text-tz-ink">
                           {relativeDayLabel(d, today)}
                           {e.mood ? (
-                            <span aria-label={`Mood ${moodLabel(e.mood)}`} className="text-[14px]">
-                              {MOODS.find((m) => m.id === e.mood)?.emoji}
+                            <span aria-label={`Mood ${moodLabel(e.mood)}`} className="inline-flex h-6 w-6 items-center justify-center">
+                              <MoodFace id={e.mood} className={cn("h-5 w-5", MOOD_TONE[e.mood].face)} />
                             </span>
                           ) : null}
                         </p>

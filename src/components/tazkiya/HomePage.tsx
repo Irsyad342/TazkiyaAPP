@@ -530,7 +530,7 @@ function DailyJourney({ today }: { today: string }) {
                 setDraft("");
                 toast.success("Target pribadi ditambahkan");
               }}
-              className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-ink text-tz-lime"
+              className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full v5-ink-btn text-tz-lime"
             >
               <Plus size={16} />
             </button>

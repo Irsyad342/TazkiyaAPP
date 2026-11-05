@@ -61,7 +61,7 @@ export function AuthGate() {
                 type="button"
                 disabled={busy}
                 onClick={() => void resolveMigration("migrate")}
-                className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-sm font-bold text-white disabled:opacity-60"
+                className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn font-display text-sm font-bold disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={16} className="animate-spin" /> : <CloudUpload size={16} />}
                 Pindahkan ke akun
@@ -96,7 +96,7 @@ export function AuthGate() {
                 type="button"
                 disabled={busy}
                 onClick={() => void resolveMigration("merge")}
-                className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-sm font-bold text-white disabled:opacity-60"
+                className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn font-display text-sm font-bold disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={16} className="animate-spin" /> : <GitMerge size={16} />}
                 Gabungkan keduanya

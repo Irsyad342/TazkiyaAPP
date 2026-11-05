@@ -173,7 +173,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
             if (n === 0) toast.error("Hitungan masih 0 — berzikir dulu ya");
             else toast.success(`${n.toLocaleString("id-ID")} zikir ditambahkan ke catatan harian`);
           }}
-          className="tap flex h-12 items-center justify-center gap-2 rounded-full bg-tz-ink px-5 text-[13.5px] font-bold text-white"
+          className="tap flex h-12 items-center justify-center gap-2 rounded-full v5-ink-btn px-5 text-[13.5px] font-bold"
         >
           Simpan Harian
         </button>
@@ -196,7 +196,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
             onClick={() => tasbihSetTarget(n)}
             className={cn(
               "tap rounded-full px-3 py-1.5 text-[11px] font-bold transition-all",
-              tasbih.target === n ? "bg-tz-ink text-white" : "bg-tz-panel-soft text-tz-muted hover:text-tz-ink"
+              tasbih.target === n ? "v5-ink-btn" : "bg-tz-panel-soft text-tz-muted hover:text-tz-ink"
             )}
           >
             {n}
@@ -395,7 +395,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
                   onClick={() => setCat(k.id)}
                   className={cn(
                     "tap shrink-0 rounded-full px-3.5 py-1.5 text-[11.5px] font-semibold transition-all",
-                    cat === k.id ? "bg-tz-ink text-white" : "bg-tz-panel-soft text-tz-muted hover:text-tz-ink"
+                    cat === k.id ? "v5-ink-btn" : "bg-tz-panel-soft text-tz-muted hover:text-tz-ink"
                   )}
                 >
                   {k.label}

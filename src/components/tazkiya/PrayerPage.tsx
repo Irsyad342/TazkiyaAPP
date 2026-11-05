@@ -657,7 +657,7 @@ function QadaTab({ today }: { today: string }) {
             <button
               type="button"
               onClick={submit}
-              className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink text-[14px] font-bold text-white"
+              className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn text-[14px] font-bold"
             >
               <Plus size={16} className="text-tz-lime" /> Tambah ke Daftar Qada
             </button>

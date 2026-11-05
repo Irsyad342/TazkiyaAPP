@@ -100,7 +100,7 @@ export function TasbihSheet({
             className={cn(
               "tap shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold",
               tasbih.dhikr === z
-                ? "border-tz-ink bg-tz-ink text-white"
+                ? "v5-ink-btn"
                 : "border-tz-line bg-tz-panel text-tz-muted"
             )}
           >
@@ -221,7 +221,7 @@ export function TasbihSheet({
               if (n === 0) toast.error("Hitungan masih 0 — berzikir dulu ya");
               else toast.success(`${n.toLocaleString("id-ID")} zikir ditambahkan ke catatan harian`);
             }}
-            className="tap flex h-12 items-center justify-center gap-2 rounded-full bg-tz-ink px-5 font-display text-sm font-bold text-white"
+            className="tap flex h-12 items-center justify-center gap-2 rounded-full v5-ink-btn px-5 font-display text-sm font-bold"
           >
             <Save size={16} className="text-tz-lime" /> Simpan Harian
           </button>
@@ -245,7 +245,7 @@ export function TasbihSheet({
               className={cn(
                 "tap min-w-[38px] flex-1 rounded-full px-2 py-1.5 text-[11px] font-bold transition-all",
                 tasbih.target === n
-                  ? "bg-tz-ink text-white"
+                  ? "v5-ink-btn"
                   : "bg-tz-panel-soft text-tz-muted"
               )}
             >

@@ -114,7 +114,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
   };
 
   const saveBtn =
-    "tap flex min-h-[42px] shrink-0 items-center justify-center gap-1.5 rounded-full bg-tz-ink px-4 text-[12.5px] font-bold text-white";
+    "tap flex min-h-[42px] shrink-0 items-center justify-center gap-1.5 rounded-full v5-ink-btn px-4 text-[12.5px] font-bold";
 
   return (
     <m.div
@@ -180,7 +180,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
                 className={cn(
                   "tap flex-1 rounded-full py-1.5 text-[12px] font-bold transition-all",
                   unit === u.id
-                    ? "bg-tz-ink text-white"
+                    ? "v5-ink-btn"
                     : "text-tz-muted"
                 )}
               >

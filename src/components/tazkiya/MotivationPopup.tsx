@@ -82,15 +82,15 @@ function MosqueIcon({ className }: { className?: string }) {
 const VARIANT_ACCENT: Record<MotivationVariant, { badge: string; button: string }> = {
   jamaah: {
     badge: "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent",
-    button: "bg-tz-ink text-white",
+    button: "v5-ink-btn",
   },
   mandiri: {
     badge: "bg-tz-blue-soft text-tz-blue dark:bg-tz-blue/20 dark:text-[#aebcff]",
-    button: "bg-tz-ink text-white",
+    button: "v5-ink-btn",
   },
   missed: {
     badge: "bg-tz-amber-soft text-tz-amber",
-    button: "bg-tz-ink text-white",
+    button: "v5-ink-btn",
   },
 };
 

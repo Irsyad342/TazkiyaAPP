@@ -1,10 +1,11 @@
 "use client";
 
 /**
- * Tazkiya — Halaman autentikasi (Masuk / Daftar / Lupa sandi / Atur sandi baru).
+ * Tazkiya v5 — Halaman autentikasi (Masuk / Daftar / Lupa sandi / Atur sandi baru).
  *
- * Desain selaras aplikasi: ungu glassmorphism, dukungan tema gelap–terang
- * (mengikuti data-theme dari localStorage Tazkiya), mobile-first.
+ * Desain Minimalist Premium: kartu putih terpusat di kanvas #F8F9FC dengan
+ * lingkaran tonal lavender/lime, tipografi Plus Jakarta Sans + Manrope,
+ * dukungan tema gelap–terang (mengikuti data-theme dari localStorage).
  * Bila deployment belum memiliki konfigurasi Supabase, halaman ini jujur
  * menampilkan keterangan "belum dikonfigurasi" — tanpa login palsu.
  */
@@ -186,19 +187,19 @@ function AuthForm() {
           Kembali ke aplikasi
         </Link>
 
-        {/* Kartu kaca */}
-        <div className="glass rounded-[1.65rem] p-6 shadow-[0_1px_2px_rgba(25,25,35,0.04),0_40px_90px_-40px_rgba(46,38,104,0.35)]">
+        {/* Kartu putih bersih — satu-satunya permukaan berbayang di halaman */}
+        <div className="glass rounded-[1.75rem] p-6 shadow-[0_24px_64px_-24px_rgba(34,33,42,0.16)]">
           {/* Logo */}
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] bg-tz-violet font-display text-2xl font-bold text-white shadow-[0_16px_36px_-14px_rgba(136,121,232,0.7)]">
+            <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] bg-tz-violet text-2xl font-bold text-white">
               ت
             </div>
-            <h1 className="mt-3 font-display text-[22px] font-bold tracking-tight text-tz-ink">Tazkiya</h1>
-            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-tz-accent/90">A Better Daily Journey</p>
+            <h1 className="mt-3 text-[22px] font-extrabold tracking-[-0.02em] text-tz-ink">Tazkiya</h1>
+            <p className="v5-overline mt-1">A Better Daily Journey</p>
           </div>
 
-          <div className="mt-5">
-            <h2 className="font-display text-[16px] font-bold text-tz-ink">{title}</h2>
+          <div className="mt-6 border-t border-tz-line pt-5">
+            <h2 className="text-[16.5px] font-bold tracking-[-0.01em] text-tz-ink">{title}</h2>
             <p className="mt-0.5 text-[12px] text-tz-muted">{subtitle}</p>
           </div>
 
@@ -258,7 +259,7 @@ function AuthForm() {
               <button
                 type="submit"
                 disabled={unconfigured || busy || loading}
-                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-sm font-bold text-white transition-all disabled:opacity-60"
+                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn font-display text-sm font-bold transition-all disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={17} className="animate-spin" /> : <KeyRound size={16} />}
                 {busy ? "Menyimpan…" : "Simpan kata sandi baru"}
@@ -289,7 +290,7 @@ function AuthForm() {
               <button
                 type="submit"
                 disabled={unconfigured || busy || loading}
-                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-sm font-bold text-white transition-all disabled:opacity-60"
+                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn font-display text-sm font-bold transition-all disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={17} className="animate-spin" /> : <Mail size={16} />}
                 {busy ? "Mengirim…" : "Kirim tautan atur ulang"}
@@ -331,7 +332,7 @@ function AuthForm() {
                     className={cn(
                       "tap flex min-h-[38px] items-center justify-center gap-1.5 rounded-lg text-[12.5px] font-bold transition-all",
                       mode === t.id
-                        ? "bg-tz-ink text-white"
+                        ? "v5-ink-btn"
                         : "text-tz-muted hover:text-tz-ink"
                     )}
                   >
@@ -435,7 +436,7 @@ function AuthForm() {
                 <button
                   type="submit"
                   disabled={unconfigured || busy || loading}
-                  className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-sm font-bold text-white transition-all disabled:opacity-60"
+                  className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn font-display text-sm font-bold transition-all disabled:opacity-60"
                 >
                   {busy ? <LoaderCircle size={17} className="animate-spin" /> : mode === "login" ? <LogIn size={16} /> : <UserPlus size={16} />}
                   {busy ? (mode === "login" ? "Memproses…" : "Mendaftarkan…") : mode === "login" ? "Masuk" : "Buat Akun"}

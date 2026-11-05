@@ -1,15 +1,28 @@
 "use client";
 
 /**
- * Tazkiya v4 — Rizq & Amal sebagai personal habit tracker beraksen hijau.
- * Komposisi baru: ringkasan angka-besar + bar mingguan hijau dalam satu kartu
- * hero, chip target kebaikan, formulir catat amal dengan tombol tinta, daftar
- * hari ini & riwayat. Prinsip tetap: tanpa penilaian keimanan, tanpa
- * kompetisi, tanpa perhitungan keuangan.
+ * Tazkiya v5 — Rizq & Amal sebagai personal habit tracker minimalis.
+ * Komposisi: blok statistik angka-besar (aksen garis lime) + bar mingguan
+ * lavender, chip target kebaikan, formulir catat dengan tombol tinta,
+ * daftar hari ini & riwayat ber-hairline. Jenis kebaikan memakai ikon
+ * Lucide seragam (bukan emoji). Prinsip tetap: tanpa penilaian keimanan,
+ * tanpa kompetisi, tanpa perhitungan keuangan.
  */
 
 import { useMemo, useState } from "react";
-import { Check, HandCoins, Plus, Sparkles, Trash2, X } from "lucide-react";
+import {
+  BookOpen,
+  Check,
+  HandCoins,
+  HandHeart,
+  MessageCircleHeart,
+  Plus,
+  Sparkles,
+  Sprout,
+  Trash2,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { AMAL_KINDS, amalKindLabel, type AmalKind } from "@/lib/tazkiya/types";
@@ -20,6 +33,16 @@ import { SubPageHeader } from "./SubPageHeader";
 import { cn } from "@/lib/utils";
 
 const inputCls = "tz-field";
+
+/** Ikon Lucide seragam per jenis kebaikan (pengganti emoji dekoratif). */
+const AMAL_ICONS: Record<AmalKind, LucideIcon> = {
+  sedekah: HandCoins,
+  membantu: HandHeart,
+  silaturahmi: MessageCircleHeart,
+  "niat-baik": Sprout,
+  "berbagi-ilmu": BookOpen,
+  lainnya: Sparkles,
+};
 
 export function RizqAmalPage({ onBack }: { onBack: () => void }) {
   const today = todayKey();
@@ -62,40 +85,32 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
 
       <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
         <div className="space-y-6 lg:col-span-7">
-          {/* ---------- Hero tracker: angka besar + bar mingguan ---------- */}
+          {/* ---------- Hero tracker: blok statistik angka besar ---------- */}
           <section aria-label="Ringkasan kebaikan" className="animate-tz-fade-up">
-            <GlassCard className="p-5">
-              <div className="flex items-end justify-between gap-4">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-tz-muted">Kebaikan hari ini</p>
-                  <p className="tnum mt-1 font-display text-[46px] font-bold leading-none tracking-[-0.03em] text-tz-ink">
+            <div className="glass rounded-[1.75rem] p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="v5-overline">Kebaikan hari ini</p>
+                  <p className="v5-display mt-3 text-[46px] font-extrabold leading-none text-tz-ink">
                     {todayEntries.length}
-                    <span className="text-[16px] font-semibold text-tz-muted"> catatan</span>
+                    <span className="text-[15px] font-bold text-tz-muted"> catatan</span>
                   </p>
-                  <p className="mt-1.5 flex items-center gap-1.5 text-[11.5px] font-semibold text-tz-green">
-                    <Sparkles size={13} />
+                  <p className="mt-2.5 flex items-center gap-2 text-[11.5px] font-semibold text-tz-ink/80">
+                    <span aria-hidden className="h-3.5 w-[3px] rounded-full bg-tz-lime" />
                     {weekTotal > 0 ? `${weekTotal} kebaikan dalam 7 hari terakhir` : "Buka jalan dengan satu kebaikan kecil"}
                   </p>
                 </div>
-                <span aria-hidden className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-tz-green-soft">
-                  <svg viewBox="0 0 32 32" className="h-9 w-9" fill="none">
-                    <path d="M16 27V15" stroke="#5FBF7A" strokeWidth="2" strokeLinecap="round" />
-                    <circle cx="11" cy="12" r="5" fill="#5FBF7A" opacity="0.85" />
-                    <circle cx="21.5" cy="9.5" r="3.6" fill="#A8D9B4" />
-                    <circle cx="16" cy="27" r="2" fill="#5FBF7A" />
-                  </svg>
-                </span>
               </div>
 
-              {/* Bar 7 hari */}
+              {/* Bar 7 hari — lavender, hari ini violet */}
               <div className="mt-5 flex items-end justify-between gap-2 border-t border-tz-line pt-4" aria-hidden>
                 {weekCounts.map((c, i) => (
                   <div key={week[i]} className="flex flex-1 flex-col items-center gap-1.5">
                     <span className="tnum text-[9.5px] font-bold text-tz-muted/80">{c > 0 ? c : ""}</span>
                     <div className="flex h-16 w-full items-end">
                       <div
-                        className={cn("tz-bar-grow-x mx-auto w-full max-w-[24px] rounded-full", week[i] === today ? "bg-tz-lime" : "bg-tz-green")}
-                        style={{ height: `${Math.max(c > 0 ? 10 : 3, (c / maxDay) * 100)}%`, opacity: c > 0 ? 1 : 0.3 }}
+                        className={cn("tz-bar-grow-x mx-auto w-full max-w-[24px] rounded-full", week[i] === today ? "bg-tz-violet" : "bg-tz-lav-deco")}
+                        style={{ height: `${Math.max(c > 0 ? 10 : 3, (c / maxDay) * 100)}%` }}
                       />
                     </div>
                     <span className={cn("text-[9.5px]", week[i] === today ? "font-bold text-tz-ink" : "text-tz-muted")}>
@@ -104,7 +119,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                   </div>
                 ))}
               </div>
-            </GlassCard>
+            </div>
           </section>
 
           {/* ---------- Target kebaikan ---------- */}
@@ -135,7 +150,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                       setTitle(g.label);
                       toast.info(`Menulis catatan: ${g.label}`);
                     }}
-                    className="tap rounded-full border border-tz-green/30 bg-tz-green-soft px-3 py-1.5 text-[11.5px] font-semibold text-tz-green transition-all hover:border-tz-green/60"
+                    className="tap rounded-full bg-tz-lavender px-3 py-1.5 text-[11.5px] font-semibold text-tz-violet transition-all hover:bg-tz-lav-deco"
                   >
                     + {g.label}
                   </button>
@@ -182,7 +197,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                         setGoalDraft("");
                         toast.success("Target pribadi ditambahkan");
                       }}
-                      className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-ink text-tz-lime"
+                      className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full v5-ink-btn text-tz-lime"
                     >
                       <Plus size={16} />
                     </button>
@@ -197,24 +212,26 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
             <SectionHeader title="Catat Amal Hari Ini" caption="Sedekah, bantuan, silaturahmi — semua sama berharganya" />
             <GlassCard className="space-y-3 p-4 sm:p-5">
               <div>
-                <p className="mb-1.5 block text-[10.5px] font-semibold uppercase tracking-wide text-tz-muted/90">Jenis kebaikan</p>
+                <p className="v5-overline mb-1.5 block">Jenis kebaikan</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {AMAL_KINDS.map((k) => (
-                    <button
-                      key={k.id}
-                      type="button"
-                      aria-pressed={kind === k.id}
-                      onClick={() => setKind(k.id)}
-                      className={cn(
-                        "tap rounded-full border px-3 py-1.5 text-[11.5px] font-semibold transition-all",
-                        kind === k.id
-                          ? "border-tz-ink bg-tz-ink text-white"
-                          : "border-tz-line bg-tz-panel-soft text-tz-muted hover:text-tz-ink"
-                      )}
-                    >
-                      {k.emoji} {k.label}
-                    </button>
-                  ))}
+                  {AMAL_KINDS.map((k) => {
+                    const Icon = AMAL_ICONS[k.id];
+                    return (
+                      <button
+                        key={k.id}
+                        type="button"
+                        aria-pressed={kind === k.id}
+                        onClick={() => setKind(k.id)}
+                        className={cn(
+                          "tap flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] font-semibold transition-all",
+                          kind === k.id ? "v5-ink-btn" : "bg-tz-panel-soft text-tz-muted hover:text-tz-ink"
+                        )}
+                      >
+                        <Icon size={13} className={kind === k.id ? "text-tz-lime" : "text-tz-violet"} />
+                        {k.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
               <input
@@ -238,7 +255,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
               <button
                 type="button"
                 onClick={submit}
-                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-[14px] font-bold text-white"
+                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn font-display text-[14px] font-bold"
               >
                 <Check size={16} strokeWidth={3} className="text-tz-lime" /> Simpan Catatan
               </button>
@@ -259,32 +276,35 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
               />
             ) : (
               <div className="space-y-2">
-                {todayEntries.map((e) => (
-                  <div key={e.id} className="flex items-center gap-3 rounded-[1.1rem] border border-tz-line bg-tz-panel px-3 py-2.5">
-                    <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-green-soft text-[14px]">
-                      {AMAL_KINDS.find((k) => k.id === e.kind)?.emoji ?? "✨"}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[12.5px] font-semibold text-tz-ink">{e.title}</span>
-                      <span className="block text-[10.5px] text-tz-muted">
-                        {amalKindLabel(e.kind)}
-                        {e.note ? ` · ${e.note}` : ""}
+                {todayEntries.map((e) => {
+                  const Icon = AMAL_ICONS[e.kind] ?? Sparkles;
+                  return (
+                    <div key={e.id} className="flex items-center gap-3 rounded-[1.1rem] bg-tz-panel-soft px-3 py-2.5">
+                      <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet">
+                        <Icon size={15} />
                       </span>
-                    </span>
-                    <ConfirmButton
-                      label="Hapus catatan amal"
-                      title="Hapus catatan amal ini?"
-                      description="Catatan kebaikan hari ini akan dihapus dari riwayat."
-                      onConfirm={() => {
-                        deleteAmalEntry(e.id);
-                        toast.info("Catatan dihapus");
-                      }}
-                      className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-[#E5484D]/10 hover:text-[#E5484D]"
-                    >
-                      <Trash2 size={14} />
-                    </ConfirmButton>
-                  </div>
-                ))}
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[12.5px] font-semibold text-tz-ink">{e.title}</span>
+                        <span className="block text-[10.5px] text-tz-muted">
+                          {amalKindLabel(e.kind)}
+                          {e.note ? ` · ${e.note}` : ""}
+                        </span>
+                      </span>
+                      <ConfirmButton
+                        label="Hapus catatan amal"
+                        title="Hapus catatan amal ini?"
+                        description="Catatan kebaikan hari ini akan dihapus dari riwayat."
+                        onConfirm={() => {
+                          deleteAmalEntry(e.id);
+                          toast.info("Catatan dihapus");
+                        }}
+                        className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-[#E5484D]/10 hover:text-[#E5484D]"
+                      >
+                        <Trash2 size={14} />
+                      </ConfirmButton>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </section>
@@ -298,31 +318,34 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
           ) : (
             <GlassCard className="thin-scrollbar max-h-[36rem] overflow-y-auto">
               <ul className="divide-y divide-tz-line-soft">
-                {amalEntries.slice(0, 30).map((e) => (
-                  <li key={e.id} className="flex items-center gap-3 px-4 py-2.5">
-                    <span aria-hidden className="text-[14px]">
-                      {AMAL_KINDS.find((k) => k.id === e.kind)?.emoji ?? "✨"}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[12px] font-medium text-tz-ink/90">{e.title}</span>
-                      <span className="block text-[10px] text-tz-muted">
-                        {relativeDayLabel(e.date, today)} · {amalKindLabel(e.kind)}
+                {amalEntries.slice(0, 30).map((e) => {
+                  const Icon = AMAL_ICONS[e.kind] ?? Sparkles;
+                  return (
+                    <li key={e.id} className="flex items-center gap-3 px-4 py-2.5">
+                      <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tz-panel-soft text-tz-violet">
+                        <Icon size={14} />
                       </span>
-                    </span>
-                    <ConfirmButton
-                      label="Hapus catatan"
-                      title="Hapus catatan amal ini?"
-                      description="Catatan kebaikan ini akan dihapus dari riwayat."
-                      onConfirm={() => {
-                        deleteAmalEntry(e.id);
-                        toast.info("Catatan dihapus");
-                      }}
-                      className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-[#E5484D]/10 hover:text-[#E5484D]"
-                    >
-                      <Trash2 size={13} />
-                    </ConfirmButton>
-                  </li>
-                ))}
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[12px] font-medium text-tz-ink/90">{e.title}</span>
+                        <span className="block text-[10px] text-tz-muted">
+                          {relativeDayLabel(e.date, today)} · {amalKindLabel(e.kind)}
+                        </span>
+                      </span>
+                      <ConfirmButton
+                        label="Hapus catatan"
+                        title="Hapus catatan amal ini?"
+                        description="Catatan kebaikan ini akan dihapus dari riwayat."
+                        onConfirm={() => {
+                          deleteAmalEntry(e.id);
+                          toast.info("Catatan dihapus");
+                        }}
+                        className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-[#E5484D]/10 hover:text-[#E5484D]"
+                      >
+                        <Trash2 size={13} />
+                      </ConfirmButton>
+                    </li>
+                  );
+                })}
               </ul>
             </GlassCard>
           )}

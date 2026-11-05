@@ -258,7 +258,7 @@ export function PrayerRecordDialog({
                 aria-hidden
                 className={cn(
                   "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border transition-all",
-                  addToQada ? "border-tz-ink bg-tz-ink text-tz-lime" : "border-tz-line-strong text-transparent"
+                  addToQada ? "border-tz-ink v5-ink-btn text-tz-lime" : "border-tz-line-strong text-transparent"
                 )}
               >
                 <Check size={12} strokeWidth={3.4} />

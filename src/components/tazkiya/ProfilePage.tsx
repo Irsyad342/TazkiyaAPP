@@ -336,7 +336,7 @@ export function ProfilePage({
               type="button"
               aria-label="Ubah foto profil"
               onClick={() => fileRef.current?.click()}
-              className="tap absolute -bottom-0.5 -right-0.5 flex h-8 w-8 items-center justify-center rounded-full border-[3px] border-tz-stage bg-tz-ink text-tz-lime"
+              className="tap absolute -bottom-0.5 -right-0.5 flex h-8 w-8 items-center justify-center rounded-full border-[3px] border-tz-stage v5-ink-btn text-tz-lime"
             >
               <Camera size={14} />
             </button>
@@ -368,7 +368,7 @@ export function ProfilePage({
                     setEditingName(false);
                     toast.success("Nama diperbarui");
                   }}
-                  className="tap flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-tz-ink text-tz-lime"
+                  className="tap flex h-11 w-11 shrink-0 items-center justify-center rounded-full v5-ink-btn text-tz-lime"
                 >
                   <Check size={17} />
                 </button>
@@ -506,7 +506,7 @@ export function ProfilePage({
           <button
             type="button"
             onClick={onGoTracker}
-            className="tap mt-4 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink text-[13.5px] font-bold text-white"
+            className="tap mt-4 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn text-[13.5px] font-bold"
           >
             <ListChecks size={15} className="text-tz-lime" aria-hidden />
             Lanjutkan Tracker
@@ -610,7 +610,7 @@ export function ProfilePage({
               <div className="grid grid-cols-2 gap-2.5 px-4 py-4">
                 <Link
                   href="/auth"
-                  className="tap flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-tz-ink text-[13px] font-bold text-white"
+                  className="tap flex min-h-[44px] items-center justify-center gap-2 rounded-full v5-ink-btn text-[13px] font-bold"
                 >
                   <LogIn size={15} className="text-tz-lime" />
                   Masuk
@@ -891,7 +891,7 @@ export function ProfilePage({
                 type="button"
                 onClick={useCurrentLocation}
                 disabled={geoBusy}
-                className="tap mt-2.5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink text-[13px] font-bold text-white disabled:opacity-50"
+                className="tap mt-2.5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn text-[13px] font-bold disabled:opacity-50"
               >
                 {geoBusy ? <LoaderCircle size={16} className="animate-spin" /> : <LocateFixed size={16} className="text-tz-lime" />}
                 {geoBusy ? "Mencari lokasi…" : settings.geo ? "Perbarui Lokasi Saat Ini" : "Aktifkan Lokasi Otomatis"}
@@ -946,7 +946,7 @@ export function ProfilePage({
                           className={cn(
                             "tap rounded-full px-2.5 py-1 text-[10.5px] font-semibold transition-colors",
                             (settings.prayerMethod ?? "kemenag") === mo.id
-                              ? "bg-tz-ink text-white"
+                              ? "v5-ink-btn"
                               : "bg-tz-panel-soft text-tz-muted hover:text-tz-ink"
                           )}
                         >

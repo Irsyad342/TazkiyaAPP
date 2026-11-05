@@ -305,6 +305,17 @@ html[data-theme="dark"] {
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.035em;
   }
+  /* Tombol tinta (primary): gelap pada tema terang; pada tema gelap tetap
+     permukaan gelap yang terangkat — bukan putih (menghindari teks putih
+     di atas token ink yang ikut memutar terang saat mode gelap). */
+  .v5-ink-btn {
+    background: #22212a;
+    color: #ffffff;
+  }
+  html[data-theme="dark"] .v5-ink-btn {
+    background: #2e2d38;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
   .no-scrollbar {
     scrollbar-width: none;
   }

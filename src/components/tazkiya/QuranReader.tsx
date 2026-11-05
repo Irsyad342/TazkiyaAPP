@@ -384,7 +384,7 @@ export function QuranReader({
               <button
                 type="button"
                 onClick={() => void reload(true)}
-                className="tap mt-1 flex min-h-[42px] items-center gap-2 rounded-full bg-tz-ink px-5 text-sm font-bold text-white"
+                className="tap mt-1 flex min-h-[42px] items-center gap-2 rounded-full v5-ink-btn px-5 text-sm font-bold"
               >
                 <RotateCcw size={15} className="text-tz-lime" /> Coba lagi
               </button>
@@ -392,10 +392,10 @@ export function QuranReader({
           ) : data ? (
             <>
               {/* Panel pembuka surah */}
-              <div className="mb-6 rounded-[1.6rem] border border-tz-line bg-tz-panel px-5 py-6 text-center shadow-[0_1px_2px_rgba(25,25,35,0.03),0_18px_44px_-30px_rgba(46,38,104,0.25)]">
+              <div className="mb-6 rounded-[1.75rem] bg-tz-panel-soft px-5 py-6 text-center">
                 <p className="quran-arabic text-[26px] leading-[1.7] text-tz-ink">{data.surah.arabic}</p>
                 {data.bismillah ? (
-                  <p className="quran-bismillah mt-2 text-[22px] leading-[1.9] text-tz-violet dark:text-tz-accent">{data.bismillah}</p>
+                  <p className="quran-bismillah mt-2 text-[22px] leading-[1.9] text-tz-violet">{data.bismillah}</p>
                 ) : null}
                 {data.fromCache ? (
                   <p className="mt-2 text-[10px] text-tz-muted">Dibaca dari simpanan perangkat (offline)</p>
@@ -414,7 +414,7 @@ export function QuranReader({
                     }}
                     className={cn(
                       "mb-3 rounded-[1.4rem] border px-4 py-4 transition-colors sm:px-5",
-                      active ? "border-tz-violet/30 bg-tz-panel shadow-[0_1px_2px_rgba(25,25,35,0.03),0_18px_44px_-30px_rgba(46,38,104,0.25)]" : "border-transparent"
+                      active ? "border-tz-lav-deco bg-tz-lavender" : "border-transparent"
                     )}
                   >
                     <div className="mb-2.5 flex items-center justify-between gap-2">

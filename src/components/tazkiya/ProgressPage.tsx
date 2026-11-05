@@ -234,11 +234,9 @@ export function ProgressPage() {
   return (
     <div className="space-y-6">
       {/* ---------- Judul ---------- */}
-      <header className="animate-tz-fade-up flex items-end justify-between pt-1">
+      <header className="animate-tz-fade-up pt-1">
         <div>
-          <h1 className="font-display text-[30px] font-bold tracking-[-0.025em] text-tz-ink">
-            Progress<span className="text-tz-violet">.</span>
-          </h1>
+          <h1 className="text-[28px] font-extrabold tracking-[-0.03em] text-tz-ink">Progress</h1>
           <p className="mt-1 text-[12.5px] text-tz-muted">Perjalanan ibadahmu — satu langkah kecil setiap hari</p>
         </div>
       </header>
@@ -381,24 +379,20 @@ export function ProgressPage() {
             </section>
           </div>
 
-          {/* Panel kanan desktop: dua statistik */}
+          {/* Panel kanan desktop: dua statistik — blok editorial, bukan kartu kembar */}
           <div className="mt-5 space-y-5 lg:col-span-5 lg:mt-0">
-            <GlassCard variant="violet" className="p-5">
-              <span aria-hidden className="flex h-10 w-10 items-center justify-center rounded-full bg-white/70 text-tz-amber dark:bg-white/10">
-                <Flame size={18} />
-              </span>
-              <p className="tnum mt-3 font-display text-[40px] font-bold leading-none tracking-tight text-tz-ink">{streak}</p>
-              <p className="mt-1.5 text-[11.5px] font-semibold text-tz-ink/80">Hari beruntun 5 salat</p>
-              <p className="mt-1 text-[10px] leading-relaxed text-tz-muted">Salah satu ukuran — bukan satu-satunya.</p>
-            </GlassCard>
-            <GlassCard className="p-5">
-              <span aria-hidden className="flex h-10 w-10 items-center justify-center rounded-full bg-tz-blue-soft text-tz-blue dark:bg-tz-blue/20 dark:text-[#aebcff]">
-                <Trophy size={18} />
-              </span>
-              <p className="tnum mt-3 font-display text-[40px] font-bold leading-none tracking-tight text-tz-ink">{weekStreak}</p>
-              <p className="mt-1.5 text-[11.5px] font-semibold text-tz-ink/80">Hari lengkap minggu ini</p>
-              <p className="mt-1 text-[10px] leading-relaxed text-tz-muted">Hari dengan seluruh salat wajib tercatat.</p>
-            </GlassCard>
+            <div className="rounded-[1.75rem] bg-tz-lavender p-5">
+              <p className="v5-overline">Streak</p>
+              <p className="v5-display mt-3 text-[44px] font-extrabold leading-none text-tz-ink">{streak}</p>
+              <p className="mt-1.5 text-[12px] font-semibold text-tz-ink/80">Hari beruntun 5 salat</p>
+              <p className="mt-1 text-[10.5px] leading-relaxed text-tz-muted">Salah satu ukuran — bukan satu-satunya.</p>
+            </div>
+            <div className="glass rounded-[1.75rem] p-5">
+              <p className="v5-overline">Minggu ini</p>
+              <p className="v5-display mt-3 text-[44px] font-extrabold leading-none text-tz-ink">{weekStreak}</p>
+              <p className="mt-1.5 text-[12px] font-semibold text-tz-ink/80">Hari lengkap minggu ini</p>
+              <p className="mt-1 text-[10.5px] leading-relaxed text-tz-muted">Hari dengan seluruh salat wajib tercatat.</p>
+            </div>
           </div>
         </div>
       ) : null}
@@ -549,7 +543,7 @@ export function ProgressPage() {
                       <span
                         className={cn(
                           "tnum flex h-9 w-9 items-center justify-center rounded-full text-[12px] font-bold transition-colors",
-                          d.isToday ? "bg-tz-ink text-white" : "bg-tz-panel-soft text-tz-ink/85"
+                          d.isToday ? "v5-ink-btn" : "bg-tz-panel-soft text-tz-ink/85"
                         )}
                       >
                         {Number(d.key.slice(-2))}
@@ -702,7 +696,7 @@ export function ProgressPage() {
                   <span
                     className={cn(
                       "tnum flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10.5px] font-bold",
-                      idx === 0 ? "bg-tz-ink text-tz-lime" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
+                      idx === 0 ? "v5-ink-btn text-tz-lime" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
                     )}
                   >
                     {idx + 1}
