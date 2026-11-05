@@ -47,159 +47,158 @@
 
 @theme {
   /* ============================================================
-     TAZKIYA V3 — "AURORA PASTEL"
-     Identitas baru: kanvas putih-lavender dengan blob aurora
-     (lavender · biru muda · lime · pink lembut), kartu putih
-     radius besar berbayangan pastel, tipografi Outfit (display)
-     + Plus Jakarta Sans (body), teks navy.
-     Hero aplikasi = gradien aurora ungu→biru; kartu premium =
-     "midnight" navy-lavender. Mode gelap = navy lembut.
-     Nama token lama (tz-violet, tz-purple, dst.) DIPERTAHANKAN
-     sebagai API agar seluruh kelas utilitas halaman ikut berubah
-     warna secara konsisten.
+     TAZKIYA V4 — "A BETTER DAILY JOURNEY"
+     Rekonstruksi visual total. Bahasa desain: editorial produktivitas
+     pada kanvas terang — permukaan putih bersih ber-border hairline,
+     lavendernya terarah (#8879E8), lime hanya aksen (#D5F76A),
+     tipografi Outfit (display/angka besar) + Plus Jakarta Sans (body),
+     Amiri Quran (Arab). Tanpa glassmorphism sebagai gaya dasar, tanpa
+     gradien di kartu, tanpa glow — dekorasi berupa lingkaran besar
+     flat, cincin garis, dan pola titik.
+     Mode gelap: "ink dusk" — netral gelap hangat dengan aksen sama,
+     BUKAN balikan warna terang dan BUKAN ungu gelap.
+     Nama token tz-* DIPERTAHANKAN sebagai API kelas, nilainya baru.
      ============================================================ */
-  --color-tz-ink: #e9e8f8;
-  --color-tz-deep: #23244d;
-  --color-tz-purple: #6756e8;
-  --color-tz-violet: #9b8cfa;
-  --color-tz-lavender: #c3bbff;
-  --color-tz-muted: #8e8cb0;
-  --color-tz-line: rgba(255, 255, 255, 0.09);
-  --color-tz-accent: #b7adff;
-  --color-tz-frame: #13142b;
-  --color-tz-stage: #0c0d1f;
-  --color-tz-panel: #1c1e3a;
-  --color-tz-panel-soft: #191b36;
-  --color-tz-panel-strong: #232547;
-  --color-tz-line-soft: rgba(255, 255, 255, 0.05);
-  --color-tz-line-strong: rgba(255, 255, 255, 0.22);
-  --color-tz-track: rgba(255, 255, 255, 0.12);
-  --color-tz-aurora-a: rgba(46, 42, 96, 0.5);
-  --color-tz-aurora-b: rgba(16, 15, 36, 0.85);
-  --color-tz-orb-deep: #2b2a63;
-  /* Lavender dekoratif (pantulan kaca) — dipakai di kedua tema */
-  --color-tz-lav-deco: #b3a5ff;
-  /* Aksen v3: lime (progres/positif), biru muda (penekanan), pastel lembut */
-  --color-tz-lime: #cff05c;
+  --color-tz-ink: #191923;
+  --color-tz-muted: #858592;
+  --color-tz-deep: #191923;
+  --color-tz-violet: #8879e8;
+  --color-tz-lavender: #eae6ff;
+  --color-tz-lav-deco: #d9d3fb;
+  --color-tz-line: #ececf3;
+  --color-tz-accent: #8879e8;
+  --color-tz-frame: #f7f9fc;
+  --color-tz-stage: #f7f9fc;
+  --color-tz-panel: #ffffff;
+  --color-tz-panel-soft: #f4f4f9;
+  --color-tz-panel-strong: #ffffff;
+  --color-tz-line-soft: #f1f1f7;
+  --color-tz-line-strong: #e0e0ea;
+  --color-tz-track: #ececf3;
+  --color-tz-aurora-a: transparent;
+  --color-tz-aurora-b: transparent;
+  --color-tz-orb-deep: #eae6ff;
+  /* Aksen fungsional */
+  --color-tz-lime: #d5f76a;
+  --color-tz-lime-ink: #3f4d0e;
+  --color-tz-lime-soft: #f3fce0;
   --color-tz-blue: #5b8def;
   --color-tz-blue-soft: #eaf1fe;
-  --color-tz-mint: #efedfd;
-  --color-tz-forest: #262457;
+  --color-tz-mint: #eae6ff;
+  --color-tz-forest: #191923;
+  --color-tz-amber: #f0b34e;
+  --color-tz-amber-soft: #fdf3e0;
+  --color-tz-teal: #3fbcb4;
+  --color-tz-green: #5fbf7a;
+  --color-tz-green-soft: #e9f7ec;
+  --color-tz-rose: #e8698d;
+  --color-tz-sky-soft: #eaf1fe;
 }
 
 :root {
   --radius: 1.1rem;
-  --background: #13142b;
-  --foreground: #e9e8f8;
-  --card: #1c1e3a;
-  --card-foreground: #e9e8f8;
-  --popover: #22244a;
-  --popover-foreground: #e9e8f8;
-  --primary: #9b8cfa;
-  --primary-foreground: #191633;
-  --secondary: rgba(155, 140, 250, 0.15);
-  --secondary-foreground: #cfc8ff;
-  --muted: rgba(255, 255, 255, 0.06);
-  --muted-foreground: #8e8cb0;
-  --accent: rgba(155, 140, 250, 0.16);
-  --accent-foreground: #d4ceff;
-  --destructive: #fb7185;
-  --border: rgba(255, 255, 255, 0.09);
-  --input: rgba(255, 255, 255, 0.14);
-  --ring: #9b8cfa;
-  --chart-1: #9b8cfa;
-  --chart-2: #cff05c;
-  --chart-3: #5b8def;
-  --chart-4: #f2a4c8;
-  --chart-5: #fbc26b;
-  --sidebar: #1c1e3a;
-  --sidebar-foreground: #e9e8f8;
-  --sidebar-primary: #9b8cfa;
-  --sidebar-primary-foreground: #191633;
-  --sidebar-accent: rgba(155, 140, 250, 0.16);
-  --sidebar-accent-foreground: #d4ceff;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #9b8cfa;
-  /* Token turunan tema (bayangan input, fokus, grafik) */
-  --tz-inset: rgba(10, 8, 28, 0.3);
-  --tz-ring-soft: rgba(155, 140, 250, 0.2);
-  --tz-chart-grid: rgba(255, 255, 255, 0.06);
-  --tz-chart-axis: #8e8cb0;
-  --tz-empty-cell: rgba(255, 255, 255, 0.045);
-}
-
-.dark {
-  --background: #13142b;
-  --foreground: #e9e8f8;
-  --card: #1c1e3a;
-  --card-foreground: #e9e8f8;
-  --popover: #22244a;
-  --popover-foreground: #e9e8f8;
-  --primary: #9b8cfa;
-  --primary-foreground: #191633;
-  --secondary: rgba(155, 140, 250, 0.15);
-  --secondary-foreground: #cfc8ff;
-  --muted: rgba(255, 255, 255, 0.06);
-  --muted-foreground: #8e8cb0;
-  --accent: rgba(155, 140, 250, 0.16);
-  --accent-foreground: #d4ceff;
-  --destructive: #fb7185;
-  --border: rgba(255, 255, 255, 0.09);
-  --input: rgba(255, 255, 255, 0.14);
-  --ring: #9b8cfa;
-}
-
-/* ---------- Tema terang — kanvas aurora pastel ala referensi ----------
-   Background #F4F2FB (putih-lavender) · kartu #FFFFFF · teks navy
-   #26243E / muted #8C8AA5 · border #EBE8F5 · ungu merek #7B6CF6
-   lavender #A79BF5 · biru muda #5B8DEF · lime #A8CC2E (teks) */
-html[data-theme="light"] {
-  --background: #f4f2fb;
-  --foreground: #26243e;
+  --background: #f7f9fc;
+  --foreground: #191923;
   --card: #ffffff;
-  --card-foreground: #26243e;
+  --card-foreground: #191923;
   --popover: #ffffff;
-  --popover-foreground: #26243e;
-  --primary: #7b6cf6;
+  --popover-foreground: #191923;
+  --primary: #8879e8;
   --primary-foreground: #ffffff;
-  --secondary: rgba(123, 108, 246, 0.1);
-  --secondary-foreground: #6352d6;
-  --muted: rgba(38, 36, 62, 0.05);
-  --muted-foreground: #8c8aa5;
-  --accent: rgba(123, 108, 246, 0.1);
-  --accent-foreground: #6352d6;
-  --destructive: #e11d48;
-  --border: #ebe8f5;
-  --input: rgba(38, 36, 62, 0.16);
-  --ring: #7b6cf6;
-  --chart-1: #7b6cf6;
+  --secondary: #eae6ff;
+  --secondary-foreground: #5b4dc4;
+  --muted: #f1f1f7;
+  --muted-foreground: #858592;
+  --accent: #eae6ff;
+  --accent-foreground: #5b4dc4;
+  --destructive: #e5484d;
+  --border: #ececf3;
+  --input: #dcdce6;
+  --ring: #8879e8;
+  --chart-1: #8879e8;
   --chart-2: #a8cc2e;
   --chart-3: #5b8def;
-  --chart-4: #ef9cc4;
-  --chart-5: #f6a856;
-  /* Token Tazkiya versi terang */
-  --color-tz-ink: #26243e;
-  --color-tz-muted: #8c8aa5;
-  --color-tz-violet: #7b6cf6;
-  --color-tz-lavender: #7d6ff0;
-  --color-tz-accent: #6f5ff0;
-  --color-tz-frame: #f4f2fb;
-  --color-tz-stage: #e7e3f6;
-  --color-tz-panel: #ffffff;
-  --color-tz-panel-soft: #f7f5fd;
-  --color-tz-panel-strong: #ffffff;
-  --color-tz-line: #ebe8f5;
-  --color-tz-line-soft: rgba(235, 232, 245, 0.72);
-  --color-tz-line-strong: #ded9f0;
-  --color-tz-track: rgba(38, 36, 62, 0.08);
-  --color-tz-aurora-a: rgba(255, 255, 255, 0.6);
-  --color-tz-aurora-b: rgba(236, 231, 250, 0.85);
-  --color-tz-orb-deep: #d3c9f8;
-  --tz-inset: rgba(38, 36, 62, 0.05);
-  --tz-ring-soft: rgba(123, 108, 246, 0.18);
-  --tz-chart-grid: rgba(38, 36, 62, 0.08);
-  --tz-chart-axis: #8c8aa5;
-  --tz-empty-cell: rgba(38, 36, 62, 0.045);
+  --chart-4: #e8698d;
+  --chart-5: #f0b34e;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #191923;
+  --sidebar-primary: #8879e8;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eae6ff;
+  --sidebar-accent-foreground: #5b4dc4;
+  --sidebar-border: #ececf3;
+  --sidebar-ring: #8879e8;
+  /* Token turunan tema */
+  --tz-inset: rgba(25, 25, 35, 0.05);
+  --tz-ring-soft: rgba(136, 121, 232, 0.18);
+  --tz-chart-grid: #ececf3;
+  --tz-chart-axis: #858592;
+  --tz-empty-cell: #f1f1f7;
+}
+
+/* ---------- Mode gelap "ink dusk" ----------
+   Dasar netral-gelap hangat (#14131A), permukaan naik bertahap,
+   border halus, teks putih keabuan; lavender lebih terang agar tetap
+   kontras, lime tetap sama. Tanpa glow, tanpa ungu gelap dominan. */
+html[data-theme="dark"] {
+  --background: #14131a;
+  --foreground: #f1f0f6;
+  --card: #1e1d27;
+  --card-foreground: #f1f0f6;
+  --popover: #232230;
+  --popover-foreground: #f1f0f6;
+  --primary: #9486f0;
+  --primary-foreground: #14131a;
+  --secondary: #262433;
+  --secondary-foreground: #c9c2f5;
+  --muted: #26252f;
+  --muted-foreground: #9c9aa8;
+  --accent: #2a2740;
+  --accent-foreground: #c9c2f5;
+  --destructive: #ff6369;
+  --border: #2c2b36;
+  --input: #3a3946;
+  --ring: #9486f0;
+  --chart-1: #9486f0;
+  --chart-2: #d5f76a;
+  --chart-3: #6f9df2;
+  --chart-4: #ef7fa0;
+  --chart-5: #f0b34e;
+  --sidebar: #17161e;
+  --sidebar-foreground: #f1f0f6;
+  --sidebar-primary: #9486f0;
+  --sidebar-primary-foreground: #14131a;
+  --sidebar-accent: #262433;
+  --sidebar-accent-foreground: #c9c2f5;
+  --sidebar-border: #26252f;
+  --sidebar-ring: #9486f0;
+  /* Token Tazkiya versi gelap */
+  --color-tz-ink: #f1f0f6;
+  --color-tz-muted: #9c9aa8;
+  --color-tz-violet: #9486f0;
+  --color-tz-lavender: #262433;
+  --color-tz-lav-deco: #3a3556;
+  --color-tz-line: #2c2b36;
+  --color-tz-accent: #b7adfa;
+  --color-tz-frame: #14131a;
+  --color-tz-stage: #14131a;
+  --color-tz-panel: #1e1d27;
+  --color-tz-panel-soft: #17161e;
+  --color-tz-panel-strong: #26252f;
+  --color-tz-line-soft: #23222c;
+  --color-tz-line-strong: #3a3946;
+  --color-tz-track: #2c2b36;
+  --tz-inset: rgba(0, 0, 0, 0.28);
+  --tz-ring-soft: rgba(148, 134, 240, 0.22);
+  --tz-chart-grid: #26252f;
+  --tz-chart-axis: #9c9aa8;
+  --tz-empty-cell: #201f29;
+  --color-tz-lime-ink: #22300a;
+  --color-tz-lime-soft: #2a3016;
+  --color-tz-blue-soft: #1d2637;
+  --color-tz-amber-soft: #322a1c;
+  --color-tz-green-soft: #1e2b22;
+  --color-tz-sky-soft: #1d2637;
 }
 
 @layer base {
@@ -208,35 +207,38 @@ html[data-theme="light"] {
     -webkit-tap-highlight-color: transparent;
   }
   html {
-    background-color: #0c0d1f;
+    background-color: #f7f9fc;
+  }
+  html[data-theme="dark"] {
+    background-color: #14131a;
   }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "ss01" on;
   }
   ::selection {
-    color: #191633;
-    background: rgba(155, 140, 250, 0.45);
+    color: #ffffff;
+    background: rgba(136, 121, 232, 0.85);
   }
-  html[data-theme="light"] {
-    background-color: #f4f2fb;
+  html[data-theme="dark"] ::selection {
+    color: #14131a;
+    background: rgba(148, 134, 240, 0.7);
   }
-  html[data-theme="light"] ::selection {
-    color: #26243e;
-    background: rgba(123, 108, 246, 0.2);
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.015em;
   }
 }
 
 @layer utilities {
-  /* ---------- Kartu dasar (glass = kartu putih berbayangan pastel) ----------
-     Permukaan solid tanpa blur: ringan di GPU. Bayangan pastel ungu menyebar
-     lembut ke bawah — ciri khas referensi dashboard premium. */
+  /* ---------- Kartu dasar: putih bersih + hairline + soft shadow ---------- */
   .glass {
     background: var(--color-tz-panel);
     border: 1px solid var(--color-tz-line);
     box-shadow:
-      0 1px 2px rgba(35, 28, 78, 0.04),
-      0 20px 44px -28px rgba(103, 86, 232, 0.3);
+      0 1px 2px rgba(25, 25, 35, 0.03),
+      0 18px 44px -30px rgba(46, 38, 104, 0.25);
   }
   /* Pagar: kelas kaca tidak boleh menimpa position:fixed milik konten dialog
      Radix (AlertDialog/Dialog/Sheet) — tanpa ini dialog jatuh ke alur dokumen
@@ -246,55 +248,65 @@ html[data-theme="light"] {
   [data-slot="sheet-content"] {
     position: fixed !important;
   }
-  /* Modal / sheet / overlay penting: permukaan sama, bayangan lebih hadir */
   .glass-strong {
     background: var(--color-tz-panel);
     border: 1px solid var(--color-tz-line);
     box-shadow:
-      0 1px 2px rgba(35, 28, 78, 0.05),
-      0 28px 70px -28px rgba(103, 86, 232, 0.42);
+      0 2px 6px rgba(25, 25, 35, 0.05),
+      0 32px 80px -32px rgba(46, 38, 104, 0.35);
   }
-  /* Kartu tint lavender — section sekunder (Daily Barakah, hadis, dsb.) */
+  /* Kartu tint lavender lembut (soft purple #EAE6FF) */
   .glass-violet {
-    background: linear-gradient(165deg, rgba(234, 241, 254, 0.65), rgba(255, 255, 255, 0.95) 62%);
-    border: 1px solid rgba(123, 108, 246, 0.16);
-    box-shadow: 0 1px 2px rgba(35, 28, 78, 0.03), 0 16px 36px -26px rgba(103, 86, 232, 0.28);
+    background: var(--color-tz-lavender);
+    border: 1px solid color-mix(in srgb, var(--color-tz-violet) 14%, transparent);
+    box-shadow: none;
   }
   html[data-theme="dark"] .glass-violet {
-    background: linear-gradient(165deg, rgba(91, 141, 239, 0.1), rgba(28, 30, 58, 0.96) 62%);
-    border: 1px solid rgba(155, 140, 250, 0.22);
+    border-color: color-mix(in srgb, var(--color-tz-violet) 26%, transparent);
   }
-  /* Kartu hero AURORA — gradien ungu→biru dengan sapuan lavender & lime,
-     teks putih di kedua tema. Identitas utama aplikasi v3. */
+  /* HERO: lavendernya terarah — SATU permukaan merek flat per layar,
+     tanpa gradien: lingkaran besar tonal sebagai dekorasi geometris. */
   .glass-hero {
-    background:
-      radial-gradient(120% 150% at 88% -12%, rgba(207, 240, 92, 0.2), rgba(207, 240, 92, 0) 46%),
-      radial-gradient(90% 120% at -8% 108%, rgba(242, 164, 200, 0.24), rgba(242, 164, 200, 0) 52%),
-      linear-gradient(138deg, #8b7cf8 0%, #6c5ce7 44%, #5b7bf0 78%, #4f6ce4 100%);
-    border: 1px solid rgba(255, 255, 255, 0.34);
-    box-shadow:
-      0 22px 48px -22px rgba(103, 86, 232, 0.55),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    background: var(--color-tz-violet);
+    border: 1px solid color-mix(in srgb, var(--color-tz-violet) 80%, #ffffff 20%);
+    box-shadow: 0 24px 56px -28px rgba(136, 121, 232, 0.55);
+    position: relative;
+    overflow: hidden;
+  }
+  .glass-hero::before {
+    content: "";
+    position: absolute;
+    right: -14%;
+    top: -58%;
+    width: 62%;
+    aspect-ratio: 1;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.12);
+    pointer-events: none;
+  }
+  .glass-hero::after {
+    content: "";
+    position: absolute;
+    right: 4%;
+    top: -30%;
+    width: 34%;
+    aspect-ratio: 1;
+    border-radius: 9999px;
+    border: 1.5px solid rgba(255, 255, 255, 0.22);
+    pointer-events: none;
   }
   .tz-card-clean {
     background: var(--color-tz-panel);
     border: 1px solid var(--color-tz-line);
     box-shadow:
-      0 1px 2px rgba(35, 28, 78, 0.04),
-      0 20px 44px -28px rgba(103, 86, 232, 0.3);
+      0 1px 2px rgba(25, 25, 35, 0.03),
+      0 18px 44px -30px rgba(46, 38, 104, 0.25);
   }
-  /* Aura latar: sapuan lavender-biru sangat lembut di belakang bingkai */
+  /* Latar stage: kanvas polos + pola titik sangat samar di tepi atas */
   .tz-aurora {
-    background:
-      radial-gradient(56% 40% at 84% -6%, rgba(155, 140, 250, 0.12), rgba(155, 140, 250, 0) 66%),
-      radial-gradient(44% 34% at 8% 6%, rgba(91, 141, 239, 0.09), rgba(91, 141, 239, 0) 68%),
-      radial-gradient(40% 30% at 52% 106%, rgba(207, 240, 92, 0.07), rgba(207, 240, 92, 0) 70%);
-  }
-  html[data-theme="light"] .tz-aurora {
-    background:
-      radial-gradient(56% 40% at 84% -6%, rgba(195, 187, 255, 0.34), rgba(195, 187, 255, 0) 66%),
-      radial-gradient(44% 34% at 6% 4%, rgba(196, 221, 253, 0.4), rgba(196, 221, 253, 0) 68%),
-      radial-gradient(38% 28% at 50% 108%, rgba(223, 244, 168, 0.42), rgba(223, 244, 168, 0) 70%);
+    background-image: radial-gradient(color-mix(in srgb, var(--color-tz-muted) 22%, transparent) 1px, transparent 1px);
+    background-size: 18px 18px;
+    opacity: 0.14;
   }
   .no-scrollbar {
     scrollbar-width: none;
@@ -304,13 +316,13 @@ html[data-theme="light"] {
   }
   .thin-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(123, 108, 246, 0.35) transparent;
+    scrollbar-color: rgba(136, 121, 232, 0.4) transparent;
   }
   .thin-scrollbar::-webkit-scrollbar {
     width: 5px;
   }
   .thin-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(123, 108, 246, 0.35);
+    background: rgba(136, 121, 232, 0.4);
     border-radius: 999px;
   }
   .tap {
@@ -322,25 +334,25 @@ html[data-theme="light"] {
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  /* Alias kelas lama → bahasa visual baru: judul ungu merek, bukan gradien */
+  /* Angka editorial: Outfit tabular agar countdown tidak bergoyang */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Alias lama dipertahankan agar tidak ada kelas menggantung */
   .text-gradient-violet {
     color: var(--color-tz-accent);
   }
   .text-glow {
     text-shadow: none;
   }
-  .glow-violet {
-    box-shadow: 0 10px 26px -12px rgba(103, 86, 232, 0.55);
-  }
+  .glow-violet,
   .glow-violet-sm {
-    box-shadow: 0 8px 20px -10px rgba(103, 86, 232, 0.5);
+    box-shadow: 0 12px 28px -14px rgba(136, 121, 232, 0.45);
   }
 }
 
-/* ---------- Kolom formulir tema-sadar (dipakai semua input aplikasi) ----------
-   Sengaja di @layer components — BUKAN utilities — agar utility Tailwind
-   (pl-*, pr-*, border-*, min-h-*, resize-*) SELALU menang atas gaya dasar field. */
 @layer components {
+  /* ---------- Kolom formulir tema-sadar (dipakai semua input aplikasi) ---------- */
   .tz-field {
     width: 100%;
     border-radius: 0.85rem;
@@ -354,11 +366,8 @@ html[data-theme="light"] {
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   }
-  html[data-theme="dark"] .tz-field {
-    background: var(--color-tz-panel-strong);
-  }
   .tz-field::placeholder {
-    color: color-mix(in srgb, var(--color-tz-muted) 70%, transparent);
+    color: color-mix(in srgb, var(--color-tz-muted) 75%, transparent);
   }
   .tz-field:focus {
     border-color: color-mix(in srgb, var(--color-tz-violet) 60%, transparent);
@@ -370,17 +379,16 @@ html[data-theme="light"] {
   }
 }
 
-/* ---------- Mode Liquid Glass (setelan pengguna dipertahankan) ----------
-   Permukaan agak transparan + blur ringan; kedua tema. */
+/* ---------- Mode Liquid Glass (setelan pengguna dipertahankan) ---------- */
 html[data-glass="liquid"] .glass {
-  background: color-mix(in srgb, var(--color-tz-panel) 82%, transparent);
-  -webkit-backdrop-filter: blur(14px) saturate(1.15);
-  backdrop-filter: blur(14px) saturate(1.15);
+  background: color-mix(in srgb, var(--color-tz-panel) 84%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  backdrop-filter: blur(14px) saturate(1.1);
 }
 html[data-glass="liquid"] .glass-strong {
-  background: color-mix(in srgb, var(--color-tz-panel) 90%, transparent);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
-  backdrop-filter: blur(18px) saturate(1.2);
+  background: color-mix(in srgb, var(--color-tz-panel) 92%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  backdrop-filter: blur(18px) saturate(1.15);
 }
 @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
   html[data-glass="liquid"] .glass,
@@ -389,8 +397,7 @@ html[data-glass="liquid"] .glass-strong {
   }
 }
 
-/* ---------- Keyframes animasi (versi ringan) ----------
-   Hanya transform/opacity — dikerjakan kompositor, hormat reduced-motion. */
+/* ---------- Keyframes animasi (ringan, transform/opacity saja) ---------- */
 @keyframes tz-soft-pulse {
   0%,
   100% {
@@ -398,8 +405,8 @@ html[data-glass="liquid"] .glass-strong {
     opacity: 1;
   }
   50% {
-    transform: scale(1.04);
-    opacity: 0.94;
+    transform: scale(1.05);
+    opacity: 0.92;
   }
 }
 @keyframes tz-fade-up {
@@ -410,17 +417,6 @@ html[data-glass="liquid"] .glass-strong {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-@keyframes tz-aurora-drift {
-  0%,
-  100% {
-    opacity: 0.85;
-    transform: translate(0) scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: translate(-4%, 3%) scale(1.08);
   }
 }
 @keyframes tz-spin-slow {
@@ -434,14 +430,11 @@ html[data-glass="liquid"] .glass-strong {
 .animate-tz-fade-up {
   animation: tz-fade-up 0.45s ease both;
 }
-.animate-tz-aurora {
-  animation: tz-aurora-drift 11s ease-in-out infinite;
-}
 .animate-tz-spin-slow {
   animation: tz-spin-slow 14s linear infinite;
 }
 
-/* ---------- Beam progres (kartu target Al-Qur'an) ---------- */
+/* ---------- Beam progres: trek hairline + isian lavender solid ---------- */
 .tz-beam {
   background: var(--color-tz-track);
   border-radius: 999px;
@@ -450,144 +443,105 @@ html[data-glass="liquid"] .glass-strong {
   overflow: hidden;
 }
 .tz-beam-fill {
-  background: linear-gradient(90deg, #6c5ce7, #9b8cfa 55%, #cff05c);
+  background: var(--color-tz-violet);
   border-radius: 999px;
   min-width: 0;
   height: 100%;
   transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
-  overflow: hidden;
 }
 .tz-beam-runner {
   display: none;
 }
 
-/* ---------- Kartu premium MIDNIGHT (Al-Qur'an, Qada) ----------
-   Satu identitas di kedua tema — kartu gelap premium khas referensi
-   ("Prayers to make up"): navy-ungu #23244D, artwork blob lavender &
-   biru + bintang, teks putih. Berbeda total dari hijau hutan v2. */
+/* ---------- Kartu premium "ink" (Al-Qur'an, Qada) ----------
+   Permukaan tinta gelap satu identitas di kedua tema — flat, border
+   halus, lingkaran tonal; pengganti kartu midnight lama. */
 .tz-task-card {
-  --task-bezel: #191a38;
-  --task-art-h: 132px;
-  --task-glass: rgba(48, 44, 104, 0.4);
-  --task-glass-border: rgba(255, 255, 255, 0.13);
+  --task-bezel: #191923;
+  --task-art-h: 0px;
+  --task-glass: rgba(255, 255, 255, 0.08);
+  --task-glass-border: rgba(255, 255, 255, 0.14);
   --task-ink: #ffffff;
   --task-ink-70: rgba(255, 255, 255, 0.78);
   --task-ink-55: rgba(255, 255, 255, 0.58);
   --task-ink-45: rgba(255, 255, 255, 0.48);
-  --task-deco: #cff05c;
-  --task-pill-bg: rgba(255, 255, 255, 0.14);
-  --task-chip-border: rgba(255, 255, 255, 0.17);
+  --task-deco: #d5f76a;
+  --task-pill-bg: rgba(255, 255, 255, 0.12);
+  --task-chip-border: rgba(255, 255, 255, 0.18);
   --task-chip-bg: rgba(255, 255, 255, 0.08);
   background: var(--task-bezel);
-  border-radius: 30px;
-  padding: 7px;
-  box-shadow:
-    0 26px 54px -26px rgba(24, 20, 62, 0.7),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  border-radius: 28px;
+  padding: 20px;
+  box-shadow: 0 26px 54px -30px rgba(25, 25, 35, 0.55);
+  position: relative;
+  overflow: hidden;
+}
+html[data-theme="dark"] .tz-task-card {
+  --task-bezel: #26252f;
+  box-shadow: 0 26px 54px -30px rgba(0, 0, 0, 0.7);
+}
+.tz-task-card::before {
+  content: "";
+  position: absolute;
+  right: -18%;
+  top: -70%;
+  width: 58%;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
 }
 .tz-task-inner {
   position: relative;
-  overflow: hidden;
-  border-radius: 24px;
-  background:
-    radial-gradient(120% 90% at 88% -10%, rgba(207, 240, 92, 0.13), rgba(207, 240, 92, 0) 55%),
-    radial-gradient(115% 82% at 8% 0%, rgba(139, 124, 248, 0.55), rgba(139, 124, 248, 0) 62%),
-    linear-gradient(168deg, #312e6e 0%, #23244d 46%, #272a58 100%);
+  border-radius: 0;
+  background: transparent;
 }
 .tz-task-art {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-.tz-task-art > .tz-task-blob {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(24px);
-}
-.tz-task-blob-violet {
-  left: -12%;
-  top: -28%;
-  width: 55%;
-  height: 54%;
-  background: radial-gradient(closest-side, rgba(155, 140, 250, 0.6), rgba(155, 140, 250, 0));
-}
-.tz-task-blob-gold {
-  right: -8%;
-  top: -34%;
-  width: 50%;
-  height: 50%;
-  background: radial-gradient(closest-side, rgba(91, 141, 239, 0.5), rgba(91, 141, 239, 0));
-}
-.tz-task-blob-hot {
-  left: 36%;
-  top: -18%;
-  width: 32%;
-  height: 38%;
-  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0));
-}
-.tz-task-art--spot .tz-task-blob-gold {
-  left: -10%;
-  right: auto;
-}
-.tz-task-art--spot .tz-task-blob-violet {
-  left: auto;
-  right: -12%;
+  display: none;
 }
 .tz-task-panel {
   position: relative;
   z-index: 1;
-  margin-top: var(--task-art-h);
-  background: var(--task-glass);
-  -webkit-backdrop-filter: blur(14px) saturate(1.3);
-  backdrop-filter: blur(14px) saturate(1.3);
-  border-radius: 0 0 24px 24px;
-  padding: 9px 18px 20px;
+  margin-top: 0;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
 }
 .tz-task-tab {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
+  position: static;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   max-width: 92%;
-  background: var(--task-glass);
-  -webkit-backdrop-filter: blur(14px) saturate(1.3);
-  backdrop-filter: blur(14px) saturate(1.3);
-  border-radius: 14px 22px 0 0;
-  padding: 12px 18px 8px;
+  background: transparent;
+  border-radius: 0;
+  padding: 0 0 8px;
 }
 .tz-task-tab::after {
-  content: "";
-  position: absolute;
-  left: 100%;
-  bottom: 0;
-  width: 14px;
-  height: 14px;
-  background: radial-gradient(circle at 100% 0, rgba(0, 0, 0, 0) 14px, var(--task-glass) 14.5px);
+  content: none;
 }
 .tz-task-card .tz-beam {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.16);
 }
 .tz-task-card .tz-beam-fill {
-  background: linear-gradient(90deg, #9b8cfa, #cff05c);
+  background: var(--task-deco);
 }
 
-/* ---------- Piringan tasbih ---------- */
+/* ---------- Piringan tasbih: cincin lavender flat di permukaan karta ---------- */
 .tz-tasbih-disc {
-  background: linear-gradient(150deg, rgba(155, 140, 250, 0.36), rgba(30, 28, 74, 0.9) 62%, rgba(20, 18, 52, 0.96));
+  background: var(--color-tz-panel);
 }
 html[data-theme="light"] .tz-tasbih-disc {
-  background: linear-gradient(150deg, rgba(255, 255, 255, 0.98), rgba(228, 224, 253, 0.92) 58%, rgba(155, 140, 250, 0.55));
+  background: var(--color-tz-panel);
   box-shadow:
-    inset 0 2px 22px rgba(255, 255, 255, 0.95),
-    0 24px 54px -16px rgba(103, 86, 232, 0.4);
+    inset 0 0 0 1px var(--color-tz-line),
+    0 24px 54px -24px rgba(136, 121, 232, 0.4);
 }
 
-/* ---------- Bintang dekoratif hero aurora (sekali-jalan + statis) ---------- */
+/* ---------- Bintang/bingkai dekoratif garis ---------- */
 .tz-star {
-  opacity: 0.55;
+  opacity: 0.4;
 }
 .tz-star.twinkle {
   animation: tz-twinkle 3.2s ease-in-out infinite;
@@ -595,26 +549,23 @@ html[data-theme="light"] .tz-tasbih-disc {
 @keyframes tz-twinkle {
   0%,
   100% {
-    opacity: 0.25;
+    opacity: 0.2;
     transform: scale(0.85);
   }
   50% {
-    opacity: 0.9;
+    opacity: 0.7;
     transform: scale(1.1);
   }
 }
 
 /* ---------- Mode hemat animasi (saklar "Animasi transisi" = mati) ---------- */
-html[data-anim="off"] .animate-tz-aurora,
 html[data-anim="off"] .animate-tz-pulse,
 html[data-anim="off"] .animate-tz-spin-slow,
 html[data-anim="off"] .tz-star.twinkle {
   animation: none !important;
 }
 
-/* Hemat daya OS: hormati preferensi "kurangi gerak" pengguna */
 @media (prefers-reduced-motion: reduce) {
-  html .animate-tz-aurora,
   html .animate-tz-pulse,
   html .animate-tz-spin-slow,
   html .tz-sparkle,
@@ -636,9 +587,7 @@ html[data-anim="off"] .tz-star.twinkle {
   font-family: var(--font-amiri), "Amiri Quran", Amiri, serif;
 }
 
-/* ---------- Hemat paint daftar panjang ----------
-   114 baris surah / 30 baris juz: baris di luar viewport tidak dilayout &
-   tidak dirender sampai mendekat (scroll tetap mulus, tab Al-Qur'an ringan). */
+/* ---------- Hemat paint daftar panjang ---------- */
 .tz-list-cv > * {
   content-visibility: auto;
   contain-intrinsic-size: auto 88px;
@@ -675,7 +624,7 @@ html[data-anim="off"] .tz-sparkle {
   }
 }
 
-/* ---------- Animasi ringan redesign (bar, pop, fade) ---------- */
+/* ---------- Animasi ringan (bar, pop, fade) ---------- */
 .tz-bar-grow {
   transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }

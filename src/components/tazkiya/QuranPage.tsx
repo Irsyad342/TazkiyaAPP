@@ -1,11 +1,12 @@
 "use client";
 
 /**
- * Tazkiya — Halaman Al-Qur'an.
- * Kartu target bacaan, sorotan surah paling sering dibaca, jelajah surah
- * (pencarian + filter + sortir dalam grid 2 kolom), juz 1–30, pencatatan
- * ringkas (cukup surah & ayat — rentang dan penanda diisi otomatis), dan
- * riwayat bacaan.
+ * Tazkiya v4 — Al-Qur'an sebagai aplikasi membaca digital.
+ * Struktur baru: hero lanjutkan bacaan (surah + ayat + ring progres harian),
+ * strip target angka-besar, statistik editorial (angka + hairline, tanpa
+ * kotak), surah favorit, pencarian modern + filter Makkiyah/Madaniyah +
+ * tab garis Surah/Juz, daftar surah berbentuk baris indeks (bukan grid
+ * kartu), penanda ayat, catat bacaan ringkas, dan riwayat.
  */
 
 import { useMemo, useState } from "react";
@@ -52,8 +53,8 @@ const SORT_MODES: { id: SortMode; label: string }[] = [
   { id: "ayat", label: "Ayat" },
 ];
 
-/** Kartu surah ringkas untuk grid jelajah. */
-function SurahCard({
+/** Baris surah — komposisi baru: indeks soft-purple, nama tegas, Arab di kanan. */
+function SurahRow({
   surah,
   showArabic,
   isLastRead,
@@ -71,37 +72,43 @@ function SurahCard({
       <button
         type="button"
         onClick={onOpen}
-        className="tap relative flex h-full w-full flex-col rounded-2xl border border-tz-line bg-tz-panel-soft p-3 text-left transition-all hover:border-tz-violet/45"
+        className="tap group flex w-full items-center gap-3.5 rounded-2xl px-2.5 py-3 text-left transition-colors hover:bg-tz-panel-soft"
         aria-label={`Buka ${surah.latin}`}
       >
-        <div className="flex items-start justify-between gap-1">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#5b8def]/20 bg-[#eef2ff] text-[10.5px] font-bold text-[#3d63c2] dark:border-[#8fa7ff]/25 dark:bg-[#8fa7ff]/15 dark:text-[#aebcff]">
-            {surah.number}
-          </span>
-          {showArabic ? (
-            <span className="quran-arabic truncate text-[15px] leading-snug text-tz-accent/90">{surah.arabic}</span>
-          ) : null}
-        </div>
-        <span className="mt-1.5 flex items-center gap-1 truncate text-[12.5px] font-bold text-tz-ink">
-          {surah.latin}
-          {isBookmarked ? <BookmarkIcon size={11} className="shrink-0 text-tz-accent" aria-label="Ada penanda" /> : null}
+        <span
+          className={cn(
+            "tnum relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.85rem] font-display text-[13px] font-bold",
+            isLastRead ? "bg-tz-violet text-white" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
+          )}
+        >
+          {surah.number}
         </span>
-        <span className="truncate text-[10.5px] text-tz-muted">{surah.meaning}</span>
-        <span className="text-[10px] font-medium text-tz-muted/80">
-          {surah.verses} ayat · {surah.place}
-        </span>
-        {isLastRead ? (
-          <span className="absolute -top-1.5 right-2 rounded-full bg-tz-violet px-1.5 py-px text-[8.5px] font-bold uppercase tracking-wide text-white">
-            Terakhir
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center gap-1.5">
+            <span className="truncate font-display text-[14.5px] font-bold tracking-[-0.01em] text-tz-ink">{surah.latin}</span>
+            {isBookmarked ? <BookmarkIcon size={12} className="shrink-0 text-tz-violet" aria-label="Ada penanda" /> : null}
+            {isLastRead ? (
+              <span className="shrink-0 rounded-full bg-tz-lime px-1.5 py-px text-[8.5px] font-bold uppercase tracking-wide text-tz-lime-ink">
+                Terakhir
+              </span>
+            ) : null}
           </span>
-        ) : null}
+          <span className="mt-0.5 block truncate text-[10.5px] text-tz-muted">
+            {surah.meaning} · {surah.verses} ayat · {surah.place}
+          </span>
+        </span>
+        {showArabic ? (
+          <span className="quran-arabic shrink-0 text-[19px] leading-snug text-tz-violet dark:text-tz-accent">{surah.arabic}</span>
+        ) : (
+          <ChevronRight size={16} className="shrink-0 text-tz-muted/60" />
+        )}
       </button>
     </li>
   );
 }
 
-/** Kartu juz ringkas (juz 1–30 tetap dipertahankan, tampil lebih ringkas). */
-function JuzCard({ juz, onOpen }: { juz: (typeof JUZ_RANGES)[number]; onOpen: () => void }) {
+/** Baris juz ringkas. */
+function JuzRow({ juz, onOpen }: { juz: (typeof JUZ_RANGES)[number]; onOpen: () => void }) {
   const start = getSurah(juz.startSurah);
   const end = getSurah(juz.endSurah);
   return (
@@ -109,21 +116,19 @@ function JuzCard({ juz, onOpen }: { juz: (typeof JUZ_RANGES)[number]; onOpen: ()
       <button
         type="button"
         onClick={onOpen}
-        className="tap flex h-full w-full flex-col rounded-2xl border border-tz-line bg-tz-panel-soft p-3 text-left transition-all hover:border-tz-violet/45"
+        className="tap flex w-full items-center gap-3.5 rounded-2xl px-2.5 py-3 text-left transition-colors hover:bg-tz-panel-soft"
         aria-label={`Buka Juz ${juz.juz} dari ${start?.latin}`}
       >
-        <div className="flex items-center justify-between gap-1">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#5b8def]/20 bg-[#eef2ff] text-[10.5px] font-bold text-[#3d63c2] dark:border-[#8fa7ff]/25 dark:bg-[#8fa7ff]/15 dark:text-[#aebcff]">
-            {juz.juz}
-          </span>
-          <span className="text-[9.5px] font-semibold uppercase tracking-wide text-tz-muted/80">
-            {juz.surahs.length} surah
-          </span>
-        </div>
-        <span className="mt-1.5 truncate text-[12.5px] font-bold text-tz-ink">Juz {juz.juz}</span>
-        <span className="truncate text-[10.5px] text-tz-accent/90">
-          {start?.latin} {juz.startAyah} — {end?.latin} {juz.endAyah}
+        <span className="tnum flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.85rem] bg-tz-lavender font-display text-[13px] font-bold text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+          {juz.juz}
         </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate font-display text-[14.5px] font-bold text-tz-ink">Juz {juz.juz}</span>
+          <span className="block truncate text-[10.5px] text-tz-muted">
+            {start?.latin} {juz.startAyah} — {end?.latin} {juz.endAyah} · {juz.surahs.length} surah
+          </span>
+        </span>
+        <ChevronRight size={16} className="shrink-0 text-tz-muted/60" />
       </button>
     </li>
   );
@@ -298,517 +303,517 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
 
   return (
     <div className="space-y-6">
-      {/* ---------- Judul ---------- */}
+      {/* ---------- Judul halaman ---------- */}
       <header className="animate-tz-fade-up flex items-end justify-between pt-1">
         <div>
-          <h1 className="font-display text-[26px] font-bold tracking-tight text-gradient-violet">Al-Qur&apos;an</h1>
-          <p className="mt-1 text-sm text-tz-muted">Temukan ketenangan dalam setiap ayat</p>
+          <h1 className="font-display text-[30px] font-bold tracking-[-0.025em] text-tz-ink">
+            Al-Qur&apos;an<span className="text-tz-violet">.</span>
+          </h1>
+          <p className="mt-1 text-[12.5px] text-tz-muted">Temukan ketenangan dalam setiap ayat</p>
         </div>
-        <span aria-hidden className="pb-1 font-display text-2xl text-tz-accent/40">
+        <span aria-hidden className="pb-1.5 font-display text-2xl text-tz-violet/45">
           ﴾﴿
         </span>
       </header>
 
-      {/* ---------- Kartu target gaya "Taskello": bingkai + artwork cahaya + tab (ikon tema) ---------- */}
-      <article className="tz-task-card animate-tz-fade-up" aria-label="Target bacaan harian">
-        <div className="tz-task-inner">
-          <div className="tz-task-art" aria-hidden>
-            <span className="tz-task-blob tz-task-blob-violet" />
-            <span className="tz-task-blob tz-task-blob-gold" />
-            <span className="tz-task-blob tz-task-blob-hot" />
-            <p className="absolute right-4 top-3.5 text-right leading-tight text-[color:var(--task-ink)]">
-              <span className="block text-[11px] font-bold tracking-tight">Tazkiya</span>
-              <span className="block text-[9.5px] font-medium text-[color:var(--task-ink-55)]">Al-Qur&apos;an</span>
-            </p>
-          </div>
-          <div className="tz-task-panel">
-            <div className="tz-task-tab">
-              <span className="flex items-center gap-2">
-                <span className="font-display text-[16px] font-bold tracking-tight text-[color:var(--task-ink)]">Target Bacaan Harian</span>
-                <span className="shrink-0 rounded-full bg-[color:var(--task-pill-bg)] px-2 py-0.5 text-[10px] font-bold text-[color:var(--task-ink)]">{pct}%</span>
-              </span>
-              <span className="mt-px truncate text-[11.5px] font-medium text-[color:var(--task-ink-55)]">{targetSubtitle}</span>
-            </div>
-            <div
-              className="tz-beam h-[6px]"
-              role="progressbar"
-              aria-valuenow={pct}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label={`Progres bacaan hari ini ${pct}%`}
-            >
-              <div className="tz-beam-fill" style={{ width: `${pct}%` }}>
-                <span className="tz-beam-runner" />
-              </div>
-            </div>
-            <p className="mt-2.5 text-[12px] leading-relaxed text-[color:var(--task-ink-70)]">
-              {pct >= 100 ? "Target hari ini tercapai. Barakallah!" : `${Math.max(0, targetValue - value).toLocaleString("id-ID")} ${targetType === "surah" ? "ayat" : unit} lagi menuju target`}
-            </p>
-            <p className="mt-1.5 flex items-center gap-1.5 truncate text-[11px] text-[color:var(--task-ink-55)]">
-              <BookmarkIcon size={12} className="shrink-0 text-[color:var(--task-deco)]" />
-              {lastPos
-                ? `Terakhir: ${getSurah(lastPos.surah)?.latin ?? `Surah ${lastPos.surah}`} · ayat ${lastPos.ayah}`
-                : "Belum ada bacaan — buka surah pertamamu"}
-            </p>
-            {/* Baris statistik angka-besar khas kartu referensi */}
-            <div className="mt-4 flex items-end justify-between gap-3">
-              <p className="flex items-baseline gap-2">
-                <span className="font-display text-[36px] font-extrabold leading-none tracking-tight text-[color:var(--task-ink)]">
-                  {value.toLocaleString("id-ID")}
-                </span>
-                <span className="text-[12px] font-semibold text-[color:var(--task-ink-45)]">{unit}</span>
+      <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
+        {/* ---------- Hero lanjutkan bacaan (komposisi baru) ---------- */}
+        <section aria-label="Lanjutkan bacaan" className="animate-tz-fade-up lg:col-span-7">
+          <div className="relative flex h-full flex-col justify-between overflow-hidden rounded-[1.6rem] border border-tz-line bg-tz-panel p-5 shadow-[0_1px_2px_rgba(25,25,35,0.03),0_18px_44px_-30px_rgba(46,38,104,0.25)]">
+            <span aria-hidden className="pointer-events-none absolute -right-10 -top-14 h-40 w-40 rounded-full bg-tz-lavender dark:bg-tz-accent/10" />
+            <span aria-hidden className="pointer-events-none absolute right-6 top-6 h-16 w-16 rounded-full border-[1.5px] border-tz-lav-deco" />
+
+            <div className="relative">
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-tz-muted">
+                {lastPos ? "Lanjutkan Bacaan" : "Mulai Membaca"}
               </p>
-              <p className="text-[14px] font-bold text-[color:var(--task-ink)]">
-                dari {targetValue.toLocaleString("id-ID")} <span className="font-semibold text-[color:var(--task-ink-55)]">{unit}</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      {/* ---------- Lanjutkan bacaan ---------- */}
-      <button
-        type="button"
-        onClick={() => onOpenReader(lastPos?.surah ?? 1, lastPos?.ayah ?? 1)}
-        className="tap glass flex w-full items-center gap-3.5 rounded-[1.3rem] p-4 text-left transition-all hover:border-tz-violet/40"
-        aria-label="Lanjutkan bacaan Al-Qur'an"
-      >
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-white glow-violet-sm">
-          <Play size={18} className="ml-0.5" />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-[10.5px] font-semibold uppercase tracking-[0.14em] text-tz-muted">
-            {lastPos ? "Lanjutkan Bacaan" : "Mulai Membaca"}
-          </span>
-          <span className="block truncate text-[14.5px] font-semibold text-tz-ink">
-            {lastSurahMeta && lastPos ? `${lastSurahMeta.latin} · ayat ${lastPos.ayah}` : "Al-Fatihah · ayat 1"}
-          </span>
-        </span>
-        <ChevronRight size={17} className="shrink-0 text-tz-muted/70" />
-      </button>
-
-      {/* ---------- Progres bacaan: total kumulatif + mingguan ---------- */}
-      <section aria-label="Progres bacaan" className="animate-tz-fade-up">
-        <SectionHeader title="Progres Bacaanmu" caption="Dihitung dari catatan bacaan yang benar-benar kamu lakukan" />
-        <GlassCard className="p-4">
-          <div className="grid grid-cols-3 gap-2.5">
-            {[
-              { value: totalPages.toLocaleString("id-ID"), label: "halaman dibaca" },
-              { value: totalVerses.toLocaleString("id-ID"), label: "ayat dibaca" },
-              { value: daysRead.toLocaleString("id-ID"), label: "hari membaca" },
-            ].map(({ value, label }) => (
-              <div key={label} className="rounded-xl border border-tz-line bg-tz-panel-soft p-2.5 text-center">
-                <p className="font-display text-[20px] font-extrabold leading-none tabular-nums text-tz-ink">{value}</p>
-                <p className="mt-1 text-[9.5px] leading-tight text-tz-muted">{label}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Batang 7 hari — kronologis kiri ke kanan */}
-          <div className="mt-4 flex items-end justify-between gap-1.5" aria-hidden>
-            {lastNDays(7, today).map((k) => {
-              const pages = logs[k]?.quranPages ?? 0;
-              const verses = logs[k]?.quranVerses ?? 0;
-              const h = Math.max(pages > 0 || verses > 0 ? 10 : 2, Math.min(100, (pages / Math.max(1, settings.quranDailyTarget)) * 100));
-              return (
-                <div key={k} className="flex flex-1 flex-col items-center gap-1.5">
-                  <span className="text-[9px] font-semibold tabular-nums text-tz-muted/80">{pages > 0 ? pages : ""}</span>
-                  <div className="flex h-16 w-full items-end">
-                    <div
-                      className="tz-bar-grow-x mx-auto w-full max-w-[22px] rounded-full bg-gradient-to-t from-[#6c5ce7] to-[#9b8cfa]"
-                      style={{ height: `${h}%`, opacity: pages > 0 || verses > 0 ? 1 : 0.35 }}
-                    />
-                  </div>
-                  <span className={cn("text-[9.5px]", k === today ? "font-bold text-tz-accent" : "text-tz-muted")}>{weekdayShort(k)}</span>
-                </div>
-              );
-            })}
-          </div>
-          <p className="mt-2.5 text-[10.5px] leading-relaxed text-tz-muted">
-            Minggu ini: {weekPages.toLocaleString("id-ID")} halaman · {weekVerses.toLocaleString("id-ID")} ayat. Hari tanpa
-            catatan bukan hari gagal — tinggal lanjutkan besok.
-          </p>
-        </GlassCard>
-      </section>
-
-      {/* ---------- Penanda ayat ---------- */}
-      {ayahBookmarks.length > 0 ? (
-        <section aria-label="Ayat yang ditandai" className="animate-tz-fade-up">
-          <SectionHeader title="Ayat Ditandai" caption={`${ayahBookmarks.length} ayat — ketuk untuk membuka`} />
-          <GlassCard className="thin-scrollbar max-h-64 overflow-y-auto">
-            <ul className="divide-y divide-tz-line-soft">
-              {ayahBookmarks.slice(0, 20).map((b) => {
-                const meta = getSurah(b.surah);
-                return (
-                  <li key={`${b.surah}:${b.ayah}`}>
-                    <button
-                      type="button"
-                      onClick={() => onOpenReader(b.surah, b.ayah)}
-                      className="tap flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-tz-panel-soft"
-                      aria-label={`Buka ${meta?.latin ?? "surah"} ayat ${b.ayah}`}
-                    >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#5b8def]/20 bg-[#eef2ff] text-[#3d63c2] dark:border-[#8fa7ff]/25 dark:bg-[#8fa7ff]/15 dark:text-[#aebcff]">
-                        <BookmarkIcon size={13} />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[12.5px] font-semibold text-tz-ink">
-                          {meta?.latin ?? `Surah ${b.surah}`} · ayat {b.ayah}
-                        </span>
-                        <span className="block text-[10px] text-tz-muted">{relativeDayLabel(b.savedAt.slice(0, 10), today)}</span>
-                      </span>
-                      <ChevronRight size={15} className="shrink-0 text-tz-muted/70" />
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </GlassCard>
-        </section>
-      ) : null}
-
-      {/* ---------- Sorotan: paling sering dibaca (gaya kartu Taskello) ---------- */}
-      {topEntry && topMeta ? (
-        <section aria-label="Surah paling sering dibaca" className="animate-tz-fade-up">
-          <button
-            type="button"
-            onClick={() =>
-              onOpenReader(
-                topEntry[0],
-                lastRead?.surah === topEntry[0] ? lastRead.ayah : manualBookmark?.surah === topEntry[0] ? manualBookmark.ayah : 1
-              )
-            }
-            className="tap block w-full text-left"
-            aria-label={`Buka ${topMeta.latin} — dibaca ${topEntry[1].count} kali`}
-          >
-            <div className="tz-task-card">
-              <div className="tz-task-inner">
-                <div className="tz-task-art tz-task-art--spot" aria-hidden>
-                  <span className="tz-task-blob tz-task-blob-violet" />
-                  <span className="tz-task-blob tz-task-blob-gold" />
-                  <span className="tz-task-blob tz-task-blob-hot" />
-                  <p className="absolute right-4 top-3.5 text-right leading-tight text-[color:var(--task-ink)]">
-                    <span className="block text-[11px] font-bold tracking-tight">Sorotan</span>
-                    <span className="block text-[9.5px] font-medium text-[color:var(--task-ink-55)]">Bacaanmu</span>
+              <div className="mt-2 flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate font-display text-[26px] font-bold tracking-[-0.02em] text-tz-ink">
+                    {lastSurahMeta?.latin ?? "Al-Fatihah"}
+                  </p>
+                  <p className="mt-0.5 text-[11.5px] font-medium text-tz-muted">
+                    Ayat {lastPos?.ayah ?? 1} · {lastSurahMeta?.meaning ?? "Pembukaan"}
                   </p>
                 </div>
-                <div className="tz-task-panel">
-                  <div className="tz-task-tab">
-                    <span className="flex items-baseline gap-2">
-                      <span className="font-display text-[16px] font-bold tracking-tight text-[color:var(--task-ink)]">{topMeta.latin}</span>
-                      {settings.showArabic ? (
-                        <span className="quran-arabic text-[13px] text-[color:var(--task-deco)]">{topMeta.arabic}</span>
-                      ) : null}
-                    </span>
-                    <span className="mt-px truncate text-[11.5px] font-medium text-[color:var(--task-ink-55)]">
-                      Paling sering dibaca · terakhir {relativeDayLabel(topEntry[1].lastDate, today)}
-                    </span>
-                  </div>
-                  {runnerUps.length > 0 ? (
-                    <p className="flex flex-wrap items-center gap-1.5">
-                      <span className="text-[9.5px] font-semibold uppercase tracking-wide text-[color:var(--task-ink-55)]">Juga sering</span>
-                      {runnerUps.map(([n, st], i) => (
-                        <span
-                          key={n}
-                          className="rounded-full border border-[color:var(--task-chip-border)] bg-[color:var(--task-chip-bg)] px-2 py-0.5 text-[10.5px] text-[color:var(--task-ink-70)]"
-                        >
-                          <span className="font-bold text-[color:var(--task-deco)]">{i + 2}.</span> {getSurah(n)?.latin} · {st.count}×
-                        </span>
-                      ))}
-                    </p>
-                  ) : null}
-                  {/* Baris statistik angka-besar khas kartu referensi */}
-                  <div className="mt-4 flex items-end justify-between gap-3">
-                    <p className="flex items-baseline gap-2">
-                      <span className="font-display text-[36px] font-extrabold leading-none tracking-tight text-[color:var(--task-ink)]">
-                        {topEntry[1].count}
-                      </span>
-                      <span className="text-[12px] font-semibold text-[color:var(--task-ink-45)]">kali dibaca</span>
-                    </p>
-                    <p className="text-[14px] font-bold text-[color:var(--task-ink)]">
-                      {topEntry[1].verses.toLocaleString("id-ID")} <span className="font-semibold text-[color:var(--task-ink-55)]">ayat</span>
-                    </p>
-                  </div>
-                </div>
+                {settings.showArabic && lastSurahMeta ? (
+                  <span className="quran-arabic shrink-0 text-[26px] leading-snug text-tz-violet dark:text-tz-accent">
+                    {lastSurahMeta.arabic}
+                  </span>
+                ) : null}
               </div>
             </div>
-          </button>
-        </section>
-      ) : null}
 
-      {/* ---------- Jelajah: pencarian + filter + sortir ---------- */}
-      <section aria-label="Daftar surah dan juz">
-        <GlassCard className="p-4">
-          {/* Pencarian — desain baru: pil lembut, ikon dalam lingkaran, tombol bersihkan */}
-          <div className="relative">
-            <span
-              aria-hidden
-              className="pointer-events-none absolute left-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-tz-violet/25 bg-tz-violet/15 text-tz-accent"
-            >
-              <Search size={13} />
-            </span>
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Cari surah…"
-              aria-label="Cari surah"
-              className={cn(inputCls, "rounded-full! py-2.5! pl-11!", query && "pr-11!")}
-            />
-            {query ? (
+            <div className="relative mt-5 flex items-center justify-between gap-3">
               <button
                 type="button"
-                onClick={() => setQuery("")}
-                aria-label="Bersihkan pencarian"
-                className="tap absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-tz-violet/15 text-tz-muted transition-colors hover:text-tz-accent"
+                onClick={() => onOpenReader(lastPos?.surah ?? 1, lastPos?.ayah ?? 1)}
+                className="tap flex min-h-[46px] items-center gap-2 rounded-full bg-tz-ink px-5 text-[13px] font-bold text-white transition-all hover:bg-tz-ink/90"
               >
-                <X size={14} />
+                <Play size={15} className="text-tz-lime" />
+                {lastPos ? "Lanjutkan" : "Buka Qur'an"}
               </button>
-            ) : null}
+              {manualBookmark ? (
+                <button
+                  type="button"
+                  onClick={() => onOpenReader(manualBookmark.surah, manualBookmark.ayah)}
+                  className="tap flex items-center gap-1.5 rounded-full border border-tz-line-strong px-3 py-2 text-[11px] font-semibold text-tz-muted"
+                >
+                  <BookmarkIcon size={13} className="text-tz-violet" />
+                  Penanda: {getSurah(manualBookmark.surah)?.latin} · {manualBookmark.ayah}
+                </button>
+              ) : null}
+            </div>
           </div>
+        </section>
 
-          <div className="mt-3" role="tablist" aria-label="Pilih daftar">
-            <SegmentedTabs
-              ariaLabel="Pilih daftar surah atau juz"
-              className="grid-cols-2"
-              items={[
-                { id: "surah" as const, label: `Surah (${SURAH_LIST.length})` },
-                { id: "juz" as const, label: `Juz (${JUZ_RANGES.length})` },
-              ]}
-              value={listMode}
-              onChange={setListMode}
-            />
-          </div>
+        {/* ---------- Target bacaan hari ini (angka besar + ring) ---------- */}
+        <section aria-label="Target bacaan harian" className="animate-tz-fade-up mt-6 lg:col-span-5 lg:mt-0">
+          <GlassCard className="flex h-full items-center gap-5 p-5">
+            <div className="relative inline-flex shrink-0 items-center justify-center" style={{ width: 92, height: 92 }}>
+              <svg width={92} height={92} className="-rotate-90">
+                <circle cx={46} cy={46} r={40} fill="none" strokeWidth={8} className="stroke-tz-track" />
+                <circle
+                  cx={46}
+                  cy={46}
+                  r={40}
+                  fill="none"
+                  strokeWidth={8}
+                  strokeLinecap="round"
+                  className="stroke-tz-lime"
+                  strokeDasharray={`${(pct / 100) * 2 * Math.PI * 40} ${2 * Math.PI * 40}`}
+                  style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.22, 1, 0.36, 1)" }}
+                />
+              </svg>
+              <span className="tnum absolute font-display text-[20px] font-bold text-tz-ink">{pct}%</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-tz-muted">Target Bacaan</p>
+              <p className="mt-1 flex items-baseline gap-1.5">
+                <span className="tnum font-display text-[32px] font-bold leading-none tracking-tight text-tz-ink">
+                  {value.toLocaleString("id-ID")}
+                </span>
+                <span className="text-[11.5px] font-semibold text-tz-muted">/ {targetValue.toLocaleString("id-ID")} {targetType === "surah" ? "ayat" : unit}</span>
+              </p>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-tz-muted">
+                {pct >= 100 ? "Target hari ini tercapai. Barakallah!" : `${Math.max(0, targetValue - value).toLocaleString("id-ID")} ${targetType === "surah" ? "ayat" : unit} lagi · ${targetSubtitle}`}
+              </p>
+            </div>
+          </GlassCard>
+        </section>
 
-          {listMode === "surah" ? (
-            <>
-              {/* Filter cepat */}
-              <div className="-mx-1 mt-3 flex gap-1.5 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none]" role="group" aria-label="Filter surah">
-                {PLACE_FILTERS.map((f) => (
-                  <button
-                    key={f.id}
-                    type="button"
-                    aria-pressed={placeFilter === f.id}
-                    onClick={() => setPlaceFilter(f.id)}
-                    className={cn(
-                      "tap shrink-0 rounded-full border px-3 py-1.5 text-[11.5px] font-semibold transition-all",
-                      placeFilter === f.id
-                        ? "border-tz-violet/60 bg-tz-violet text-white shadow-[0_4px_14px_-6px_rgba(108,92,231,0.9)]"
-                        : "border-tz-line bg-tz-panel-soft text-tz-muted hover:text-tz-accent"
-                    )}
-                  >
-                    {f.label}
-                    {f.id === "Makkiyah" ? ` · ${filterCounts.makkiyah}` : ""}
-                    {f.id === "Madaniyah" ? ` · ${filterCounts.madaniyah}` : ""}
-                    {f.id === "ditandai" ? ` · ${filterCounts.ditandai}` : ""}
-                  </button>
-                ))}
+        {/* ---------- Statistik editorial: angka besar + hairline ---------- */}
+        <section aria-label="Progres bacaan" className="animate-tz-fade-up mt-6 lg:col-span-12">
+          <GlassCard className="p-5">
+            <div className="grid grid-cols-3 divide-x divide-tz-line">
+              {[
+                { value: totalPages.toLocaleString("id-ID"), label: "halaman dibaca" },
+                { value: totalVerses.toLocaleString("id-ID"), label: "ayat dibaca" },
+                { value: daysRead.toLocaleString("id-ID"), label: "hari membaca" },
+              ].map(({ value, label }, i) => (
+                <div key={label} className={cn("px-3 text-center sm:px-6", i === 0 && "pl-0 text-left sm:pl-0")}>
+                  <p className="tnum font-display text-[26px] font-bold leading-none tracking-tight text-tz-ink sm:text-[32px]">{value}</p>
+                  <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-tz-muted">{label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Batang 7 hari — kronologis kiri ke kanan */}
+            <div className="mt-5 flex items-end justify-between gap-1.5 border-t border-tz-line pt-4" aria-hidden>
+              {lastNDays(7, today).map((k) => {
+                const pages = logs[k]?.quranPages ?? 0;
+                const verses = logs[k]?.quranVerses ?? 0;
+                const h = Math.max(pages > 0 || verses > 0 ? 10 : 2, Math.min(100, (pages / Math.max(1, settings.quranDailyTarget)) * 100));
+                return (
+                  <div key={k} className="flex flex-1 flex-col items-center gap-1.5">
+                    <span className="text-[9px] font-semibold tabular-nums text-tz-muted/80">{pages > 0 ? pages : ""}</span>
+                    <div className="flex h-16 w-full items-end">
+                      <div
+                        className={cn("tz-bar-grow-x mx-auto w-full max-w-[24px] rounded-full", k === today ? "bg-tz-lime" : "bg-tz-violet")}
+                        style={{ height: `${h}%`, opacity: pages > 0 || verses > 0 ? 1 : 0.3 }}
+                      />
+                    </div>
+                    <span className={cn("text-[9.5px]", k === today ? "font-bold text-tz-ink" : "text-tz-muted")}>{weekdayShort(k)}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="mt-3 text-[10.5px] leading-relaxed text-tz-muted">
+              Minggu ini: {weekPages.toLocaleString("id-ID")} halaman · {weekVerses.toLocaleString("id-ID")} ayat. Hari tanpa
+              catatan bukan hari gagal — tinggal lanjutkan besok.
+            </p>
+          </GlassCard>
+        </section>
+
+        {/* ---------- Surah favorit ---------- */}
+        {topEntry && topMeta ? (
+          <section aria-label="Surah paling sering dibaca" className="animate-tz-fade-up mt-6 lg:col-span-5">
+            <SectionHeader title="Surah Favorit" caption="Paling sering kamu baca" />
+            <button
+              type="button"
+              onClick={() =>
+                onOpenReader(
+                  topEntry[0],
+                  lastRead?.surah === topEntry[0] ? lastRead.ayah : manualBookmark?.surah === topEntry[0] ? manualBookmark.ayah : 1
+                )
+              }
+              className="tap block w-full text-left"
+              aria-label={`Buka ${topMeta.latin} — dibaca ${topEntry[1].count} kali`}
+            >
+              <div className="relative h-full overflow-hidden rounded-[1.6rem] border border-tz-line bg-tz-lavender p-5 dark:bg-tz-accent/10">
+                <span aria-hidden className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-white/60 dark:bg-white/5" />
+                <div className="relative flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="flex items-baseline gap-2">
+                      <span className="font-display text-[22px] font-bold tracking-[-0.02em] text-tz-ink">{topMeta.latin}</span>
+                      {settings.showArabic ? (
+                        <span className="quran-arabic text-[16px] text-tz-violet dark:text-tz-accent">{topMeta.arabic}</span>
+                      ) : null}
+                    </p>
+                    <p className="mt-0.5 text-[11px] font-medium text-tz-muted">
+                      Terakhir dibaca {relativeDayLabel(topEntry[1].lastDate, today)}
+                    </p>
+                  </div>
+                  <span aria-hidden className="absolute right-0 top-0 h-2 w-2 rounded-full bg-tz-lime" />
+                </div>
+                <p className="relative mt-4 flex items-baseline gap-2">
+                  <span className="tnum font-display text-[40px] font-bold leading-none tracking-tight text-tz-ink">{topEntry[1].count}</span>
+                  <span className="text-[11.5px] font-semibold text-tz-muted">kali dibaca</span>
+                  <span className="ml-auto text-[12px] font-bold text-tz-violet dark:text-tz-accent">
+                    {topEntry[1].verses.toLocaleString("id-ID")} ayat
+                  </span>
+                </p>
+                {runnerUps.length > 0 ? (
+                  <p className="relative mt-3 flex flex-wrap items-center gap-1.5 border-t border-tz-violet/20 pt-3">
+                    <span className="text-[9.5px] font-bold uppercase tracking-wide text-tz-muted">Juga sering</span>
+                    {runnerUps.map(([n, st], i) => (
+                      <span
+                        key={n}
+                        className="rounded-full bg-white/70 px-2 py-0.5 text-[10.5px] font-semibold text-tz-ink/85 dark:bg-white/10 dark:text-tz-ink/85"
+                      >
+                        {i + 2}. {getSurah(n)?.latin} · {st.count}×
+                      </span>
+                    ))}
+                  </p>
+                ) : null}
               </div>
-              {/* Sortir + jumlah hasil */}
-              <div className="mt-2.5 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5" role="group" aria-label="Urutkan surah">
-                  <span className="text-[10px] font-semibold uppercase tracking-wide text-tz-muted/80">Urut</span>
-                  {SORT_MODES.map((s) => (
+            </button>
+          </section>
+        ) : null}
+
+        {/* ---------- Penanda ayat ---------- */}
+        {ayahBookmarks.length > 0 ? (
+          <section aria-label="Ayat yang ditandai" className="animate-tz-fade-up mt-6 lg:col-span-7">
+            <SectionHeader title="Ayat Ditandai" caption={`${ayahBookmarks.length} ayat — ketuk untuk membuka`} />
+            <GlassCard className="thin-scrollbar max-h-64 overflow-y-auto">
+              <ul className="divide-y divide-tz-line-soft">
+                {ayahBookmarks.slice(0, 20).map((b) => {
+                  const meta = getSurah(b.surah);
+                  return (
+                    <li key={`${b.surah}:${b.ayah}`}>
+                      <button
+                        type="button"
+                        onClick={() => onOpenReader(b.surah, b.ayah)}
+                        className="tap flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-tz-panel-soft"
+                        aria-label={`Buka ${meta?.latin ?? "surah"} ayat ${b.ayah}`}
+                      >
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                          <BookmarkIcon size={13} />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[12.5px] font-semibold text-tz-ink">
+                            {meta?.latin ?? `Surah ${b.surah}`} · ayat {b.ayah}
+                          </span>
+                          <span className="block text-[10px] text-tz-muted">{relativeDayLabel(b.savedAt.slice(0, 10), today)}</span>
+                        </span>
+                        <ChevronRight size={15} className="shrink-0 text-tz-muted/70" />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </GlassCard>
+          </section>
+        ) : null}
+
+        {/* ---------- Jelajah: pencarian + filter + tab + daftar baris ---------- */}
+        <section aria-label="Daftar surah dan juz" className="animate-tz-fade-up mt-6 lg:col-span-12">
+          <SectionHeader title="Jelajah" caption="Cari surah atau juz, filter tempat turunnya" />
+          <GlassCard className="p-4 sm:p-5">
+            {/* Pencarian pil modern */}
+            <div className="relative">
+              <span
+                aria-hidden
+                className="pointer-events-none absolute left-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/20 dark:text-tz-accent"
+              >
+                <Search size={13} />
+              </span>
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Cari surah, arti, atau nomor…"
+                aria-label="Cari surah"
+                className={cn(inputCls, "rounded-full! py-2.5! pl-11!", query && "pr-11!")}
+              />
+              {query ? (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  aria-label="Bersihkan pencarian"
+                  className="tap absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-tz-panel-soft text-tz-muted transition-colors hover:text-tz-ink"
+                >
+                  <X size={14} />
+                </button>
+              ) : null}
+            </div>
+
+            <div className="mt-4" role="tablist" aria-label="Pilih daftar">
+              <SegmentedTabs
+                ariaLabel="Pilih daftar surah atau juz"
+                items={[
+                  { id: "surah" as const, label: `Surah (${SURAH_LIST.length})` },
+                  { id: "juz" as const, label: `Juz (${JUZ_RANGES.length})` },
+                ]}
+                value={listMode}
+                onChange={setListMode}
+              />
+            </div>
+
+            {listMode === "surah" ? (
+              <>
+                {/* Filter tempat turun */}
+                <div className="-mx-1 mt-4 flex gap-1.5 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none]" role="group" aria-label="Filter surah">
+                  {PLACE_FILTERS.map((f) => (
                     <button
-                      key={s.id}
+                      key={f.id}
                       type="button"
-                      aria-pressed={sortMode === s.id}
-                      onClick={() => setSortMode(s.id)}
+                      aria-pressed={placeFilter === f.id}
+                      onClick={() => setPlaceFilter(f.id)}
                       className={cn(
-                        "tap rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-all",
-                        sortMode === s.id
-                          ? "border-tz-violet/55 bg-tz-violet/15 text-tz-accent"
-                          : "border-tz-line bg-tz-panel-soft text-tz-muted hover:text-tz-accent"
+                        "tap shrink-0 rounded-full border px-3.5 py-1.5 text-[11.5px] font-semibold transition-all",
+                        placeFilter === f.id
+                          ? "border-tz-ink bg-tz-ink text-white"
+                          : "border-tz-line bg-tz-panel-soft text-tz-muted hover:text-tz-ink"
                       )}
                     >
-                      {s.label}
+                      {f.label}
+                      {f.id === "Makkiyah" ? ` · ${filterCounts.makkiyah}` : ""}
+                      {f.id === "Madaniyah" ? ` · ${filterCounts.madaniyah}` : ""}
+                      {f.id === "ditandai" ? ` · ${filterCounts.ditandai}` : ""}
                     </button>
                   ))}
                 </div>
-                <span className="shrink-0 text-[10.5px] text-tz-muted">{filtered.length} surah</span>
-              </div>
-
-              <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {filtered.map((s) => (
-                  <SurahCard
-                    key={s.number}
-                    surah={s}
-                    showArabic={settings.showArabic}
-                    isLastRead={lastRead?.surah === s.number}
-                    isBookmarked={bookmarkedSurahs.has(s.number)}
-                    onOpen={() => onOpenReader(s.number, lastRead?.surah === s.number ? lastRead.ayah : 1)}
-                  />
-                ))}
-              </ul>
-              {filtered.length === 0 ? (
-                <p className="mt-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3 py-4 text-center text-sm text-tz-muted">
-                  Tidak ada surah yang cocok — coba kata kunci atau filter lain.
-                </p>
-              ) : null}
-            </>
-          ) : (
-            <>
-              <p className="mt-3 text-[10.5px] text-tz-muted">
-                {juzFiltered.length} dari {JUZ_RANGES.length} juz — sentuh untuk membuka dari awal juz.
-              </p>
-              <ul className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {juzFiltered.map((j) => (
-                  <JuzCard key={j.juz} juz={j} onOpen={() => onOpenReader(j.startSurah, j.startAyah)} />
-                ))}
-              </ul>
-              {juzFiltered.length === 0 ? (
-                <p className="mt-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3 py-4 text-center text-sm text-tz-muted">
-                  Juz tidak ditemukan — coba nomor juz atau nama surah di dalamnya.
-                </p>
-              ) : null}
-            </>
-          )}
-        </GlassCard>
-      </section>
-
-      {/* ---------- Catat bacaan & penanda (ringkas) ---------- */}
-      <section aria-label="Catat bacaan dan penanda">
-        <GlassCard className="overflow-hidden">
-          <button
-            type="button"
-            onClick={() => setFormOpen((v) => !v)}
-            className="tap flex w-full items-center gap-3 px-4 py-3.5 text-left"
-            aria-expanded={formOpen}
-          >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-tz-violet/25 bg-tz-violet/15 text-tz-violet">
-              <Plus size={18} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[14px] font-semibold text-tz-ink">Catat Bacaan</span>
-              <span className="block text-[11px] text-tz-muted">Cukup surah &amp; ayat — rentang dan penanda diisi otomatis</span>
-            </span>
-            <ChevronRight size={16} className={cn("shrink-0 text-tz-muted/70 transition-transform", formOpen && "rotate-90")} />
-          </button>
-          {formOpen ? (
-            <div className="space-y-4 border-t border-tz-line-soft p-4">
-              {/* Catat bacaan: hanya surah + ayat */}
-              <div>
-                <p className={labelCls}>Catat bacaan</p>
-                <div className="grid grid-cols-[1.5fr_1fr] gap-3">
-                  <div>
-                    <label className={labelCls} htmlFor="cat-surah">
-                      Surah
-                    </label>
-                    <select id="cat-surah" value={catSurah} onChange={(e) => setCatSurah(e.target.value)} className={inputCls}>
-                      <option value="">— Pilih —</option>
-                      {SURAH_LIST.map((s) => (
-                        <option key={s.number} value={s.number}>
-                          {s.number}. {s.latin}
-                        </option>
-                      ))}
-                    </select>
+                {/* Sortir + jumlah hasil */}
+                <div className="mt-2.5 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5" role="group" aria-label="Urutkan surah">
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-tz-muted/80">Urut</span>
+                    {SORT_MODES.map((s) => (
+                      <button
+                        key={s.id}
+                        type="button"
+                        aria-pressed={sortMode === s.id}
+                        onClick={() => setSortMode(s.id)}
+                        className={cn(
+                          "tap rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all",
+                          sortMode === s.id ? "bg-tz-lavender text-tz-violet dark:bg-tz-accent/20 dark:text-tz-accent" : "text-tz-muted hover:text-tz-ink"
+                        )}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
                   </div>
-                  <div>
-                    <label className={labelCls} htmlFor="cat-ayat">
-                      Ayat terakhir
-                    </label>
-                    <input
-                      id="cat-ayat"
-                      type="number"
-                      min={1}
-                      inputMode="numeric"
-                      placeholder="mis. 10"
-                      value={catAyat}
-                      onChange={(e) => setCatAyat(e.target.value)}
-                      className={inputCls}
-                    />
-                  </div>
+                  <span className="shrink-0 text-[10.5px] text-tz-muted">{filtered.length} surah</span>
                 </div>
-                {catPreview ? (
-                  <p className="mt-2 flex items-start gap-1.5 rounded-xl border border-tz-violet/25 bg-tz-violet/10 px-3 py-2 text-[11px] leading-relaxed text-tz-ink/90">
-                    <Sparkles size={12} className="mt-0.5 shrink-0 text-tz-accent" />
-                    <span>
-                      {catPreview.exceeds ? (
-                        <>
-                          {catPreview.meta.latin} hanya {catPreview.meta.verses} ayat —{" "}
-                        </>
-                      ) : null}
-                      Tercatat: {catPreview.meta.latin} {catPreview.from}
-                      {catPreview.to > catPreview.from ? `–${catPreview.to}` : ""} · {catPreview.to - catPreview.from + 1} ayat ·
-                      penanda pindah ke ayat {catPreview.to}
-                      {catPreview.continuing ? " (lanjutan dari posisi terakhir)" : ""}
-                    </span>
-                  </p>
-                ) : (
-                  <p className="mt-2 text-[11px] leading-relaxed text-tz-muted">
-                    Pilih surah &amp; ayat terakhir — rentang bacaan dihitung otomatis dari posisi terakhirmu.
-                  </p>
-                )}
-                <button
-                  type="button"
-                  onClick={saveCatatan}
-                  className="tap mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[0.9rem] bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] font-semibold text-white shadow-[0_10px_26px_-10px_rgba(108,92,231,0.7),inset_0_1px_0_rgba(255,255,255,0.25)] transition-all hover:brightness-110"
-                >
-                  <Check size={17} /> Simpan Bacaan
-                </button>
-              </div>
-            </div>
-          ) : null}
-        </GlassCard>
-      </section>
 
-      {/* ---------- Riwayat bacaan ---------- */}
-      <section aria-label="Riwayat bacaan">
-        <SectionHeader title="Riwayat Bacaan" caption={`${readingHistory.length} catatan tersimpan`} />
-        {readingHistory.length === 0 ? (
-          <EmptyState
-            icon={<History size={18} />}
-            title="Riwayat masih kosong"
-            caption="Bacaan tercatat otomatis dari pembaca, atau catat manual lewat form di atas."
-          />
-        ) : (
-          <GlassCard className="thin-scrollbar max-h-96 overflow-y-auto">
-            <ul className="divide-y divide-tz-line-soft">
-              {readingHistory.slice(0, 30).map((e) => {
-                const s = e.surah ? getSurah(e.surah) : undefined;
-                return (
-                  <li key={e.id} className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-tz-panel-soft">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-tz-violet/25 bg-tz-violet/12 text-tz-violet">
-                      {e.auto ? <Flame size={15} /> : <BookOpen size={16} />}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[13px] font-medium text-tz-ink/90">
-                        {e.pages > 0 ? `${e.pages.toLocaleString("id-ID")} halaman` : ""}
-                        {e.pages > 0 && e.verses > 0 ? " · " : ""}
-                        {e.verses > 0 ? `${e.verses.toLocaleString("id-ID")} ayat` : ""}
-                        {s ? ` — ${s.latin}${e.ayahFrom ? ` : ${e.ayahFrom}-${e.ayahTo ?? e.ayahFrom}` : ""}` : ""}
-                      </p>
-                      <p className="flex items-center gap-1.5 text-[11px] text-tz-muted">
-                        {relativeDayLabel(e.date, today)}
-                        {e.auto ? (
-                          <span className="inline-flex items-center rounded-full border border-tz-violet/30 bg-tz-violet/10 px-1.5 py-px text-[8.5px] font-bold uppercase tracking-wide text-tz-accent">
-                            Otomatis
-                          </span>
-                        ) : null}
-                      </p>
-                    </div>
-                    <ConfirmButton
-                      label="Hapus catatan bacaan"
-                      title="Hapus catatan bacaan ini?"
-                      description="Catatan ini akan dikeluarkan dari riwayat bacaan. Penanda ayat dan posisi terakhir tidak terpengaruh."
-                      onConfirm={() => {
-                        deleteReadingEntry(e.id);
-                        toast.info("Catatan bacaan dihapus");
-                      }}
-                      className="tap flex h-9 w-9 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-300"
-                    >
-                      <Trash2 size={15} />
-                    </ConfirmButton>
-                  </li>
-                );
-              })}
-            </ul>
+                <ul className="tz-list-cv mt-2 divide-y divide-tz-line-soft sm:grid sm:grid-cols-2 sm:gap-x-4 sm:divide-y-0 lg:grid-cols-3">
+                  {filtered.map((s) => (
+                    <SurahRow
+                      key={s.number}
+                      surah={s}
+                      showArabic={settings.showArabic}
+                      isLastRead={lastRead?.surah === s.number}
+                      isBookmarked={bookmarkedSurahs.has(s.number)}
+                      onOpen={() => onOpenReader(s.number, lastRead?.surah === s.number ? lastRead.ayah : 1)}
+                    />
+                  ))}
+                </ul>
+                {filtered.length === 0 ? (
+                  <p className="mt-3 rounded-2xl border border-tz-line bg-tz-panel-soft px-3 py-4 text-center text-sm text-tz-muted">
+                    Tidak ada surah yang cocok — coba kata kunci atau filter lain.
+                  </p>
+                ) : null}
+              </>
+            ) : (
+              <>
+                <p className="mt-4 text-[10.5px] text-tz-muted">
+                  {juzFiltered.length} dari {JUZ_RANGES.length} juz — sentuh untuk membuka dari awal juz.
+                </p>
+                <ul className="tz-list-cv mt-2 divide-y divide-tz-line-soft sm:grid sm:grid-cols-2 sm:gap-x-4 sm:divide-y-0 lg:grid-cols-3">
+                  {juzFiltered.map((j) => (
+                    <JuzRow key={j.juz} juz={j} onOpen={() => onOpenReader(j.startSurah, j.startAyah)} />
+                  ))}
+                </ul>
+                {juzFiltered.length === 0 ? (
+                  <p className="mt-3 rounded-2xl border border-tz-line bg-tz-panel-soft px-3 py-4 text-center text-sm text-tz-muted">
+                    Juz tidak ditemukan — coba nomor juz atau nama surah di dalamnya.
+                  </p>
+                ) : null}
+              </>
+            )}
           </GlassCard>
-        )}
-      </section>
+        </section>
+
+        {/* ---------- Catat bacaan & penanda (ringkas) ---------- */}
+        <section aria-label="Catat bacaan dan penanda" className="animate-tz-fade-up mt-6 lg:col-span-12">
+          <GlassCard className="overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setFormOpen((v) => !v)}
+              className="tap flex w-full items-center gap-3 px-4 py-3.5 text-left sm:px-5"
+              aria-expanded={formOpen}
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-tz-ink text-tz-lime">
+                <Plus size={18} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-display text-[14.5px] font-bold text-tz-ink">Catat Bacaan</span>
+                <span className="block text-[11px] text-tz-muted">Cukup surah &amp; ayat — rentang dan penanda diisi otomatis</span>
+              </span>
+              <ChevronRight size={16} className={cn("shrink-0 text-tz-muted/70 transition-transform", formOpen && "rotate-90")} />
+            </button>
+            {formOpen ? (
+              <div className="space-y-4 border-t border-tz-line p-4 sm:p-5">
+                {/* Catat bacaan: hanya surah + ayat */}
+                <div>
+                  <p className={labelCls}>Catat bacaan</p>
+                  <div className="grid grid-cols-[1.5fr_1fr] gap-3">
+                    <div>
+                      <label className={labelCls} htmlFor="cat-surah">
+                        Surah
+                      </label>
+                      <select id="cat-surah" value={catSurah} onChange={(e) => setCatSurah(e.target.value)} className={inputCls}>
+                        <option value="">— Pilih —</option>
+                        {SURAH_LIST.map((s) => (
+                          <option key={s.number} value={s.number}>
+                            {s.number}. {s.latin}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className={labelCls} htmlFor="cat-ayat">
+                        Ayat terakhir
+                      </label>
+                      <input
+                        id="cat-ayat"
+                        type="number"
+                        min={1}
+                        inputMode="numeric"
+                        placeholder="mis. 10"
+                        value={catAyat}
+                        onChange={(e) => setCatAyat(e.target.value)}
+                        className={inputCls}
+                      />
+                    </div>
+                  </div>
+                  {catPreview ? (
+                    <p className="mt-2 flex items-start gap-1.5 rounded-2xl border border-tz-violet/25 bg-tz-lavender/50 px-3 py-2 text-[11px] leading-relaxed text-tz-ink/90 dark:bg-tz-accent/10">
+                      <Sparkles size={12} className="mt-0.5 shrink-0 text-tz-violet dark:text-tz-accent" />
+                      <span>
+                        {catPreview.exceeds ? (
+                          <>
+                            {catPreview.meta.latin} hanya {catPreview.meta.verses} ayat —{" "}
+                          </>
+                        ) : null}
+                        Tercatat: {catPreview.meta.latin} {catPreview.from}
+                        {catPreview.to > catPreview.from ? `–${catPreview.to}` : ""} · {catPreview.to - catPreview.from + 1} ayat ·
+                        penanda pindah ke ayat {catPreview.to}
+                        {catPreview.continuing ? " (lanjutan dari posisi terakhir)" : ""}
+                      </span>
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-[11px] leading-relaxed text-tz-muted">
+                      Pilih surah &amp; ayat terakhir — rentang bacaan dihitung otomatis dari posisi terakhirmu.
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={saveCatatan}
+                    className="tap mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-[14px] font-bold text-white transition-all hover:bg-tz-ink/90"
+                  >
+                    <Check size={17} className="text-tz-lime" /> Simpan Bacaan
+                  </button>
+                </div>
+              </div>
+            ) : null}
+          </GlassCard>
+        </section>
+
+        {/* ---------- Riwayat bacaan ---------- */}
+        <section aria-label="Riwayat bacaan" className="animate-tz-fade-up mt-6 lg:col-span-12">
+          <SectionHeader title="Riwayat Bacaan" caption={`${readingHistory.length} catatan tersimpan`} />
+          {readingHistory.length === 0 ? (
+            <EmptyState
+              icon={<History size={18} />}
+              title="Riwayat masih kosong"
+              caption="Bacaan tercatat otomatis dari pembaca, atau catat manual lewat form di atas."
+            />
+          ) : (
+            <GlassCard className="thin-scrollbar max-h-96 overflow-y-auto">
+              <ul className="divide-y divide-tz-line-soft">
+                {readingHistory.slice(0, 30).map((e) => {
+                  const s = e.surah ? getSurah(e.surah) : undefined;
+                  return (
+                    <li key={e.id} className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-tz-panel-soft">
+                      <span
+                        className={cn(
+                          "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
+                          e.auto ? "bg-tz-lime/60 text-tz-lime-ink dark:bg-tz-lime/20 dark:text-tz-lime" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
+                        )}
+                      >
+                        {e.auto ? <Flame size={15} /> : <BookOpen size={16} />}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[13px] font-medium text-tz-ink/90">
+                          {e.pages > 0 ? `${e.pages.toLocaleString("id-ID")} halaman` : ""}
+                          {e.pages > 0 && e.verses > 0 ? " · " : ""}
+                          {e.verses > 0 ? `${e.verses.toLocaleString("id-ID")} ayat` : ""}
+                          {s ? ` — ${s.latin}${e.ayahFrom ? ` : ${e.ayahFrom}-${e.ayahTo ?? e.ayahFrom}` : ""}` : ""}
+                        </p>
+                        <p className="flex items-center gap-1.5 text-[11px] text-tz-muted">
+                          {relativeDayLabel(e.date, today)}
+                          {e.auto ? (
+                            <span className="inline-flex items-center rounded-full bg-tz-lime/50 px-1.5 py-px text-[8.5px] font-bold uppercase tracking-wide text-tz-lime-ink dark:bg-tz-lime/15 dark:text-tz-lime">
+                              Otomatis
+                            </span>
+                          ) : null}
+                        </p>
+                      </div>
+                      <ConfirmButton
+                        label="Hapus catatan bacaan"
+                        title="Hapus catatan bacaan ini?"
+                        description="Catatan ini akan dikeluarkan dari riwayat bacaan. Penanda ayat dan posisi terakhir tidak terpengaruh."
+                        onConfirm={() => {
+                          deleteReadingEntry(e.id);
+                          toast.info("Catatan bacaan dihapus");
+                        }}
+                        className="tap flex h-9 w-9 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-[#E5484D]/10 hover:text-[#E5484D]"
+                      >
+                        <Trash2 size={15} />
+                      </ConfirmButton>
+                    </li>
+                  );
+                })}
+              </ul>
+            </GlassCard>
+          )}
+        </section>
+      </div>
 
       {/* ---------- Catatan sumber ---------- */}
-      <div className="pb-1">
-        <p className="flex items-start gap-1.5 rounded-xl border border-tz-line bg-tz-panel-soft px-3 py-2 text-[11px] leading-relaxed text-tz-muted">
+      <div className="mt-6 pb-1">
+        <p className="flex items-start gap-1.5 rounded-2xl border border-tz-line bg-tz-panel-soft px-3.5 py-2.5 text-[11px] leading-relaxed text-tz-muted">
           <Info size={13} className="mt-0.5 shrink-0" />
           Teks ayat &amp; terjemahan diambil dari AlQuran Cloud API (edisi Uthmani &amp; Kemenag). Bacaan di pembaca tercatat
           otomatis dari ayat awal sampai ayat akhir, dan surah yang pernah dibuka tersimpan di perangkat agar tetap bisa

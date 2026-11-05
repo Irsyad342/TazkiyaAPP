@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * Tazkiya — Jurnal Syukur (halaman tersendiri dari menu Lainnya).
- * A. Today's Shukr: tiga hal yang disyukuri + tombol simpan.
- * B. Mood check-in: pilihan perasaan oleh pengguna (bukan diagnosis).
- * C. Hadith for Your Heart: hadis dengan sumber kitab + nomor yang jelas —
- *    tidak ada teks buatan; dapat disalin/dibagikan dan diganti.
- * D. Privasi: data hanya di perangkat & akun pengguna; riwayat bisa
- *    diedit dan dihapus; tetap ada setelah logout-login.
+ * Tazkiya v4 — Jurnal Syukur sebagai aplikasi journaling premium.
+ * A. Refleksi hari ini: tiga pertanyaan bernomor dalam kolom tulis yang
+ *    lega + tombol simpan tinta.
+ * B. Mood check-in: lingkaran besar terpilih lavender.
+ * C. Hadis kutipan editorial dengan sumber kitab + nomor jelas.
+ * D. Riwayat: daftar kartu kecil berisi pratinjau + edit + hapus (konfirmasi).
+ * Logika simpan/muat/hapus, mood, dan hadis-per-mood tidak berubah.
  */
 
 import { useMemo, useState } from "react";
@@ -78,212 +78,220 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
     <div className="space-y-6">
       <SubPageHeader title="Jurnal Syukur" caption="Refleksi harian — tiga hal kecil yang layak disyukuri" onBack={onBack} />
 
-      {/* ---------- A. Today's Shukr ---------- */}
-      <section aria-label="Jurnal hari ini" className="animate-tz-fade-up">
-        <GlassCard variant="clean" className="p-5">
-          <p className="font-display text-[17px] font-bold leading-snug text-tz-ink">
-            Hal apa yang kamu syukuri hari ini?
-          </p>
-          <p className="mt-1 text-[11.5px] leading-relaxed text-tz-muted">
-            Tulis dengan bebas. Sesederhana apa pun tetap berharga.
-          </p>
+      <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
+        {/* ---------- A. Refleksi hari ini ---------- */}
+        <section aria-label="Jurnal hari ini" className="animate-tz-fade-up lg:col-span-7">
+          <GlassCard className="p-5 sm:p-6">
+            <div className="flex items-baseline justify-between gap-2">
+              <p className="font-display text-[19px] font-bold tracking-[-0.015em] text-tz-ink">
+                Hal apa yang kamu syukuri hari ini?
+              </p>
+            </div>
+            <p className="mt-1 text-[11.5px] leading-relaxed text-tz-muted">
+              Tulis dengan bebas. Sesederhana apa pun tetap berharga.
+            </p>
 
-          <div className="mt-4 space-y-2.5">
-            {([0, 1, 2] as const).map((i) => (
-              <div key={i} className="flex items-center gap-2.5">
-                <span
-                  aria-hidden
-                  className={cn(
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-[12px] font-bold",
-                    items[i]?.trim()
-                      ? "border-transparent bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-white"
-                      : "border-tz-line bg-tz-panel text-tz-muted"
-                  )}
-                >
-                  {items[i]?.trim() ? <Check size={14} strokeWidth={3} /> : i + 1}
-                </span>
-                <input
-                  type="text"
-                  value={items[i]}
-                  maxLength={160}
-                  onChange={(e) => {
-                    const next = [...items] as [string, string, string];
-                    next[i] = e.target.value;
-                    setItems(next);
-                  }}
-                  placeholder={i === 0 ? "Hal pertama yang saya syukuri…" : i === 1 ? "Hal kedua yang saya syukuri…" : "Hal ketiga — yang kecil pun boleh…"}
-                  aria-label={`Hal ${i + 1} yang disyukuri`}
-                  className="tz-field flex-1"
-                />
-              </div>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={save}
-            disabled={!canSave}
-            className={cn(
-              "tap mt-4 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white transition-all",
-              canSave
-                ? "bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] shadow-[0_8px_22px_-8px_rgba(108,92,231,0.9)]"
-                : "cursor-not-allowed opacity-40"
-            )}
-          >
-            <BookHeart size={16} /> Simpan Jurnal
-          </button>
-          <p className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-tz-muted/80">
-            <Lock size={10} />
-            {savedAt ? `Tersimpan hari ini — kamu bisa mengeditnya kapan saja.` : "Privat — hanya kamu yang bisa membacanya."}
-          </p>
-        </GlassCard>
-      </section>
-
-      {/* ---------- B. Mood check-in ---------- */}
-      <section aria-label="Mood check-in" className="animate-tz-fade-up">
-        <SectionHeader title="Mood Check-in" caption="Bagaimana perasaanmu hari ini? Pilihanmu sepenuhnya milikmu" />
-        <GlassCard className="p-4">
-          <div className="grid grid-cols-4 gap-2">
-            {MOODS.map((m) => {
-              const active = activeMood === m.id;
-              return (
-                <button
-                  key={m.id}
-                  type="button"
-                  aria-pressed={active}
-                  aria-label={`Mood ${m.label}`}
-                  onClick={() => {
-                    setMoodSel(m.id);
-                    setMood(today, m.id);
-                  }}
-                  className={cn(
-                    "tap flex flex-col items-center gap-1.5 rounded-2xl border px-1 py-3 transition-all",
-                    active
-                      ? "border-tz-violet/60 bg-tz-violet/12 shadow-[0_0_16px_-6px_rgba(108,92,231,0.7)]"
-                      : "border-tz-line bg-tz-panel-soft hover:border-tz-violet/35"
-                  )}
-                >
-                  <span aria-hidden className="text-[22px] leading-none">
-                    {m.emoji}
+            <div className="mt-5 space-y-3">
+              {([0, 1, 2] as const).map((i) => (
+                <div key={i} className="flex items-stretch gap-3">
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "tnum mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.9rem] font-display text-[14px] font-bold transition-colors",
+                      items[i]?.trim() ? "bg-tz-ink text-tz-lime" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
+                    )}
+                  >
+                    {items[i]?.trim() ? <Check size={15} strokeWidth={3} /> : i + 1}
                   </span>
-                  <span className={cn("text-[10px] font-semibold leading-tight", active ? "text-tz-ink" : "text-tz-muted")}>
-                    {m.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="mt-2.5 text-[10px] leading-relaxed text-tz-muted/80">
-            Mood membantu memilih pengingat yang sesuai — bukan penilaian atau diagnosis psikologis.
-          </p>
-        </GlassCard>
-      </section>
+                  <textarea
+                    value={items[i]}
+                    maxLength={160}
+                    rows={i === 0 ? 2 : 2}
+                    onChange={(e) => {
+                      const next = [...items] as [string, string, string];
+                      next[i] = e.target.value;
+                      setItems(next);
+                    }}
+                    placeholder={i === 0 ? "Hal pertama yang saya syukuri…" : i === 1 ? "Hal kedua yang saya syukuri…" : "Hal ketiga — yang kecil pun boleh…"}
+                    aria-label={`Hal ${i + 1} yang disyukuri`}
+                    className="tz-field flex-1 resize-none py-3 leading-relaxed"
+                  />
+                </div>
+              ))}
+            </div>
 
-      {/* ---------- C. Hadith for Your Heart ---------- */}
-      <section aria-label="Hadis untuk hatimu" className="animate-tz-fade-up">
-        <SectionHeader
-          title="Hadith for Your Heart"
-          caption={activeMood ? `Pengingat yang selaras dengan mood "${moodLabel(activeMood)}"` : "Pengingat untuk hatimu hari ini"}
-        />
-        <GlassCard variant="clean" className="p-5">
-          <Chip className="border-tz-violet/30 bg-tz-violet/10 text-tz-accent">{hadith.tag}</Chip>
-          <p className="quran-arabic mt-3.5 text-right text-[21px] leading-[1.95] text-tz-ink">{hadith.arabic}</p>
-          <p className="mt-3 text-[13px] leading-relaxed text-tz-ink/95">&ldquo;{hadith.text}&rdquo;</p>
-          <div className="mt-3 flex flex-wrap items-center gap-1.5">
-            <Chip className="border-tz-violet/30 bg-tz-violet/10 text-tz-accent">{hadith.source}</Chip>
-            <Chip className="border-tz-line">Dinukil apa adanya</Chip>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => void shareQuote(`"${hadith.text}"\n— ${hadith.source}`)}
-              className="tap flex min-h-[40px] items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] px-3.5 text-[12px] font-semibold text-white"
+              onClick={save}
+              disabled={!canSave}
+              className={cn(
+                "tap mt-5 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-full font-display text-[14.5px] font-bold text-white transition-all",
+                canSave ? "bg-tz-ink" : "cursor-not-allowed bg-tz-ink/40"
+              )}
             >
-              <Share2 size={14} /> Simpan / Bagikan
+              <BookHeart size={16} className={canSave ? "text-tz-lime" : ""} /> Simpan Jurnal
             </button>
-            <button
-              type="button"
-              onClick={() => setHadithOffset((o) => o + 1)}
-              className="tap flex min-h-[40px] items-center gap-1.5 rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 text-[12px] font-semibold text-tz-accent"
-            >
-              <Sparkles size={14} /> Lihat hadis lainnya
-            </button>
-          </div>
-          <p className="mt-2.5 text-[10px] leading-relaxed text-tz-muted/80">
-            Kutipan diambil dari koleksi riwayat masyhur dengan sumber tertulis. Tidak ada teks yang dihasilkan otomatis.
-          </p>
-        </GlassCard>
-      </section>
+            <p className="mt-2.5 flex items-center justify-center gap-1.5 text-[10px] text-tz-muted/80">
+              <Lock size={10} />
+              {savedAt ? "Tersimpan hari ini — kamu bisa mengeditnya kapan saja." : "Privat — hanya kamu yang bisa membacanya."}
+            </p>
+          </GlassCard>
+        </section>
 
-      {/* ---------- D. Riwayat jurnal ---------- */}
-      <section aria-label="Riwayat jurnal syukur" className="animate-tz-fade-up">
-        <SectionHeader title="Riwayat Jurnal" caption={`${historyDates.length} hari tercatat`} />
-        {historyDates.length === 0 ? (
-          <EmptyState
-            icon={<BookHeart size={18} />}
-            title="Riwayat masih kosong"
-            caption="Jurnal yang kamu simpan akan muncul di sini dan tetap ada setelah logout-login."
-          />
-        ) : (
-          <GlassCard className="thin-scrollbar max-h-[26rem] overflow-y-auto">
-            <ul className="divide-y divide-tz-line-soft">
-              {historyDates.map((d) => {
-                const e = journal[d];
+        {/* ---------- B. Mood check-in ---------- */}
+        <section aria-label="Mood check-in" className="animate-tz-fade-up mt-6 lg:col-span-5 lg:mt-0">
+          <SectionHeader title="Mood Check-in" caption="Pilihanmu sepenuhnya milikmu" />
+          <GlassCard className="p-4">
+            <div className="grid grid-cols-4 gap-2">
+              {MOODS.map((m) => {
+                const active = activeMood === m.id;
                 return (
-                  <li key={d} className="px-4 py-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[12.5px] font-bold text-tz-ink">{relativeDayLabel(d, today)}</p>
-                      <div className="flex items-center gap-1.5">
-                        {e.mood ? (
-                          <span aria-label={`Mood ${moodLabel(e.mood)}`} className="text-[14px]">
-                            {MOODS.find((m) => m.id === e.mood)?.emoji}
-                          </span>
-                        ) : null}
-                        <button
-                          type="button"
-                          aria-label={`Muulkan jurnal ${formatDayFull(d)} untuk diedit`}
-                          onClick={() => {
-                            setItems(e.items);
-                            setMoodSel(e.mood);
-                            setSavedAt(e.savedAt);
-                            toast.info("Jurnal dimuat ke atas — ubah lalu simpan kembali");
-                            // Konten aplikasi bergulir di dalam bingkai, bukan di window.
-                            document.getElementById("konten-tazkiya")?.scrollTo({ top: 0, behavior: "smooth" });
-                          }}
-                          className="tap rounded-lg border border-tz-line bg-tz-panel-soft px-2 py-1 text-[10px] font-semibold text-tz-accent"
-                        >
-                          Edit
-                        </button>
-                        <ConfirmButton
-                          label={`Hapus jurnal ${formatDayFull(d)}`}
-                          title={`Hapus jurnal ${relativeDayLabel(d, today)}?`}
-                          description={`Jurnal syukur ${relativeDayLabel(d, today).toLowerCase()} akan dihapus permanen dari riwayat.`}
-                          onConfirm={() => {
-                            deleteJournal(d);
-                            toast.info("Jurnal dihapus");
-                          }}
-                          className="tap flex h-9 w-9 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-400"
-                        >
-                          <Trash2 size={13} />
-                        </ConfirmButton>
-                      </div>
-                    </div>
-                    <ul className="mt-1 space-y-0.5">
-                      {e.items.filter(Boolean).map((it, i) => (
-                        <li key={i} className="flex items-start gap-1.5 text-[11.5px] leading-relaxed text-tz-ink/85">
-                          <Heart size={10} className="mt-1 shrink-0 text-tz-violet/70" aria-hidden />
-                          <span>{it}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
+                  <button
+                    key={m.id}
+                    type="button"
+                    aria-pressed={active}
+                    aria-label={`Mood ${m.label}`}
+                    onClick={() => {
+                      setMoodSel(m.id);
+                      setMood(today, m.id);
+                    }}
+                    className="tap flex flex-col items-center gap-2 rounded-[1.2rem] px-1 py-3 transition-all"
+                  >
+                    <span
+                      aria-hidden
+                      className={cn(
+                        "flex h-[52px] w-[52px] items-center justify-center rounded-full text-[24px] transition-all",
+                        active
+                          ? "bg-tz-lavender ring-2 ring-tz-violet dark:bg-tz-accent/20"
+                          : "bg-tz-panel-soft"
+                      )}
+                    >
+                      {m.emoji}
+                    </span>
+                    <span className={cn("text-[10px] font-bold leading-tight", active ? "text-tz-ink" : "text-tz-muted")}>
+                      {m.label}
+                    </span>
+                  </button>
                 );
               })}
-            </ul>
+            </div>
+            <p className="mt-3 border-t border-tz-line pt-2.5 text-[10px] leading-relaxed text-tz-muted/80">
+              Mood membantu memilih pengingat yang sesuai — bukan penilaian atau diagnosis psikologis.
+            </p>
           </GlassCard>
-        )}
-      </section>
+        </section>
+
+        {/* ---------- C. Hadis editorial ---------- */}
+        <section aria-label="Hadis untuk hatimu" className="animate-tz-fade-up mt-6 lg:col-span-5">
+          <SectionHeader
+            title="Hadith for Your Heart"
+            caption={activeMood ? `Selaras dengan mood "${moodLabel(activeMood)}"` : "Pengingat untuk hatimu hari ini"}
+          />
+          <GlassCard className="p-5">
+            <span aria-hidden className="pointer-events-none absolute right-4 top-1 font-display text-[52px] leading-none text-tz-lavender select-none">
+              &rdquo;
+            </span>
+            <Chip className="relative border-tz-violet/25 bg-tz-lavender/60 text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">{hadith.tag}</Chip>
+            <p className="quran-arabic relative mt-3.5 text-right text-[21px] leading-[1.95] text-tz-ink">{hadith.arabic}</p>
+            <p className="relative mt-3 text-[13px] leading-relaxed text-tz-ink/95">&ldquo;{hadith.text}&rdquo;</p>
+            <div className="relative mt-3 flex flex-wrap items-center gap-1.5">
+              <Chip className="border-tz-violet/25 bg-tz-lavender/60 text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">{hadith.source}</Chip>
+              <Chip className="border-tz-line">Dinukil apa adanya</Chip>
+            </div>
+
+            <div className="relative mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => void shareQuote(`"${hadith.text}"\n— ${hadith.source}`)}
+                className="tap flex min-h-[40px] items-center gap-1.5 rounded-full bg-tz-ink px-4 text-[12px] font-bold text-white"
+              >
+                <Share2 size={14} className="text-tz-lime" /> Simpan / Bagikan
+              </button>
+              <button
+                type="button"
+                onClick={() => setHadithOffset((o) => o + 1)}
+                className="tap flex min-h-[40px] items-center gap-1.5 rounded-full border border-tz-line-strong bg-tz-panel px-4 text-[12px] font-semibold text-tz-ink"
+              >
+                <Sparkles size={14} className="text-tz-violet" /> Hadis lainnya
+              </button>
+            </div>
+            <p className="relative mt-2.5 text-[10px] leading-relaxed text-tz-muted/80">
+              Kutipan diambil dari koleksi riwayat masyhur dengan sumber tertulis. Tidak ada teks yang dihasilkan otomatis.
+            </p>
+          </GlassCard>
+        </section>
+
+        {/* ---------- D. Riwayat jurnal ---------- */}
+        <section aria-label="Riwayat jurnal syukur" className="animate-tz-fade-up mt-6 lg:col-span-7">
+          <SectionHeader title="Riwayat Jurnal" caption={`${historyDates.length} hari tercatat`} />
+          {historyDates.length === 0 ? (
+            <EmptyState
+              icon={<BookHeart size={18} />}
+              title="Riwayat masih kosong"
+              caption="Jurnal yang kamu simpan akan muncul di sini dan tetap ada setelah logout-login."
+            />
+          ) : (
+            <GlassCard className="thin-scrollbar max-h-[26rem] overflow-y-auto">
+              <ul className="divide-y divide-tz-line-soft">
+                {historyDates.map((d) => {
+                  const e = journal[d];
+                  return (
+                    <li key={d} className="px-4 py-3.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="flex items-center gap-2 font-display text-[13px] font-bold text-tz-ink">
+                          {relativeDayLabel(d, today)}
+                          {e.mood ? (
+                            <span aria-label={`Mood ${moodLabel(e.mood)}`} className="text-[14px]">
+                              {MOODS.find((m) => m.id === e.mood)?.emoji}
+                            </span>
+                          ) : null}
+                        </p>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            aria-label={`Muulkan jurnal ${formatDayFull(d)} untuk diedit`}
+                            onClick={() => {
+                              setItems(e.items);
+                              setMoodSel(e.mood);
+                              setSavedAt(e.savedAt);
+                              toast.info("Jurnal dimuat ke atas — ubah lalu simpan kembali");
+                              // Konten aplikasi bergulir di dalam kontainer utama, bukan di window.
+                              document.getElementById("konten-tazkiya")?.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
+                            className="tap rounded-full border border-tz-line-strong bg-tz-panel px-2.5 py-1 text-[10px] font-semibold text-tz-ink"
+                          >
+                            Edit
+                          </button>
+                          <ConfirmButton
+                            label={`Hapus jurnal ${formatDayFull(d)}`}
+                            title={`Hapus jurnal ${relativeDayLabel(d, today)}?`}
+                            description={`Jurnal syukur ${relativeDayLabel(d, today).toLowerCase()} akan dihapus permanen dari riwayat.`}
+                            onConfirm={() => {
+                              deleteJournal(d);
+                              toast.info("Jurnal dihapus");
+                            }}
+                            className="tap flex h-9 w-9 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-[#E5484D]/10 hover:text-[#E5484D]"
+                          >
+                            <Trash2 size={13} />
+                          </ConfirmButton>
+                        </div>
+                      </div>
+                      <ul className="mt-1.5 space-y-0.5">
+                        {e.items.filter(Boolean).map((it, i) => (
+                          <li key={i} className="flex items-start gap-1.5 text-[11.5px] leading-relaxed text-tz-ink/85">
+                            <Heart size={10} className="mt-1 shrink-0 text-tz-violet dark:text-tz-accent" aria-hidden />
+                            <span>{it}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  );
+                })}
+              </ul>
+            </GlassCard>
+          )}
+        </section>
+      </div>
 
       <p className="flex items-center justify-center gap-1.5 pb-1 text-center text-[10px] leading-relaxed text-tz-muted/60">
         <Lock size={10} />

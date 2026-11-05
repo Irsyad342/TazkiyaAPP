@@ -1,11 +1,13 @@
 "use client";
 
 /**
- * Tazkiya — Kerangka aplikasi (Islamic Daily Companion).
- * Gerbang hidrasi, bingkai ponsel mobile-first, tema (gelap/terang/sistem),
- * mode Liquid Glass, transisi antartab, lima menu utama (Beranda, Al-Qur'an,
- * Sholat, Progress, Profil) + sub-halaman refleksi dari Beranda (Jurnal
- * Syukur, Zikir & Doa, Rizq & Amal), pembaca Al-Qur'an, dan Tasbih Digital.
+ * Tazkiya v4 — "A Better Daily Journey" — Kerangka aplikasi.
+ * Rekonstruksi tata letak: kanvas penuh tanpa bingkai ponsel.
+ * Mobile: viewport penuh + navigasi kapsul mengambang + safe area.
+ * Desktop (lg+): sidebar navigasi proporsional + dashboard lebar
+ * multi-kolom. Gerbang hidrasi, tema (gelap/terang/sistem), mode
+ * Liquid Glass, transisi antartab, lima menu utama + sub-halaman,
+ * pembaca Al-Qur'an, dan Tasbih Digital tetap di satu kerangka ini.
  */
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -14,7 +16,7 @@ import { AnimatePresence, LazyMotion, domAnimation, m } from "framer-motion";
 import { LoaderCircle } from "lucide-react";
 import { Toaster } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
-import { BottomNav, type SubPageId, type TabId } from "@/components/tazkiya/BottomNav";
+import { BottomNav, SidebarNav, type SubPageId, type TabId } from "@/components/tazkiya/BottomNav";
 import { AuthGate } from "@/components/tazkiya/AuthGate";
 import { HomePage } from "@/components/tazkiya/HomePage";
 import { QuranPage } from "@/components/tazkiya/QuranPage";
@@ -48,13 +50,6 @@ const ProgressPage = dynamic(() => import("@/components/tazkiya/ProgressPage").t
     </div>
   ),
 });
-
-/* Orb dekoratif untuk latar luar bingkai (desktop).
-   Radius blur diatur lewat className agar bisa berbeda antara HP (blur-2xl,
-   lebih murah) dan desktop (blur-3xl) tanpa konflik kelas Tailwind. */
-function OuterOrb({ className }: { className?: string }) {
-  return <div aria-hidden className={`pointer-events-none absolute rounded-full ${className ?? ""}`} />;
-}
 
 const TAB_TITLES: Record<TabId, string> = {
   beranda: "Tazkiya — Beranda",
@@ -97,7 +92,7 @@ export default function Page() {
   const animations = useWorshipStore((s) => s.settings.animations);
   const theme = useWorshipStore((s) => s.settings.theme);
   const liquidGlass = useWorshipStore((s) => s.settings.liquidGlass);
-  const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">("dark");
+  const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">("light");
 
   const readerRef = useRef<{ surah: number; ayah?: number } | null>(null);
   const tasbihRef = useRef(false);
@@ -122,7 +117,7 @@ export default function Page() {
       // Warna bilah status/URL browser mengikuti tema aktif.
       document
         .querySelector('meta[name="theme-color"]')
-        ?.setAttribute("content", resolved === "light" ? "#F4F2FB" : "#13142B");
+        ?.setAttribute("content", resolved === "light" ? "#F7F9FC" : "#14131A");
     };
     apply();
     if (theme === "system") {
@@ -131,7 +126,7 @@ export default function Page() {
     }
   }, [theme]);
 
-  // Saklar "Animasi transisi" juga menghentikan animasi CSS dekoratif (glow bergerak)
+  // Saklar "Animasi transisi" juga menghentikan animasi CSS dekoratif
   // agar perangkat lambat tetap ringan bila pengguna mematikan animasi.
   useEffect(() => {
     document.documentElement.dataset.anim = animations ? "on" : "off";
@@ -206,17 +201,15 @@ export default function Page() {
 
   if (!hydrated) {
     return (
-      <main className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-tz-stage">
-        <div
-          aria-hidden
-          className="animate-tz-aurora absolute left-1/2 top-1/3 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-tz-violet/25 blur-[90px] md:h-[420px] md:w-[420px] md:blur-[130px]"
-        />
-        <div aria-hidden className="absolute bottom-10 right-1/4 h-44 w-44 rounded-full bg-tz-blue/20 blur-[70px] md:h-64 md:w-64 md:blur-[110px]" />
-        <div className="relative flex flex-col items-center gap-4">
-          <div className="animate-tz-pulse relative flex h-[72px] w-[72px] items-center justify-center rounded-[1.6rem] bg-gradient-to-br from-[#8b7cf8] via-[#6c5ce7] to-[#5b8def] font-display text-3xl font-bold text-white shadow-[0_18px_40px_-16px_rgba(108,92,231,0.75)]">
+      <main className="flex min-h-dvh items-center justify-center bg-tz-stage" aria-label="Memuat Tazkiya">
+        <div className="flex flex-col items-center gap-5">
+          <div className="animate-tz-pulse relative flex h-16 w-16 items-center justify-center rounded-[1.4rem] bg-tz-violet font-display text-3xl font-bold text-white shadow-[0_20px_44px_-18px_rgba(136,121,232,0.65)]">
             ت
           </div>
-          <p className="font-display text-sm font-bold uppercase tracking-[0.22em] text-tz-accent">Tazkiya</p>
+          <div className="text-center">
+            <p className="font-display text-base font-bold tracking-[0.02em] text-tz-ink">Tazkiya</p>
+            <p className="mt-1 text-[11px] font-medium tracking-[0.2em] text-tz-muted uppercase">A Better Daily Journey</p>
+          </div>
         </div>
       </main>
     );
@@ -224,59 +217,49 @@ export default function Page() {
 
   return (
     <LazyMotion features={domAnimation} strict>
-    <main className="relative flex min-h-dvh w-full items-center justify-center bg-tz-stage" aria-label="Aplikasi Tazkiya">
-      {/* Aura latar (desktop / area di luar bingkai) — disembunyikan di HP:
-          di layar ≤430px bingkai menutupi seluruh layar sehingga aura ini tak
-          terlihat, tetapi 3 lapisan blur besar tetap memakan memori & GPU. */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 hidden overflow-hidden md:block">
-        <div className="animate-tz-aurora absolute left-1/2 top-[28%] h-[340px] w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-tz-purple/30 blur-[90px] md:h-[560px] md:w-[560px] md:blur-[150px]" />
-        <div className="absolute bottom-0 right-[16%] h-52 w-52 rounded-full bg-tz-violet/16 blur-[80px] md:h-80 md:w-80 md:blur-[130px]" />
-        <div className="absolute left-[8%] top-[12%] h-44 w-44 rounded-full bg-tz-orb-deep/30 blur-[70px] md:h-64 md:w-64 md:blur-[120px]" />
-      </div>
+      <main className="relative min-h-dvh w-full bg-tz-stage" aria-label="Aplikasi Tazkiya">
+        <div className="flex w-full">
+          {/* Sidebar desktop — navigasi vertikal proporsional (lg+) */}
+          <SidebarNav active={tab} onChange={(t) => { setSubpage(null); setTab(t); }} subpage={subpage} onOpenSubpage={setSubpage} />
 
-      {/* Bingkai ponsel */}
-      <div
-        role="application"
-        className="relative flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-tz-frame md:h-[min(880px,94dvh)] md:rounded-[2.4rem] md:border md:border-tz-line md:shadow-[0_50px_140px_-30px_rgba(103,86,232,0.5)]"
-      >
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="tz-aurora animate-tz-aurora absolute inset-0" />
-          {/* Orb dekoratif: versi HP lebih kecil & blur lebih tipis — area filter
-              blur tumbuh kuadratik, 4 lapisan besar berarti biaya komposit tinggi. */}
-          <OuterOrb className="-right-20 -top-20 h-52 w-52 bg-tz-violet/16 blur-2xl md:-right-28 md:-top-28 md:h-80 md:w-80 md:blur-3xl" />
-          <OuterOrb className="-left-24 top-1/3 h-48 w-48 bg-tz-blue/14 blur-2xl md:-left-32 md:h-72 md:w-72 md:blur-3xl" />
-          <OuterOrb className="bottom-16 right-0 h-40 w-40 bg-tz-lime/12 blur-2xl md:h-60 md:w-60 md:blur-3xl" />
-          <div className="absolute inset-0 bg-gradient-to-b from-tz-aurora-a via-transparent to-tz-aurora-b" />
-        </div>
+          {/* Kanvas konten: mobile penuh, desktop dashboard lebar */}
+          <div className="relative min-h-dvh flex-1">
+            {/* Pola titik samar di tepi atas kanvas (dekorasi flat) */}
+            <div aria-hidden className="tz-aurora pointer-events-none absolute inset-x-0 top-0 h-40" />
 
-        <div id="konten-tazkiya" className="no-scrollbar relative z-10 flex-1 overflow-y-auto px-5 pb-36 pt-[max(1rem,env(safe-area-inset-top))]">
-          <AnimatePresence mode="wait" initial={false}>
-            <m.div
-              key={subpage ?? tab}
-              initial={{ opacity: 0, y: 10 * (animations ? 1 : 0) }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: animations ? -8 : 0 }}
-              transition={{ duration: 0.16 * (animations ? 1 : 0), ease: "easeOut" }}
+            <div
+              id="konten-tazkiya"
+              className="no-scrollbar relative z-10 mx-auto w-full max-w-[1120px] px-4 pb-40 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-6 lg:px-10 lg:pb-14 lg:pt-10"
             >
-              {subpage === null && tab === "beranda" && (
-                <HomePage
-                  onNavigate={(t) => {
-                    setSubpage(null);
-                    setTab(t);
-                  }}
-                  onOpenSubpage={setSubpage}
-                />
-              )}
-              {subpage === null && tab === "quran" && <QuranPage onOpenReader={openReader} />}
-              {subpage === null && tab === "sholat" && <PrayerPage />}
-              {subpage === null && tab === "progress" && <ProgressPage />}
-              {subpage === null && tab === "profil" && <ProfilePage onOpenTargets={openTargets} onGoTracker={goTracker} />}
+              <AnimatePresence mode="wait" initial={false}>
+                <m.div
+                  key={subpage ?? tab}
+                  initial={{ opacity: 0, y: 10 * (animations ? 1 : 0) }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: animations ? -8 : 0 }}
+                  transition={{ duration: 0.16 * (animations ? 1 : 0), ease: "easeOut" }}
+                >
+                  {subpage === null && tab === "beranda" && (
+                    <HomePage
+                      onNavigate={(t) => {
+                        setSubpage(null);
+                        setTab(t);
+                      }}
+                      onOpenSubpage={setSubpage}
+                    />
+                  )}
+                  {subpage === null && tab === "quran" && <QuranPage onOpenReader={openReader} />}
+                  {subpage === null && tab === "sholat" && <PrayerPage />}
+                  {subpage === null && tab === "progress" && <ProgressPage />}
+                  {subpage === null && tab === "profil" && <ProfilePage onOpenTargets={openTargets} onGoTracker={goTracker} />}
 
-              {subpage === "jurnal" && <JurnalPage onBack={() => setSubpage(null)} />}
-              {subpage === "zikir-doa" && <ZikirDoaPage onBack={() => setSubpage(null)} onOpenTasbih={openTasbih} />}
-              {subpage === "rizq-amal" && <RizqAmalPage onBack={() => setSubpage(null)} />}
-            </m.div>
-          </AnimatePresence>
+                  {subpage === "jurnal" && <JurnalPage onBack={() => setSubpage(null)} />}
+                  {subpage === "zikir-doa" && <ZikirDoaPage onBack={() => setSubpage(null)} onOpenTasbih={openTasbih} />}
+                  {subpage === "rizq-amal" && <RizqAmalPage onBack={() => setSubpage(null)} />}
+                </m.div>
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
 
         <AnimatePresence>
@@ -292,7 +275,7 @@ export default function Page() {
         {/* Gerbang akun: inisialisasi sesi + dialog keputusan data (migrasi/gabung). */}
         <AuthGate />
 
-        {/* Ganti tab menutup sub-halaman yang terbuka agar navigasi tidak "nyangkut". */}
+        {/* Navigasi kapsul mengambang (mobile & tablet) */}
         <BottomNav
           active={tab}
           onChange={(t) => {
@@ -300,40 +283,39 @@ export default function Page() {
             setTab(t);
           }}
         />
-      </div>
 
-      <Toaster
-        position="top-center"
-        gap={8}
+        <Toaster
+          position="top-center"
+          gap={8}
           toastOptions={
             resolvedTheme === "light"
               ? {
                   duration: 2600,
                   style: {
-                    background: "rgba(255,255,255,0.97)",
-                    border: "1px solid rgba(123,108,246,0.24)",
-                    color: "#26243E",
-                    borderRadius: "16px",
+                    background: "#ffffff",
+                    border: "1px solid #ECECF3",
+                    color: "#191923",
+                    borderRadius: "999px",
                     fontSize: "13px",
-                    backdropFilter: "blur(10px)",
-                    boxShadow: "0 12px 40px rgba(103,86,232,0.2)",
+                    fontWeight: 600,
+                    boxShadow: "0 16px 44px -18px rgba(46,38,104,0.28)",
                   },
                 }
               : {
                   duration: 2600,
                   style: {
-                    background: "rgba(28,30,58,0.96)",
-                    border: "1px solid rgba(155,140,250,0.32)",
-                    color: "#E9E8F8",
-                    borderRadius: "16px",
+                    background: "#26252F",
+                    border: "1px solid #3A3946",
+                    color: "#F1F0F6",
+                    borderRadius: "999px",
                     fontSize: "13px",
-                    backdropFilter: "blur(12px)",
-                    boxShadow: "0 12px 40px rgba(12,13,31,0.6)",
+                    fontWeight: 600,
+                    boxShadow: "0 16px 44px -18px rgba(0,0,0,0.6)",
                   },
                 }
-        }
-      />
-    </main>
+          }
+        />
+      </main>
     </LazyMotion>
   );
 }

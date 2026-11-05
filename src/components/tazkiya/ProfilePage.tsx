@@ -1,9 +1,13 @@
 "use client";
 
 /**
- * Tazkiya — Halaman Profil & Pengaturan.
- * Nama, foto, Target Ibadah (halaman khusus), pengingat, lokasi otomatis (GPS),
- * tema & Liquid Glass, akun (login/keluar), dan riwayat aktivitas dinamis.
+ * Tazkiya v4 — Halaman Profil & Pengaturan.
+ * Struktur baru: kartu hero lavender flat (avatar ring putih + badge kamera
+ * lime), baris statistik personal, Fokus Ibadah berupa lima indikator pil,
+ * grup pengaturan berupa daftar ikon-persegi lembut, pratinjau tema palet
+ * baru, dan riwayat aktivitas dengan titik status. Semua logika (nama, foto,
+ * GPS otomatis, pengingat, tema/Liquid Glass, akun Supabase, riwayat
+ * expand/edit, Target Ibadah) dipertahankan apa adanya.
  *
  * CATATAN KETERBATASAN (jujur kepada pengguna):
  * - Pengingat & jadwal salat: waktu hanya TERSIMPAN sebagai preferensi lokal;
@@ -28,6 +32,7 @@ import {
   CloudUpload,
   Clock,
   Droplets,
+  Flame,
   Info,
   LoaderCircle,
   LocateFixed,
@@ -73,14 +78,14 @@ import { computePrayerTimes, PRAYER_METHOD_OPTIONS } from "@/lib/tazkiya/prayerT
 import { convertImageToWebp, formatBytes } from "@/lib/tazkiya/image";
 import { recordedDateList, reviewActivityDays } from "@/lib/tazkiya/stats";
 import { formatGregorian, isFriday, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
-import { Chip, EmptyState, GlassCard, GlowOrb, IconBox, SectionHeader } from "./ui-bits";
+import { Chip, EmptyState, GlassCard, SectionHeader } from "./ui-bits";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { cn } from "@/lib/utils";
 
 const THEME_OPTIONS: { id: ThemeMode; label: string; hint: string; bg: string; dot: string }[] = [
-  { id: "dark", label: "Gelap", hint: "Hijau malam", bg: "linear-gradient(140deg,#1c1e3a,#13142b)", dot: "#9B8CFA" },
-  { id: "light", label: "Terang", hint: "Kanvas bersih", bg: "linear-gradient(140deg,#ffffff,#f4f2fb)", dot: "#16A34A" },
-  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#1c1e3a 50%,#f4f2fb 50%)", dot: "#A79BF5" },
+  { id: "light", label: "Terang", hint: "Kanvas bersih", bg: "linear-gradient(140deg,#ffffff,#f7f9fc)", dot: "#8879E8" },
+  { id: "dark", label: "Gelap", hint: "Ink dusk", bg: "linear-gradient(140deg,#1E1D27,#14131A)", dot: "#9486F0" },
+  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#14131A 50%,#f7f9fc 50%)", dot: "#D5F76A" },
 ];
 
 /** Jam perangkat HH:mm — aksen kanan-atas kartu profil. */
@@ -92,8 +97,8 @@ const hhmmNow = () => {
 /** Lencana "Otomatis" — menandai fitur lokasi yang selalu aktif tanpa saklar. */
 function AutoBadge() {
   return (
-    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-tz-violet/35 bg-tz-violet/12 px-2.5 py-1 text-[10px] font-bold text-tz-accent">
-      <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-tz-violet" />
+    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-tz-lavender px-2.5 py-1 text-[10px] font-bold text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+      <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-tz-violet dark:bg-tz-accent" />
       Otomatis
     </span>
   );
@@ -283,125 +288,105 @@ export function ProfilePage({
 
   return (
     <div className="space-y-6">
-      {/* ---------- Kartu profil utama — putih bersih dengan aksen hijau, strip lime menyembul ---------- */}
+      {/* ---------- Kartu profil utama: lavender flat + avatar ring putih ---------- */}
       <section aria-label="Kartu profil" className="animate-tz-fade-up relative">
-        {/* Cahaya hijau lembut di bawah komposisi — statis & terkontrol */}
-        <div aria-hidden className="absolute inset-x-10 -bottom-2 h-16 rounded-full bg-tz-violet/20 blur-2xl" />
+        <div className="glass-hero rounded-[1.9rem] p-5 sm:p-6">
+          <div className="relative flex items-center justify-between gap-2">
+            <span className="flex min-w-0 items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white/85">
+              <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-tz-lime" />
+              Perjalanan Ibadah Aktif
+            </span>
+            <span className="tnum flex shrink-0 items-center gap-1.5 text-[11.5px] font-semibold text-white/85">
+              <Clock size={13} aria-hidden />
+              {clock}
+            </span>
+          </div>
 
-        {/* Kartu utama — lapis depan */}
-        <div className="glass relative z-10 overflow-hidden rounded-[1.9rem]">
-          <div aria-hidden className="absolute inset-0 bg-[radial-gradient(130%_100%_at_18%_0%,rgba(74,222,128,0.1)_0%,rgba(255,255,255,0)_55%)] dark:bg-[radial-gradient(130%_100%_at_18%_0%,rgba(74,222,128,0.12)_0%,rgba(255,255,255,0)_55%)]" />
-
-          <div className="relative flex flex-col gap-5 p-5">
-            {/* Status (kiri) + jam perangkat (kanan) */}
-            <div className="flex items-center justify-between gap-2">
-              <span className="flex min-w-0 items-center gap-2 text-[11.5px] font-semibold text-tz-accent">
-                <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-tz-violet shadow-[0_0_8px_1px_rgba(108,92,231,0.5)]" />
-                Perjalanan Ibadah Aktif
-              </span>
-              <span className="flex shrink-0 items-center gap-1.5 tabular-nums text-[11.5px] font-medium text-tz-muted">
-                <Clock size={13} aria-hidden />
-                {clock}
-              </span>
+          {editingName ? (
+            <div className="relative mt-4 flex items-center gap-2">
+              <input
+                value={nameDraft}
+                onChange={(e) => setNameDraft(e.target.value)}
+                maxLength={40}
+                aria-label="Nama pengguna"
+                placeholder="Nama pengguna"
+                className="tz-field min-h-[44px] w-full text-[14px] font-semibold"
+                autoFocus
+              />
+              <button
+                type="button"
+                aria-label="Simpan nama"
+                onClick={() => {
+                  const n = nameDraft.trim();
+                  if (!n) {
+                    toast.error("Nama tidak boleh kosong");
+                    return;
+                  }
+                  updateSettings({ name: n });
+                  setEditingName(false);
+                  toast.success("Nama diperbarui");
+                }}
+                className="tap flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-tz-ink text-tz-lime"
+              >
+                <Check size={17} />
+              </button>
             </div>
-
-            {/* Avatar di kiri — nama & email di kanannya */}
-            {editingName ? (
-              <div className="flex items-center gap-2">
-                <input
-                  value={nameDraft}
-                  onChange={(e) => setNameDraft(e.target.value)}
-                  maxLength={40}
-                  aria-label="Nama pengguna"
-                  placeholder="Nama pengguna"
-                  className="tz-field min-h-[44px] w-full text-[14px] font-semibold"
-                  autoFocus
-                />
+          ) : (
+            <div className="relative mt-4 flex items-center gap-4">
+              <div className="relative shrink-0">
+                {settings.avatarDataUrl ? (
+                  <img
+                    src={settings.avatarDataUrl}
+                    alt={`Foto profil ${settings.name}`}
+                    className="h-16 w-16 rounded-full border-[3px] border-white/90 object-cover"
+                  />
+                ) : (
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full border-[3px] border-white/90 bg-white/15 font-display text-2xl font-bold text-white">
+                    {settings.name.trim().charAt(0).toUpperCase() || "T"}
+                  </div>
+                )}
                 <button
                   type="button"
-                  aria-label="Simpan nama"
-                  onClick={() => {
-                    const n = nameDraft.trim();
-                    if (!n) {
-                      toast.error("Nama tidak boleh kosong");
-                      return;
-                    }
-                    updateSettings({ name: n });
-                    setEditingName(false);
-                    toast.success("Nama diperbarui");
-                  }}
-                  className="tap flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-white shadow-[0_8px_20px_-10px_rgba(108,92,231,0.7)]"
+                  aria-label="Ubah foto profil"
+                  onClick={() => fileRef.current?.click()}
+                  className="tap absolute -bottom-0.5 -right-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white/90 bg-tz-lime text-tz-lime-ink"
                 >
-                  <Check size={17} />
+                  <Camera size={13} />
                 </button>
               </div>
-            ) : (
-              <div className="flex items-center gap-3.5">
-                <div className="relative shrink-0">
-                  {settings.avatarDataUrl ? (
-                    <img
-                      src={settings.avatarDataUrl}
-                      alt={`Foto profil ${settings.name}`}
-                      className="relative h-14 w-14 rounded-full border-2 border-tz-violet/40 object-cover"
-                    />
-                  ) : (
-                    <div className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-xl font-bold text-white shadow-[0_10px_24px_-10px_rgba(108,92,231,0.7)] dark:border-white/15">
-                      {settings.name.trim().charAt(0).toUpperCase() || "T"}
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    aria-label="Ubah foto profil"
-                    onClick={() => fileRef.current?.click()}
-                    className="tap absolute -bottom-0.5 -right-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#6c5ce7] text-white transition-colors hover:bg-[#5b4ad6] dark:border-[#1c1e3a]"
-                  >
-                    <Camera size={13} />
-                  </button>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <p className="truncate font-display text-[21px] font-bold tracking-[-0.02em] text-white">{settings.name}</p>
+                  <BadgeCheck size={16} className="shrink-0 text-white/90" aria-label="Anggota Tazkiya" />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <p className="truncate text-[19px] font-bold leading-tight text-tz-ink">{settings.name}</p>
-                    <BadgeCheck size={16} className="shrink-0 text-tz-violet" aria-label="Anggota Tazkiya" />
-                  </div>
-                  <p className="mt-0.5 truncate text-[12px] font-medium text-tz-muted">
-                    {authStatus === "signedIn" && authUser ? authUser.email : "Belum masuk akun · data di perangkat"}
-                  </p>
-                </div>
+                <p className="mt-0.5 truncate text-[12px] font-medium text-white/75">
+                  {authStatus === "signedIn" && authUser ? authUser.email : "Belum masuk akun · data di perangkat"}
+                </p>
               </div>
-            )}
-
-            {/* Dua tombol setara — penuh selebar kartu */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <button
-                type="button"
-                onClick={() => {
-                  setNameDraft(settings.name);
-                  setEditingName(true);
-                }}
-                className="tap flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-tz-violet/30 bg-tz-violet/10 text-[13px] font-semibold text-tz-accent transition-colors hover:bg-tz-violet/18"
-              >
-                <Pencil size={14} aria-hidden />
-                Edit Profil
-              </button>
-              <button
-                type="button"
-                onClick={goSettings}
-                className="tap flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-tz-violet/30 bg-tz-violet/10 text-[13px] font-semibold text-tz-accent transition-colors hover:bg-tz-violet/18"
-              >
-                <Settings2 size={14} aria-hidden />
-                Pengaturan
-              </button>
             </div>
-          </div>
-        </div>
+          )}
 
-        {/* Strip lime — lapis belakang, menyembul di bawah kartu utama */}
-        <div className="relative z-0 -mt-[58px] rounded-[1.9rem] bg-gradient-to-b from-[#b9e04a] via-[#cff05c] to-[#cff05c] px-4 pt-[58px] shadow-[0_18px_40px_-20px_rgba(184,224,74,0.7)]">
-          <div className="flex h-[52px] items-center justify-center gap-2">
-            <Zap size={14} className="shrink-0 text-[#2b4a10]" aria-hidden />
-            <p className="truncate text-center text-[13px] font-bold tracking-wide text-[#2b4a10]">
-              Terus bertumbuh dalam istiqamah
-            </p>
+          {/* Dua tombol kaca putih setara */}
+          <div className="relative mt-4 grid grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={() => {
+                setNameDraft(settings.name);
+                setEditingName(true);
+              }}
+              className="tap flex min-h-[42px] items-center justify-center gap-1.5 rounded-full border border-white/30 bg-white/15 text-[12.5px] font-bold text-white backdrop-blur-sm"
+            >
+              <Pencil size={14} aria-hidden />
+              Edit Profil
+            </button>
+            <button
+              type="button"
+              onClick={goSettings}
+              className="tap flex min-h-[42px] items-center justify-center gap-1.5 rounded-full border border-white/30 bg-white/15 text-[12.5px] font-bold text-white backdrop-blur-sm"
+            >
+              <Settings2 size={14} aria-hidden />
+              Pengaturan
+            </button>
           </div>
         </div>
 
@@ -415,19 +400,35 @@ export function ProfilePage({
         />
       </section>
 
-      {/* ---------- Fokus Ibadah Hari Ini — progres salat wajib dari catatan asli ---------- */}
-      <section aria-label="Fokus ibadah hari ini" className="animate-tz-fade-up">
-        <SectionHeader title="Fokus Ibadah Hari Ini" caption="Langkah kecil untuk menjaga istiqamah setiap hari." />
-        <GlassCard className="p-4">
-          <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-br from-tz-violet/[0.1] via-transparent to-tz-purple/[0.14]" />
-          <div className="relative">
-            {/* Kepala kartu: ikon + teks kondisi dinamis */}
+      {/* ---------- Statistik personal ---------- */}
+      <section aria-label="Statistik personal" className="animate-tz-fade-up">
+        <GlassCard className="p-5">
+          <div className="grid grid-cols-3 divide-x divide-tz-line">
+            {[
+              { value: recorded.length, label: "hari aktif" },
+              { value: `${focusDone}/5`, label: "salat hari ini" },
+              { value: todayZikir.toLocaleString("id-ID"), label: "zikir hari ini" },
+            ].map(({ value, label }, i) => (
+              <div key={label} className={cn("px-3 text-center sm:px-5", i === 0 && "pl-0 text-left")}>
+                <p className="tnum font-display text-[24px] font-bold leading-none tracking-tight text-tz-ink sm:text-[28px]">{value}</p>
+                <p className="mt-1 text-[9.5px] font-semibold uppercase tracking-[0.1em] text-tz-muted">{label}</p>
+              </div>
+            ))}
+          </div>
+        </GlassCard>
+      </section>
+
+      <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
+        {/* ---------- Fokus Ibadah Hari Ini ---------- */}
+        <section aria-label="Fokus ibadah hari ini" className="animate-tz-fade-up lg:col-span-7">
+          <SectionHeader title="Fokus Ibadah Hari Ini" caption="Langkah kecil untuk menjaga istiqamah setiap hari." />
+          <GlassCard className="p-5">
             <div className="flex items-center gap-3">
-              <IconBox tone="violet" size="sm">
-                <Target />
-              </IconBox>
+              <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                <Target size={17} />
+              </span>
               <div className="min-w-0 flex-1">
-                <p className="text-[14px] font-bold text-tz-ink">Progres Sholat Hari Ini</p>
+                <p className="font-display text-[14px] font-bold text-tz-ink">Progres Sholat Hari Ini</p>
                 <p className="mt-0.5 text-[11.5px] leading-snug text-tz-muted">
                   {focusRecorded === 0
                     ? "Belum ada aktivitas tercatat. Mulai perjalanan ibadahmu hari ini."
@@ -438,29 +439,29 @@ export function ProfilePage({
               </div>
             </div>
 
-            {/* Lima indikator salat — Subuh, Zuhur/Jumat, Asar, Magrib, Isya */}
-            <div className="mt-3.5 grid grid-cols-5 gap-1.5">
+            {/* Lima indikator pil */}
+            <div className="mt-4 grid grid-cols-5 gap-1.5">
               {focusDetails.map((d) => (
                 <div
                   key={d.id}
                   className={cn(
-                    "flex flex-col items-center gap-1.5 rounded-xl border px-1 py-2",
+                    "flex flex-col items-center gap-1.5 rounded-[0.9rem] px-1 py-2.5",
                     d.status === "done"
-                      ? "border-tz-violet/35 bg-tz-violet/[0.09] light:border-tz-violet/30 light:bg-tz-violet/[0.08]"
+                      ? "bg-tz-lavender dark:bg-tz-accent/12"
                       : d.status === "missed"
-                        ? "border-rose-300/30 bg-rose-400/[0.07] light:border-rose-300/60 light:bg-rose-400/[0.08]"
-                        : "border-dashed border-tz-line-strong bg-transparent"
+                        ? "bg-tz-amber-soft"
+                        : "border border-dashed border-tz-line-strong"
                   )}
                 >
                   <span
                     aria-hidden
                     className={cn(
-                      "flex h-6 w-6 items-center justify-center rounded-full border",
+                      "flex h-6 w-6 items-center justify-center rounded-full",
                       d.status === "done"
-                        ? "border-tz-violet/50 bg-tz-violet/20 text-tz-violet light:bg-tz-violet/15"
+                        ? "bg-tz-violet text-white"
                         : d.status === "missed"
-                          ? "border-rose-300/45 bg-rose-400/10 text-rose-300 light:text-rose-500"
-                          : "border-dashed border-tz-line-strong text-tz-muted/45"
+                          ? "bg-tz-amber/20 text-tz-amber"
+                          : "text-tz-muted/45"
                     )}
                   >
                     {d.status === "done" ? <Check size={12} /> : d.status === "missed" ? <Minus size={12} /> : <span className="h-1 w-1 rounded-full bg-current" />}
@@ -481,36 +482,36 @@ export function ProfilePage({
             </div>
 
             {/* Progress bar — terisi kiri ke kanan sesuai jumlah salat terlaksana */}
+            <div
+              className="tz-beam mt-4 h-2"
+              role="img"
+              aria-label={`Salat terlaksana hari ini ${focusDone} dari 5`}
+            >
               <div
-                className="mt-3.5 h-2 w-full overflow-hidden rounded-full bg-tz-track"
-                role="img"
-                aria-label={`Salat terlaksana hari ini ${focusDone} dari 5`}
-              >
-                <div
-                  className="tz-bar-grow-x h-full rounded-full bg-gradient-to-r from-[#8b7cf8] to-[#5b8def]"
-                  style={{ width: `${barsIn ? (focusDone / 5) * 100 : 0}%` }}
-                />
-              </div>
+                className="tz-beam-fill"
+                style={{ width: `${barsIn ? (focusDone / 5) * 100 : 0}%` }}
+              />
+            </div>
 
             {/* Catatan netral bila ada salat terlewat — tanpa menghakimi */}
             {focusMissed > 0 ? (
               <p className="mt-2.5 flex items-center gap-1.5 text-[11px] leading-snug text-tz-muted">
-                <Minus size={12} className="shrink-0 text-rose-300 light:text-rose-400" aria-hidden />
+                <Minus size={12} className="shrink-0 text-tz-amber" aria-hidden />
                 {focusMissed} salat terlewat hari ini — tidak apa-apa, besok kesempatan baru.
               </p>
             ) : null}
 
-            {/* Ringkasan pendukung — hanya bila ada catatan Al-Qur'an/Zikir hari ini */}
+            {/* Ringkasan pendukung */}
             {todayQuran > 0 || todayZikir > 0 ? (
               <div className="mt-3 flex flex-wrap items-center gap-1.5">
                 {todayQuran > 0 ? (
-                  <Chip className="shrink-0 border-tz-violet/30 bg-tz-violet/10">
+                  <Chip className="shrink-0 border-tz-line">
                     <BookOpen size={11} aria-hidden />
                     Al-Qur&apos;an {todayQuran} hlm
                   </Chip>
                 ) : null}
                 {todayZikir > 0 ? (
-                  <Chip className="shrink-0 border-tz-violet/30 bg-tz-violet/10">
+                  <Chip className="shrink-0 border-tz-line">
                     <Sparkles size={11} aria-hidden />
                     Zikir {todayZikir} hitungan
                   </Chip>
@@ -518,611 +519,613 @@ export function ProfilePage({
               </div>
             ) : null}
 
-            {/* Aksi — menuju tracker salat di Beranda (fitur yang sudah ada) */}
+            {/* Aksi — menuju tracker salat */}
             <button
               type="button"
               onClick={onGoTracker}
-              className="tap mt-3.5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] text-[13.5px] font-bold text-white shadow-[0_12px_26px_-12px_rgba(108,92,231,0.7)] transition-opacity hover:opacity-95 active:opacity-90"
+              className="tap mt-4 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-[13.5px] font-bold text-white"
             >
-              <ListChecks size={15} aria-hidden />
+              <ListChecks size={15} className="text-tz-lime" aria-hidden />
               Lanjutkan Tracker
               <ChevronRight size={15} aria-hidden />
             </button>
-          </div>
-        </GlassCard>
-      </section>
+          </GlassCard>
+        </section>
 
-      {/* ---------- Akun: masuk / keluar / status sinkronisasi ---------- */}
-      <section aria-label="Akun">
-        <SectionHeader title="Akun" caption="Sinkronkan data ibadah di semua perangkat" />
-        <GlassCard className="p-4">
-          {authStatus === "loading" ? (
-            <div className="flex items-center gap-3" aria-busy="true">
-              <IconBox tone="ghost" size="sm">
-                <LoaderCircle size={16} className="animate-spin" />
-              </IconBox>
-              <p className="text-[12.5px] text-tz-muted">Memeriksa sesi akun…</p>
-            </div>
-          ) : authStatus === "unconfigured" ? (
-            <div className="flex items-start gap-3">
-              <IconBox tone="ghost" size="sm">
-                <CloudOff />
-              </IconBox>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-tz-ink">Fitur akun belum diaktifkan</p>
-                <p className="mt-0.5 text-[11px] leading-relaxed text-tz-muted">
-                  Deployment ini belum mengatur konfigurasi Supabase. Data tetap tersimpan aman di perangkat ini.
-                </p>
-              </div>
-            </div>
-          ) : authStatus === "signedIn" && authUser ? (
-            <>
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.8rem] border border-tz-violet/25 bg-gradient-to-br from-tz-violet/25 to-tz-purple/15 font-display text-[15px] font-bold text-tz-accent">
-                  {authUser.name.trim().charAt(0).toUpperCase() || "T"}
+        {/* ---------- Akun ---------- */}
+        <section aria-label="Akun" className="animate-tz-fade-up mt-6 lg:col-span-5 lg:mt-0">
+          <SectionHeader title="Akun" caption="Sinkronkan data ibadah di semua perangkat" />
+          <GlassCard className="p-4">
+            {authStatus === "loading" ? (
+              <div className="flex items-center gap-3" aria-busy="true">
+                <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-panel-soft text-tz-muted">
+                  <LoaderCircle size={16} className="animate-spin" />
                 </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-tz-ink">{authUser.name}</p>
-                  <p className="truncate text-[11px] text-tz-muted">{authUser.email}</p>
-                </div>
-                <Chip className="shrink-0 border-tz-violet/30 bg-tz-violet/10">{syncStatusLabel}</Chip>
+                <p className="text-[12.5px] text-tz-muted">Memeriksa sesi akun…</p>
               </div>
-              {syncPhase === "error" ? (
-                <p className="mt-3 flex items-start gap-1.5 rounded-xl border border-amber-300/25 bg-amber-400/10 px-3 py-2 text-[11px] leading-relaxed text-amber-700 light:border-amber-300/60 light:bg-amber-50 light:text-amber-800">
-                  <Info size={13} className="mt-0.5 shrink-0" />
-                  {syncError ?? "Gangguan sinkronisasi — data tetap tersimpan di perangkat dan akan dicoba ulang."}
-                </p>
-              ) : null}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <button
-                    type="button"
-                    className="tap mt-3.5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border border-rose-400/35 bg-rose-400/10 text-sm font-semibold text-rose-500 transition-colors hover:bg-rose-400/16 light:text-rose-600"
-                  >
-                    <LogOut size={15} />
-                    Keluar dari akun
-                  </button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Keluar dari akun?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Data ibadahmu tetap tersimpan aman di akun dan bisa diakses kembali setelah masuk lagi. Catatan
-                      baru yang kamu buat saat keluar nanti akan digabungkan otomatis ke akun.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Batal</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => {
-                        void signOut();
-                        toast.info("Kamu telah keluar — data akunmu tersimpan aman.");
-                      }}
-                    >
-                      Ya, keluar
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </>
-          ) : (
-            <>
+            ) : authStatus === "unconfigured" ? (
               <div className="flex items-start gap-3">
-                <IconBox tone="violet" size="sm">
-                  <CloudUpload />
-                </IconBox>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-tz-ink">Simpan data ibadahmu ke akun</p>
+                <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-panel-soft text-tz-muted">
+                  <CloudOff size={16} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-tz-ink">Fitur akun belum diaktifkan</p>
                   <p className="mt-0.5 text-[11px] leading-relaxed text-tz-muted">
-                    Masuk atau buat akun agar catatan tersimpan aman di cloud milikmu sendiri dan bisa dibuka dari
-                    perangkat lain.
+                    Deployment ini belum mengatur konfigurasi Supabase. Data tetap tersimpan aman di perangkat ini.
                   </p>
                 </div>
               </div>
-              <div className="mt-3.5 grid grid-cols-2 gap-2">
-                <Link
-                  href="/auth"
-                  className="tap flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-[13px] font-bold text-white shadow-[0_10px_26px_-12px_rgba(108,92,231,0.8)] transition-all hover:brightness-110"
-                >
-                  <LogIn size={15} />
-                  Masuk
-                </Link>
-                <Link
-                  href="/auth?mode=register"
-                  className="tap flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-tz-violet/40 bg-tz-violet/10 text-[13px] font-semibold text-tz-accent transition-colors hover:bg-tz-violet/18"
-                >
-                  <CloudUpload size={15} />
-                  Buat akun
-                </Link>
-              </div>
-              <p className="mt-3 text-[10.5px] leading-relaxed text-tz-muted/80">
-                Punya catatan lama di perangkat ini? Setelah masuk, kamu akan ditawari memindahkannya ke akun — tidak ada
-                data yang hilang.
-              </p>
-            </>
-          )}
-        </GlassCard>
-      </section>
-
-      {/* ---------- Target Ibadah (halaman khusus) ---------- */}
-      <section aria-label="Target ibadah">
-        <SectionHeader title="Target Ibadah" caption="Salat, bacaan Al-Qur'an, zikir, dan ibadah tambahan" />
-        <button
-          type="button"
-          onClick={onOpenTargets}
-          className="tap glass-violet relative block w-full overflow-hidden rounded-[1.35rem] p-4 text-left transition-all"
-          aria-label="Buka halaman Target Ibadah"
-        >
-          <GlowOrb className="-right-6 -top-8 h-24 w-24 bg-tz-violet/25" />
-          <div className="relative flex items-center gap-3.5">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-tz-violet/40 bg-gradient-to-br from-tz-violet/30 to-tz-purple/16 text-tz-violet">
-              <Target size={20} />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-[14px] font-semibold text-tz-ink">Atur Target Ibadah</p>
-              <p className="mt-0.5 text-[11px] leading-snug text-tz-muted">
-                {settings.quranTargetType === "surah"
-                  ? "1 surah pilihan"
-                  : `${settings.quranDailyTarget} ${settings.quranTargetType}`}
-                {" · "}
-                {settings.zikirTarget.toLocaleString("id-ID")} zikir
-                {" · "}
-                {(settings.trackedExtras ?? []).length} ibadah tambahan dilacak
-              </p>
-            </div>
-            <ChevronRight size={18} className="shrink-0 text-tz-muted" />
-          </div>
-        </button>
-      </section>
-
-      {/* ---------- Riwayat aktivitas dinamis (tumbuh 1..7 hari, lalu jendela berjalan) ---------- */}
-      <section aria-label="Riwayat aktivitas">
-        <SectionHeader
-          title="Riwayat Aktivitas"
-          caption={
-            recorded.length > 0
-              ? `${recorded.length} hari aktif tercatat · ketuk untuk detail dan ubah`
-              : "Berkembang otomatis dari catatan ibadahmu"
-          }
-        />
-        <GlassCard className="space-y-1 p-3">
-          {historyDays.length === 0 ? (
-            <div className="p-1.5">
-              <EmptyState
-                icon={<CalendarDays size={20} />}
-                title="Mulai perjalanan ibadahmu hari ini"
-                caption="Riwayat akan terisi setelah kamu mencatat salat, Al-Qur'an, atau zikir pertamamu. Tanggal sebelum catatan pertama tidak dihitung sebagai hari gagal."
-              />
-            </div>
-          ) : (
-            historyDays.map((day) => {
-            const expanded = expandedDay === day;
-            const dayLog = logs[day];
-            const doneN = PRAYERS.filter((p) => selectPrayerDetail(prayerDetails, logs, day, p.id).status === "done").length;
-            const unrecordedN = PRAYERS.filter((p) => selectPrayerDetail(prayerDetails, logs, day, p.id).status === "none").length;
-            const hasAnyRecord = !!dayLog || !!prayerDetails[day];
-            // Guard data lama/parsial: log bisa hanya punya salah satu dari dua field ini.
-            const quranPagesN = dayLog?.quranPages ?? 0;
-            const quranVersesN = dayLog?.quranVerses ?? 0;
-            const quranTxt =
-              dayLog && (quranPagesN > 0 || quranVersesN > 0)
-                ? `${quranPagesN.toLocaleString("id-ID")} hlgr · ${quranVersesN.toLocaleString("id-ID")} ayat`
-                : null;
-            const zikirTxt = dayLog && dayLog.zikirCount > 0 ? `${dayLog.zikirCount.toLocaleString("id-ID")} zikir` : null;
-            const summaryParts = [`${doneN}/5 salat terlaksana`, quranTxt, zikirTxt].filter(Boolean) as string[];
-            const summaryText = hasAnyRecord ? summaryParts.join(" · ") : "Belum ada catatan aktivitas";
-            return (
-              <div key={day} className="rounded-2xl">
-                <button
-                  type="button"
-                  aria-expanded={expanded}
-                  onClick={() => setExpandedDay(expanded ? null : day)}
-                  className="tap flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5 text-left transition-colors hover:bg-tz-panel-soft"
-                >
+            ) : authStatus === "signedIn" && authUser ? (
+              <>
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-tz-lavender font-display text-[15px] font-bold text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                    {authUser.name.trim().charAt(0).toUpperCase() || "T"}
+                  </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[12.5px] font-semibold text-tz-ink">{relativeDayLabel(day, today)}</p>
-                    <p className={cn("truncate text-[10.5px]", hasAnyRecord ? "text-tz-muted" : "text-tz-muted/60")}>{summaryText}</p>
-                    {hasAnyRecord && unrecordedN > 0 ? (
-                      <p className="mt-0.5 flex items-center gap-1 text-[9.5px] font-medium text-amber-600 light:text-amber-700">
-                        <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                        {unrecordedN} salat belum dicatat
-                      </p>
-                    ) : null}
+                    <p className="truncate text-sm font-semibold text-tz-ink">{authUser.name}</p>
+                    <p className="truncate text-[11px] text-tz-muted">{authUser.email}</p>
                   </div>
-                  {/* Titik status 5 salat */}
-                  <div className="flex shrink-0 items-center gap-1" aria-hidden>
-                    {PRAYERS.map((p) => {
-                      const d = selectPrayerDetail(prayerDetails, logs, day, p.id);
-                      return (
-                        <span
-                          key={p.id}
-                          className={cn(
-                            "h-[9px] w-[9px] rounded-full border",
-                            d.status === "done"
-                              ? "border-transparent bg-tz-violet shadow-[0_0_6px_1px_rgba(108,92,231,0.6)]"
-                              : d.status === "missed"
-                                ? "border-transparent bg-rose-400 light:bg-rose-500"
-                                : "border-dashed border-tz-line-strong bg-transparent"
-                          )}
-                        />
-                      );
-                    })}
-                  </div>
-                  <ChevronDown size={15} className={cn("shrink-0 text-tz-muted transition-transform", expanded && "rotate-180")} />
-                </button>
-                {expanded ? (
-                  <div className="mb-2 space-y-1 px-2">
-                    {PRAYERS.map((p) => {
-                      const meta = prayerMetaFor(day, p.id);
-                      const d = selectPrayerDetail(prayerDetails, logs, day, p.id);
-                      const statusText =
-                        d.status === "done"
-                          ? d.kind === "berjamaah"
-                            ? "Dilaksanakan — berjamaah"
-                            : d.kind === "mandiri"
-                              ? "Dilaksanakan — mandiri"
-                              : "Dilaksanakan"
-                          : d.status === "missed"
-                            ? `Tidak dilaksanakan${d.reason ? ` — ${missReasonLabel(d.reason)}` : ""}${
-                                d.reason === "lainnya" && d.reasonText ? `: ${d.reasonText}` : ""
-                              }`
-                            : "Belum dicatat";
-                      return (
-                        <div
-                          key={p.id}
-                          className="flex items-center justify-between gap-2 rounded-xl border border-tz-line bg-tz-panel-soft px-3 py-2"
-                        >
-                          <div className="min-w-0">
-                            <p className="text-[12px] font-semibold text-tz-ink">{meta.label}</p>
-                            <p className={cn("text-[10.5px]", d.status === "none" ? "text-tz-muted/70" : "text-tz-muted")}>{statusText}</p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setEditingPrayer({ date: day, meta })}
-                            className="tap shrink-0 rounded-full border border-tz-violet/35 bg-tz-violet/10 px-3 py-1.5 text-[11px] font-semibold text-tz-accent"
-                            aria-label={`Ubah catatan ${meta.label} ${relativeDayLabel(day, today)}`}
-                          >
-                            Ubah
-                          </button>
-                        </div>
-                      );
-                    })}
-                    <p className="flex items-center gap-1.5 px-1 pt-1 text-[10px] text-tz-muted/70">
-                      <CalendarDays size={11} />
-                      {relativeDayLabel(day, today)} · {formatGregorian(new Date(day + "T00:00:00"))}
+                  <Chip className="shrink-0 border-tz-violet/25 bg-tz-lavender/60 text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">{syncStatusLabel}</Chip>
+                </div>
+                {syncPhase === "error" ? (
+                  <p className="mt-3 flex items-start gap-1.5 rounded-xl bg-tz-amber-soft px-3 py-2 text-[11px] leading-relaxed text-tz-amber">
+                    <Info size={13} className="mt-0.5 shrink-0" />
+                    {syncError ?? "Gangguan sinkronisasi — data tetap tersimpan di perangkat dan akan dicoba ulang."}
+                  </p>
+                ) : null}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="tap mt-3.5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border border-[#E5484D]/35 bg-[#E5484D]/8 text-sm font-semibold text-[#E5484D]"
+                    >
+                      <LogOut size={15} />
+                      Keluar dari akun
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Keluar dari akun?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Data ibadahmu tetap tersimpan aman di akun dan bisa diakses kembali setelah masuk lagi. Catatan
+                        baru yang kamu buat saat keluar nanti akan digabungkan otomatis ke akun.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => {
+                          void signOut();
+                          toast.info("Kamu telah keluar — data akunmu tersimpan aman.");
+                        }}
+                      >
+                        Ya, keluar
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
+            ) : (
+              <>
+                <div className="flex items-start gap-3">
+                  <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                    <CloudUpload size={16} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-tz-ink">Simpan data ibadahmu ke akun</p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-tz-muted">
+                      Masuk atau buat akun agar catatan tersimpan aman di cloud milikmu sendiri dan bisa dibuka dari
+                      perangkat lain.
                     </p>
                   </div>
-                ) : null}
-              </div>
-            );
-            })
-          )}
-        </GlassCard>
-      </section>
-
-      {/* ---------- Pengingat ---------- */}
-      <section aria-label="Pengaturan pengingat">
-        <SectionHeader title="Pengaturan Pengingat" caption="Pengingat waktu salat" />
-        <GlassCard className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <IconBox tone="violet" size="sm">
-                <Bell />
-              </IconBox>
-              <div>
-                <p className="text-sm font-semibold text-tz-ink">Aktifkan pengingat</p>
-                <p className="text-[11px] text-tz-muted">Atur preferensi waktu pengingat</p>
-              </div>
-            </div>
-            <Switch
-              checked={settings.remindersEnabled}
-              onCheckedChange={(v) => {
-                updateSettings({ remindersEnabled: v });
-                toast.info(v ? "Preferensi pengingat disimpan" : "Pengingat dimatikan");
-              }}
-              aria-label="Aktifkan pengingat"
-            />
-          </div>
-          <div className={cn("mt-4 space-y-2 transition-opacity", !settings.remindersEnabled && "pointer-events-none opacity-40")}>
-            {autoTimes ? (
-              <p className="flex items-start gap-1.5 rounded-xl border border-tz-violet/25 bg-tz-violet/[0.07] px-3 py-2 text-[11px] leading-relaxed text-tz-accent">
-                <CalendarClock size={13} className="mt-0.5 shrink-0" />
-                Waktu di bawah otomatis dari GPS ({autoMethod?.label}) — pengingat mengikuti jadwal daerahmu.
-              </p>
-            ) : null}
-            {PRAYERS.map((p) => {
-              const rt = settings.reminderTimes[p.id];
-              return (
-                <div
-                  key={p.id}
-                  className="flex items-center justify-between rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 py-2.5 transition-colors focus-within:border-tz-violet/40"
-                >
-                  <label htmlFor={`waktu-${p.id}`} className="text-sm text-tz-ink/90">
-                    Salat {p.label}
-                  </label>
-                  <div className="flex items-center gap-2.5">
-                    <input
-                      id={`waktu-${p.id}`}
-                      type="time"
-                      value={autoTimes ? autoTimes[p.id] : rt.time}
-                      disabled={!!autoTimes}
-                      onChange={(e) =>
-                        updateSettings({
-                          reminderTimes: { ...settings.reminderTimes, [p.id]: { ...rt, time: e.target.value } },
-                        })
-                      }
-                      className="rounded-lg border border-tz-line bg-tz-panel-strong px-2.5 py-1.5 text-xs text-tz-ink outline-none transition-colors focus:border-tz-violet/60 disabled:opacity-80"
-                    />
-                    <Switch
-                      checked={rt.enabled}
-                      onCheckedChange={(v) =>
-                        updateSettings({
-                          reminderTimes: { ...settings.reminderTimes, [p.id]: { ...rt, enabled: v } },
-                        })
-                      }
-                      aria-label={`Pengingat salat ${p.label}`}
-                    />
-                  </div>
                 </div>
-              );
-            })}
-          </div>
-          <p className="mt-3 flex items-start gap-1.5 rounded-xl border border-amber-300/25 bg-amber-400/10 px-3 py-2 text-[11px] leading-relaxed text-amber-700 light:border-amber-300/60 light:bg-amber-50 light:text-amber-800">
-            <Info size={13} className="mt-0.5 shrink-0" />
-            Catatan: pengingat baru tersimpan sebagai preferensi di perangkat ini. Notifikasi sistem (alarm/berbunyi) belum
-            aktif pada versi prototipe dan memerlukan izin notifikasi yang belum terpasang.
-          </p>
-        </GlassCard>
-      </section>
-
-      {/* ---------- Lokasi (otomatis penuh — tanpa input kota manual) ---------- */}
-      <section aria-label="Pengaturan lokasi">
-        <SectionHeader title="Pengaturan Lokasi" caption="Otomatis dari GPS — jadwal salat ikut menyesuaikan saat berpindah" />
-        <GlassCard className="space-y-3 p-4">
-          {/* Status lokasi otomatis */}
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 py-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <IconBox tone="violet" size="sm">
-                <LocateFixed />
-              </IconBox>
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-tz-ink">Lokasi otomatis (GPS)</p>
-                <p className="truncate text-[11px] leading-snug text-tz-muted">
-                  {settings.geo ? (settings.geo.label ?? "Koordinat perangkat") : "Belum aktif — butuh izin lokasi"}
+                <div className="mt-3.5 grid grid-cols-2 gap-2">
+                  <Link
+                    href="/auth"
+                    className="tap flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-tz-ink text-[13px] font-bold text-white"
+                  >
+                    <LogIn size={15} className="text-tz-lime" />
+                    Masuk
+                  </Link>
+                  <Link
+                    href="/auth?mode=register"
+                    className="tap flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-tz-line-strong bg-tz-panel text-[13px] font-semibold text-tz-ink"
+                  >
+                    <CloudUpload size={15} />
+                    Buat akun
+                  </Link>
+                </div>
+                <p className="mt-3 text-[10.5px] leading-relaxed text-tz-muted/80">
+                  Punya catatan lama di perangkat ini? Setelah masuk, kamu akan ditawari memindahkannya ke akun — tidak ada
+                  data yang hilang.
                 </p>
-              </div>
-            </div>
-            <span
-              className={cn(
-                "shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-bold",
-                settings.geo
-                  ? "border-tz-violet/35 bg-tz-violet/12 text-tz-accent"
-                  : "border-tz-line bg-tz-panel-strong text-tz-muted"
-              )}
-            >
-              {settings.geo ? "Aktif" : "Nonaktif"}
-            </span>
-          </div>
+              </>
+            )}
+          </GlassCard>
+        </section>
 
-          {/* Satu tombol: minta izin (pertama kali) / perbarui posisi sekarang */}
+        {/* ---------- Riwayat aktivitas ---------- */}
+        <section aria-label="Riwayat aktivitas" className="animate-tz-fade-up mt-6 lg:col-span-7">
+          <SectionHeader
+            title="Riwayat Aktivitas"
+            caption={
+              recorded.length > 0
+                ? `${recorded.length} hari aktif tercatat · ketuk untuk detail dan ubah`
+                : "Berkembang otomatis dari catatan ibadahmu"
+            }
+          />
+          <GlassCard className="space-y-1 p-3">
+            {historyDays.length === 0 ? (
+              <div className="p-1.5">
+                <EmptyState
+                  icon={<CalendarDays size={20} />}
+                  title="Mulai perjalanan ibadahmu hari ini"
+                  caption="Riwayat akan terisi setelah kamu mencatat salat, Al-Qur'an, atau zikir pertamamu. Tanggal sebelum catatan pertama tidak dihitung sebagai hari gagal."
+                />
+              </div>
+            ) : (
+              historyDays.map((day) => {
+                const expanded = expandedDay === day;
+                const dayLog = logs[day];
+                const doneN = PRAYERS.filter((p) => selectPrayerDetail(prayerDetails, logs, day, p.id).status === "done").length;
+                const unrecordedN = PRAYERS.filter((p) => selectPrayerDetail(prayerDetails, logs, day, p.id).status === "none").length;
+                const hasAnyRecord = !!dayLog || !!prayerDetails[day];
+                // Guard data lama/parsial: log bisa hanya punya salah satu dari dua field ini.
+                const quranPagesN = dayLog?.quranPages ?? 0;
+                const quranVersesN = dayLog?.quranVerses ?? 0;
+                const quranTxt =
+                  dayLog && (quranPagesN > 0 || quranVersesN > 0)
+                    ? `${quranPagesN.toLocaleString("id-ID")} hlgr · ${quranVersesN.toLocaleString("id-ID")} ayat`
+                    : null;
+                const zikirTxt = dayLog && dayLog.zikirCount > 0 ? `${dayLog.zikirCount.toLocaleString("id-ID")} zikir` : null;
+                const summaryParts = [`${doneN}/5 salat terlaksana`, quranTxt, zikirTxt].filter(Boolean) as string[];
+                const summaryText = hasAnyRecord ? summaryParts.join(" · ") : "Belum ada catatan aktivitas";
+                return (
+                  <div key={day} className="rounded-2xl">
+                    <button
+                      type="button"
+                      aria-expanded={expanded}
+                      onClick={() => setExpandedDay(expanded ? null : day)}
+                      className="tap flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5 text-left transition-colors hover:bg-tz-panel-soft"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[12.5px] font-semibold text-tz-ink">{relativeDayLabel(day, today)}</p>
+                        <p className={cn("truncate text-[10.5px]", hasAnyRecord ? "text-tz-muted" : "text-tz-muted/60")}>{summaryText}</p>
+                        {hasAnyRecord && unrecordedN > 0 ? (
+                          <p className="mt-0.5 flex items-center gap-1 text-[9.5px] font-medium text-tz-amber">
+                            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-tz-amber" />
+                            {unrecordedN} salat belum dicatat
+                          </p>
+                        ) : null}
+                      </div>
+                      {/* Titik status 5 salat */}
+                      <div className="flex shrink-0 items-center gap-1" aria-hidden>
+                        {PRAYERS.map((p) => {
+                          const d = selectPrayerDetail(prayerDetails, logs, day, p.id);
+                          return (
+                            <span
+                              key={p.id}
+                              className={cn(
+                                "h-[9px] w-[9px] rounded-full border",
+                                d.status === "done"
+                                  ? "border-transparent bg-tz-violet"
+                                  : d.status === "missed"
+                                    ? "border-transparent bg-tz-amber"
+                                    : "border-dashed border-tz-line-strong bg-transparent"
+                              )}
+                            />
+                          );
+                        })}
+                      </div>
+                      <ChevronDown size={15} className={cn("shrink-0 text-tz-muted transition-transform", expanded && "rotate-180")} />
+                    </button>
+                    {expanded ? (
+                      <div className="mb-2 space-y-1 px-2">
+                        {PRAYERS.map((p) => {
+                          const meta = prayerMetaFor(day, p.id);
+                          const d = selectPrayerDetail(prayerDetails, logs, day, p.id);
+                          const statusText =
+                            d.status === "done"
+                              ? d.kind === "berjamaah"
+                                ? "Dilaksanakan — berjamaah"
+                                : d.kind === "mandiri"
+                                  ? "Dilaksanakan — mandiri"
+                                  : "Dilaksanakan"
+                              : d.status === "missed"
+                                ? `Tidak dilaksanakan${d.reason ? ` — ${missReasonLabel(d.reason)}` : ""}${
+                                    d.reason === "lainnya" && d.reasonText ? `: ${d.reasonText}` : ""
+                                  }`
+                                : "Belum dicatat";
+                          return (
+                            <div
+                              key={p.id}
+                              className="flex items-center justify-between gap-2 rounded-xl bg-tz-panel-soft px-3 py-2"
+                            >
+                              <div className="min-w-0">
+                                <p className="text-[12px] font-semibold text-tz-ink">{meta.label}</p>
+                                <p className={cn("text-[10.5px]", d.status === "none" ? "text-tz-muted/70" : "text-tz-muted")}>{statusText}</p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setEditingPrayer({ date: day, meta })}
+                                className="tap shrink-0 rounded-full border border-tz-line-strong bg-tz-panel px-3 py-1.5 text-[11px] font-semibold text-tz-ink"
+                                aria-label={`Ubah catatan ${meta.label} ${relativeDayLabel(day, today)}`}
+                              >
+                                Ubah
+                              </button>
+                            </div>
+                          );
+                        })}
+                        <p className="flex items-center gap-1.5 px-1 pt-1 text-[10px] text-tz-muted/70">
+                          <CalendarDays size={11} />
+                          {relativeDayLabel(day, today)} · {formatGregorian(new Date(day + "T00:00:00"))}
+                        </p>
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })
+            )}
+          </GlassCard>
+        </section>
+
+        {/* ---------- Target Ibadah ---------- */}
+        <section aria-label="Target ibadah" className="animate-tz-fade-up mt-6 lg:col-span-5 lg:mt-0">
+          <SectionHeader title="Target Ibadah" caption="Salat, bacaan Al-Qur'an, zikir, dan ibadah tambahan" />
           <button
             type="button"
-            onClick={useCurrentLocation}
-            disabled={geoBusy}
-            className="tap flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border border-tz-violet/40 bg-tz-violet/10 text-sm font-semibold text-tz-accent transition-all hover:bg-tz-violet/18 disabled:opacity-50"
+            onClick={onOpenTargets}
+            className="tap glass-violet relative block w-full overflow-hidden rounded-[1.5rem] p-5 text-left"
+            aria-label="Buka halaman Target Ibadah"
           >
-            {geoBusy ? <LoaderCircle size={16} className="animate-spin" /> : <LocateFixed size={16} />}
-            {geoBusy ? "Mencari lokasi…" : settings.geo ? "Perbarui Lokasi Saat Ini" : "Aktifkan Lokasi Otomatis"}
+            <span aria-hidden className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-white/50 dark:bg-white/5" />
+            <div className="relative flex items-center gap-3.5">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-tz-violet text-white">
+                <Target size={20} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="font-display text-[14.5px] font-bold text-tz-ink">Atur Target Ibadah</p>
+                <p className="mt-0.5 text-[11px] leading-snug text-tz-muted">
+                  {settings.quranTargetType === "surah"
+                    ? "1 surah pilihan"
+                    : `${settings.quranDailyTarget} ${settings.quranTargetType}`}
+                  {" · "}
+                  {settings.zikirTarget.toLocaleString("id-ID")} zikir
+                  {" · "}
+                  {(settings.trackedExtras ?? []).length} ibadah tambahan dilacak
+                </p>
+              </div>
+              <ChevronRight size={18} className="shrink-0 text-tz-muted" />
+            </div>
           </button>
+        </section>
 
-          {/* Pembaruan saat berpindah — selalu otomatis, tanpa saklar */}
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 py-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <IconBox tone="violet" size="sm">
-                <MapPin />
-              </IconBox>
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-tz-ink">Pembaruan saat berpindah</p>
-                <p className="text-[11px] leading-snug text-tz-muted">
-                  Posisi mengikuti kamu otomatis — hanya saat aplikasi terlihat, hemat baterai
-                </p>
+        {/* ---------- Pengingat ---------- */}
+        <section aria-label="Pengaturan pengingat" className="animate-tz-fade-up mt-6 lg:col-span-7">
+          <SectionHeader title="Pengaturan Pengingat" caption="Pengingat waktu salat" />
+          <GlassCard className="p-4 sm:p-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                  <Bell size={16} />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-tz-ink">Aktifkan pengingat</p>
+                  <p className="text-[11px] text-tz-muted">Atur preferensi waktu pengingat</p>
+                </div>
               </div>
+              <Switch
+                checked={settings.remindersEnabled}
+                onCheckedChange={(v) => {
+                  updateSettings({ remindersEnabled: v });
+                  toast.info(v ? "Preferensi pengingat disimpan" : "Pengingat dimatikan");
+                }}
+                aria-label="Aktifkan pengingat"
+              />
             </div>
-            <AutoBadge />
-          </div>
-
-          {/* Jadwal salat otomatis — selalu otomatis, tanpa saklar */}
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 py-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <IconBox tone="violet" size="sm">
-                <CalendarClock />
-              </IconBox>
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-tz-ink">Jadwal salat otomatis</p>
-                <p className="text-[11px] leading-snug text-tz-muted">
-                  Waktu dihitung dari koordinat GPS dan ikut berubah saat berpindah daerah
+            <div className={cn("mt-4 space-y-2 transition-opacity", !settings.remindersEnabled && "pointer-events-none opacity-40")}>
+              {autoTimes ? (
+                <p className="flex items-start gap-1.5 rounded-xl bg-tz-lavender/60 px-3 py-2 text-[11px] leading-relaxed text-tz-violet dark:bg-tz-accent/10 dark:text-tz-accent">
+                  <CalendarClock size={13} className="mt-0.5 shrink-0" />
+                  Waktu di bawah otomatis dari GPS ({autoMethod?.label}) — pengingat mengikuti jadwal daerahmu.
                 </p>
-              </div>
-            </div>
-            <AutoBadge />
-          </div>
-
-          {autoTimes ? (
-            <div className="rounded-xl border border-tz-violet/25 bg-tz-violet/[0.06] p-3">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-tz-accent">Jadwal hari ini</p>
-                <p className="truncate text-[10.5px] text-tz-muted">{settings.geo?.label ?? "Koordinat perangkat"}</p>
-              </div>
-              <div className="mt-2 space-y-1.5">
-                {PRAYERS.map((p) => (
-                  <div key={p.id} className="flex items-center justify-between gap-2 text-[12.5px]">
-                    <span className="text-tz-muted">Salat {p.label}</span>
-                    <span className="font-semibold tabular-nums text-tz-ink">{autoTimes[p.id]}</span>
+              ) : null}
+              {PRAYERS.map((p) => {
+                const rt = settings.reminderTimes[p.id];
+                return (
+                  <div
+                    key={p.id}
+                    className="flex items-center justify-between rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 py-2.5 transition-colors focus-within:border-tz-violet/40"
+                  >
+                    <label htmlFor={`waktu-${p.id}`} className="text-sm text-tz-ink/90">
+                      Salat {p.label}
+                    </label>
+                    <div className="flex items-center gap-2.5">
+                      <input
+                        id={`waktu-${p.id}`}
+                        type="time"
+                        value={autoTimes ? autoTimes[p.id] : rt.time}
+                        disabled={!!autoTimes}
+                        onChange={(e) =>
+                          updateSettings({
+                            reminderTimes: { ...settings.reminderTimes, [p.id]: { ...rt, time: e.target.value } },
+                          })
+                        }
+                        className="rounded-lg border border-tz-line bg-tz-panel-strong px-2.5 py-1.5 text-xs text-tz-ink outline-none transition-colors focus:border-tz-violet/60 disabled:opacity-80"
+                      />
+                      <Switch
+                        checked={rt.enabled}
+                        onCheckedChange={(v) =>
+                          updateSettings({
+                            reminderTimes: { ...settings.reminderTimes, [p.id]: { ...rt, enabled: v } },
+                          })
+                        }
+                        aria-label={`Pengingat salat ${p.label}`}
+                      />
+                    </div>
                   </div>
-                ))}
+                );
+              })}
+            </div>
+            <p className="mt-3 flex items-start gap-1.5 rounded-xl bg-tz-amber-soft px-3 py-2 text-[11px] leading-relaxed text-tz-amber">
+              <Info size={13} className="mt-0.5 shrink-0" />
+              Catatan: pengingat baru tersimpan sebagai preferensi di perangkat ini. Notifikasi sistem (alarm/berbunyi) belum
+              aktif pada versi prototipe dan memerlukan izin notifikasi yang belum terpasang.
+            </p>
+          </GlassCard>
+        </section>
+
+        {/* ---------- Lokasi ---------- */}
+        <section aria-label="Pengaturan lokasi" className="animate-tz-fade-up mt-6 lg:col-span-5 lg:mt-0">
+          <SectionHeader title="Pengaturan Lokasi" caption="Otomatis dari GPS — jadwal salat ikut menyesuaikan" />
+          <GlassCard className="space-y-3 p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-3 rounded-xl bg-tz-panel-soft px-3.5 py-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                  <LocateFixed size={16} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-tz-ink">Lokasi otomatis (GPS)</p>
+                  <p className="truncate text-[11px] leading-snug text-tz-muted">
+                    {settings.geo ? (settings.geo.label ?? "Koordinat perangkat") : "Belum aktif — butuh izin lokasi"}
+                  </p>
+                </div>
               </div>
-              <div className="mt-2.5">
-                <p className="text-[10.5px] font-semibold text-tz-muted">Metode perhitungan</p>
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {PRAYER_METHOD_OPTIONS.map((m) => (
-                    <button
-                      key={m.id}
-                      type="button"
-                      title={m.note}
-                      onClick={() => updateSettings({ prayerMethod: m.id as PrayerCalcMethod })}
-                      className={cn(
-                        "tap rounded-full border px-2.5 py-1 text-[10.5px] font-semibold transition-colors",
-                        (settings.prayerMethod ?? "kemenag") === m.id
-                          ? "border-tz-violet bg-tz-violet text-white"
-                          : "border-tz-line bg-tz-panel-strong text-tz-muted hover:text-tz-accent"
-                      )}
-                    >
-                      {m.label}
-                    </button>
+              <span
+                className={cn(
+                  "shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold",
+                  settings.geo ? "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent" : "bg-tz-panel-strong text-tz-muted"
+                )}
+              >
+                {settings.geo ? "Aktif" : "Nonaktif"}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={useCurrentLocation}
+              disabled={geoBusy}
+              className="tap flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border border-tz-line-strong bg-tz-panel text-sm font-semibold text-tz-ink disabled:opacity-50"
+            >
+              {geoBusy ? <LoaderCircle size={16} className="animate-spin" /> : <LocateFixed size={16} className="text-tz-violet" />}
+              {geoBusy ? "Mencari lokasi…" : settings.geo ? "Perbarui Lokasi Saat Ini" : "Aktifkan Lokasi Otomatis"}
+            </button>
+
+            <div className="flex items-center justify-between gap-3 rounded-xl bg-tz-panel-soft px-3.5 py-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                  <MapPin size={16} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-tz-ink">Pembaruan saat berpindah</p>
+                  <p className="text-[11px] leading-snug text-tz-muted">
+                    Posisi mengikuti kamu otomatis — hanya saat aplikasi terlihat, hemat baterai
+                  </p>
+                </div>
+              </div>
+              <AutoBadge />
+            </div>
+
+            <div className="flex items-center justify-between gap-3 rounded-xl bg-tz-panel-soft px-3.5 py-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                  <CalendarClock size={16} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-tz-ink">Jadwal salat otomatis</p>
+                  <p className="text-[11px] leading-snug text-tz-muted">
+                    Waktu dihitung dari koordinat GPS dan ikut berubah saat berpindah daerah
+                  </p>
+                </div>
+              </div>
+              <AutoBadge />
+            </div>
+
+            {autoTimes ? (
+              <div className="rounded-xl border border-tz-line p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-tz-violet dark:text-tz-accent">Jadwal hari ini</p>
+                  <p className="truncate text-[10.5px] text-tz-muted">{settings.geo?.label ?? "Koordinat perangkat"}</p>
+                </div>
+                <div className="mt-2 space-y-1.5">
+                  {PRAYERS.map((p) => (
+                    <div key={p.id} className="flex items-center justify-between gap-2 text-[12.5px]">
+                      <span className="text-tz-muted">Salat {p.label}</span>
+                      <span className="tnum font-semibold text-tz-ink">{autoTimes[p.id]}</span>
+                    </div>
                   ))}
                 </div>
-                <p className="mt-1.5 text-[10px] leading-relaxed text-tz-muted/80">
-                  {autoMethod?.note} · zona waktu mengikuti perangkat · dihitung langsung di perangkat tanpa dikirim ke server.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <p className="rounded-xl border border-tz-violet/25 bg-tz-violet/[0.07] px-3 py-2 text-[11px] leading-relaxed text-tz-accent">
-              Aktifkan lokasi dengan tombol di atas — jadwal salat, pengingat, dan Beranda langsung menyesuaikan daerahmu.
-            </p>
-          )}
-
-          <p className="flex items-start gap-1.5 rounded-xl border border-amber-300/25 bg-amber-400/10 px-3 py-2 text-[11px] leading-relaxed text-amber-700 light:border-amber-300/60 light:bg-amber-50 light:text-amber-800">
-            <Info size={13} className="mt-0.5 shrink-0" />
-            Izin lokasi hanya diminta saat tombol lokasi pertama kali dipakai. Posisi diperbarui otomatis selama aplikasi
-            terlihat; koordinat disimpan di perangkat dan hanya dipakai untuk nama kota (reverse geocoding) serta
-            perhitungan jadwal salat — tidak dikirim ke server Tazkiya.
-          </p>
-        </GlassCard>
-      </section>
-
-      {/* ---------- Preferensi ---------- */}
-      <section id="tazkiya-preferensi" aria-label="Preferensi aplikasi">
-        <SectionHeader title="Preferensi Aplikasi" caption="Sesuaikan tampilan dan interaksi" />
-        <GlassCard className="mb-3 space-y-4 p-4">
-          <div>
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-tz-muted">Tema tampilan</p>
-            <div className="grid grid-cols-3 gap-2.5" role="radiogroup" aria-label="Pilih tema">
-              {THEME_OPTIONS.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={settings.theme === t.id}
-                  onClick={() => {
-                    updateSettings({ theme: t.id });
-                    toast.success(t.id === "dark" ? "Tema gelap aktif" : t.id === "light" ? "Tema terang aktif" : "Mengikuti setelan sistem");
-                  }}
-                  className={cn(
-                    "tap rounded-2xl border p-2 text-left transition-all",
-                    settings.theme === t.id ? "border-tz-violet/70 shadow-[0_0_0_3px_rgba(108,92,231,0.18)]" : "border-tz-line hover:border-tz-violet/40"
-                  )}
-                >
-                  <span aria-hidden className="mb-1.5 block h-12 w-full rounded-xl border border-tz-line" style={{ background: t.bg }}>
-                    <span className="mt-1.5 ml-1.5 block h-4 w-8 rounded-md bg-white/15" />
-                    <span className="mt-1 ml-1.5 block h-2 w-12 rounded-full" style={{ background: t.dot, opacity: 0.85 }} />
-                  </span>
-                  <span className="flex items-center gap-1 text-[12px] font-semibold text-tz-ink">
-                    {settings.theme === t.id ? <Check size={12} className="text-tz-accent" /> : null}
-                    {t.label}
-                  </span>
-                  <span className="block text-[10px] text-tz-muted">{t.hint}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 py-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <IconBox tone="lavender" size="sm">
-                <Droplets />
-              </IconBox>
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-tz-ink">Mode Liquid Glass</p>
-                <p className="text-[11px] leading-snug text-tz-muted">
-                  Permukaan kaca cair dengan pantulan cahaya lembut — dapat dipadukan tema mana pun
-                </p>
-              </div>
-            </div>
-            <Switch
-              checked={settings.liquidGlass}
-              onCheckedChange={(v) => {
-                updateSettings({ liquidGlass: v });
-                toast.success(v ? "Gaya Liquid Glass aktif" : "Kembali ke glassmorphism standar");
-              }}
-              aria-label="Mode Liquid Glass"
-            />
-          </div>
-        </GlassCard>
-        <GlassCard className="divide-y divide-tz-line-soft">
-          {[
-            {
-              icon: Sparkles,
-              title: "Animasi transisi",
-              caption: "Efek gerak halus antarhalaman",
-              value: settings.animations,
-              onChange: (v: boolean) => updateSettings({ animations: v }),
-            },
-            {
-              icon: Vibrate,
-              title: "Getaran tasbih",
-              caption: "Bergetar singkat setiap hitungan (jika didukung)",
-              value: settings.vibration,
-              onChange: (v: boolean) => updateSettings({ vibration: v }),
-            },
-            {
-              icon: Check,
-              title: "Nama Arab surah",
-              caption: "Tampilkan tulisan Arab pada daftar surah",
-              value: settings.showArabic,
-              onChange: (v: boolean) => updateSettings({ showArabic: v }),
-            },
-          ].map(({ icon: Icon, title, caption, value, onChange }) => (
-            <div key={title} className="flex items-center justify-between gap-3 px-4 py-3.5">
-              <div className="flex items-center gap-3">
-                <IconBox tone="violet" size="sm">
-                  <Icon />
-                </IconBox>
-                <div>
-                  <p className="text-sm font-medium text-tz-ink">{title}</p>
-                  <p className="text-[11px] text-tz-muted">{caption}</p>
+                <div className="mt-2.5">
+                  <p className="text-[10.5px] font-semibold text-tz-muted">Metode perhitungan</p>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {PRAYER_METHOD_OPTIONS.map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        title={m.note}
+                        onClick={() => updateSettings({ prayerMethod: m.id as PrayerCalcMethod })}
+                        className={cn(
+                          "tap rounded-full border px-2.5 py-1 text-[10.5px] font-semibold transition-colors",
+                          (settings.prayerMethod ?? "kemenag") === m.id
+                            ? "border-tz-ink bg-tz-ink text-white"
+                            : "border-tz-line bg-tz-panel-strong text-tz-muted hover:text-tz-ink"
+                        )}
+                      >
+                        {m.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-1.5 text-[10px] leading-relaxed text-tz-muted/80">
+                    {autoMethod?.note} · zona waktu mengikuti perangkat · dihitung langsung di perangkat tanpa dikirim ke server.
+                  </p>
                 </div>
               </div>
-              <Switch checked={value} onCheckedChange={onChange} aria-label={title} />
-            </div>
-          ))}
-          <div className="flex items-center justify-between px-4 py-3.5">
-            <div className="flex items-center gap-3">
-              <IconBox tone="violet" size="sm">
-                <span className="text-[11px] font-bold">ID</span>
-              </IconBox>
-              <div>
-                <p className="text-sm font-medium text-tz-ink">Bahasa</p>
-                <p className="text-[11px] text-tz-muted">Bahasa Indonesia (tetap)</p>
+            ) : (
+              <p className="rounded-xl bg-tz-lavender/50 px-3 py-2 text-[11px] leading-relaxed text-tz-violet dark:bg-tz-accent/10 dark:text-tz-accent">
+                Aktifkan lokasi dengan tombol di atas — jadwal salat, pengingat, dan Beranda langsung menyesuaikan daerahmu.
+              </p>
+            )}
+
+            <p className="flex items-start gap-1.5 rounded-xl bg-tz-amber-soft px-3 py-2 text-[11px] leading-relaxed text-tz-amber">
+              <Info size={13} className="mt-0.5 shrink-0" />
+              Izin lokasi hanya diminta saat tombol lokasi pertama kali dipakai. Posisi diperbarui otomatis selama aplikasi
+              terlihat; koordinat disimpan di perangkat dan hanya dipakai untuk nama kota (reverse geocoding) serta
+              perhitungan jadwal salat — tidak dikirim ke server Tazkiya.
+            </p>
+          </GlassCard>
+        </section>
+
+        {/* ---------- Preferensi ---------- */}
+        <section id="tazkiya-preferensi" aria-label="Preferensi aplikasi" className="animate-tz-fade-up mt-6 lg:col-span-7">
+          <SectionHeader title="Preferensi Aplikasi" caption="Sesuaikan tampilan dan interaksi" />
+          <GlassCard className="mb-3 space-y-4 p-4 sm:p-5">
+            <div>
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-tz-muted">Tema tampilan</p>
+              <div className="grid grid-cols-3 gap-2.5" role="radiogroup" aria-label="Pilih tema">
+                {THEME_OPTIONS.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={settings.theme === t.id}
+                    onClick={() => {
+                      updateSettings({ theme: t.id });
+                      toast.success(t.id === "dark" ? "Tema gelap aktif" : t.id === "light" ? "Tema terang aktif" : "Mengikuti setelan sistem");
+                    }}
+                    className={cn(
+                      "tap rounded-[1.1rem] border p-2 text-left transition-all",
+                      settings.theme === t.id ? "border-tz-violet/70 shadow-[0_0_0_3px_rgba(136,121,232,0.18)]" : "border-tz-line hover:border-tz-violet/40"
+                    )}
+                  >
+                    <span aria-hidden className="mb-1.5 block h-12 w-full rounded-lg border border-tz-line" style={{ background: t.bg }}>
+                      <span className="mt-1.5 ml-1.5 block h-4 w-8 rounded-md bg-white/25" />
+                      <span className="mt-1 ml-1.5 block h-2 w-12 rounded-full" style={{ background: t.dot, opacity: 0.9 }} />
+                    </span>
+                    <span className="flex items-center gap-1 text-[12px] font-semibold text-tz-ink">
+                      {settings.theme === t.id ? <Check size={12} className="text-tz-violet dark:text-tz-accent" /> : null}
+                      {t.label}
+                    </span>
+                    <span className="block text-[10px] text-tz-muted">{t.hint}</span>
+                  </button>
+                ))}
               </div>
             </div>
-            <Chip>Bahasa Indonesia</Chip>
-          </div>
-        </GlassCard>
-      </section>
+            <div className="flex items-center justify-between gap-3 rounded-xl bg-tz-panel-soft px-3.5 py-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                  <Droplets size={16} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-tz-ink">Mode Liquid Glass</p>
+                  <p className="text-[11px] leading-snug text-tz-muted">
+                    Permukaan transparan tipis dengan blur ringan — dapat dipadukan tema mana pun
+                  </p>
+                </div>
+              </div>
+              <Switch
+                checked={settings.liquidGlass}
+                onCheckedChange={(v) => {
+                  updateSettings({ liquidGlass: v });
+                  toast.success(v ? "Gaya Liquid Glass aktif" : "Kembali ke permukaan solid");
+                }}
+                aria-label="Mode Liquid Glass"
+              />
+            </div>
+          </GlassCard>
+          <GlassCard className="divide-y divide-tz-line-soft">
+            {[
+              {
+                icon: Sparkles,
+                title: "Animasi transisi",
+                caption: "Efek gerak halus antarhalaman",
+                value: settings.animations,
+                onChange: (v: boolean) => updateSettings({ animations: v }),
+              },
+              {
+                icon: Vibrate,
+                title: "Getaran tasbih",
+                caption: "Bergetar singkat setiap hitungan (jika didukung)",
+                value: settings.vibration,
+                onChange: (v: boolean) => updateSettings({ vibration: v }),
+              },
+              {
+                icon: Check,
+                title: "Nama Arab surah",
+                caption: "Tampilkan tulisan Arab pada daftar surah",
+                value: settings.showArabic,
+                onChange: (v: boolean) => updateSettings({ showArabic: v }),
+              },
+            ].map(({ icon: Icon, title, caption, value, onChange }) => (
+              <div key={title} className="flex items-center justify-between gap-3 px-4 py-3.5">
+                <div className="flex items-center gap-3">
+                  <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                    <Icon size={16} />
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium text-tz-ink">{title}</p>
+                    <p className="text-[11px] text-tz-muted">{caption}</p>
+                  </div>
+                </div>
+                <Switch checked={value} onCheckedChange={onChange} aria-label={title} />
+              </div>
+            ))}
+            <div className="flex items-center justify-between px-4 py-3.5">
+              <div className="flex items-center gap-3">
+                <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lavender font-display text-[11px] font-bold text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                  ID
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-tz-ink">Bahasa</p>
+                  <p className="text-[11px] text-tz-muted">Bahasa Indonesia (tetap)</p>
+                </div>
+              </div>
+              <Chip>Bahasa Indonesia</Chip>
+            </div>
+          </GlassCard>
+        </section>
 
-      {/* ---------- Tentang ---------- */}
-      <section aria-label="Tentang aplikasi" className="pb-2">
-        <GlassCard className="flex items-center gap-3 p-4">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-lg font-bold text-white glow-violet-sm">
-            ت
-          </span>
-          <div className="flex-1">
-            <p className="font-display text-sm font-bold text-tz-ink">Tazkiya — Pelacak Ibadah Harian</p>
-            <p className="text-[11px] text-tz-muted">Versi 1.1.0 (prototipe web) · Data lokal</p>
+        {/* ---------- Tentang ---------- */}
+        <section aria-label="Tentang aplikasi" className="animate-tz-fade-up mt-6 pb-2 lg:col-span-5">
+          <SectionHeader title="Tentang" caption="Tentang aplikasi Tazkiya" />
+          <GlassCard className="flex items-center gap-3 p-4">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[0.95rem] bg-tz-violet font-display text-lg font-bold text-white">ت</span>
+            <div className="flex-1">
+              <p className="font-display text-sm font-bold text-tz-ink">Tazkiya — Pelacak Ibadah Harian</p>
+              <p className="text-[11px] text-tz-muted">Versi 4.0.0 (prototipe web) · Data lokal</p>
+            </div>
+            <Chip className="border-tz-violet/25 bg-tz-lavender/60 text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">v4.0.0</Chip>
+          </GlassCard>
+          <div className="mt-3 flex items-center gap-2 rounded-[1.1rem] border border-tz-line bg-tz-panel p-3.5">
+            <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tz-lime/50 text-tz-lime-ink dark:bg-tz-lime/15 dark:text-tz-lime">
+              <Flame size={15} />
+            </span>
+            <p className="text-[11.5px] leading-relaxed text-tz-muted">
+              <Zap size={11} className="mr-1 inline text-tz-violet" aria-hidden />
+              Terus bertumbuh dalam istiqamah — satu langkah kecil setiap hari.
+            </p>
           </div>
-          <Chip className="border-tz-violet/30 bg-tz-violet/10 text-tz-accent">v1.1.0</Chip>
-        </GlassCard>
-      </section>
+        </section>
+      </div>
 
       {/* ---------- Dialog ubah catatan riwayat (di-mount saat dipakai) ---------- */}
       {editingPrayer ? (

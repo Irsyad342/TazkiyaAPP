@@ -35,9 +35,9 @@ export function AuthGate() {
       aria-label="Keputusan data akun"
       className="absolute inset-0 z-40 flex items-center justify-center bg-black/55 p-5 backdrop-blur-sm"
     >
-      <div className="animate-tz-fade-up w-full max-w-[360px] rounded-[1.5rem] border border-tz-line-strong bg-tz-frame p-5 shadow-[0_30px_80px_-20px_rgba(10,6,20,0.85)]">
+      <div className="animate-tz-fade-up w-full max-w-[360px] rounded-[1.6rem] border border-tz-line bg-tz-panel p-5 shadow-[0_2px_6px_rgba(25,25,35,0.05),0_40px_90px_-40px_rgba(46,38,104,0.5)]">
         <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-tz-violet/40 bg-gradient-to-br from-tz-violet/30 to-tz-purple/16 text-tz-violet">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
             {prompt.kind === "migrate" ? <CloudUpload size={20} /> : <GitMerge size={20} />}
           </span>
           <div>
@@ -61,7 +61,7 @@ export function AuthGate() {
                 type="button"
                 disabled={busy}
                 onClick={() => void resolveMigration("migrate")}
-                className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-sm font-bold text-white shadow-[0_10px_26px_-10px_rgba(108,92,231,0.9)] transition-all hover:brightness-110 disabled:opacity-60"
+                className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-sm font-bold text-white disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={16} className="animate-spin" /> : <CloudUpload size={16} />}
                 Pindahkan ke akun
@@ -96,7 +96,7 @@ export function AuthGate() {
                 type="button"
                 disabled={busy}
                 onClick={() => void resolveMigration("merge")}
-                className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-sm font-bold text-white shadow-[0_10px_26px_-10px_rgba(108,92,231,0.9)] transition-all hover:brightness-110 disabled:opacity-60"
+                className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-sm font-bold text-white disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={16} className="animate-spin" /> : <GitMerge size={16} />}
                 Gabungkan keduanya
@@ -121,7 +121,7 @@ export function AuthGate() {
           type="button"
           disabled={busy}
           onClick={() => void cancelMigrationBySignOut()}
-          className="tap mt-4 flex w-full items-center justify-center gap-1.5 text-[11px] font-semibold text-tz-muted transition-colors hover:text-tz-accent disabled:opacity-60"
+          className="tap mt-4 flex w-full items-center justify-center gap-1.5 text-[11px] font-semibold text-tz-muted transition-colors hover:text-tz-ink disabled:opacity-60"
         >
           <LogOut size={12} />
           Keluar tanpa memindahkan apa pun

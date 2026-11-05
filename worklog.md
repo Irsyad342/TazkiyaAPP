@@ -687,3 +687,31 @@ Tidak ada perubahan store/handler/rumus: Jumat (SALAT_JUMAT/ZUHUR_ALTERNATIF/fri
 
 ### Pengujian (build produksi lokal, agent-browser)
 Alur lulus: catat Subuh berjamaah (popup MasyaAllah, timing "Terlambat" benar terhitung), tab Qada, mood, simpan jurnal, qada tambah→konfirmasi (Batal mempertahankan, Ya menghapus), tema via UI (terang↔gelap). Visual: Beranda/Sholat/Qur'an/Progress/Profil terang & dark, /auth — sesuai referensi. Responsif 360/420/1280 tanpa overflow horizontal, bingkai desktop 430px. Konsol 0 error. tsc+eslint+build bersih.
+
+## Task 39 — Complete UI/UX Reconstruction v4 "A Better Daily Journey" (branch `redesign/reconstruction-v4`, deploy ke produksi)
+
+Rekonstruksi total presentation layer (±3.900 baris, 25 file) — bukan skin change: struktur JSX/layout/komposisi setiap halaman ditulis ulang dari nol; 100% business logic, store, Supabase, jadwal GPS, Qada, sesi otomatis dipertahankan tanpa perubahan.
+
+### Design system baru
+- Palet light: bg #F7F9FC, kartu putih, lavender #8879E8/#EAE6FF, lime aksen #D5F76A (ink #3F4D0E), teks #191923/#858592, border #ECECF3. Dark baru yang harmonis (ink dusk): bg #14131A-ish via token, permukaan naik bertahap, lavender #A99BF4, lime tetap.
+- `@custom-variant dark` berbasis `[data-theme]` (bukan media query) + init script anti-FOUC di layout; `layout.tsx` kini `<html data-theme="light">` (sebelumnya `className="dark"` hardcode yang mati).
+- Tipografi: Outfit (display) + Plus Jakarta Sans (body) + Amiri Quran (Arab), angka tabular; hierarki hero 32–44px / section 20–22px / body 14–15px.
+- Bentuk: radius 18–28px, soft shadow berlapis, whitespace luas; glassmorphism dihapus sebagai gaya dasar (masih ada sebagai opsi "Liquid Glass" di Preferensi).
+
+### Shell & navigasi
+- `page.tsx`: shell baru — mobile: bottom nav floating capsule putih dengan lingkaran lavender aktif; desktop (≥1280): sidebar kiri (brand, menu utama, section aktivitas, kartu status) — tidak ada lagi bingkai HP `max-w-[430px]`; loading screen baru; sinkron `data-theme` reaktif (uji: klik Gelap/Terang di Profil berubah tanpa reload).
+- `ui-bits.tsx` ditulis ulang: SectionTitle editorial (dengan tanda titik aksen), StatBlock angka besar, Ring, Chip, EmptyState, ConfirmButton.
+
+### Halaman (semua komposisi baru)
+- **Beranda**: header personal (sapaan+nama+tanggal Masehi/Hijriah), hero Sholat Berikutnya dengan waktu raksasa (32–44px) + timeline 5 titik horizontal + chip countdown lime, ring Ibadah Hari Ini + baris rincian, Mood check-in lingkaran pastel besar, Jelajahi Aktivitas 3 komposisi berbeda (Jurnal Syukur lavender blob / Zikir & Doa tasbih mini / Rizq & Amal lime), Daily Barakah + Doa Hari Ini editorial tenang.
+- **Al-Qur'an**: "Mulai Membaca" kartu lanjut + blob lavender, target bacaan ring, strip mingguan, 3 statistik angka besar, tab Surah/Juz, search, filter, daftar surah baru; Reader fokus baca (bismillah hero, panel terjemah, bookmark lime).
+- **Sholat**: statistik 1/5 + chip lime %, baris lima waktu dengan status berwarna (check lavender, berjamaah teal, terlambat amber), kalender pil, Qada; dialog catat sheet baru (logika tak berubah).
+- **Progress**: analytics — ring % besar, 3 stat (hari beruntun/hari lengkap/target tercapai), kategori bar, kalender aktivitas, DayDetailSheet.
+- **Profil**: hero lavender penuh (avatar ring putih, badge kamera, CTA pill kaca), 3 statistik personal, Fokus Ibadah (bar per kategori), Akun/Target/Riwayat/Pengingat/Preferensi/Tema (radio Terang/Gelap/Sistem + Liquid Glass switch)/Tentang.
+- **Jurnal Syukur**: journaling premium — 3 refleksi bernomor dalam kartu, mood check-in, riwayat. **Zikir & Doa**: tasbih digital piringan besar di tengah, set zikir Arab+terjemah, riwayat. **Rizq & Amal**: counter kebaikan 0 besar, chip amal lime, target, riwayat. **Auth**: kartu terpusat di kanvas blob lavender/lime, segmented Masuk/Daftar, tagline "A BETTER DAILY JOURNEY".
+
+### QA
+tsc bersih · eslint src bersih · build sukses (6/6) · alur lulus (mood tersimpan; salat done+berjamaah+popup; tasbih 3 hitung→simpan→sesi+reset; jurnal; qada; persistensi reload; tema live dark↔light; 0 error console) · screenshot 10 halaman × 390/768/1440 light + 390 dark (40 file + 4 contact sheet) — mobile full-viewport, tablet nav pill, desktop sidebar multi-kolom, semua tanpa horizontal overflow.
+
+### Deploy
+Branch `redesign/reconstruction-v4` di-push, lalu di-merge ke `main` (produksi) sesuai instruksi deploy langsung; deployment diverifikasi via status Vercel pada commit + polling chunk produksi.

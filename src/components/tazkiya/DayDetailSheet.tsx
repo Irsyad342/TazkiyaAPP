@@ -44,13 +44,13 @@ export function DayDetailSheet({ date, onClose }: { date: string; onClose: () =>
       <DialogContent
         showCloseButton={false}
         aria-describedby={undefined}
-        className="glass-strong fixed! top-auto bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 translate-y-0 gap-3 overflow-y-auto rounded-t-[1.65rem] rounded-b-none border-x-0 border-b-0 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_-18px_60px_-12px_rgba(8,5,15,0.8)] duration-250 thin-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8"
+        className="glass-strong fixed! top-auto bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 translate-y-0 gap-3 overflow-y-auto rounded-t-[1.75rem] rounded-b-none border-x-0 border-b-0 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_-18px_60px_-12px_rgba(25,25,35,0.5)] duration-250 thin-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8"
       >
         <span aria-hidden className="mx-auto mb-0.5 block h-1 w-10 shrink-0 rounded-full bg-tz-line-strong/70" />
         <DialogHeader>
           <DialogTitle className="font-display text-lg text-tz-ink">Rincian {relativeDayLabel(date, today)}</DialogTitle>
           <p className="flex items-center gap-1.5 text-[11.5px] text-tz-muted">
-            <CalendarDays size={12} className="text-tz-violet" />
+            <CalendarDays size={12} className="text-tz-violet dark:text-tz-accent" />
             {formatDayFull(date)}
           </p>
         </DialogHeader>
@@ -88,9 +88,9 @@ export function DayDetailSheet({ date, onClose }: { date: string; onClose: () =>
                       className={cn(
                         "shrink-0 text-right text-[10.5px]",
                         d.status === "done"
-                          ? "text-tz-accent"
+                          ? "text-tz-violet dark:text-tz-accent"
                           : d.status === "missed"
-                            ? "text-rose-500 light:text-rose-600"
+                            ? "text-[#B3424C] dark:text-[#F09AA0]"
                             : "text-tz-muted/70"
                       )}
                     >

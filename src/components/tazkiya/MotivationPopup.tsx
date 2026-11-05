@@ -1,16 +1,16 @@
 "use client";
 
 /**
- * Tazkiya — Pop-up apresiasi setelah pencatatan salat berhasil disimpan.
- * Modal/overlay di dalam aplikasi (bukan notifikasi sistem) dengan tiga
- * varian sesuai status yang benar-benar dipilih pengguna:
- *  - "jamaah"  → MasyaAllah! (ilustrasi masjid + kilau, aksen teal)
+ * Tazkiya v4 — Pop-up apresiasi setelah pencatatan salat berhasil disimpan.
+ * Sheet putih bersih dengan medali ikon dalam lingkaran tint (tanpa glow),
+ * judul Outfit besar, dan tombol tinta beraksen lime. Tiga varian sesuai
+ * status yang benar-benar dipilih pengguna:
+ *  - "jamaah"  → MasyaAllah! (masjid, aksen lavender)
  *  - "mandiri" → Alhamdulillah! (bulan bintang, aksen biru)
  *  - "missed"  → Tetap Semangat (hati lembut, aksen amber — menenangkan,
  *                bukan menghakimi)
- * Pesan memiliki beberapa variasi (dipilih acak sekali saat mount) agar
- * tidak monoton. Pop-up murni tampilan: tidak mengubah status, tidak
- * menimpan data, dan hanya menutup kembali ke halaman sebelumnya.
+ * Pesan memiliki beberapa variasi (dipilih acak sekali saat mount). Pop-up
+ * murni tampilan: tidak mengubah status, tidak menyimpan data.
  * Komponen Ephemeral: dirender kondisional oleh parent setelah simpan.
  */
 
@@ -66,7 +66,7 @@ function MosqueIcon({ className }: { className?: string }) {
       {/* bangunan utama */}
       <rect x="15" y="24.4" width="18" height="12.6" rx="1.6" fill="currentColor" />
       {/* pintu lengkung */}
-      <path d="M21.4 37v-5.2a2.6 2.6 0 0 1 5.2 0V37Z" fill="#10281f" opacity="0.55" />
+      <path d="M21.4 37v-5.2a2.6 2.6 0 0 1 5.2 0V37Z" fill="currentColor" opacity="0.35" />
       {/* menara kiri & kanan */}
       <rect x="9.6" y="17.5" width="3" height="19.5" rx="1.5" fill="currentColor" />
       <circle cx="11.1" cy="16" r="1.7" fill="currentColor" />
@@ -78,31 +78,19 @@ function MosqueIcon({ className }: { className?: string }) {
   );
 }
 
-/** Konfigurasi aksen per varian — selaras dengan warna status di kalender. */
-const VARIANT_ACCENT: Record<
-  MotivationVariant,
-  { badge: string; glow: string; spark: string; button: string; ring: string }
-> = {
+/** Konfigurasi aksen per varian — tint lembut tanpa glow. */
+const VARIANT_ACCENT: Record<MotivationVariant, { badge: string; button: string }> = {
   jamaah: {
-    badge: "border-tz-violet/40 bg-gradient-to-br from-[#9b8cfa]/25 to-[#5b8def]/12 text-[#cfc8ff] light:border-[#6c5ce7]/30 light:from-[#9b8cfa]/20 light:to-[#5b8def]/10 light:text-[#6c5ce7]",
-    glow: "bg-[#9b8cfa]/25",
-    spark: "bg-[#b3a5ff] light:bg-[#7b6cf6]",
-    button: "from-[#8b7cf8] to-[#5b8def] shadow-[0_6px_18px_-6px_rgba(108,92,231,0.7),inset_0_1px_0_rgba(255,255,255,0.22)]",
-    ring: "shadow-[0_0_34px_-8px_rgba(155,140,250,0.55)]",
+    badge: "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent",
+    button: "bg-tz-ink text-white",
   },
   mandiri: {
-    badge: "border-sky-300/40 bg-gradient-to-br from-sky-400/25 to-blue-500/12 text-sky-200 light:border-sky-500/30 light:from-sky-400/20 light:to-blue-500/10 light:text-sky-600",
-    glow: "bg-sky-400/25",
-    spark: "bg-sky-300 light:bg-sky-400",
-    button: "from-sky-500 to-blue-500 shadow-[0_6px_18px_-6px_rgba(14,165,233,0.7),inset_0_1px_0_rgba(255,255,255,0.22)]",
-    ring: "shadow-[0_0_34px_-8px_rgba(56,189,248,0.55)]",
+    badge: "bg-tz-blue-soft text-tz-blue dark:bg-tz-blue/20 dark:text-[#aebcff]",
+    button: "bg-tz-ink text-white",
   },
   missed: {
-    badge: "border-amber-300/40 bg-gradient-to-br from-amber-400/22 to-rose-400/10 text-amber-200 light:border-amber-500/30 light:from-amber-400/18 light:to-rose-400/10 light:text-amber-600",
-    glow: "bg-amber-400/22",
-    spark: "bg-amber-300 light:bg-amber-400",
-    button: "from-amber-500 to-orange-500 shadow-[0_6px_18px_-6px_rgba(245,158,11,0.65),inset_0_1px_0_rgba(255,255,255,0.22)]",
-    ring: "shadow-[0_0_34px_-8px_rgba(251,191,36,0.5)]",
+    badge: "bg-tz-amber-soft text-tz-amber",
+    button: "bg-tz-ink text-white",
   },
 };
 
@@ -140,20 +128,18 @@ export function MotivationPopup({
       <DialogContent
         showCloseButton={false}
         aria-describedby={undefined}
-        className="glass-strong fixed! top-auto bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 translate-y-0 gap-3 overflow-y-auto rounded-t-[1.65rem] rounded-b-none border-x-0 border-b-0 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_-18px_60px_-12px_rgba(8,5,15,0.8)] duration-250 thin-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8"
+        className="glass-strong fixed! top-auto bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 translate-y-0 gap-3 overflow-y-auto rounded-t-[1.75rem] rounded-b-none border-x-0 border-b-0 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_-18px_60px_-12px_rgba(25,25,35,0.5)] duration-250 thin-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8"
       >
         {/* Pegangan sheet */}
         <span aria-hidden className="mx-auto mb-0.5 block h-1 w-10 shrink-0 rounded-full bg-tz-line-strong/70" />
 
-        {/* ---------- Ilustrasi + kilau ---------- */}
+        {/* ---------- Medali ikon + kilau ---------- */}
         <div className="relative mx-auto mt-1 flex h-24 w-24 items-center justify-center">
-          <span aria-hidden className={cn("absolute inset-1 rounded-full blur-xl", accent.glow)} />
           <span
             aria-hidden
             className={cn(
-              "relative flex h-[76px] w-[76px] items-center justify-center rounded-[1.4rem] border",
-              accent.badge,
-              accent.ring
+              "relative flex h-[76px] w-[76px] items-center justify-center rounded-full",
+              accent.badge
             )}
           >
             {variant === "jamaah" ? (
@@ -164,12 +150,14 @@ export function MotivationPopup({
               <Heart size={32} strokeWidth={1.7} className="fill-current opacity-90" />
             )}
           </span>
+          {/* cincin garis dekoratif */}
+          <span aria-hidden className="absolute inset-1 rounded-full border border-dashed border-tz-line-strong" />
           {/* Partikel kilau (sekali-jalan, hormati reduced motion) */}
           {SPARKS.map((s, i) => (
             <span
               key={i}
               aria-hidden
-              className={cn("tz-sparkle absolute left-0 top-0 rounded-full", accent.spark)}
+              className="tz-sparkle absolute left-0 top-0 rounded-full bg-tz-lime"
               style={
                 {
                   left: s.x,
@@ -186,7 +174,7 @@ export function MotivationPopup({
         </div>
 
         <DialogHeader className="items-center text-center">
-          <DialogTitle className="font-display text-[22px] font-bold text-gradient-violet">
+          <DialogTitle className="font-display text-[24px] font-bold tracking-[-0.02em] text-tz-ink">
             {MESSAGES[variant].title}
           </DialogTitle>
           <p className="flex items-center justify-center gap-1.5 text-[11px] font-medium text-tz-muted">
@@ -199,11 +187,11 @@ export function MotivationPopup({
           type="button"
           onClick={onClose}
           className={cn(
-            "tap min-h-[44px] w-full rounded-xl bg-gradient-to-r text-sm font-semibold text-white transition-all",
+            "tap min-h-[46px] w-full rounded-full font-display text-sm font-bold transition-all",
             accent.button
           )}
         >
-          {MESSAGES[variant].button}
+          <span className={variant !== "missed" ? "text-tz-lime" : ""}>{MESSAGES[variant].button}</span>
         </button>
       </DialogContent>
     </Dialog>

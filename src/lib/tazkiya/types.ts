@@ -418,7 +418,7 @@ export function createDefaultSettings(): Settings {
     animations: true,
     vibration: true,
     showArabic: true,
-    theme: "dark",
+    theme: "light",
     liquidGlass: false,
     readerArabicSize: 28,
     readerTransSize: 13,

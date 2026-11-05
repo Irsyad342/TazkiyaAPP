@@ -151,12 +151,12 @@ function AuthForm() {
   };
 
   const fieldError = (k: string) =>
-    fieldErrors[k] ? <p className="mt-1 text-[10.5px] font-medium text-rose-500 light:text-rose-600">{fieldErrors[k]}</p> : null;
+    fieldErrors[k] ? <p className="mt-1 text-[10.5px] font-medium text-[#B3424C] dark:text-[#F09AA0]">{fieldErrors[k]}</p> : null;
 
   // Kelas input seragam: tinggi nyaman disentuh + border merah saat validasi gagal.
   // (utility menang atas .tz-field karena tz-field kini di @layer components)
   const fieldCls = (k: string, extra?: string) =>
-    cn("tz-field min-h-[46px]", extra, fieldErrors[k] && "border-rose-400/70 focus:border-rose-400/80");
+    cn("tz-field min-h-[46px]", extra, fieldErrors[k] && "border-[#E5484D]/60 focus:border-[#E5484D]/80");
 
   const title = resetMode ? "Atur Kata Sandi Baru" : forgotOpen ? "Atur Ulang Kata Sandi" : mode === "login" ? "Selamat Datang Kembali" : "Buat Akun Baru";
   const subtitle = resetMode
@@ -169,31 +169,32 @@ function AuthForm() {
 
   return (
     <main className="relative flex min-h-dvh w-full flex-col items-center justify-center overflow-hidden bg-tz-stage px-4 py-8">
-      {/* Aura latar — statis (tanpa animasi) agar halaman masuk tetap ringan */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block">
-        <div className="absolute left-1/2 top-[20%] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-tz-purple/25 blur-[130px]" />
-        <div className="absolute bottom-0 right-[14%] h-64 w-64 rounded-full bg-tz-violet/14 blur-[110px]" />
+      {/* Dekorasi geometris flat — lingkaran tonal & cincin garis */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-tz-lavender dark:bg-tz-accent/8" />
+        <div className="absolute -right-20 top-1/3 h-56 w-56 rounded-full border-[1.5px] border-tz-lav-deco" />
+        <div className="absolute -bottom-24 left-1/4 h-64 w-64 rounded-full bg-tz-lime/20 dark:bg-tz-lime/6" />
+        <div className="absolute bottom-10 right-1/4 h-2.5 w-2.5 rounded-full bg-tz-violet" />
       </div>
-      <div aria-hidden className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-tz-purple/12 to-transparent" />
 
       <div className="relative w-full max-w-[400px]">
         <Link
           href="/"
-          className="tap mb-5 inline-flex items-center gap-1.5 text-[12px] font-semibold text-tz-muted transition-colors hover:text-tz-accent"
+          className="tap mb-5 inline-flex items-center gap-1.5 text-[12px] font-semibold text-tz-muted transition-colors hover:text-tz-ink"
         >
           <ArrowLeft size={14} />
           Kembali ke aplikasi
         </Link>
 
         {/* Kartu kaca */}
-        <div className="glass rounded-[1.65rem] p-6 shadow-[0_30px_80px_-30px_rgba(10,6,20,0.7)]">
+        <div className="glass rounded-[1.65rem] p-6 shadow-[0_1px_2px_rgba(25,25,35,0.04),0_40px_90px_-40px_rgba(46,38,104,0.35)]">
           {/* Logo */}
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] border border-tz-violet/40 bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] font-display text-2xl font-bold text-white glow-violet-sm">
+            <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] bg-tz-violet font-display text-2xl font-bold text-white shadow-[0_16px_36px_-14px_rgba(136,121,232,0.7)]">
               ت
             </div>
             <h1 className="mt-3 font-display text-[22px] font-bold tracking-tight text-tz-ink">Tazkiya</h1>
-            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-tz-accent/90">Pelacak Ibadah Harian</p>
+            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-tz-accent/90">A Better Daily Journey</p>
           </div>
 
           <div className="mt-5">
@@ -202,7 +203,7 @@ function AuthForm() {
           </div>
 
           {unconfigured ? (
-            <div className="mt-4 flex items-start gap-2 rounded-xl border border-amber-300/30 bg-amber-400/10 px-3.5 py-3 text-[11.5px] leading-relaxed text-amber-700 light:border-amber-300/60 light:bg-amber-50 light:text-amber-800">
+            <div className="mt-4 flex items-start gap-2 rounded-xl bg-tz-amber-soft px-3.5 py-3 text-[11.5px] leading-relaxed text-tz-amber">
               <Info size={14} className="mt-0.5 shrink-0" />
               <span>
                 Fitur akun belum diaktifkan pada deployment ini. Admin perlu mengatur environment variable{" "}
@@ -214,12 +215,12 @@ function AuthForm() {
           ) : null}
 
           {error ? (
-            <div role="alert" className="mt-4 rounded-xl border border-rose-400/30 bg-rose-400/10 px-3.5 py-2.5 text-[12px] font-medium leading-relaxed text-rose-500 light:border-rose-300 light:bg-rose-50 light:text-rose-600">
+            <div role="alert" className="mt-4 rounded-xl bg-[#FBE4E6] px-3.5 py-2.5 text-[12px] font-medium leading-relaxed text-[#B3424C] dark:bg-[#3A2226] dark:text-[#F09AA0]">
               {error}
             </div>
           ) : null}
           {info ? (
-            <div role="status" className="mt-4 flex items-start gap-2 rounded-xl border border-tz-violet/30 bg-tz-violet/10 px-3.5 py-2.5 text-[12px] font-medium leading-relaxed text-tz-accent">
+            <div role="status" className="mt-4 flex items-start gap-2 rounded-xl bg-tz-lavender/60 px-3.5 py-2.5 text-[12px] font-medium leading-relaxed text-tz-violet dark:bg-tz-accent/10 dark:text-tz-accent">
               <MailCheck size={14} className="mt-0.5 shrink-0" />
               <span>{info}</span>
             </div>
@@ -247,7 +248,7 @@ function AuthForm() {
                     type="button"
                     onClick={() => setShowPw((v) => !v)}
                     aria-label={showPw ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
-                    className="tap absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-tz-muted transition-colors hover:text-tz-accent"
+                    className="tap absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-tz-muted transition-colors hover:text-tz-ink"
                   >
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -257,7 +258,7 @@ function AuthForm() {
               <button
                 type="submit"
                 disabled={unconfigured || busy || loading}
-                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(108,92,231,0.95)] transition-all hover:brightness-110 disabled:opacity-60"
+                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-sm font-bold text-white transition-all disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={17} className="animate-spin" /> : <KeyRound size={16} />}
                 {busy ? "Menyimpan…" : "Simpan kata sandi baru"}
@@ -288,7 +289,7 @@ function AuthForm() {
               <button
                 type="submit"
                 disabled={unconfigured || busy || loading}
-                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(108,92,231,0.95)] transition-all hover:brightness-110 disabled:opacity-60"
+                className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-sm font-bold text-white transition-all disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={17} className="animate-spin" /> : <Mail size={16} />}
                 {busy ? "Mengirim…" : "Kirim tautan atur ulang"}
@@ -300,7 +301,7 @@ function AuthForm() {
                   setError(null);
                   setFieldErrors({});
                 }}
-                className="tap w-full text-center text-[11.5px] font-semibold text-tz-muted transition-colors hover:text-tz-accent"
+                className="tap w-full text-center text-[11.5px] font-semibold text-tz-muted transition-colors hover:text-tz-ink"
               >
                 Kembali ke halaman masuk
               </button>
@@ -330,8 +331,8 @@ function AuthForm() {
                     className={cn(
                       "tap flex min-h-[38px] items-center justify-center gap-1.5 rounded-lg text-[12.5px] font-bold transition-all",
                       mode === t.id
-                        ? "bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-white shadow-[0_8px_20px_-8px_rgba(108,92,231,0.9)]"
-                        : "text-tz-muted hover:text-tz-accent"
+                        ? "bg-tz-ink text-white"
+                        : "text-tz-muted hover:text-tz-ink"
                     )}
                   >
                     <t.icon size={14} />
@@ -402,7 +403,7 @@ function AuthForm() {
                       type="button"
                       onClick={() => setShowPw((v) => !v)}
                       aria-label={showPw ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
-                      className="tap absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-tz-muted transition-colors hover:text-tz-accent"
+                      className="tap absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-tz-muted transition-colors hover:text-tz-ink"
                     >
                       {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -434,7 +435,7 @@ function AuthForm() {
                 <button
                   type="submit"
                   disabled={unconfigured || busy || loading}
-                  className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(108,92,231,0.95)] transition-all hover:brightness-110 disabled:opacity-60"
+                  className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-sm font-bold text-white transition-all disabled:opacity-60"
                 >
                   {busy ? <LoaderCircle size={17} className="animate-spin" /> : mode === "login" ? <LogIn size={16} /> : <UserPlus size={16} />}
                   {busy ? (mode === "login" ? "Memproses…" : "Mendaftarkan…") : mode === "login" ? "Masuk" : "Buat Akun"}
@@ -449,7 +450,7 @@ function AuthForm() {
                       setInfo(null);
                       setFieldErrors({});
                     }}
-                    className="tap w-full text-center text-[11.5px] font-semibold text-tz-muted transition-colors hover:text-tz-accent"
+                    className="tap w-full text-center text-[11.5px] font-semibold text-tz-muted transition-colors hover:text-tz-ink"
                   >
                     Lupa kata sandi?
                   </button>

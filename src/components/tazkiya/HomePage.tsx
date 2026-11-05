@@ -1,16 +1,19 @@
 "use client";
 
 /**
- * Tazkiya — Halaman Beranda (Islamic Daily Companion):
- * A. Header sapaan + nama + tanggal Masehi & Hijriah + avatar + notifikasi.
- * B. Next Prayer: salat berikutnya, jadwal aktual (GPS/manual), countdown,
- *    dan timeline lima waktu dengan penanda lewat / berjalan / berikutnya.
- * C. Daily Journey: target harian (otomatis dari catatan + manual, bisa diatur).
- * D. Mood Check-in: pilihan mood berilustrasi, satu catatan per hari.
- * E. Jelajahi Aktivitas: pintasan editorial ke Jurnal Syukur, Zikir & Doa,
- *    Rizq & Amal.
- * F. Ringkasan yang masih berguna: Progres Hari Ini, Daily Barakah, Doa Hari Ini.
- * Pencatatan salat ada di halaman Sholat — Beranda tidak menduplikasinya.
+ * Tazkiya v4 — Beranda "A Better Daily Journey" — komposisi BARU:
+ * A. Header personal: logo, sapaan waktu, nama besar, tanggal Masehi &
+ *    Hijriah, avatar, notifikasi.
+ * B. Hero Sholat Berikutnya: waktu raksasa Outfit, countdown lime,
+ *    timeline horizontal lima waktu dengan indikator posisi sekarang.
+ * C. Overview Ibadah editorial: cincin persentase besar + baris aktivitas
+ *    tercatat + ringkasan target harian (bukan strip kartu seragam).
+ * D. Mood Check-in interaktif (MoodSection).
+ * E. Jelajahi Aktivitas: tiga komposisi berbeda (JelajahiAktivitas).
+ * F. Pekan Ini: bar mingguan dari data nyata.
+ * G. Target Harian (atur/toggle/hapus — logika lama utuh).
+ * H. Daily Barakah & Doa Hari Ini: blok editorial tenang.
+ * Pencatatan salat tetap di halaman Sholat. Desktop: grid 12 kolom.
  */
 
 import { useEffect, useMemo, useState } from "react";
@@ -36,7 +39,7 @@ import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { formatCountdown, goalStatuses, nextPrayerState } from "@/lib/tazkiya/goals";
 import { barakahOfTheDay } from "@/lib/tazkiya/barakah";
 import { duaOfTheDay } from "@/lib/tazkiya/duas";
-import { Chip, ConfirmButton, GlassCard, IconBox, ProgressBar, SectionHeader } from "./ui-bits";
+import { Chip, ConfirmButton, GlassCard, ProgressBar, SectionHeader } from "./ui-bits";
 import { MoodSection } from "./MoodSection";
 import { JelajahiAktivitas } from "./JelajahiAktivitas";
 import type { SubPageId, TabId } from "./BottomNav";
@@ -73,33 +76,9 @@ function useToday(): string {
   return today;
 }
 
-/* ---------------- B. Kartu Salat Berikutnya (hero aurora v3) ---------------- */
+/* ---------------- B. Hero Sholat Berikutnya (komposisi baru v4) ---------------- */
 
-/** Ornamen bulan sabit + bintang untuk kartu aurora — identitas v3. */
-function AuroraMoonsky() {
-  return (
-    <svg viewBox="0 0 200 120" fill="none" aria-hidden className="pointer-events-none absolute -right-3 -top-1 h-28 w-44 text-white">
-      {/* bulan sabit */}
-      <path
-        d="M158 14a26 26 0 1 0 26 26 20 20 0 1 1-26-26Z"
-        fill="currentColor"
-        opacity="0.28"
-      />
-      {/* bintang */}
-      <g fill="currentColor">
-        <path d="M120 26l2.2 5.2 5.2 2.2-5.2 2.2-2.2 5.2-2.2-5.2-5.2-2.2 5.2-2.2 2.2-5.2Z" opacity="0.5" />
-        <path d="M143 58l1.5 3.4 3.4 1.5-3.4 1.5-1.5 3.4-1.5-3.4-3.4-1.5 3.4-1.5 1.5-3.4Z" opacity="0.35" />
-        <circle cx="112" cy="62" r="2" opacity="0.3" />
-        <circle cx="178" cy="70" r="1.6" opacity="0.28" />
-        <circle cx="96" cy="20" r="1.4" opacity="0.25" />
-      </g>
-      {/* lengkung horizon bawah */}
-      <path d="M0 116c40-14 90-18 200-10v14H0v-4Z" fill="currentColor" opacity="0.12" />
-    </svg>
-  );
-}
-
-function NextPrayerCard({ today }: { today: string }) {
+function NextPrayerHero({ today }: { today: string }) {
   const settings = useWorshipStore((s) => s.settings);
   const prayerDetails = useWorshipStore((s) => s.prayerDetails);
   const logs = useWorshipStore((s) => s.logs);
@@ -131,34 +110,54 @@ function NextPrayerCard({ today }: { today: string }) {
 
   return (
     <section aria-label="Salat berikutnya" className="animate-tz-fade-up">
-      {/* Kartu hero aurora — gradien ungu→biru + bulan & bintang, teks putih di kedua tema */}
-      <div className="glass-hero relative overflow-hidden rounded-[1.75rem] p-5">
-        <AuroraMoonsky />
+      <GlassCard className="overflow-hidden p-0">
+        <div className="relative p-5 pb-4 sm:p-6">
+          {/* cincin dekoratif garis — geometris, tanpa gradien */}
+          <svg aria-hidden viewBox="0 0 120 120" className="pointer-events-none absolute -right-6 -top-10 h-36 w-36 text-tz-lavender">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" strokeWidth="1.4" />
+            <circle cx="60" cy="60" r="38" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.55" />
+            <circle cx="60" cy="8" r="3.2" fill="#D5F76A" />
+          </svg>
 
-        <div className="relative">
-          <p className="font-display text-[10px] font-bold uppercase tracking-[0.2em] text-white/90">
-            Salat berikutnya · {nextLabel}
-            {state.tomorrow ? " (besok)" : ""}
-          </p>
-          <div className="mt-1 flex flex-wrap items-end gap-x-3 gap-y-2">
-            <p className="font-display text-[46px] font-extrabold leading-none tracking-tight text-white">
-              {state.nextTime}
-            </p>
-            <span
-              className={cn(
-                "mb-1 rounded-full px-3 py-1 text-[11px] font-bold",
-                animations
-                  ? "bg-tz-lime text-[#23244d] shadow-[0_6px_16px_-6px_rgba(207,240,92,0.85)]"
-                  : "border border-white/25 bg-white/15 text-white"
-              )}
-            >
-              {formatCountdown(state.secondsLeft)} lagi
-            </span>
+          <div className="relative">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-tz-muted">
+                Sholat Berikutnya
+              </p>
+              <span
+                className={cn(
+                  "rounded-full px-3 py-1.5 text-[11px] font-bold text-tz-lime-ink",
+                  animations && "animate-tz-pulse"
+                )}
+                style={{ background: "var(--color-tz-lime)" }}
+              >
+                {formatCountdown(state.secondsLeft)} lagi
+              </span>
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-end gap-x-4 gap-y-1">
+              <p className="tnum font-display text-[64px] font-bold leading-[0.95] tracking-[-0.03em] text-tz-ink sm:text-[76px]">
+                {state.nextTime}
+              </p>
+              <div className="pb-2">
+                <p className="font-display text-[22px] font-bold leading-none text-tz-violet">
+                  {nextLabel}
+                  {state.tomorrow ? <span className="text-[13px] font-semibold text-tz-muted"> · besok</span> : null}
+                </p>
+                <p className="mt-1 text-[11px] font-medium text-tz-muted">
+                  {state.tomorrow
+                    ? "Menunggu Subuh esok hari"
+                    : `${PRAYER_ORDER.find((p) => p.id === state.current)?.label ?? "-"} sedang berlangsung`}
+                </p>
+              </div>
+            </div>
           </div>
+        </div>
 
-          {/* Timeline 5 waktu */}
-          <div className="relative mt-4">
-            <span aria-hidden className="absolute inset-x-2 top-[5px] h-px bg-white/30" />
+        {/* Timeline lima waktu — indikator posisi sekarang */}
+        <div className="relative border-t border-tz-line px-5 pb-4 pt-4 sm:px-6">
+          <div className="relative" role="group" aria-label="Lima waktu salat hari ini">
+            <span aria-hidden className="absolute inset-x-4 top-[6px] h-px bg-tz-line-strong" />
             <div className="relative grid grid-cols-5 gap-1">
               {PRAYER_ORDER.map(({ id, label }) => {
                 const st = slotState(id);
@@ -168,23 +167,28 @@ function NextPrayerCard({ today }: { today: string }) {
                     <span
                       aria-hidden
                       className={cn(
-                        "h-2.5 w-2.5 rounded-full border transition-all",
+                        "h-3 w-3 rounded-full border-2 transition-all",
                         st === "next"
-                          ? "border-white bg-white shadow-[0_0_12px_2px_rgba(255,255,255,0.6)]"
+                          ? "animate-tz-pulse border-tz-violet bg-tz-lime"
                           : st === "past" || st === "current"
-                            ? "border-transparent bg-white/75"
-                            : "border-white/45 bg-transparent"
+                            ? "border-tz-violet bg-tz-violet"
+                            : "border-tz-line-strong bg-tz-panel"
                       )}
                     />
                     <span
                       className={cn(
-                        "text-[9.5px] font-semibold leading-none",
-                        st === "next" ? "text-white" : st === "past" || st === "current" ? "text-white/85" : "text-white/60"
+                        "text-[10px] font-bold leading-none",
+                        st === "next" ? "text-tz-ink" : "text-tz-muted"
                       )}
                     >
                       {label}
                     </span>
-                    <span className={cn("text-[8.5px] leading-none", done ? "font-bold text-tz-lime" : "text-white/70")}>
+                    <span
+                      className={cn(
+                        "tnum text-[9.5px] leading-none",
+                        done ? "font-bold text-tz-violet" : st === "next" ? "font-semibold text-tz-ink/80" : "text-tz-muted"
+                      )}
+                    >
                       {done ? "✓" : times[id]?.time ?? ""}
                     </span>
                   </div>
@@ -192,23 +196,176 @@ function NextPrayerCard({ today }: { today: string }) {
               })}
             </div>
           </div>
-
-          <p className="mt-3 flex items-center gap-1.5 text-[9.5px] text-white/65">
-            <Sparkles size={10} className="shrink-0" />
-            {scheduleSource} ·{" "}
-            {state.tomorrow
-              ? "Menunggu Subuh esok"
-              : `${PRAYER_ORDER.find((p) => p.id === state.current)?.label ?? "-"} sedang berlangsung`}
+          <p className="mt-3 flex items-center gap-1.5 text-[10px] text-tz-muted">
+            <Sparkles size={11} className="shrink-0 text-tz-violet" />
+            {scheduleSource}
           </p>
         </div>
-      </div>
+      </GlassCard>
     </section>
   );
 }
 
-/* ---------------- B2. Strip Pekan Ini (weekly progress nyata) ---------------- */
+/* ---------------- C. Overview Ibadah Hari Ini (editorial) ---------------- */
 
-function WeeklyStrip({ today }: { today: string }) {
+function DailyOverview({
+  today,
+  onNavigate,
+  onOpenSubpage,
+}: {
+  today: string;
+  onNavigate: (tab: TabId) => void;
+  onOpenSubpage: (sub: SubPageId) => void;
+}) {
+  const settings = useWorshipStore((s) => s.settings);
+  const log = useWorshipStore((s) => s.logs[today]);
+  const dailyGoals = useWorshipStore((s) => s.dailyGoals);
+  const prayerDetails = useWorshipStore((s) => s.prayerDetails);
+  const zikirSessions = useWorshipStore((s) => s.zikirSessions);
+  const amalEntries = useWorshipStore((s) => s.amalEntries);
+  const goalDone = useWorshipStore((s) => s.goalDone);
+
+  const prayersDone = PRAYER_ORDER.filter((p) => log?.prayers?.[p.id]).length;
+  const quran = log?.quranPages ?? 0;
+  const zikir = log?.zikirCount ?? 0;
+
+  const quranPct = Math.min(100, (quran / Math.max(1, settings.quranDailyTarget)) * 100);
+  const zikirPct = Math.min(100, (zikir / Math.max(1, settings.zikirTarget)) * 100);
+  const salatPct = (prayersDone / 5) * 100;
+  const overall = Math.round((salatPct + quranPct + zikirPct) / 3);
+  const recorded = [prayersDone > 0, quran > 0, zikir > 0].filter(Boolean).length;
+
+  const goalStatusesToday = useMemo(
+    () =>
+      goalStatuses(dailyGoals, today, {
+        logs: useWorshipStore.getState().logs,
+        prayerDetails,
+        zikirSessions,
+        amalEntries,
+        goalDone,
+        subuhOntime: null,
+      }),
+    [dailyGoals, today, prayerDetails, zikirSessions, amalEntries, goalDone]
+  );
+  const goalsDone = goalStatusesToday.filter((g) => g.done).length;
+
+  const rows = [
+    {
+      label: "Salat lima waktu",
+      value: `${prayersDone}/5`,
+      pct: salatPct,
+      onClick: () => onNavigate("sholat"),
+    },
+    {
+      label: "Bacaan Al-Qur'an",
+      value: `${quran}/${settings.quranDailyTarget} hlm`,
+      pct: quranPct,
+      onClick: () => onNavigate("quran"),
+    },
+    {
+      label: "Zikir hari ini",
+      value: zikir.toLocaleString("id-ID"),
+      pct: zikirPct,
+      onClick: () => onOpenSubpage("zikir-doa"),
+    },
+  ];
+
+  return (
+    <section aria-label="Ringkasan ibadah hari ini" className="animate-tz-fade-up">
+      <SectionHeader
+        title="Ibadah Hari Ini"
+        caption="Semua yang kamu catat sejak bangun pagi"
+      />
+      <GlassCard className="p-5">
+        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-7">
+          {/* Cincin persentase besar */}
+          <div className="relative shrink-0">
+            <Ring percent={overall} />
+          </div>
+
+          {/* Baris aktivitas */}
+          <div className="w-full min-w-0 flex-1 space-y-4">
+            {rows.map(({ label, value, pct, onClick }) => (
+              <button
+                key={label}
+                type="button"
+                onClick={onClick}
+                aria-label={`${label}: ${value} — buka detail`}
+                className="tap block w-full text-left"
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-[12px] font-semibold text-tz-ink/90">{label}</span>
+                  <span className="tnum text-[13px] font-bold text-tz-ink">{value}</span>
+                </div>
+                <ProgressBar value={pct} className="mt-1.5 h-1.5" />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-tz-line pt-3.5">
+          <p className="text-[11px] font-medium text-tz-muted">
+            <span className="tnum font-bold text-tz-ink">{recorded}</span> jenis aktivitas tercatat · target harian{" "}
+            <span className="tnum font-bold text-tz-ink">
+              {goalsDone}/{goalStatusesToday.length}
+            </span>
+          </p>
+          <button
+            type="button"
+            onClick={() => onNavigate("progress")}
+            className="tap flex items-center gap-0.5 text-[11.5px] font-bold text-tz-violet"
+          >
+            Lihat analitik <ChevronRight size={14} />
+          </button>
+        </div>
+      </GlassCard>
+    </section>
+  );
+}
+
+/** Cincin besar editorial: busur lavender + titik lime + persentase Outfit. */
+function Ring({ percent }: { percent: number }) {
+  const size = 132;
+  const stroke = 11;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const clamped = Math.max(0, Math.min(100, percent));
+  const dash = (clamped / 100) * c;
+  return (
+    <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} className="stroke-tz-track" />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          className="stroke-tz-violet"
+          strokeDasharray={`${dash} ${c}`}
+          style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.22, 1, 0.36, 1)" }}
+        />
+      </svg>
+      {/* titik aksen lime di ujung busur */}
+      <span
+        aria-hidden
+        className="absolute left-1/2 top-1/2 h-2.5 w-2.5 rounded-full bg-tz-lime shadow-[0_0_0_3px_rgba(213,247,106,0.35)]"
+        style={{
+          transform: `translate(-50%, -50%) rotate(${(clamped / 100) * 360}deg) translateY(-${r}px)`,
+        }}
+      />
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="tnum font-display text-[30px] font-bold leading-none text-tz-ink">{clamped}%</span>
+        <span className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-tz-muted">Hari ini</span>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- F. Pekan Ini (bar mingguan editorial) ---------------- */
+
+function WeeklyBars({ today }: { today: string }) {
   const logs = useWorshipStore((s) => s.logs);
   /** Senin-minggu pekan ini (kronologis) — tanggal lokal dari lib dates. */
   const week = useMemo(() => {
@@ -223,35 +380,43 @@ function WeeklyStrip({ today }: { today: string }) {
   }, [logs, today]);
 
   const total = week.reduce((a, w) => a + w.count, 0);
+  const best = Math.max(1, ...week.map((w) => w.count));
 
   return (
     <section aria-label="Pekan ini" className="animate-tz-fade-up">
-      <GlassCard variant="clean" className="p-4">
-        <div className="mb-3 flex items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-2">
-            <CalendarDays size={14} className="shrink-0 text-tz-violet" />
-            <p className="font-display text-[13.5px] font-bold text-tz-ink">Pekan Ini</p>
-          </div>
-          <Chip className="border-tz-violet/25 bg-tz-violet/10 text-tz-accent">{total} salat tercatat</Chip>
-        </div>
-        <div className="grid grid-cols-7 gap-1.5" role="group" aria-label="Salat tercatat per hari pekan ini">
+      <SectionHeader
+        title="Pekan Ini"
+        caption="Konsistensi salat tujuh hari terakhir"
+        action={<Chip className="border-tz-violet/25 bg-tz-lavender/60 text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">{total} salat</Chip>}
+      />
+      <GlassCard className="p-5">
+        <div className="grid grid-cols-7 gap-2" role="group" aria-label="Salat tercatat per hari pekan ini">
           {week.map(({ label, count, isToday, isFuture }) => (
             <div key={label} className="flex flex-col items-center gap-1.5">
-              <div aria-hidden className="flex h-14 w-full items-end justify-center rounded-lg bg-tz-panel-soft px-0.5 pt-0.5">
+              <span
+                className={cn(
+                  "tnum text-[10px] font-bold leading-none",
+                  isFuture ? "text-transparent" : count > 0 ? "text-tz-ink" : "text-tz-muted/50"
+                )}
+              >
+                {count === 0 ? "–" : count}
+              </span>
+              <div aria-hidden className="flex h-[76px] w-full items-end justify-center">
                 <span
                   className={cn(
-                    "tz-bar-grow-x w-full rounded-md",
-                    count === 0 ? "h-[3px] bg-tz-track" : "bg-gradient-to-t from-[#6c5ce7] to-[#9b8cfa]",
-                    isToday && count > 0 && "from-[#5b8def] to-[#8b7cf8]"
+                    "tz-bar-grow w-full max-w-[22px] rounded-full",
+                    count === 0 ? "h-[4px] bg-tz-track" : isToday ? "bg-tz-lime" : "bg-tz-violet"
                   )}
-                  style={{ height: count === 0 ? 3 : `${Math.max(10, (count / 5) * 100)}%` }}
+                  style={{ height: count === 0 ? 4 : `${Math.max(8, (count / best) * 100)}%` }}
                 />
               </div>
-              <span className={cn("text-[9px] font-semibold leading-none", isToday ? "text-tz-accent" : isFuture ? "text-tz-muted/50" : "text-tz-muted")}>
+              <span
+                className={cn(
+                  "text-[9.5px] font-semibold leading-none",
+                  isToday ? "font-bold text-tz-ink" : isFuture ? "text-tz-muted/40" : "text-tz-muted"
+                )}
+              >
                 {label}
-              </span>
-              <span className={cn("text-[8.5px] leading-none tabular-nums", isFuture ? "text-transparent" : count > 0 ? "font-bold text-tz-ink/80" : "text-tz-muted/60")}>
-                {count === 0 ? "–" : count}
               </span>
             </div>
           ))}
@@ -261,7 +426,7 @@ function WeeklyStrip({ today }: { today: string }) {
   );
 }
 
-/* ---------------- C. Target Harian (Daily Journey) ---------------- */
+/* ---------------- G. Target Harian ---------------- */
 
 function DailyJourney({ today }: { today: string }) {
   const dailyGoals = useWorshipStore((s) => s.dailyGoals);
@@ -303,7 +468,7 @@ function DailyJourney({ today }: { today: string }) {
           <Chip
             className={cn(
               doneCount === statuses.length && statuses.length > 0
-                ? "border-tz-violet/30 bg-tz-violet/12 text-tz-accent"
+                ? "border-tz-violet/30 bg-tz-lavender/60 text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
                 : "border-tz-line"
             )}
           >
@@ -312,7 +477,7 @@ function DailyJourney({ today }: { today: string }) {
         }
       />
       <GlassCard className="p-4">
-        <ProgressBar value={pct} className="mb-3.5 h-1.5" />
+        <ProgressBar value={pct} className="mb-3.5 h-1.5" fillClass="bg-tz-lime" />
 
         <ul className="space-y-1.5" role="group" aria-label="Daftar target harian">
           {statuses.map(({ goal, done, auto }) => (
@@ -336,17 +501,15 @@ function DailyJourney({ today }: { today: string }) {
                   }
                 }}
                 className={cn(
-                  "tap flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all",
-                  done ? "border-tz-violet/45 bg-tz-violet/12" : "border-tz-line bg-tz-panel-soft hover:border-tz-violet/35"
+                  "tap flex w-full items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition-all",
+                  done ? "border-tz-violet/40 bg-tz-lavender/50 dark:bg-tz-accent/10" : "border-tz-line bg-tz-panel hover:border-tz-violet/35"
                 )}
               >
                 <span
                   aria-hidden
                   className={cn(
                     "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all",
-                    done
-                      ? "border-transparent bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-white shadow-[0_4px_12px_-4px_rgba(108,92,231,0.7)]"
-                      : "border-dashed border-tz-line-strong text-transparent"
+                    done ? "border-transparent bg-tz-ink text-tz-lime" : "border-dashed border-tz-line-strong text-transparent"
                   )}
                 >
                   <Check size={13} strokeWidth={3} />
@@ -368,7 +531,7 @@ function DailyJourney({ today }: { today: string }) {
 
         {/* Editor target */}
         {editing ? (
-          <div className="tz-fade-in mt-3 space-y-2.5 rounded-xl border border-tz-line bg-tz-panel-soft p-3">
+          <div className="tz-fade-in mt-3 space-y-2.5 rounded-2xl border border-tz-line bg-tz-panel-soft p-3">
             <p className="text-[10.5px] font-semibold uppercase tracking-wide text-tz-muted">Atur target harian</p>
             <ul className="space-y-1.5">
               {dailyGoals.map((g) => (
@@ -398,7 +561,7 @@ function DailyJourney({ today }: { today: string }) {
                       title={`Hapus target "${g.label}"?`}
                       description="Target pribadi ini akan dihapus dari daftar. Catatan ibadah yang sudah ada tidak terpengaruh."
                       onConfirm={() => deleteDailyGoal(g.id)}
-                      className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-400"
+                      className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-[#E5484D]/10 hover:text-[#E5484D]"
                     >
                       <Trash2 size={13} />
                     </ConfirmButton>
@@ -431,7 +594,7 @@ function DailyJourney({ today }: { today: string }) {
                   setDraft("");
                   toast.success("Target pribadi ditambahkan");
                 }}
-                className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-white shadow-[0_6px_16px_-8px_rgba(108,92,231,0.7)]"
+                className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-ink text-tz-lime"
               >
                 <Plus size={16} />
               </button>
@@ -449,7 +612,7 @@ function DailyJourney({ today }: { today: string }) {
             type="button"
             aria-expanded={editing}
             onClick={() => setEditing((v) => !v)}
-            className="tap flex shrink-0 items-center gap-1 rounded-full border border-tz-violet/30 bg-tz-violet/10 px-2.5 py-1 text-[10.5px] font-semibold text-tz-accent"
+            className="tap flex shrink-0 items-center gap-1 rounded-full border border-tz-line-strong bg-tz-panel px-2.5 py-1 text-[10.5px] font-semibold text-tz-ink"
           >
             <Settings2 size={12} /> Atur
           </button>
@@ -459,7 +622,7 @@ function DailyJourney({ today }: { today: string }) {
   );
 }
 
-/* ---------------- D. Daily Barakah ---------------- */
+/* ---------------- H. Daily Barakah (blok editorial tenang) ---------------- */
 
 function DailyBarakah() {
   const today = todayKey();
@@ -473,19 +636,19 @@ function DailyBarakah() {
   return (
     <section aria-label="Daily Barakah" className="animate-tz-fade-up">
       <SectionHeader title="Daily Barakah" caption="Pengingat & refleksi untuk hari ini" />
-      <GlassCard variant="violet" className="p-4">
-        <ul className="space-y-3">
+      <GlassCard variant="violet" className="p-5">
+        <ul className="space-y-3.5">
           {rows.map(({ icon: Icon, label, text }, i) => (
-            <li key={label} className={cn("flex items-start gap-3", i > 0 && "border-t border-tz-line-soft pt-3")}>
+            <li key={label} className={cn("flex items-start gap-3", i > 0 && "border-t border-tz-violet/20 pt-3.5")}>
               <span
                 aria-hidden
-                className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-tz-violet/30 bg-tz-violet/12 text-tz-accent"
+                className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/70 text-tz-violet dark:bg-white/10 dark:text-tz-accent"
               >
                 <Icon size={15} />
               </span>
               <span className="min-w-0">
-                <span className="block text-[10px] font-bold uppercase tracking-[0.12em] text-tz-accent/90">{label}</span>
-                <span className="mt-0.5 block text-[12px] leading-relaxed text-tz-ink/90">{text}</span>
+                <span className="block text-[9.5px] font-bold uppercase tracking-[0.16em] text-tz-violet/90 dark:text-tz-accent/90">{label}</span>
+                <span className="mt-0.5 block text-[12.5px] leading-relaxed text-tz-ink/90">{text}</span>
               </span>
             </li>
           ))}
@@ -505,11 +668,7 @@ export function HomePage({
   onOpenSubpage: (sub: SubPageId) => void;
 }) {
   const settings = useWorshipStore((s) => s.settings);
-  const logs = useWorshipStore((s) => s.logs);
-  const today = useToday();
-
-  const log = logs[today];
-  const dua = duaOfTheDay(today);
+  const dua = duaOfTheDay(todayKey());
   const greeting = (() => {
     const h = new Date().getHours();
     if (h >= 4 && h < 11) return "Selamat pagi";
@@ -518,25 +677,18 @@ export function HomePage({
     return "Selamat malam";
   })();
 
-  const prayersDone = PRAYER_ORDER.filter((p) => log?.prayers?.[p.id]).length;
-  const zikir = log?.zikirCount ?? 0;
-  const quran = log?.quranPages ?? 0;
+  const today = useToday();
 
   return (
-    <div className="space-y-6">
-      {/* ---------- A. Header: sapaan + tanggal + avatar + notifikasi ---------- */}
-      <header className="animate-tz-fade-up pt-1">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-[11px] font-medium text-tz-accent/90">{greeting} · Assalamu&apos;alaikum</p>
-            <h1 className="mt-0.5 truncate font-display text-[22px] font-bold leading-tight text-tz-ink">{settings.name}</h1>
-            <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10.5px] text-tz-muted">
-              <span className="inline-flex items-center gap-1">
-                <CalendarDays size={11} className="text-tz-violet" />
-                {formatGregorian(new Date())}
-              </span>
-              {formatHijri(new Date()) ? <span className="text-tz-accent/85">· {formatHijri(new Date())}</span> : null}
-            </p>
+    <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
+      {/* ---------- A. Header personal ---------- */}
+      <header className="animate-tz-fade-up pt-1 lg:col-span-12">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-tz-violet font-display text-base font-bold text-white">ت</span>
+            <span className="font-display text-[15px] font-bold tracking-[-0.01em] text-tz-ink">
+              Tazkiya<span className="text-tz-violet">.</span>
+            </span>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <button
@@ -545,116 +697,104 @@ export function HomePage({
               onClick={() => toast.info("Belum ada notifikasi baru")}
               className="tap glass relative flex h-10 w-10 items-center justify-center rounded-full text-tz-muted"
             >
-              <Bell size={17} />
-              <span aria-hidden className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-tz-lime shadow-[0_0_6px_2px_rgba(207,240,92,0.55)]" />
+              <Bell size={16} />
+              <span aria-hidden className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-tz-lime" />
             </button>
             <button type="button" aria-label="Buka profil" onClick={() => onNavigate("profil")} className="tap relative">
               {settings.avatarDataUrl ? (
                 <img
                   src={settings.avatarDataUrl}
                   alt={`Foto profil ${settings.name}`}
-                  className="h-12 w-12 rounded-full border-2 border-tz-lavender/50 object-cover"
+                  className="h-11 w-11 rounded-full border-2 border-tz-lavender object-cover dark:border-tz-lav-deco"
                 />
               ) : (
-                <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-[#8b7cf8] via-[#6c5ce7] to-[#5b8def] font-display text-lg font-bold text-white shadow-[0_8px_20px_-8px_rgba(108,92,231,0.7)] dark:border-white/15">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-tz-lavender bg-tz-violet font-display text-lg font-bold text-white dark:border-tz-lav-deco">
                   {settings.name.trim().charAt(0).toUpperCase() || "T"}
                 </span>
               )}
             </button>
           </div>
         </div>
+
+        <div className="mt-5 px-0.5">
+          <p className="text-[11.5px] font-semibold text-tz-muted">
+            {greeting} · Assalamu&apos;alaikum
+          </p>
+          <h1 className="mt-0.5 truncate font-display text-[30px] font-bold leading-tight tracking-[-0.025em] text-tz-ink sm:text-[34px]">
+            {settings.name || "Sahabat Tazkiya"}
+          </h1>
+          <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] font-medium text-tz-muted">
+            <span className="inline-flex items-center gap-1">
+              <CalendarDays size={12} className="text-tz-violet" />
+              {formatGregorian(new Date())}
+            </span>
+            {formatHijri(new Date()) ? (
+              <span className="rounded-full bg-tz-lavender/60 px-2 py-0.5 text-[10px] font-semibold text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                {formatHijri(new Date())}
+              </span>
+            ) : null}
+          </p>
+        </div>
       </header>
 
-      {/* ---------- B. Salat berikutnya ---------- */}
-      <NextPrayerCard today={today} />
+      {/* ---------- B. Hero sholat berikutnya ---------- */}
+      <div className="mt-6 lg:col-span-12">
+        <NextPrayerHero today={today} />
+      </div>
 
-      {/* ---------- B2. Pekan Ini (progres mingguan) ---------- */}
-      <WeeklyStrip today={today} />
+      {/* ---------- C. Overview editorial ---------- */}
+      <div className="mt-6 lg:col-span-7">
+        <DailyOverview today={today} onNavigate={onNavigate} onOpenSubpage={onOpenSubpage} />
+      </div>
 
-      {/* ---------- C. Target Harian ---------- */}
-      <DailyJourney today={today} />
+      {/* ---------- D. Mood check-in ---------- */}
+      <div className="mt-6 lg:col-span-5">
+        <MoodSection today={today} onOpenSubpage={onOpenSubpage} />
+      </div>
 
-      {/* ---------- D. Mood Check-in ---------- */}
-      <MoodSection today={today} onOpenSubpage={onOpenSubpage} />
+      {/* ---------- E. Jelajahi aktivitas ---------- */}
+      <div className="mt-6 lg:col-span-5">
+        <JelajahiAktivitas today={today} onOpen={onOpenSubpage} />
+      </div>
 
-      {/* ---------- E. Jelajahi Aktivitas ---------- */}
-      <JelajahiAktivitas today={today} onOpen={onOpenSubpage} />
+      {/* ---------- F. Pekan ini ---------- */}
+      <div className="mt-6 lg:col-span-7">
+        <WeeklyBars today={today} />
+      </div>
 
-      {/* ---------- F1. Progres hari ini (ringkas, tanpa pencatatan) ---------- */}
-      <section aria-label="Progres ibadah hari ini">
-        <SectionHeader
-          title="Progres Hari Ini"
-          caption="Ringkasan aktivitas yang sudah tercatat"
-          action={
-            <button
-              type="button"
-              onClick={() => onNavigate("progress")}
-              className="tap flex items-center gap-0.5 rounded-full border border-tz-violet/30 bg-tz-violet/10 py-1 pl-3 pr-2 text-xs font-semibold text-tz-accent transition-all hover:bg-tz-violet/18"
-            >
-              Detail <ChevronRight size={14} />
-            </button>
-          }
-        />
-        <div className="grid grid-cols-3 gap-2.5">
-          {[
-            {
-              label: "Salat",
-              value: `${prayersDone}/5`,
-              pct: (prayersDone / 5) * 100,
-              onClick: () => onNavigate("sholat"),
-              accent: "text-tz-accent",
-            },
-            {
-              label: "Al-Qur'an",
-              value: `${quran} hlm`,
-              pct: Math.min(100, (quran / Math.max(1, settings.quranDailyTarget)) * 100),
-              onClick: () => onNavigate("quran"),
-              accent: "text-tz-blue light:text-tz-blue dark:text-[#8b96ff]",
-            },
-            {
-              label: "Zikir",
-              value: zikir.toLocaleString("id-ID"),
-              pct: Math.min(100, (zikir / Math.max(1, settings.zikirTarget)) * 100),
-              onClick: () => onOpenSubpage("zikir-doa"),
-              accent: "text-amber-500 light:text-amber-600 dark:text-amber-300",
-            },
-          ].map(({ label, value, pct, onClick, accent }) => (
-            <GlassCard key={label} variant="clean" className="tap cursor-pointer p-3.5" onClick={onClick}>
-              <p className="text-[10.5px] font-semibold text-tz-muted">{label}</p>
-              <p className={cn("mt-1 text-[22px] font-extrabold leading-none tabular-nums", accent)}>{value}</p>
-              <ProgressBar value={pct} className="mt-2.5 h-1" />
-            </GlassCard>
-          ))}
-        </div>
-      </section>
+      {/* ---------- G. Target harian ---------- */}
+      <div className="mt-6 lg:col-span-12">
+        <DailyJourney today={today} />
+      </div>
 
-      {/* ---------- F2. Daily Barakah ---------- */}
-      <DailyBarakah />
+      {/* ---------- H. Daily Barakah ---------- */}
+      <div className="mt-6 lg:col-span-7">
+        <DailyBarakah />
+      </div>
 
-      {/* ---------- Doa Hari Ini ---------- */}
-      <GlassCard variant="clean" className="p-5">
-        <div className="flex items-center gap-2.5">
-          <IconBox tone="lavender" size="sm">
-            <BookOpen />
-          </IconBox>
-          <div className="min-w-0">
-            <p className="font-display text-[15px] font-bold text-tz-ink">Doa Hari Ini</p>
-            <p className="text-[10.5px] text-tz-muted">{dua.title}</p>
-          </div>
-        </div>
-        {dua.arabic ? <p className="quran-arabic mt-4 text-right text-[22px] leading-[2] text-tz-ink">{dua.arabic}</p> : null}
-        {dua.transliteration ? <p className="mt-2.5 text-[11.5px] italic leading-relaxed text-tz-muted">&ldquo;{dua.transliteration}&rdquo;</p> : null}
-        <p className="mt-2 text-[12.5px] leading-relaxed text-tz-ink/95">{dua.meaning}</p>
-        {dua.source ? (
-          <div className="mt-3">
-            <Chip className="border-tz-violet/30 bg-tz-violet/10 text-tz-accent">{dua.source}</Chip>
-          </div>
-        ) : null}
-        <div className="mt-3.5 flex items-center justify-between border-t border-tz-line-soft pt-3">
-          <p className="text-[10px] font-medium text-tz-accent/85">Tazkiya, teman ibadah harianmu</p>
-          <p className="text-[10px] text-tz-muted/70">Berganti setiap hari</p>
-        </div>
-      </GlassCard>
+      {/* ---------- I. Doa hari ini ---------- */}
+      <div className="mt-6 lg:col-span-5">
+        <section aria-label="Doa hari ini" className="animate-tz-fade-up">
+          <SectionHeader title="Doa Hari Ini" caption={dua.title} />
+          <GlassCard className="p-5">
+            <span aria-hidden className="pointer-events-none absolute left-4 top-2 font-display text-[44px] leading-none text-tz-lavender select-none">
+              &ldquo;
+            </span>
+            {dua.arabic ? <p className="quran-arabic relative mt-4 text-right text-[22px] leading-[2] text-tz-ink">{dua.arabic}</p> : null}
+            {dua.transliteration ? <p className="relative mt-2.5 text-[11.5px] italic leading-relaxed text-tz-muted">&ldquo;{dua.transliteration}&rdquo;</p> : null}
+            <p className="relative mt-2 text-[12.5px] leading-relaxed text-tz-ink/95">{dua.meaning}</p>
+            {dua.source ? (
+              <div className="mt-3.5">
+                <Chip className="border-tz-violet/25 bg-tz-lavender/60 text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">{dua.source}</Chip>
+              </div>
+            ) : null}
+            <div className="mt-4 flex items-center justify-between border-t border-tz-line pt-3">
+              <p className="text-[10px] font-semibold text-tz-violet/90 dark:text-tz-accent/90">Tazkiya, teman ibadah harianmu</p>
+              <p className="text-[10px] text-tz-muted/70">Berganti setiap hari</p>
+            </div>
+          </GlassCard>
+        </section>
+      </div>
     </div>
   );
 }

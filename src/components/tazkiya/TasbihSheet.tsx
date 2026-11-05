@@ -1,9 +1,11 @@
 "use client";
 
 /**
- * Tazkiya — Tasbih Digital (overlay layar penuh).
- * Piringan hitung dengan cincin progres, cahaya conic berputar,
- * preset zikir, preset target (33/100/500/1000), dan simpan harian.
+ * Tazkiya v4 — Tasbih Digital (overlay layar penuh).
+ * Piringan penghitung baru: lingkaran putih bersih dengan cincin progres
+ * lavender dan titik lime di ujung busur — tanpa conic glow. Preset zikir
+ * berupa chip; target preset 33/100/500/1000 + angka khusus; simpan harian
+ * tetap menulis ke catatan hari ini & riwayat (logika tidak berubah).
  */
 
 import { useState } from "react";
@@ -24,7 +26,6 @@ import {
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { ZIKIR_PRESETS, type ZikirSlot } from "@/lib/tazkiya/types";
 import { todayKey } from "@/lib/tazkiya/dates";
-import { ProgressRing } from "./ui-bits";
 import { cn } from "@/lib/utils";
 
 export function TasbihSheet({
@@ -52,31 +53,38 @@ export function TasbihSheet({
   const pct = Math.min(100, Math.round((tasbih.count / Math.max(1, tasbih.target)) * 100));
   const reached = tasbih.count >= tasbih.target;
 
+  /** Busur SVG cincin penghitung (r=118 pada viewBox 260). */
+  const R = 118;
+  const CIRC = 2 * Math.PI * R;
+  const dash = (pct / 100) * CIRC;
+  const angle = (-90 + (pct / 100) * 360) * (Math.PI / 180);
+  const tipX = 130 + R * Math.cos(angle);
+  const tipY = 130 + R * Math.sin(angle);
+
   return (
     <m.div
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 24 }}
       transition={{ duration: 0.22, ease: "easeOut" }}
-      className="absolute inset-0 z-40 flex flex-col overflow-hidden bg-tz-frame"
+      className="absolute inset-0 z-40 flex flex-col overflow-hidden bg-tz-stage"
       role="dialog"
       aria-modal="true"
       aria-label="Tasbih digital"
     >
-      <div aria-hidden className="pointer-events-none absolute -left-16 top-10 h-56 w-56 rounded-full bg-tz-purple/40 blur-3xl" />
-      <div aria-hidden className="pointer-events-none absolute -right-20 bottom-24 h-64 w-64 rounded-full bg-tz-violet/25 blur-3xl" />
-
       {/* ---------- Kepala ---------- */}
       <div className="relative z-10 flex items-center justify-between px-5 pb-2 pt-[max(1rem,env(safe-area-inset-top))]">
         <div>
-          <h2 className="font-display text-lg font-bold text-gradient-violet">Tasbih Digital</h2>
+          <h2 className="font-display text-lg font-bold tracking-[-0.01em] text-tz-ink">
+            Tasbih Digital<span className="text-tz-violet">.</span>
+          </h2>
           <p className="text-xs text-tz-muted">Ketuk lingkaran besar untuk berzikir</p>
         </div>
         <button
           type="button"
           aria-label="Tutup tasbih"
           onClick={onClose}
-          className="tap glass flex h-10 w-10 items-center justify-center rounded-full text-tz-lavender"
+          className="tap glass flex h-10 w-10 items-center justify-center rounded-full text-tz-ink"
         >
           <X size={18} />
         </button>
@@ -90,9 +98,9 @@ export function TasbihSheet({
             type="button"
             onClick={() => tasbihSetDhikr(z)}
             className={cn(
-              "tap shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium",
+              "tap shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold",
               tasbih.dhikr === z
-                ? "border-tz-violet/60 bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] text-white glow-violet-sm"
+                ? "border-tz-ink bg-tz-ink text-white"
                 : "border-tz-line bg-tz-panel text-tz-muted"
             )}
           >
@@ -103,7 +111,7 @@ export function TasbihSheet({
 
       {/* ---------- Piringan hitung ---------- */}
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center gap-6 px-6">
-        <p className="max-w-full truncate text-center font-display text-lg font-semibold text-tz-accent">{tasbih.dhikr}</p>
+        <p className="max-w-full truncate text-center font-display text-[17px] font-bold text-tz-violet dark:text-tz-accent">{tasbih.dhikr}</p>
         <m.button
           type="button"
           onClick={() => {
@@ -119,43 +127,53 @@ export function TasbihSheet({
           }}
           whileTap={{ scale: 0.94 }}
           aria-label={`Tambah hitungan, saat ini ${tasbih.count}`}
-          className={cn("relative flex h-[248px] w-[248px] items-center justify-center rounded-full", reached && "animate-tz-pulse")}
+          className={cn("relative flex h-[248px] w-[248px] items-center justify-center rounded-full sm:h-[260px] sm:w-[260px]", reached && "animate-tz-pulse")}
         >
+          {/* cincin luar tipis */}
+          <span aria-hidden className="absolute inset-0 rounded-full border border-tz-violet/25" />
+          {/* cincin progres lavender + titik lime */}
+          <svg aria-hidden viewBox="0 0 260 260" className="absolute inset-0 h-full w-full -rotate-90">
+            <circle cx="130" cy="130" r={R} fill="none" strokeWidth="7" className="stroke-tz-track" />
+            <circle
+              cx="130"
+              cy="130"
+              r={R}
+              fill="none"
+              strokeWidth="7"
+              strokeLinecap="round"
+              className="stroke-tz-violet"
+              strokeDasharray={`${dash} ${CIRC}`}
+              style={{ transition: "stroke-dasharray 0.5s cubic-bezier(0.22, 1, 0.36, 1)" }}
+            />
+          </svg>
+          {/* titik lime di ujung busur */}
+          {pct > 2 && pct < 100 ? (
+            <span
+              aria-hidden
+              className="absolute h-3 w-3 rounded-full bg-tz-lime shadow-[0_0_0_4px_rgba(213,247,106,0.3)]"
+              style={{
+                left: `calc(${(tipX / 260) * 100}% - 6px)`,
+                top: `calc(${(tipY / 260) * 100}% - 6px)`,
+              }}
+            />
+          ) : null}
+          {/* piringan putih */}
           <span
             aria-hidden
-            className="animate-tz-spin-slow absolute -inset-3 rounded-full opacity-60"
-            style={{
-              background:
-                "conic-gradient(from 0deg, rgba(108,92,231,0) 0deg, rgba(108,92,231,0.35) 80deg, rgba(216,197,255,0.5) 140deg, rgba(108,92,231,0) 220deg)",
-              filter: "blur(14px)",
-            }}
-          />
-          <ProgressRing value={pct} size={248} stroke={8} trackClass="stroke-tz-track" className="absolute inset-0" />
-          <span
-            aria-hidden
-            className="tz-tasbih-disc absolute inset-[22px] rounded-full border border-tz-violet/40 bg-gradient-to-br from-tz-violet/40 via-tz-purple/28 to-tz-deep/92"
-            style={{
-              boxShadow:
-                "inset 0 2px 28px rgba(108,92,231,0.4), inset 0 -8px 30px rgba(13,10,20,0.5), 0 24px 60px -12px rgba(13,10,20,0.7), 0 0 44px -10px rgba(108,92,231,0.5)",
-            }}
-          />
-          <span
-            aria-hidden
-            className="absolute inset-[22px] rounded-full bg-[radial-gradient(80%_60%_at_50%_0%,rgba(255,255,255,0.14),rgba(255,255,255,0)_60%)]"
+            className="tz-tasbih-disc absolute inset-[26px] rounded-full border border-tz-line"
+            style={{ boxShadow: "0 24px 60px -20px rgba(136,121,232,0.45)" }}
           />
           <span className="relative flex flex-col items-center">
-            <span className="text-glow font-display text-[64px] font-extrabold leading-none tabular-nums text-tz-ink">
+            <span className="tnum font-display text-[64px] font-bold leading-none tracking-[-0.03em] text-tz-ink">
               {tasbih.count.toLocaleString("id-ID")}
             </span>
-            <span className="mt-1.5 text-xs text-tz-accent/95">
+            <span className="mt-1.5 text-xs font-medium text-tz-muted">
               dari {tasbih.target.toLocaleString("id-ID")} target
             </span>
             <span
               className={cn(
-                "mt-2.5 rounded-full border px-3 py-1 text-[10px] font-semibold",
-                reached
-                  ? "border-white/40 bg-white text-tz-purple shadow-[0_0_16px_-2px_rgba(255,255,255,0.7)]"
-                  : "border-tz-line bg-tz-track text-tz-accent"
+                "mt-3 rounded-full px-3 py-1 text-[10px] font-bold",
+                reached ? "bg-tz-lime text-tz-lime-ink" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
               )}
             >
               {reached ? "Target tercapai" : `${pct}%`}
@@ -168,7 +186,7 @@ export function TasbihSheet({
             type="button"
             onClick={tasbihMinus}
             aria-label="Kurangi satu hitungan"
-            className="tap glass flex h-12 w-12 items-center justify-center rounded-2xl text-tz-accent"
+            className="tap glass flex h-12 w-12 items-center justify-center rounded-full text-tz-ink"
           >
             <Minus size={18} />
           </button>
@@ -176,7 +194,7 @@ export function TasbihSheet({
             <AlertDialogTrigger asChild>
               <button
                 type="button"
-                className="tap glass flex h-12 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-semibold text-rose-500 light:text-rose-600"
+                className="tap glass flex h-12 items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold text-tz-muted"
               >
                 <RotateCcw size={16} /> Reset
               </button>
@@ -192,7 +210,7 @@ export function TasbihSheet({
               <AlertDialogFooter>
                 <AlertDialogCancel className="border-tz-line bg-tz-panel text-tz-ink">Batal</AlertDialogCancel>
                 <AlertDialogAction
-                  className="bg-rose-500 text-white"
+                  className="bg-[#E5484D] text-white"
                   onClick={() => {
                     tasbihReset();
                     toast.info("Hitungan tasbih direset");
@@ -210,16 +228,16 @@ export function TasbihSheet({
               if (n === 0) toast.error("Hitungan masih 0 — berzikir dulu ya");
               else toast.success(`${n.toLocaleString("id-ID")} zikir ditambahkan ke catatan harian`);
             }}
-            className="tap flex h-12 items-center justify-center gap-2 rounded-2xl border border-tz-violet/50 bg-gradient-to-r from-[#8b7cf8] via-[#6c5ce7] to-[#5b8def] px-4 text-sm font-semibold text-white shadow-[0_10px_28px_-8px_rgba(108,92,231,0.9),inset_0_1px_0_rgba(255,255,255,0.25)] transition-all hover:brightness-110"
+            className="tap flex h-12 items-center justify-center gap-2 rounded-full bg-tz-ink px-5 font-display text-sm font-bold text-white"
           >
-            <Save size={16} /> Simpan Harian
+            <Save size={16} className="text-tz-lime" /> Simpan Harian
           </button>
         </div>
       </div>
 
       {/* ---------- Target ---------- */}
-      <div className="glass-strong relative z-10 mx-4 mb-[max(1.5rem,env(safe-area-inset-bottom))] mt-4 flex flex-col gap-2.5 rounded-[1.15rem] p-3.5">
-        <label htmlFor="tasbih-target" className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-tz-muted">
+      <div className="glass-strong relative z-10 mx-4 mb-[max(1.5rem,env(safe-area-inset-bottom))] mt-4 flex flex-col gap-2.5 rounded-[1.3rem] p-3.5">
+        <label htmlFor="tasbih-target" className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-tz-muted">
           Target hitungan
         </label>
         <div className="flex items-center gap-1.5">
@@ -232,10 +250,10 @@ export function TasbihSheet({
                 setTargetDraft(String(n));
               }}
               className={cn(
-                "tap min-w-[38px] flex-1 rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition-all",
+                "tap min-w-[38px] flex-1 rounded-full px-2 py-1.5 text-[11px] font-bold transition-all",
                 tasbih.target === n
-                  ? "border-tz-violet/60 bg-tz-violet text-white shadow-[0_0_12px_-3px_rgba(108,92,231,0.8)]"
-                  : "border-tz-line bg-tz-panel text-tz-muted"
+                  ? "bg-tz-ink text-white"
+                  : "bg-tz-panel-soft text-tz-muted"
               )}
             >
               {n}
@@ -249,7 +267,7 @@ export function TasbihSheet({
             value={targetDraft}
             onChange={(e) => setTargetDraft(e.target.value)}
             aria-label="Target hitungan khusus"
-            className="w-[52px] shrink-0 rounded-lg border border-tz-line bg-tz-panel-strong px-2 py-1.5 text-center text-xs text-tz-ink outline-none transition-colors focus:border-tz-violet/60"
+            className="w-[52px] shrink-0 rounded-full border border-tz-line bg-tz-panel-strong px-2 py-1.5 text-center text-xs text-tz-ink outline-none transition-colors focus:border-tz-violet/60"
           />
           <button
             type="button"
@@ -262,7 +280,7 @@ export function TasbihSheet({
               tasbihSetTarget(n);
               toast.success(`Target diatur ke ${n.toLocaleString("id-ID")}`);
             }}
-            className="tap shrink-0 rounded-lg bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] px-3 py-1.5 text-[11px] font-bold text-white shadow-[0_4px_12px_-4px_rgba(108,92,231,0.8)]"
+            className="tap shrink-0 rounded-full bg-tz-lime px-3.5 py-1.5 text-[11px] font-bold text-tz-lime-ink"
           >
             Atur
           </button>

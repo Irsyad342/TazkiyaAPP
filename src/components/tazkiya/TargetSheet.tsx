@@ -37,13 +37,13 @@ function SectionCard({
   children?: ReactNode;
 }) {
   return (
-    <section className="glass rounded-[1.35rem] p-4">
+    <section className="glass rounded-[1.5rem] p-4">
       <div className="flex items-center gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-tz-violet/25 bg-gradient-to-br from-tz-violet/22 to-tz-purple/12 text-tz-violet">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
           {icon}
         </span>
         <div className="min-w-0">
-          <h3 className="font-display text-[14.5px] font-semibold text-tz-ink">{title}</h3>
+          <h3 className="font-display text-[14.5px] font-bold text-tz-ink">{title}</h3>
           <p className="text-[10.5px] leading-snug text-tz-muted">{caption}</p>
         </div>
       </div>
@@ -114,7 +114,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
   };
 
   const saveBtn =
-    "tap flex min-h-[42px] shrink-0 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] px-4 text-[12.5px] font-semibold text-white shadow-[0_4px_14px_-4px_rgba(108,92,231,0.8)]";
+    "tap flex min-h-[42px] shrink-0 items-center justify-center gap-1.5 rounded-full bg-tz-ink px-4 text-[12.5px] font-bold text-white";
 
   return (
     <m.div
@@ -122,25 +122,25 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 24 }}
       transition={{ duration: 0.22, ease: "easeOut" }}
-      className="absolute inset-0 z-40 flex flex-col overflow-hidden bg-tz-frame"
+      className="absolute inset-0 z-40 flex flex-col overflow-hidden bg-tz-stage"
       role="dialog"
       aria-modal="true"
       aria-label="Target Ibadah"
     >
-      <div aria-hidden className="pointer-events-none absolute -right-20 top-16 h-56 w-56 rounded-full bg-tz-purple/25 blur-3xl" />
-
       {/* ---------- Kepala ---------- */}
       <div className="relative z-10 flex items-center gap-3 px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top))]">
         <button
           type="button"
           aria-label="Kembali ke Profil"
           onClick={onClose}
-          className="tap glass flex h-10 w-10 items-center justify-center rounded-full text-tz-accent"
+          className="tap glass flex h-10 w-10 items-center justify-center rounded-full text-tz-ink"
         >
           <ChevronLeft size={19} />
         </button>
         <div>
-          <h2 className="font-display text-lg font-bold text-gradient-violet">Target Ibadah</h2>
+          <h2 className="font-display text-lg font-bold tracking-[-0.01em] text-tz-ink">
+            Target Ibadah<span className="text-tz-violet">.</span>
+          </h2>
           <p className="text-[11px] text-tz-muted">Atur sasaran harian sesuai kemampuanmu</p>
         </div>
       </div>
@@ -169,7 +169,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
         {/* B. Bacaan Al-Qur'an */}
         <SectionCard icon={<BookOpen size={17} />} title="Bacaan Al-Qur'an" caption="Pilih satuan dan jumlah target harian">
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-tz-muted">Satuan target</p>
-          <div className="glass-violet flex rounded-xl p-1" role="radiogroup" aria-label="Satuan target bacaan">
+          <div className="rounded-full border border-tz-line bg-tz-panel-soft p-1" role="radiogroup" aria-label="Satuan target bacaan">
             {UNIT_OPTIONS.map((u) => (
               <button
                 key={u.id}
@@ -178,9 +178,9 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
                 aria-checked={unit === u.id}
                 onClick={() => setUnit(u.id)}
                 className={cn(
-                  "tap flex-1 rounded-lg py-1.5 text-[12px] font-semibold transition-all",
+                  "tap flex-1 rounded-full py-1.5 text-[12px] font-bold transition-all",
                   unit === u.id
-                    ? "bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] text-white shadow-[0_4px_12px_-4px_rgba(108,92,231,0.8)]"
+                    ? "bg-tz-ink text-white"
                     : "text-tz-muted"
                 )}
               >
