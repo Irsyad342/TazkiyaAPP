@@ -68,8 +68,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    /* data-v="8": penanda generasi desain untuk verifikasi deployment. */
-    <html lang="id" data-theme="dark" data-v="8" suppressHydrationWarning>
+    /* data-v="9": penanda generasi desain untuk verifikasi deployment. */
+    <html lang="id" data-theme="dark" data-v="9" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>

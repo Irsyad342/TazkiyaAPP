@@ -19,7 +19,7 @@ export const MOOD_TONE: Record<MoodId, { face: string; activeBg: string }> = {
   bersyukur: { face: "text-[#d95f80] dark:text-[#ef8aa4]", activeBg: "bg-[#fdeef2] dark:bg-[#2f1d22]" },
   lelah: { face: "text-[#8e8e99] dark:text-[#a5a5ad]", activeBg: "bg-[#ececef] dark:bg-[#1f1f23]" },
   sedih: { face: "text-[#6a89c9] dark:text-[#89a8e0]", activeBg: "bg-[#eef2fa] dark:bg-[#1e2634]" },
-  cemas: { face: "text-[#8a79d9] dark:text-[#a99cf2]", activeBg: "bg-[#f0edff] dark:bg-[#26223a]" },
+  cemas: { face: "text-[#2f9e8f] dark:text-[#5cc0ad]", activeBg: "bg-[#e9f7f2] dark:bg-[#152b26]" },
   "campur-aduk": { face: "text-[#e8722e] dark:text-[#ff8a50]", activeBg: "bg-[#fdeee4] dark:bg-[#2b1b10]" },
 };
 

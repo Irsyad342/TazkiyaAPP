@@ -845,3 +845,43 @@ BUG v7 ikut diperbaiki: pindah tab periode otomatis membuka sheet "Rincian Hari 
 tsc 0 · eslint bersih · build sukses. Browser (1280 desktop & 360/390/430): kolom 430px terpusat tanpa sidebar,
 overflow 0px semua tab & lebar, siklus tab Progress bersih tanpa auto-sheet, mood terpilih ber-ring orange,
 tema terang/gelap konsisten, 0 error konsol.
+
+## Task 44 — v9: pencatatan sholat sekali-ketuk + logo oranye + beranda penuh + liquid glass nyata
+
+Umpan balik pengguna: (1) mencatat salat harus menggeser sumbu horizontal — susah & tidak efisien,
+(2) ikon aplikasi masih ungu, logo diganti, (3) kartu beranda ada yang kosong, (4) fitur Liquid Glass
+tidak terasa, (5) banyak tombol dianggap tidak berfungsi.
+
+### Audit tombol
+Diuji klik nyata di browser untuk puluhan tombol di Beranda, Sholat, Al-Qur'an, Progress, Profil, Zikir
+(dialog, tasbih, sheet, toggles): semua handler hidup — pembaca Qur'an pun terbuka benar. Kesimpulan:
+kesan "tombol mati" berasal dari interaksi yang tidak terjangkau (sumbu geser), footer tiruan yang tidak
+bisa diklik ("Ketuk untuk mencatat"), dan efek Liquid Glass yang tak terlihat. Semua sumber itu dibereskan.
+
+### Sholat — daftar vertikal sekali-ketuk
+Komponen sumbu waktu horizontal 1824px (harus menggulir menyamping untuk menemukan blok salat) DIHAPUS,
+diganti `PrayerList`: lima baris vertikal — ikon status, nama, jam, chip status (Berikutnya/Tepat
+waktu/Terlambat), ceklis — semuanya muat satu layar; satu ketukan langsung membuka sheet pencatatan.
+
+### Logo & ikon (ungu → identitas oranye)
+Logo baru digambar programatis (`scripts/gen_logo.py`): bulan sabit + bintang + buku terbuka dengan
+gradien oranye merek #FA5200 di kanvas arang — favicon (`src/app/icon.svg`) dan seluruh set ikon PWA
+(192/512 + maskable) dirender ulang; mood "Cemas" dari ungu menjadi teal hangat.
+
+### Beranda — kartu Kebaikan diisi
+Kartu oranye yang setengah kosong kini berisi: baris dua-tinta (nama + keterangan "Target 5 halaman…",
+"Sedekah, bantu sesama…" dst), chevron, badge 0/4, kalimat insight dinamis, dan footer yang tadinya teks
+mati ("Ketuk untuk mencatat") menjadi tombol sungguhan "Lihat perkembangan" menuju Progress.
+
+### Liquid Glass berfungsi
+Penyebab tak terasanya: blur di atas latar polos = tidak ada yang dibiaskan. Kini ada lapisan cahaya
+ambien (4 gugus gradien hangat + satu bergerak lambat, hormat saklar animasi) di belakang konten; saat
+mode liquid, permukaan `.glass*`, kartu putih, kartu hero, dan pil navigasi bawah menjadi benar-benar
+tembus (opasitas 55-84% + blur 14-24px + saturasi naik). Mode klasik tetap solid dengan ambien redup.
+
+### QA
+tsc 0 · eslint bersih · build sukses. Browser 360/390: daftar salat 5 baris tanpa gulir menyamping
+(overflow 0px semua tab), sheet "Catat Salat Subuh" terbuka satu ketukan, kartu Kebaikan penuh tanpa
+ruang kosong, glass terlihat jelas (teks tembus di pil nav & kartu), tema terang/gelap konsisten,
+0 error konsol. Kendala QA: proses worker next-server yatim sempat menyajikan build lama — dihentikan
+paksa, diverifikasi ulang dari build segar.
