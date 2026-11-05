@@ -2,7 +2,7 @@
 
 /**
  * Tazkiya — Komponen visual dasar (redesign "Fresh Green").
- * Kartu putih soft-shadow di kanvas #F8FAFC, hijau emerald sebagai warna
+ * Kartu putih soft-shadow di kanvas #F4F2FB, hijau emerald sebagai warna
  * merek, lime untuk progres positif, biru & lavender sebagai aksen sekunder.
  * API komponen dipertahankan dari versi sebelumnya agar seluruh halaman
  * tetap terhubung; hanya bahasa visualnya yang berganti.
@@ -230,7 +230,7 @@ export function IconBox({
               ? "h-12 w-12 rounded-2xl [&>svg]:h-[22px] [&>svg]:w-[22px]"
               : "h-10 w-10 rounded-[0.8rem] [&>svg]:h-[18px] [&>svg]:w-[18px]",
         tone === "solid"
-          ? "border border-tz-violet bg-tz-violet text-white dark:text-[#06251a]"
+          ? "border border-tz-violet bg-tz-violet text-white dark:text-[#191633]"
           : tone === "ghost"
             ? "border border-tz-line bg-tz-panel-soft text-tz-muted"
             : tone === "lavender"
@@ -253,8 +253,8 @@ export function ProgressRing({
   children,
   className,
   trackClass = "stroke-tz-track",
-  from = "#4ADE80",
-  to = "#C7F464",
+  from = "#7B6CF6",
+  to = "#CFF05C",
 }: {
   value: number; // 0..100
   size?: number;

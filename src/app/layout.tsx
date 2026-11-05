@@ -1,11 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Amiri_Quran } from "next/font/google";
+import { Outfit, Plus_Jakarta_Sans, Amiri_Quran } from "next/font/google";
 import "./globals.css";
 
 /*
- * Satu keluarga font utama untuk seluruh aplikasi (Plus Jakarta Sans) —
- * heading dan body konsisten; Amiri Quran khusus teks Arab.
+ * Dua keluarga font (identitas v3 "Aurora Pastel"): Outfit — display geometris
+ * modern untuk judul, angka, dan label besar; Plus Jakarta Sans — teks body.
+ * Amiri Quran khusus teks Arab.
  */
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
   subsets: ["latin"],
@@ -40,7 +47,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0B1512",
+  themeColor: "#13142B",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -51,7 +58,7 @@ export const viewport: Viewport = {
  * ada kilatan tema gelap pada pengguna tema terang. Membaca langsung dari
  * localStorage yang sama dengan store Tazkiya; gagal parse → biarkan default.
  */
-const themeInitScript = `(function(){try{var r=localStorage.getItem("tazkiya-store-v1");if(!r)return;var s=JSON.parse(r).state&&JSON.parse(r).state.settings;if(!s)return;var t=s.theme||"dark";if(t==="system"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.dataset.theme=t;document.documentElement.dataset.glass=s.liquidGlass?"liquid":"classic";document.documentElement.dataset.anim=s.animations===false?"off":"on";var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#F8FAFC":"#0B1512");}catch(e){}})();`;
+const themeInitScript = `(function(){try{var r=localStorage.getItem("tazkiya-store-v1");if(!r)return;var s=JSON.parse(r).state&&JSON.parse(r).state.settings;if(!s)return;var t=s.theme||"dark";if(t==="system"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.dataset.theme=t;document.documentElement.dataset.glass=s.liquidGlass?"liquid":"classic";document.documentElement.dataset.anim=s.animations===false?"off":"on";var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#F4F2FB":"#13142B");}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -64,7 +71,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body
-        className={`${jakarta.variable} ${amiriQuran.variable} antialiased bg-background text-foreground`}
+        className={`${outfit.variable} ${jakarta.variable} ${amiriQuran.variable} antialiased bg-background text-foreground`}
       >
         {children}
       </body>

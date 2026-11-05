@@ -41,7 +41,7 @@ export function JelajahiAktivitas({
           <div className="flex items-center gap-3.5">
             <span
               aria-hidden
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white shadow-[0_10px_22px_-10px_rgba(22,163,74,0.7)]"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-white shadow-[0_10px_22px_-10px_rgba(108,92,231,0.7)]"
             >
               <BookHeart size={21} strokeWidth={1.9} />
             </span>

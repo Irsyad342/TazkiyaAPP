@@ -23,9 +23,9 @@ const TONE: Record<MoodId, { text: string; selBg: string; selBorder: string }> =
     selBorder: "border-amber-300/60 light:border-amber-500/50",
   },
   tenang: {
-    text: "text-teal-300 light:text-teal-600",
-    selBg: "bg-teal-400/[0.13] light:bg-teal-400/20",
-    selBorder: "border-teal-300/60 light:border-teal-500/50",
+    text: "text-[#8fa7ff] light:text-[#5b8def]",
+    selBg: "bg-[#5b8def]/[0.13] light:bg-[#5b8def]/15",
+    selBorder: "border-[#8fa7ff]/60 light:border-[#5b8def]/50",
   },
   bersyukur: {
     text: "text-pink-300 light:text-pink-600",
@@ -48,7 +48,7 @@ const TONE: Record<MoodId, { text: string; selBg: string; selBorder: string }> =
     selBorder: "border-indigo-300/60 light:border-indigo-500/50",
   },
   "campur-aduk": {
-    text: "text-tz-violet light:text-[#16a34a]",
+    text: "text-tz-violet light:text-[#6c5ce7]",
     selBg: "bg-tz-violet/[0.13] light:bg-tz-violet/15",
     selBorder: "border-tz-violet/55",
   },
@@ -185,7 +185,7 @@ export function MoodSection({
               className={cn(
                 "tap flex w-[86px] shrink-0 snap-start flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 transition-all duration-200 active:scale-95",
                 active
-                  ? cn("shadow-[0_10px_22px_-14px_rgba(22,163,74,0.6)]", tone.selBg, tone.selBorder)
+                  ? cn("shadow-[0_10px_22px_-14px_rgba(108,92,231,0.6)]", tone.selBg, tone.selBorder)
                   : "border-tz-line bg-tz-panel hover:border-tz-line-strong"
               )}
             >

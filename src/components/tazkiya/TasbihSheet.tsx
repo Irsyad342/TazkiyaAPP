@@ -92,7 +92,7 @@ export function TasbihSheet({
             className={cn(
               "tap shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium",
               tasbih.dhikr === z
-                ? "border-tz-violet/60 bg-gradient-to-r from-[#4ade80] to-[#16a34a] text-white glow-violet-sm"
+                ? "border-tz-violet/60 bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] text-white glow-violet-sm"
                 : "border-tz-line bg-tz-panel text-tz-muted"
             )}
           >
@@ -126,7 +126,7 @@ export function TasbihSheet({
             className="animate-tz-spin-slow absolute -inset-3 rounded-full opacity-60"
             style={{
               background:
-                "conic-gradient(from 0deg, rgba(22,163,74,0) 0deg, rgba(22,163,74,0.35) 80deg, rgba(216,197,255,0.5) 140deg, rgba(22,163,74,0) 220deg)",
+                "conic-gradient(from 0deg, rgba(108,92,231,0) 0deg, rgba(108,92,231,0.35) 80deg, rgba(216,197,255,0.5) 140deg, rgba(108,92,231,0) 220deg)",
               filter: "blur(14px)",
             }}
           />
@@ -136,7 +136,7 @@ export function TasbihSheet({
             className="tz-tasbih-disc absolute inset-[22px] rounded-full border border-tz-violet/40 bg-gradient-to-br from-tz-violet/40 via-tz-purple/28 to-tz-deep/92"
             style={{
               boxShadow:
-                "inset 0 2px 28px rgba(22,163,74,0.4), inset 0 -8px 30px rgba(13,10,20,0.5), 0 24px 60px -12px rgba(13,10,20,0.7), 0 0 44px -10px rgba(22,163,74,0.5)",
+                "inset 0 2px 28px rgba(108,92,231,0.4), inset 0 -8px 30px rgba(13,10,20,0.5), 0 24px 60px -12px rgba(13,10,20,0.7), 0 0 44px -10px rgba(108,92,231,0.5)",
             }}
           />
           <span
@@ -210,7 +210,7 @@ export function TasbihSheet({
               if (n === 0) toast.error("Hitungan masih 0 — berzikir dulu ya");
               else toast.success(`${n.toLocaleString("id-ID")} zikir ditambahkan ke catatan harian`);
             }}
-            className="tap flex h-12 items-center justify-center gap-2 rounded-2xl border border-tz-violet/50 bg-gradient-to-r from-[#4ade80] via-[#22c55e] to-[#16a34a] px-4 text-sm font-semibold text-white shadow-[0_10px_28px_-8px_rgba(22,163,74,0.9),inset_0_1px_0_rgba(255,255,255,0.25)] transition-all hover:brightness-110"
+            className="tap flex h-12 items-center justify-center gap-2 rounded-2xl border border-tz-violet/50 bg-gradient-to-r from-[#8b7cf8] via-[#6c5ce7] to-[#5b8def] px-4 text-sm font-semibold text-white shadow-[0_10px_28px_-8px_rgba(108,92,231,0.9),inset_0_1px_0_rgba(255,255,255,0.25)] transition-all hover:brightness-110"
           >
             <Save size={16} /> Simpan Harian
           </button>
@@ -234,7 +234,7 @@ export function TasbihSheet({
               className={cn(
                 "tap min-w-[38px] flex-1 rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition-all",
                 tasbih.target === n
-                  ? "border-tz-violet/60 bg-tz-violet text-white shadow-[0_0_12px_-3px_rgba(22,163,74,0.8)]"
+                  ? "border-tz-violet/60 bg-tz-violet text-white shadow-[0_0_12px_-3px_rgba(108,92,231,0.8)]"
                   : "border-tz-line bg-tz-panel text-tz-muted"
               )}
             >
@@ -262,7 +262,7 @@ export function TasbihSheet({
               tasbihSetTarget(n);
               toast.success(`Target diatur ke ${n.toLocaleString("id-ID")}`);
             }}
-            className="tap shrink-0 rounded-lg bg-gradient-to-r from-[#4ade80] to-[#16a34a] px-3 py-1.5 text-[11px] font-bold text-white shadow-[0_4px_12px_-4px_rgba(22,163,74,0.8)]"
+            className="tap shrink-0 rounded-lg bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] px-3 py-1.5 text-[11px] font-bold text-white shadow-[0_4px_12px_-4px_rgba(108,92,231,0.8)]"
           >
             Atur
           </button>

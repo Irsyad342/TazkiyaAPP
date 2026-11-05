@@ -135,7 +135,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                     setGoalDraft("");
                     toast.success("Target pribadi ditambahkan");
                   }}
-                  className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white"
+                  className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-white"
                 >
                   <Plus size={16} />
                 </button>
@@ -161,7 +161,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                   className={cn(
                     "tap rounded-full border px-3 py-1.5 text-[11.5px] font-semibold transition-all",
                     kind === k.id
-                      ? "border-tz-violet/60 bg-tz-violet text-white shadow-[0_4px_14px_-6px_rgba(22,163,74,0.9)]"
+                      ? "border-tz-violet/60 bg-tz-violet text-white shadow-[0_4px_14px_-6px_rgba(108,92,231,0.9)]"
                       : "border-tz-line bg-tz-panel-soft text-tz-muted hover:text-tz-accent"
                   )}
                 >
@@ -191,7 +191,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
           <button
             type="button"
             onClick={submit}
-            className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4ade80] to-[#16a34a] text-sm font-semibold text-white shadow-[0_8px_22px_-8px_rgba(22,163,74,0.9)]"
+            className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] text-sm font-semibold text-white shadow-[0_8px_22px_-8px_rgba(108,92,231,0.9)]"
           >
             <Check size={16} strokeWidth={3} /> Simpan Catatan
           </button>

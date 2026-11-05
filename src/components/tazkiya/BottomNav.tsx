@@ -1,10 +1,11 @@
 "use client";
 
 /**
- * Tazkiya — Navigasi bawah dengan 5 menu utama:
+ * Tazkiya v3 — Navigasi bawah dengan 5 menu utama:
  * Beranda · Al-Qur'an · Sholat · Progress · Profil.
- * Gaya redesign: bilah putih mengambang dengan sudut besar, item aktif
- * berupa pil hijau emerald bergradasi dengan titik lime — sesuai referensi.
+ * Gaya "Aurora Pastel": kapsul putih mengambang; item aktif berupa
+ * gelembung bulat bergradien aurora (ungu→biru) dengan titik lime,
+ * item lain berupa ikon lembut — komposisi berbeda dari pil persegi.
  */
 
 import { BookOpen, ChartColumn, CircleUserRound, House, MoonStar } from "lucide-react";
@@ -33,12 +34,13 @@ export function BottomNav({
   return (
     <nav
       aria-label="Navigasi utama"
-      className="pointer-events-auto absolute inset-x-3 bottom-0 z-30 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      className="pointer-events-auto absolute inset-x-4 bottom-0 z-30 pb-[max(0.8rem,env(safe-area-inset-bottom))]"
     >
-      <div className="glass-strong relative flex items-center justify-around gap-0.5 rounded-[1.7rem] px-2 py-2">
+      <div className="glass-strong relative flex items-end justify-around gap-0.5 rounded-[1.9rem] px-3 pt-2.5 pb-2">
+        {/* aksen tepi atas: sapuan aurora tipis */}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-x-10 -top-px h-px bg-gradient-to-r from-transparent via-tz-violet/40 to-transparent"
+          className="pointer-events-none absolute inset-x-12 -top-px h-px bg-gradient-to-r from-transparent via-tz-lavender/60 to-transparent"
         />
         {TABS.map(({ id, label, icon: Icon }) => {
           const isActive = active === id;
@@ -49,33 +51,37 @@ export function BottomNav({
               aria-current={isActive ? "page" : undefined}
               aria-label={`Buka menu ${label}`}
               onClick={() => onChange(id)}
-              className={cn(
-                "tap relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 transition-all duration-200 active:scale-95",
-                isActive
-                  ? "bg-gradient-to-br from-[#4ade80] to-[#16a34a] shadow-[0_10px_22px_-10px_rgba(22,163,74,0.75)]"
-                  : "border border-transparent"
-              )}
+              className="tap relative flex min-h-[54px] flex-1 flex-col items-center justify-start gap-1 px-1 py-1"
             >
-              <Icon
-                size={19}
-                strokeWidth={isActive ? 2.2 : 1.8}
-                className={cn("transition-colors duration-200", isActive ? "text-white dark:text-[#06251a]" : "text-tz-muted")}
-              />
+              <span
+                aria-hidden
+                className={cn(
+                  "relative flex h-10 w-10 items-center justify-center rounded-[1.05rem] transition-all duration-200",
+                  isActive
+                    ? "-translate-y-0.5 bg-gradient-to-br from-[#8b7cf8] via-[#6c5ce7] to-[#5b8def] shadow-[0_10px_20px_-8px_rgba(108,92,231,0.65)]"
+                    : "bg-transparent"
+                )}
+              >
+                <Icon
+                  size={19}
+                  strokeWidth={isActive ? 2.3 : 1.8}
+                  className={cn("transition-colors duration-200", isActive ? "text-white" : "text-tz-muted")}
+                />
+                {isActive ? (
+                  <span
+                    aria-hidden
+                    className="absolute -bottom-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-tz-lime shadow-[0_0_8px_2px_rgba(207,240,92,0.55)]"
+                  />
+                ) : null}
+              </span>
               <span
                 className={cn(
                   "text-[9.5px] font-semibold leading-none transition-colors duration-200",
-                  isActive ? "text-white dark:text-[#06251a]" : "text-tz-muted"
+                  isActive ? "font-bold text-tz-ink" : "text-tz-muted"
                 )}
               >
                 {label}
               </span>
-              <span
-                aria-hidden
-                className={cn(
-                  "absolute bottom-[3px] h-1 w-1 rounded-full transition-all duration-200",
-                  isActive ? "bg-tz-lime" : "bg-transparent"
-                )}
-              />
             </button>
           );
         })}

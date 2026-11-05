@@ -61,7 +61,7 @@ export function AuthGate() {
                 type="button"
                 disabled={busy}
                 onClick={() => void resolveMigration("migrate")}
-                className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-sm font-bold text-white shadow-[0_10px_26px_-10px_rgba(22,163,74,0.9)] transition-all hover:brightness-110 disabled:opacity-60"
+                className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-sm font-bold text-white shadow-[0_10px_26px_-10px_rgba(108,92,231,0.9)] transition-all hover:brightness-110 disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={16} className="animate-spin" /> : <CloudUpload size={16} />}
                 Pindahkan ke akun
@@ -96,7 +96,7 @@ export function AuthGate() {
                 type="button"
                 disabled={busy}
                 onClick={() => void resolveMigration("merge")}
-                className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-sm font-bold text-white shadow-[0_10px_26px_-10px_rgba(22,163,74,0.9)] transition-all hover:brightness-110 disabled:opacity-60"
+                className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-sm font-bold text-white shadow-[0_10px_26px_-10px_rgba(108,92,231,0.9)] transition-all hover:brightness-110 disabled:opacity-60"
               >
                 {busy ? <LoaderCircle size={16} className="animate-spin" /> : <GitMerge size={16} />}
                 Gabungkan keduanya

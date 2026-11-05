@@ -101,15 +101,15 @@ function PrayerRow({
   if (isDone) {
     statusChips.push(
       timing === "ontime"
-        ? { text: "Tepat waktu", cls: "border-emerald-300/40 bg-emerald-400/12 text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-400/15 dark:text-emerald-300" }
+        ? { text: "Tepat waktu", cls: "border-tz-violet/35 bg-tz-violet/12 text-tz-accent" }
         : timing === "late"
           ? { text: "Terlambat · dilaksanakan", cls: "border-amber-300/45 bg-amber-400/12 text-amber-700 dark:border-amber-400/30 dark:bg-amber-400/15 dark:text-amber-300" }
           : { text: "Dilaksanakan", cls: "border-tz-violet/40 bg-tz-violet/12 text-tz-accent" }
     );
     if (detail.kind === "berjamaah") {
-      statusChips.push({ text: "Berjamaah", cls: "border-emerald-300/40 bg-emerald-400/12 text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-400/15 dark:text-emerald-300" });
+      statusChips.push({ text: "Berjamaah", cls: "border-[#5b8def]/35 bg-[#5b8def]/12 text-[#3d63c2] dark:border-[#8fa7ff]/40 dark:bg-[#8fa7ff]/15 dark:text-[#aebcff]" });
     } else if (detail.kind === "mandiri") {
-      statusChips.push({ text: "Mandiri", cls: "border-[#4263eb]/30 bg-[#eef2ff] text-[#3b55d6] dark:border-[#7c86ff]/35 dark:bg-[#7c86ff]/15 dark:text-[#aeb6ff]" });
+      statusChips.push({ text: "Mandiri", cls: "border-tz-lavender/40 bg-tz-lavender/12 text-tz-lavender" });
     }
   } else if (isMissed) {
     statusChips.push({ text: "Tidak dilaksanakan", cls: "border-rose-300/35 bg-rose-400/[0.08] text-rose-600 dark:border-rose-400/30 dark:bg-rose-400/12 dark:text-rose-300" });
@@ -132,10 +132,10 @@ function PrayerRow({
         className={cn(
           "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
           isDone
-            ? "border border-transparent bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white shadow-[0_6px_14px_-6px_rgba(22,163,74,0.8)]"
+            ? "border border-transparent bg-gradient-to-br from-[#8b7cf8] via-[#6c5ce7] to-[#5b8def] text-white shadow-[0_6px_14px_-6px_rgba(108,92,231,0.8)]"
             : isMissed
               ? "border border-rose-300/30 bg-rose-400/10 text-rose-500 dark:text-rose-300"
-              : "bg-gradient-to-br from-amber-100 to-amber-50 text-amber-600 dark:from-amber-400/15 dark:to-amber-400/5 dark:text-amber-300"
+              : "bg-gradient-to-br from-[#e6e2fb] to-[#f2f0fd] text-[#6c5ce7] dark:from-[#6c5ce7]/20 dark:to-[#6c5ce7]/8 dark:text-[#b7adff]"
         )}
       >
         <Icon size={17} strokeWidth={1.9} />
@@ -240,7 +240,7 @@ function TodayTab({
               <defs>
                 <linearGradient id="prayer-ring" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#FFFFFF" />
-                  <stop offset="100%" stopColor="#C7F464" />
+                  <stop offset="100%" stopColor="#CFF05C" />
                 </linearGradient>
               </defs>
             </svg>
@@ -329,7 +329,7 @@ function SunnahChip({
         aria-hidden
         className={cn(
           "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
-          done ? "bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white" : "bg-tz-panel-strong text-tz-muted"
+          done ? "bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-white shadow-[0_5px_12px_-6px_rgba(108,92,231,0.8)]" : "bg-tz-panel-strong text-tz-muted"
         )}
       >
         {done ? <Check size={16} strokeWidth={3} /> : <Icon size={16} />}
@@ -421,8 +421,8 @@ function MonthTab({ today }: { today: string }) {
             const st = isFuture ? { jamaah: 0, mandiri: 0, missed: 0, done: 0, hasData: false } : statusFor(key);
             const intensity = st.done / 5;
             let bg: string | undefined;
-            if (!isFuture && st.jamaah > 0) bg = `rgba(34,197,94,${(0.18 + intensity * 0.6).toFixed(3)})`;
-            else if (!isFuture && st.mandiri > 0) bg = `rgba(66,99,235,${(0.14 + intensity * 0.5).toFixed(3)})`;
+            if (!isFuture && st.jamaah > 0) bg = `rgba(108,92,231,${(0.2 + intensity * 0.6).toFixed(3)})`;
+            else if (!isFuture && st.mandiri > 0) bg = `rgba(91,141,239,${(0.16 + intensity * 0.5).toFixed(3)})`;
             else if (!isFuture && st.missed > 0) bg = `rgba(245,158,11,${(0.15 + (st.missed / 5) * 0.35).toFixed(3)})`;
             else if (!isFuture) bg = "var(--tz-empty-cell)";
             return (
@@ -447,10 +447,10 @@ function MonthTab({ today }: { today: string }) {
 
         <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[10px] text-tz-muted">
           <span className="flex items-center gap-1">
-            <span aria-hidden className="h-2 w-2 rounded-full bg-emerald-500 dark:bg-emerald-400" /> Berjamaah
+            <span aria-hidden className="h-2 w-2 rounded-full bg-[#6c5ce7] dark:bg-[#9b8cfa]" /> Berjamaah
           </span>
           <span className="flex items-center gap-1">
-            <span aria-hidden className="h-2 w-2 rounded-full bg-[#4263eb] dark:bg-[#7c86ff]" /> Mandiri
+            <span aria-hidden className="h-2 w-2 rounded-full bg-[#5b8def] dark:bg-[#8fa7ff]" /> Mandiri
           </span>
           <span className="flex items-center gap-1">
             <span aria-hidden className="h-2 w-2 rounded-full bg-amber-400/90" /> Ada yang tidak dilaksanakan
@@ -508,11 +508,12 @@ function QadaTab({ today }: { today: string }) {
 
   return (
     <div className="space-y-5">
-      {/* Ringkasan lembut — kartu premium hijau hutan ala referensi Qada */}
-      <div className="relative overflow-hidden rounded-[1.5rem] bg-[#0b2e23] p-5 shadow-[0_22px_48px_-24px_rgba(8,37,27,0.7)]">
-        <div aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-[#c7f464]/15 blur-2xl" />
-        <p className="relative text-[10px] font-bold uppercase tracking-[0.16em] text-[#c7f464]">Qada — salat yang ingin dimakbulkan</p>
-        <p className="relative mt-1 text-[34px] font-extrabold leading-none tabular-nums text-white">
+      {/* Ringkasan lembut — kartu premium midnight navy-ungu ala referensi Qada */}
+      <div className="relative overflow-hidden rounded-[1.5rem] bg-[#23244d] p-5 shadow-[0_22px_48px_-24px_rgba(24,20,62,0.75)]">
+        <div aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-[#9b8cfa]/25 blur-2xl" />
+        <div aria-hidden className="pointer-events-none absolute -left-8 bottom-[-40px] h-28 w-28 rounded-full bg-[#5b8def]/20 blur-2xl" />
+        <p className="relative text-[10px] font-bold uppercase tracking-[0.16em] text-[#cff05c]">Qada — salat yang ingin dimakbulkan</p>
+        <p className="relative mt-1 font-display text-[34px] font-extrabold leading-none tabular-nums text-white">
           {pending.length} <span className="text-[15px] font-bold text-white/65">belum selesai</span>
         </p>
         <p className="relative mt-1.5 text-[11px] leading-relaxed text-white/75">
@@ -523,7 +524,7 @@ function QadaTab({ today }: { today: string }) {
         {/* Bar kemajuan bulan ini */}
         <div className="relative mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/15">
           <div
-            className="tz-bar-grow-x h-full rounded-full bg-gradient-to-r from-[#4ade80] to-[#c7f464]"
+            className="tz-bar-grow-x h-full rounded-full bg-gradient-to-r from-[#9b8cfa] to-[#cff05c]"
             style={{ width: `${Math.min(100, completedThisMonth * 12)}%` }}
           />
         </div>
@@ -564,7 +565,7 @@ function QadaTab({ today }: { today: string }) {
                         completeQada(q.id);
                         toast.success("Alhamdulillah, qada tercatat selesai");
                       }}
-                      className="tap flex shrink-0 items-center gap-1 rounded-full bg-gradient-to-r from-[#4ade80] to-[#16a34a] px-3 py-1.5 text-[10.5px] font-bold text-white shadow-[0_6px_16px_-8px_rgba(22,163,74,0.8)]"
+                      className="tap flex shrink-0 items-center gap-1 rounded-full bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] px-3 py-1.5 text-[10.5px] font-bold text-white shadow-[0_6px_16px_-8px_rgba(108,92,231,0.8)]"
                     >
                       <Check size={12} strokeWidth={3} /> Sudah diqada
                     </button>
@@ -641,7 +642,7 @@ function QadaTab({ today }: { today: string }) {
           <button
             type="button"
             onClick={submit}
-            className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4ade80] to-[#16a34a] text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(22,163,74,0.7)]"
+            className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#8b7cf8] via-[#6c5ce7] to-[#5b8def] text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(108,92,231,0.7)]"
           >
             <Plus size={16} /> Tambah ke Daftar Qada
           </button>
@@ -656,7 +657,7 @@ function QadaTab({ today }: { today: string }) {
             <ul className="divide-y divide-tz-line-soft">
               {completed.slice(0, 40).map((q) => (
                 <li key={q.id} className="flex items-center gap-3 px-4 py-2.5">
-                  <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-300/30 bg-emerald-400/10 text-emerald-600 light:text-emerald-700">
+                  <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-tz-violet/30 bg-tz-violet/12 text-tz-accent">
                     <Check size={14} strokeWidth={3} />
                   </span>
                   <span className="min-w-0 flex-1">

@@ -69,7 +69,7 @@ function ZikirSetCard({ set, onOpenTasbih }: { set: ZikirSet; onOpenTasbih: (slo
             <button
               type="button"
               onClick={() => onOpenTasbih(set.slot)}
-              className="tap flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4ade80] to-[#16a34a] text-[12.5px] font-semibold text-white shadow-[0_6px_18px_-6px_rgba(22,163,74,0.9)]"
+              className="tap flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] text-[12.5px] font-semibold text-white shadow-[0_6px_18px_-6px_rgba(108,92,231,0.9)]"
             >
               <CircleDot size={15} /> Buka tasbih — {set.title.toLowerCase()}
             </button>
@@ -151,7 +151,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
             className={cn(
               "tap flex min-h-[40px] items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all",
               tab === id
-                ? "bg-gradient-to-r from-[#4ade80] to-[#16a34a] text-white shadow-[0_4px_14px_-4px_rgba(22,163,74,0.8)]"
+                ? "bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] text-white shadow-[0_4px_14px_-4px_rgba(108,92,231,0.8)]"
                 : "text-tz-muted hover:text-tz-accent"
             )}
           >
@@ -258,7 +258,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
                 className={cn(
                   "tap shrink-0 rounded-full border px-3.5 py-1.5 text-[11.5px] font-semibold transition-all",
                   cat === k.id
-                    ? "border-tz-violet/60 bg-tz-violet text-white shadow-[0_4px_14px_-6px_rgba(22,163,74,0.9)]"
+                    ? "border-tz-violet/60 bg-tz-violet text-white shadow-[0_4px_14px_-6px_rgba(108,92,231,0.9)]"
                     : "border-tz-line bg-tz-panel-soft text-tz-muted hover:text-tz-accent"
                 )}
               >

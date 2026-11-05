@@ -73,7 +73,31 @@ function useToday(): string {
   return today;
 }
 
-/* ---------------- B. Kartu Salat Berikutnya ---------------- */
+/* ---------------- B. Kartu Salat Berikutnya (hero aurora v3) ---------------- */
+
+/** Ornamen bulan sabit + bintang untuk kartu aurora — identitas v3. */
+function AuroraMoonsky() {
+  return (
+    <svg viewBox="0 0 200 120" fill="none" aria-hidden className="pointer-events-none absolute -right-3 -top-1 h-28 w-44 text-white">
+      {/* bulan sabit */}
+      <path
+        d="M158 14a26 26 0 1 0 26 26 20 20 0 1 1-26-26Z"
+        fill="currentColor"
+        opacity="0.28"
+      />
+      {/* bintang */}
+      <g fill="currentColor">
+        <path d="M120 26l2.2 5.2 5.2 2.2-5.2 2.2-2.2 5.2-2.2-5.2-5.2-2.2 5.2-2.2 2.2-5.2Z" opacity="0.5" />
+        <path d="M143 58l1.5 3.4 3.4 1.5-3.4 1.5-1.5 3.4-1.5-3.4-3.4-1.5 3.4-1.5 1.5-3.4Z" opacity="0.35" />
+        <circle cx="112" cy="62" r="2" opacity="0.3" />
+        <circle cx="178" cy="70" r="1.6" opacity="0.28" />
+        <circle cx="96" cy="20" r="1.4" opacity="0.25" />
+      </g>
+      {/* lengkung horizon bawah */}
+      <path d="M0 116c40-14 90-18 200-10v14H0v-4Z" fill="currentColor" opacity="0.12" />
+    </svg>
+  );
+}
 
 function NextPrayerCard({ today }: { today: string }) {
   const settings = useWorshipStore((s) => s.settings);
@@ -107,33 +131,24 @@ function NextPrayerCard({ today }: { today: string }) {
 
   return (
     <section aria-label="Salat berikutnya" className="animate-tz-fade-up">
-      {/* Kartu hero hijau emerald — gradien + siluet masjid, teks putih di kedua tema */}
-      <div className="glass-hero relative overflow-hidden rounded-[1.65rem] p-5">
-        {/* Siluet masjid dekoratif */}
-        <svg viewBox="0 0 200 120" fill="none" aria-hidden className="pointer-events-none absolute -right-4 -top-2 h-28 w-40 text-white/[0.14]">
-          <path d="M100 22c8 6 12 12 12 18H88c0-6 4-12 12-18Z" fill="currentColor" />
-          <rect x="84" y="44" width="32" height="40" rx="2" fill="currentColor" />
-          <path d="M92 84v-9a8 8 0 0 1 16 0v9Z" fill="currentColor" opacity="0.5" />
-          <rect x="64" y="34" width="5" height="50" rx="2.5" fill="currentColor" />
-          <circle cx="66.5" cy="30" r="3" fill="currentColor" />
-          <rect x="131" y="34" width="5" height="50" rx="2.5" fill="currentColor" />
-          <circle cx="133.5" cy="30" r="3" fill="currentColor" />
-        </svg>
+      {/* Kartu hero aurora — gradien ungu→biru + bulan & bintang, teks putih di kedua tema */}
+      <div className="glass-hero relative overflow-hidden rounded-[1.75rem] p-5">
+        <AuroraMoonsky />
 
         <div className="relative">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/90">
+          <p className="font-display text-[10px] font-bold uppercase tracking-[0.2em] text-white/90">
             Salat berikutnya · {nextLabel}
             {state.tomorrow ? " (besok)" : ""}
           </p>
           <div className="mt-1 flex flex-wrap items-end gap-x-3 gap-y-2">
-            <p className="text-[44px] font-extrabold leading-none tracking-tight text-white">
+            <p className="font-display text-[46px] font-extrabold leading-none tracking-tight text-white">
               {state.nextTime}
             </p>
             <span
               className={cn(
                 "mb-1 rounded-full px-3 py-1 text-[11px] font-bold",
                 animations
-                  ? "bg-tz-lime text-[#1d3a10] shadow-[0_6px_16px_-6px_rgba(199,244,100,0.8)]"
+                  ? "bg-tz-lime text-[#23244d] shadow-[0_6px_16px_-6px_rgba(207,240,92,0.85)]"
                   : "border border-white/25 bg-white/15 text-white"
               )}
             >
@@ -143,7 +158,7 @@ function NextPrayerCard({ today }: { today: string }) {
 
           {/* Timeline 5 waktu */}
           <div className="relative mt-4">
-            <span aria-hidden className="absolute inset-x-2 top-[5px] h-px bg-white/25" />
+            <span aria-hidden className="absolute inset-x-2 top-[5px] h-px bg-white/30" />
             <div className="relative grid grid-cols-5 gap-1">
               {PRAYER_ORDER.map(({ id, label }) => {
                 const st = slotState(id);
@@ -155,21 +170,21 @@ function NextPrayerCard({ today }: { today: string }) {
                       className={cn(
                         "h-2.5 w-2.5 rounded-full border transition-all",
                         st === "next"
-                          ? "border-white bg-white shadow-[0_0_12px_2px_rgba(255,255,255,0.55)]"
+                          ? "border-white bg-white shadow-[0_0_12px_2px_rgba(255,255,255,0.6)]"
                           : st === "past" || st === "current"
-                            ? "border-transparent bg-white/70"
-                            : "border-white/40 bg-transparent"
+                            ? "border-transparent bg-white/75"
+                            : "border-white/45 bg-transparent"
                       )}
                     />
                     <span
                       className={cn(
                         "text-[9.5px] font-semibold leading-none",
-                        st === "next" ? "text-white" : st === "past" || st === "current" ? "text-white/85" : "text-white/55"
+                        st === "next" ? "text-white" : st === "past" || st === "current" ? "text-white/85" : "text-white/60"
                       )}
                     >
                       {label}
                     </span>
-                    <span className={cn("text-[8.5px] leading-none", done ? "font-bold text-[#e9ffd4]" : "text-white/65")}>
+                    <span className={cn("text-[8.5px] leading-none", done ? "font-bold text-tz-lime" : "text-white/70")}>
                       {done ? "✓" : times[id]?.time ?? ""}
                     </span>
                   </div>
@@ -178,7 +193,7 @@ function NextPrayerCard({ today }: { today: string }) {
             </div>
           </div>
 
-          <p className="mt-3 flex items-center gap-1.5 text-[9.5px] text-white/60">
+          <p className="mt-3 flex items-center gap-1.5 text-[9.5px] text-white/65">
             <Sparkles size={10} className="shrink-0" />
             {scheduleSource} ·{" "}
             {state.tomorrow
@@ -187,6 +202,61 @@ function NextPrayerCard({ today }: { today: string }) {
           </p>
         </div>
       </div>
+    </section>
+  );
+}
+
+/* ---------------- B2. Strip Pekan Ini (weekly progress nyata) ---------------- */
+
+function WeeklyStrip({ today }: { today: string }) {
+  const logs = useWorshipStore((s) => s.logs);
+  /** Senin-minggu pekan ini (kronologis) — tanggal lokal dari lib dates. */
+  const week = useMemo(() => {
+    const now = new Date();
+    const dow = (now.getDay() + 6) % 7; // Senin = 0
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow + i);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const count = Object.values(logs[key]?.prayers ?? {}).filter(Boolean).length;
+      return { key, label: ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"][i], count, isToday: key === today, isFuture: key > today };
+    });
+  }, [logs, today]);
+
+  const total = week.reduce((a, w) => a + w.count, 0);
+
+  return (
+    <section aria-label="Pekan ini" className="animate-tz-fade-up">
+      <GlassCard variant="clean" className="p-4">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <CalendarDays size={14} className="shrink-0 text-tz-violet" />
+            <p className="font-display text-[13.5px] font-bold text-tz-ink">Pekan Ini</p>
+          </div>
+          <Chip className="border-tz-violet/25 bg-tz-violet/10 text-tz-accent">{total} salat tercatat</Chip>
+        </div>
+        <div className="grid grid-cols-7 gap-1.5" role="group" aria-label="Salat tercatat per hari pekan ini">
+          {week.map(({ label, count, isToday, isFuture }) => (
+            <div key={label} className="flex flex-col items-center gap-1.5">
+              <div aria-hidden className="flex h-14 w-full items-end justify-center rounded-lg bg-tz-panel-soft px-0.5 pt-0.5">
+                <span
+                  className={cn(
+                    "tz-bar-grow-x w-full rounded-md",
+                    count === 0 ? "h-[3px] bg-tz-track" : "bg-gradient-to-t from-[#6c5ce7] to-[#9b8cfa]",
+                    isToday && count > 0 && "from-[#5b8def] to-[#8b7cf8]"
+                  )}
+                  style={{ height: count === 0 ? 3 : `${Math.max(10, (count / 5) * 100)}%` }}
+                />
+              </div>
+              <span className={cn("text-[9px] font-semibold leading-none", isToday ? "text-tz-accent" : isFuture ? "text-tz-muted/50" : "text-tz-muted")}>
+                {label}
+              </span>
+              <span className={cn("text-[8.5px] leading-none tabular-nums", isFuture ? "text-transparent" : count > 0 ? "font-bold text-tz-ink/80" : "text-tz-muted/60")}>
+                {count === 0 ? "–" : count}
+              </span>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
     </section>
   );
 }
@@ -275,7 +345,7 @@ function DailyJourney({ today }: { today: string }) {
                   className={cn(
                     "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all",
                     done
-                      ? "border-transparent bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white shadow-[0_4px_12px_-4px_rgba(22,163,74,0.7)]"
+                      ? "border-transparent bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-white shadow-[0_4px_12px_-4px_rgba(108,92,231,0.7)]"
                       : "border-dashed border-tz-line-strong text-transparent"
                   )}
                 >
@@ -361,7 +431,7 @@ function DailyJourney({ today }: { today: string }) {
                   setDraft("");
                   toast.success("Target pribadi ditambahkan");
                 }}
-                className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white"
+                className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-white shadow-[0_6px_16px_-8px_rgba(108,92,231,0.7)]"
               >
                 <Plus size={16} />
               </button>
@@ -476,17 +546,17 @@ export function HomePage({
               className="tap glass relative flex h-10 w-10 items-center justify-center rounded-full text-tz-muted"
             >
               <Bell size={17} />
-              <span aria-hidden className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-tz-violet shadow-[0_0_6px_2px_rgba(22,163,74,0.5)]" />
+              <span aria-hidden className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-tz-lime shadow-[0_0_6px_2px_rgba(207,240,92,0.55)]" />
             </button>
             <button type="button" aria-label="Buka profil" onClick={() => onNavigate("profil")} className="tap relative">
               {settings.avatarDataUrl ? (
                 <img
                   src={settings.avatarDataUrl}
                   alt={`Foto profil ${settings.name}`}
-                  className="h-12 w-12 rounded-full border-2 border-tz-violet/40 object-cover"
+                  className="h-12 w-12 rounded-full border-2 border-tz-lavender/50 object-cover"
                 />
               ) : (
-                <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-lg font-bold text-white shadow-[0_8px_20px_-8px_rgba(22,163,74,0.7)] dark:border-white/15">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-[#8b7cf8] via-[#6c5ce7] to-[#5b8def] font-display text-lg font-bold text-white shadow-[0_8px_20px_-8px_rgba(108,92,231,0.7)] dark:border-white/15">
                   {settings.name.trim().charAt(0).toUpperCase() || "T"}
                 </span>
               )}
@@ -497,6 +567,9 @@ export function HomePage({
 
       {/* ---------- B. Salat berikutnya ---------- */}
       <NextPrayerCard today={today} />
+
+      {/* ---------- B2. Pekan Ini (progres mingguan) ---------- */}
+      <WeeklyStrip today={today} />
 
       {/* ---------- C. Target Harian ---------- */}
       <DailyJourney today={today} />

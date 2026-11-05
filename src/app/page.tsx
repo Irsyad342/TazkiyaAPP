@@ -122,7 +122,7 @@ export default function Page() {
       // Warna bilah status/URL browser mengikuti tema aktif.
       document
         .querySelector('meta[name="theme-color"]')
-        ?.setAttribute("content", resolved === "light" ? "#F8FAFC" : "#0B1512");
+        ?.setAttribute("content", resolved === "light" ? "#F4F2FB" : "#13142B");
     };
     apply();
     if (theme === "system") {
@@ -211,12 +211,12 @@ export default function Page() {
           aria-hidden
           className="animate-tz-aurora absolute left-1/2 top-1/3 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-tz-violet/25 blur-[90px] md:h-[420px] md:w-[420px] md:blur-[130px]"
         />
-        <div aria-hidden className="absolute bottom-10 right-1/4 h-44 w-44 rounded-full bg-tz-lime/20 blur-[70px] md:h-64 md:w-64 md:blur-[110px]" />
+        <div aria-hidden className="absolute bottom-10 right-1/4 h-44 w-44 rounded-full bg-tz-blue/20 blur-[70px] md:h-64 md:w-64 md:blur-[110px]" />
         <div className="relative flex flex-col items-center gap-4">
-          <div className="animate-tz-pulse relative flex h-[72px] w-[72px] items-center justify-center rounded-[1.6rem] bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-3xl font-bold text-white shadow-[0_18px_40px_-16px_rgba(22,163,74,0.7)]">
+          <div className="animate-tz-pulse relative flex h-[72px] w-[72px] items-center justify-center rounded-[1.6rem] bg-gradient-to-br from-[#8b7cf8] via-[#6c5ce7] to-[#5b8def] font-display text-3xl font-bold text-white shadow-[0_18px_40px_-16px_rgba(108,92,231,0.75)]">
             ت
           </div>
-          <p className="text-sm font-bold uppercase tracking-[0.22em] text-tz-accent">Tazkiya</p>
+          <p className="font-display text-sm font-bold uppercase tracking-[0.22em] text-tz-accent">Tazkiya</p>
         </div>
       </main>
     );
@@ -237,15 +237,15 @@ export default function Page() {
       {/* Bingkai ponsel */}
       <div
         role="application"
-        className="relative flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-tz-frame md:h-[min(880px,94dvh)] md:rounded-[2.4rem] md:border md:border-tz-line md:shadow-[0_50px_140px_-30px_rgba(12,59,46,0.5)]"
+        className="relative flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-tz-frame md:h-[min(880px,94dvh)] md:rounded-[2.4rem] md:border md:border-tz-line md:shadow-[0_50px_140px_-30px_rgba(103,86,232,0.5)]"
       >
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="tz-aurora animate-tz-aurora absolute inset-0" />
           {/* Orb dekoratif: versi HP lebih kecil & blur lebih tipis — area filter
               blur tumbuh kuadratik, 4 lapisan besar berarti biaya komposit tinggi. */}
           <OuterOrb className="-right-20 -top-20 h-52 w-52 bg-tz-violet/16 blur-2xl md:-right-28 md:-top-28 md:h-80 md:w-80 md:blur-3xl" />
-          <OuterOrb className="-left-24 top-1/3 h-48 w-48 bg-tz-lime/14 blur-2xl md:-left-32 md:h-72 md:w-72 md:blur-3xl" />
-          <OuterOrb className="bottom-16 right-0 h-40 w-40 bg-tz-violet/10 blur-2xl md:h-60 md:w-60 md:blur-3xl" />
+          <OuterOrb className="-left-24 top-1/3 h-48 w-48 bg-tz-blue/14 blur-2xl md:-left-32 md:h-72 md:w-72 md:blur-3xl" />
+          <OuterOrb className="bottom-16 right-0 h-40 w-40 bg-tz-lime/12 blur-2xl md:h-60 md:w-60 md:blur-3xl" />
           <div className="absolute inset-0 bg-gradient-to-b from-tz-aurora-a via-transparent to-tz-aurora-b" />
         </div>
 
@@ -305,32 +305,32 @@ export default function Page() {
       <Toaster
         position="top-center"
         gap={8}
-        toastOptions={
-          resolvedTheme === "light"
-            ? {
-                duration: 2600,
-                style: {
-                  background: "rgba(255,255,255,0.97)",
-                  border: "1px solid rgba(22,163,74,0.22)",
-                  color: "#171923",
-                  borderRadius: "16px",
-                  fontSize: "13px",
-                  backdropFilter: "blur(10px)",
-                  boxShadow: "0 12px 40px rgba(12,59,46,0.18)",
-                },
-              }
-            : {
-                duration: 2600,
-                style: {
-                  background: "rgba(18,33,27,0.96)",
-                  border: "1px solid rgba(74,222,128,0.3)",
-                  color: "#E7F1EA",
-                  borderRadius: "16px",
-                  fontSize: "13px",
-                  backdropFilter: "blur(12px)",
-                  boxShadow: "0 12px 40px rgba(6,13,10,0.6)",
-                },
-              }
+          toastOptions={
+            resolvedTheme === "light"
+              ? {
+                  duration: 2600,
+                  style: {
+                    background: "rgba(255,255,255,0.97)",
+                    border: "1px solid rgba(123,108,246,0.24)",
+                    color: "#26243E",
+                    borderRadius: "16px",
+                    fontSize: "13px",
+                    backdropFilter: "blur(10px)",
+                    boxShadow: "0 12px 40px rgba(103,86,232,0.2)",
+                  },
+                }
+              : {
+                  duration: 2600,
+                  style: {
+                    background: "rgba(28,30,58,0.96)",
+                    border: "1px solid rgba(155,140,250,0.32)",
+                    color: "#E9E8F8",
+                    borderRadius: "16px",
+                    fontSize: "13px",
+                    backdropFilter: "blur(12px)",
+                    boxShadow: "0 12px 40px rgba(12,13,31,0.6)",
+                  },
+                }
         }
       />
     </main>

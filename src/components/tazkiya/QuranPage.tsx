@@ -75,7 +75,7 @@ function SurahCard({
         aria-label={`Buka ${surah.latin}`}
       >
         <div className="flex items-start justify-between gap-1">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#4263eb]/20 bg-[#eef2ff] text-[10.5px] font-bold text-[#3b55d6] dark:border-[#7c86ff]/25 dark:bg-[#7c86ff]/15 dark:text-[#aeb6ff]">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#5b8def]/20 bg-[#eef2ff] text-[10.5px] font-bold text-[#3d63c2] dark:border-[#8fa7ff]/25 dark:bg-[#8fa7ff]/15 dark:text-[#aebcff]">
             {surah.number}
           </span>
           {showArabic ? (
@@ -113,7 +113,7 @@ function JuzCard({ juz, onOpen }: { juz: (typeof JUZ_RANGES)[number]; onOpen: ()
         aria-label={`Buka Juz ${juz.juz} dari ${start?.latin}`}
       >
         <div className="flex items-center justify-between gap-1">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#4263eb]/20 bg-[#eef2ff] text-[10.5px] font-bold text-[#3b55d6] dark:border-[#7c86ff]/25 dark:bg-[#7c86ff]/15 dark:text-[#aeb6ff]">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#5b8def]/20 bg-[#eef2ff] text-[10.5px] font-bold text-[#3d63c2] dark:border-[#8fa7ff]/25 dark:bg-[#8fa7ff]/15 dark:text-[#aebcff]">
             {juz.juz}
           </span>
           <span className="text-[9.5px] font-semibold uppercase tracking-wide text-tz-muted/80">
@@ -373,7 +373,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
         className="tap glass flex w-full items-center gap-3.5 rounded-[1.3rem] p-4 text-left transition-all hover:border-tz-violet/40"
         aria-label="Lanjutkan bacaan Al-Qur'an"
       >
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white glow-violet-sm">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-white glow-violet-sm">
           <Play size={18} className="ml-0.5" />
         </span>
         <span className="min-w-0 flex-1">
@@ -415,7 +415,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                   <span className="text-[9px] font-semibold tabular-nums text-tz-muted/80">{pages > 0 ? pages : ""}</span>
                   <div className="flex h-16 w-full items-end">
                     <div
-                      className="tz-bar-grow-x mx-auto w-full max-w-[22px] rounded-full bg-gradient-to-t from-[#16a34a] to-[#4ade80]"
+                      className="tz-bar-grow-x mx-auto w-full max-w-[22px] rounded-full bg-gradient-to-t from-[#6c5ce7] to-[#9b8cfa]"
                       style={{ height: `${h}%`, opacity: pages > 0 || verses > 0 ? 1 : 0.35 }}
                     />
                   </div>
@@ -447,7 +447,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                       className="tap flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-tz-panel-soft"
                       aria-label={`Buka ${meta?.latin ?? "surah"} ayat ${b.ayah}`}
                     >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#4263eb]/20 bg-[#eef2ff] text-[#3b55d6] dark:border-[#7c86ff]/25 dark:bg-[#7c86ff]/15 dark:text-[#aeb6ff]">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#5b8def]/20 bg-[#eef2ff] text-[#3d63c2] dark:border-[#8fa7ff]/25 dark:bg-[#8fa7ff]/15 dark:text-[#aebcff]">
                         <BookmarkIcon size={13} />
                       </span>
                       <span className="min-w-0 flex-1">
@@ -592,7 +592,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                     className={cn(
                       "tap shrink-0 rounded-full border px-3 py-1.5 text-[11.5px] font-semibold transition-all",
                       placeFilter === f.id
-                        ? "border-tz-violet/60 bg-tz-violet text-white shadow-[0_4px_14px_-6px_rgba(22,163,74,0.9)]"
+                        ? "border-tz-violet/60 bg-tz-violet text-white shadow-[0_4px_14px_-6px_rgba(108,92,231,0.9)]"
                         : "border-tz-line bg-tz-panel-soft text-tz-muted hover:text-tz-accent"
                     )}
                   >
@@ -741,7 +741,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                 <button
                   type="button"
                   onClick={saveCatatan}
-                  className="tap mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[0.9rem] bg-gradient-to-r from-[#4ade80] to-[#16a34a] font-semibold text-white shadow-[0_10px_26px_-10px_rgba(22,163,74,0.7),inset_0_1px_0_rgba(255,255,255,0.25)] transition-all hover:brightness-110"
+                  className="tap mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[0.9rem] bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] font-semibold text-white shadow-[0_10px_26px_-10px_rgba(108,92,231,0.7),inset_0_1px_0_rgba(255,255,255,0.25)] transition-all hover:brightness-110"
                 >
                   <Check size={17} /> Simpan Bacaan
                 </button>

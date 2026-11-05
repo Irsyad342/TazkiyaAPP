@@ -78,9 +78,9 @@ import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { cn } from "@/lib/utils";
 
 const THEME_OPTIONS: { id: ThemeMode; label: string; hint: string; bg: string; dot: string }[] = [
-  { id: "dark", label: "Gelap", hint: "Hijau malam", bg: "linear-gradient(140deg,#12211b,#0b1512)", dot: "#4ADE80" },
-  { id: "light", label: "Terang", hint: "Kanvas bersih", bg: "linear-gradient(140deg,#ffffff,#f8fafc)", dot: "#16A34A" },
-  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#12211b 50%,#f8fafc 50%)", dot: "#7CD992" },
+  { id: "dark", label: "Gelap", hint: "Hijau malam", bg: "linear-gradient(140deg,#1c1e3a,#13142b)", dot: "#9B8CFA" },
+  { id: "light", label: "Terang", hint: "Kanvas bersih", bg: "linear-gradient(140deg,#ffffff,#f4f2fb)", dot: "#16A34A" },
+  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#1c1e3a 50%,#f4f2fb 50%)", dot: "#A79BF5" },
 ];
 
 /** Jam perangkat HH:mm — aksen kanan-atas kartu profil. */
@@ -296,7 +296,7 @@ export function ProfilePage({
             {/* Status (kiri) + jam perangkat (kanan) */}
             <div className="flex items-center justify-between gap-2">
               <span className="flex min-w-0 items-center gap-2 text-[11.5px] font-semibold text-tz-accent">
-                <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-tz-violet shadow-[0_0_8px_1px_rgba(22,163,74,0.5)]" />
+                <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-tz-violet shadow-[0_0_8px_1px_rgba(108,92,231,0.5)]" />
                 Perjalanan Ibadah Aktif
               </span>
               <span className="flex shrink-0 items-center gap-1.5 tabular-nums text-[11.5px] font-medium text-tz-muted">
@@ -330,7 +330,7 @@ export function ProfilePage({
                     setEditingName(false);
                     toast.success("Nama diperbarui");
                   }}
-                  className="tap flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-white shadow-[0_8px_20px_-10px_rgba(22,163,74,0.7)]"
+                  className="tap flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-white shadow-[0_8px_20px_-10px_rgba(108,92,231,0.7)]"
                 >
                   <Check size={17} />
                 </button>
@@ -345,7 +345,7 @@ export function ProfilePage({
                       className="relative h-14 w-14 rounded-full border-2 border-tz-violet/40 object-cover"
                     />
                   ) : (
-                    <div className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-xl font-bold text-white shadow-[0_10px_24px_-10px_rgba(22,163,74,0.7)] dark:border-white/15">
+                    <div className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-xl font-bold text-white shadow-[0_10px_24px_-10px_rgba(108,92,231,0.7)] dark:border-white/15">
                       {settings.name.trim().charAt(0).toUpperCase() || "T"}
                     </div>
                   )}
@@ -353,7 +353,7 @@ export function ProfilePage({
                     type="button"
                     aria-label="Ubah foto profil"
                     onClick={() => fileRef.current?.click()}
-                    className="tap absolute -bottom-0.5 -right-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#16a34a] text-white transition-colors hover:bg-[#15803d] dark:border-[#12211b]"
+                    className="tap absolute -bottom-0.5 -right-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#6c5ce7] text-white transition-colors hover:bg-[#5b4ad6] dark:border-[#1c1e3a]"
                   >
                     <Camera size={13} />
                   </button>
@@ -396,7 +396,7 @@ export function ProfilePage({
         </div>
 
         {/* Strip lime — lapis belakang, menyembul di bawah kartu utama */}
-        <div className="relative z-0 -mt-[58px] rounded-[1.9rem] bg-gradient-to-b from-[#a3d94a] via-[#b7e55c] to-[#c7f464] px-4 pt-[58px] shadow-[0_18px_40px_-20px_rgba(163,217,74,0.7)]">
+        <div className="relative z-0 -mt-[58px] rounded-[1.9rem] bg-gradient-to-b from-[#b9e04a] via-[#cff05c] to-[#cff05c] px-4 pt-[58px] shadow-[0_18px_40px_-20px_rgba(184,224,74,0.7)]">
           <div className="flex h-[52px] items-center justify-center gap-2">
             <Zap size={14} className="shrink-0 text-[#2b4a10]" aria-hidden />
             <p className="truncate text-center text-[13px] font-bold tracking-wide text-[#2b4a10]">
@@ -487,7 +487,7 @@ export function ProfilePage({
                 aria-label={`Salat terlaksana hari ini ${focusDone} dari 5`}
               >
                 <div
-                  className="tz-bar-grow-x h-full rounded-full bg-gradient-to-r from-[#4ade80] to-[#16a34a]"
+                  className="tz-bar-grow-x h-full rounded-full bg-gradient-to-r from-[#8b7cf8] to-[#5b8def]"
                   style={{ width: `${barsIn ? (focusDone / 5) * 100 : 0}%` }}
                 />
               </div>
@@ -522,7 +522,7 @@ export function ProfilePage({
             <button
               type="button"
               onClick={onGoTracker}
-              className="tap mt-3.5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4ade80] to-[#16a34a] text-[13.5px] font-bold text-white shadow-[0_12px_26px_-12px_rgba(22,163,74,0.7)] transition-opacity hover:opacity-95 active:opacity-90"
+              className="tap mt-3.5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#8b7cf8] to-[#5b8def] text-[13.5px] font-bold text-white shadow-[0_12px_26px_-12px_rgba(108,92,231,0.7)] transition-opacity hover:opacity-95 active:opacity-90"
             >
               <ListChecks size={15} aria-hidden />
               Lanjutkan Tracker
@@ -622,7 +622,7 @@ export function ProfilePage({
               <div className="mt-3.5 grid grid-cols-2 gap-2">
                 <Link
                   href="/auth"
-                  className="tap flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-[13px] font-bold text-white shadow-[0_10px_26px_-12px_rgba(22,163,74,0.8)] transition-all hover:brightness-110"
+                  className="tap flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-[13px] font-bold text-white shadow-[0_10px_26px_-12px_rgba(108,92,231,0.8)] transition-all hover:brightness-110"
                 >
                   <LogIn size={15} />
                   Masuk
@@ -739,7 +739,7 @@ export function ProfilePage({
                           className={cn(
                             "h-[9px] w-[9px] rounded-full border",
                             d.status === "done"
-                              ? "border-transparent bg-tz-violet shadow-[0_0_6px_1px_rgba(22,163,74,0.6)]"
+                              ? "border-transparent bg-tz-violet shadow-[0_0_6px_1px_rgba(108,92,231,0.6)]"
                               : d.status === "missed"
                                 ? "border-transparent bg-rose-400 light:bg-rose-500"
                                 : "border-dashed border-tz-line-strong bg-transparent"
@@ -1020,7 +1020,7 @@ export function ProfilePage({
                   }}
                   className={cn(
                     "tap rounded-2xl border p-2 text-left transition-all",
-                    settings.theme === t.id ? "border-tz-violet/70 shadow-[0_0_0_3px_rgba(22,163,74,0.18)]" : "border-tz-line hover:border-tz-violet/40"
+                    settings.theme === t.id ? "border-tz-violet/70 shadow-[0_0_0_3px_rgba(108,92,231,0.18)]" : "border-tz-line hover:border-tz-violet/40"
                   )}
                 >
                   <span aria-hidden className="mb-1.5 block h-12 w-full rounded-xl border border-tz-line" style={{ background: t.bg }}>
@@ -1113,7 +1113,7 @@ export function ProfilePage({
       {/* ---------- Tentang ---------- */}
       <section aria-label="Tentang aplikasi" className="pb-2">
         <GlassCard className="flex items-center gap-3 p-4">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#4ade80] to-[#16a34a] text-lg font-bold text-white glow-violet-sm">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#8b7cf8] to-[#5b8def] text-lg font-bold text-white glow-violet-sm">
             ت
           </span>
           <div className="flex-1">

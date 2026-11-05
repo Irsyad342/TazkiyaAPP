@@ -84,11 +84,11 @@ const VARIANT_ACCENT: Record<
   { badge: string; glow: string; spark: string; button: string; ring: string }
 > = {
   jamaah: {
-    badge: "border-teal-300/40 bg-gradient-to-br from-teal-400/25 to-emerald-500/12 text-teal-200 light:border-teal-500/30 light:from-teal-400/20 light:to-emerald-500/10 light:text-teal-600",
-    glow: "bg-teal-400/25",
-    spark: "bg-teal-300 light:bg-teal-400",
-    button: "from-teal-500 to-emerald-500 shadow-[0_6px_18px_-6px_rgba(20,184,166,0.7),inset_0_1px_0_rgba(255,255,255,0.22)]",
-    ring: "shadow-[0_0_34px_-8px_rgba(45,212,191,0.55)]",
+    badge: "border-tz-violet/40 bg-gradient-to-br from-[#9b8cfa]/25 to-[#5b8def]/12 text-[#cfc8ff] light:border-[#6c5ce7]/30 light:from-[#9b8cfa]/20 light:to-[#5b8def]/10 light:text-[#6c5ce7]",
+    glow: "bg-[#9b8cfa]/25",
+    spark: "bg-[#b3a5ff] light:bg-[#7b6cf6]",
+    button: "from-[#8b7cf8] to-[#5b8def] shadow-[0_6px_18px_-6px_rgba(108,92,231,0.7),inset_0_1px_0_rgba(255,255,255,0.22)]",
+    ring: "shadow-[0_0_34px_-8px_rgba(155,140,250,0.55)]",
   },
   mandiri: {
     badge: "border-sky-300/40 bg-gradient-to-br from-sky-400/25 to-blue-500/12 text-sky-200 light:border-sky-500/30 light:from-sky-400/20 light:to-blue-500/10 light:text-sky-600",
