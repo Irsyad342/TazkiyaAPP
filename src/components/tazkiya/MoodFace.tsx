@@ -12,13 +12,13 @@ import type { MoodId } from "@/lib/tazkiya/types";
 
 /** Aksen warna per karakter mood — pastel di tema terang, muatan gelap di tema gelap. */
 export const MOOD_TONE: Record<MoodId, { face: string; activeBg: string }> = {
-  bahagia: { face: "text-tz-amber", activeBg: "bg-tz-amber-soft" },
-  tenang: { face: "text-tz-blue", activeBg: "bg-tz-blue-soft" },
+  bahagia: { face: "text-tk-amber", activeBg: "bg-tk-amber-soft" },
+  tenang: { face: "text-tk-blue", activeBg: "bg-tk-blue-soft" },
   bersyukur: { face: "text-[#d95f80] dark:text-[#ef8aa4]", activeBg: "bg-[#fdeef2] dark:bg-[#2f1d22]" },
-  lelah: { face: "text-tz-muted", activeBg: "bg-tz-panel-soft" },
+  lelah: { face: "text-tk-muted", activeBg: "bg-tk-panel-soft" },
   sedih: { face: "text-[#6a89c9] dark:text-[#89a8e0]", activeBg: "bg-[#eef2fa] dark:bg-[#1e2634]" },
   cemas: { face: "text-[#8a79d9] dark:text-[#a99cf2]", activeBg: "bg-[#f0edff] dark:bg-[#26223a]" },
-  "campur-aduk": { face: "text-[#e8722e] dark:text-[#ff8a50]", activeBg: "bg-tz-lavender" },
+  "campur-aduk": { face: "text-[#e8722e] dark:text-[#ff8a50]", activeBg: "bg-tk-lavender" },
 };
 
 export function MoodFace({ id, className }: { id: MoodId; className?: string }) {

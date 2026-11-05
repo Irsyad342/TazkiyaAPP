@@ -765,3 +765,42 @@ tidak disentuh.
 
 ### QA
 tsc 0 · eslint bersih · build sukses · agent-browser 390/360/430: alur catat Subuh (dialog→done+mandiri→popup→timeline ter-update), reader buka→tutup→1 ayat tercatat otomatis (Progress 11%), tasbih 3×→Simpan Harian (store zikirCount=3), pil tanggal→DayDetailSheet, tema Gelap↔Terang live dari Profil; overflow horizontal = 0 di semua tab+subpage 360/390/430; konsol 0 error; dark & light diverifikasi visual.
+
+## Task 42 — v7: pembongkaran source-level sesuai referensi (branch `redesign/ember-v7`)
+
+Umpan balik pengguna atas v6: "masih belum mirip — ubah juga di source code, jangan pertahankan fitur/design lama, dan
+fontnya juga". Jawaban: bukan skin lagi, tapi pembongkaran total di level source.
+
+### Font — akar masalah ditemukan
+v6 memuat Plus Jakarta Sans + Manrope via next/font, TETAPI `--font-sans` tidak pernah merambat ke body (preflight
+Tailwind jatuh ke ui-sans-serif) — jadi aplikasi selama ini dirender font sistem. v7:
+- General Sans (Fontshare, ITF Free Font License) menjadi SATU-SATUNYA keluarga latin (body + display) — font khas
+  desain task-planner premium seperti referensi; 4 weight (400-700) di-self-host `src/app/fonts/*.woff2` via
+  next/font/local (tanpa dependensi jaringan saat build).
+- Aturan font-family diterapkan EKSPLISIT pada <body> (variabel --font-gs dipasang next/font di body, html tidak
+  melihatnya) — perbaikan permanen untuk bug font yang mewarisi v6.
+- Amiri Quran tetap untuk teks Arab (terverifikasi di reader: computed font "Amiri Quran").
+
+### Token — nilai DISAMPLING dari gambar referensi (PIL sampling piksel)
+Orange #FA5200 (pil tanggal terpilih) / #FD5C18 (nav); kanvas #1B1B1E; kartu #242429; input & pil #33333A; nav bar
+hitam pekat #0A0A0B; kartu PUTIH #FFFFFF + kartu tugas abu terang #E9E9E7 (trio referensi). Namespace kelas diganti
+total: `tz-*`→`tk-*`, `v5-*`→`gs-*` (sweep seluruh src, 0 sisa) — API internal benar-benar baru.
+
+### Markup dibangun ulang (bukan distyle)
+- BottomNav: bar hitam kapsul, item aktif PIL ORANGE ikon+label, item lain lingkaran gelap ikon saja — persis referensi.
+- Beranda DARI NOL: header avatar kiri + sapaan/nama TENGAH + tombol lonceng bulat kanan (sheet Pengingat Ibadah:
+  countdown + 5 waktu salat real-time), bar pencarian kapsul (sheet pencarian NYATA: aktivitas, 114 surah, catatan
+  jurnal → navigasi), "Jadwal Anda" + dropdown bulan (kalender bulan nyata → DayDetailSheet), pil tanggal BULAT,
+  trio kartu referensi (PUTIH periksa salat lima waktu + cincin | ORANGE kebaikan hari ini), "Tugas Hari Ini" kartu
+  abu terang dengan tombol cek gelap + "Lihat semua". WeeklyBars & DailyOverview v6 dihapus dari beranda.
+- Sholat gaya layar kiri referensi ("Manage Task"): judul tanggal besar + TIMELINE SUMBU WAKTU HORIZONTAL — sumbu jam
+  00.00-24.00 dengan garis putus-putus, penanda waktu berjalan orange, blok acara per salat (bar kiri orange=done,
+  amber=missed) yang bisa digulir & diketuk untuk mencatat. Qada summary jadi kartu orange; form Qada label tegas +
+  input gelap + CTA orange bulat.
+- ui-bits: radius 1.4rem, varian kartu white/light; hex lama dibersihkan (Profil/AreaChart/splash/auth).
+
+### QA
+tsc 0 · eslint bersih · build sukses (setelah perbaikan standalone .next basi — build putus di tengah membuat
+manifest menunjuk chunk CSS yang tak ada; clear rebuild). agent-browser: font body = "generalSans" ✓; alur catat
+Subuh via blok timeline → jenis pelaksanaan → popup → header 1/5 ✓; search "fatihah" → navigasi Al-Qur'an ✓;
+pil tanggal → DayDetailSheet ✓; tema terang dari Profil ✓; overflow 0px di 360/390/430 × 5 tab; konsol 0 error.

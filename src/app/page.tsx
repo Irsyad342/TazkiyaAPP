@@ -46,7 +46,7 @@ const ProgressPage = dynamic(() => import("@/components/tazkiya/ProgressPage").t
   ssr: false,
   loading: () => (
     <div aria-busy="true" aria-label="Memuat progress" className="flex h-72 items-center justify-center">
-      <LoaderCircle size={26} className="animate-spin text-tz-violet" />
+      <LoaderCircle size={26} className="animate-spin text-tk-violet" />
     </div>
   ),
 });
@@ -117,7 +117,7 @@ export default function Page() {
       // Warna bilah status/URL browser mengikuti tema aktif.
       document
         .querySelector('meta[name="theme-color"]')
-        ?.setAttribute("content", resolved === "light" ? "#F6F6F7" : "#161616");
+        ?.setAttribute("content", resolved === "light" ? "#F2F2F4" : "#1B1B1E");
     };
     apply();
     if (theme === "system") {
@@ -201,14 +201,14 @@ export default function Page() {
 
   if (!hydrated) {
     return (
-      <main className="flex min-h-dvh items-center justify-center bg-tz-stage" aria-label="Memuat Tazkiya">
+      <main className="flex min-h-dvh items-center justify-center bg-tk-stage" aria-label="Memuat Tazkiya">
         <div className="flex flex-col items-center gap-4">
-          <span className="animate-tz-pulse flex h-14 w-14 items-center justify-center rounded-[1.1rem] bg-tz-violet text-2xl font-bold text-white">
+          <span className="animate-tk-pulse flex h-14 w-14 items-center justify-center rounded-[1.1rem] bg-tk-violet text-2xl font-bold text-white">
             ت
           </span>
           <div className="text-center">
-            <p className="text-[15px] font-bold tracking-[-0.01em] text-tz-ink">Tazkiya</p>
-            <p className="v5-overline mt-1.5">A Better Daily Journey</p>
+            <p className="text-[15px] font-bold tracking-[-0.01em] text-tk-ink">Tazkiya</p>
+            <p className="gs-overline mt-1.5">A Better Daily Journey</p>
           </div>
         </div>
       </main>
@@ -217,7 +217,7 @@ export default function Page() {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <main className="relative min-h-dvh w-full bg-tz-stage" aria-label="Aplikasi Tazkiya">
+      <main className="relative min-h-dvh w-full bg-tk-stage" aria-label="Aplikasi Tazkiya">
         <div className="flex w-full">
           {/* Sidebar desktop — navigasi vertikal proporsional (lg+) */}
           <SidebarNav active={tab} onChange={(t) => { setSubpage(null); setTab(t); }} subpage={subpage} onOpenSubpage={setSubpage} />
@@ -303,7 +303,7 @@ export default function Page() {
               : {
                   duration: 2600,
                   style: {
-                    background: "#252525",
+                    background: "#242429",
                     border: "1px solid #383838",
                     color: "#FFFFFF",
                     borderRadius: "999px",

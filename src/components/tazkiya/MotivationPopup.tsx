@@ -81,16 +81,16 @@ function MosqueIcon({ className }: { className?: string }) {
 /** Konfigurasi aksen per varian — tint lembut tanpa glow. */
 const VARIANT_ACCENT: Record<MotivationVariant, { badge: string; button: string }> = {
   jamaah: {
-    badge: "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent",
-    button: "v5-ink-btn",
+    badge: "bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent",
+    button: "gs-ink-btn",
   },
   mandiri: {
-    badge: "bg-tz-blue-soft text-tz-blue dark:bg-tz-blue/20 dark:text-[#aebcff]",
-    button: "v5-ink-btn",
+    badge: "bg-tk-blue-soft text-tk-blue dark:bg-tk-blue/20 dark:text-[#aebcff]",
+    button: "gs-ink-btn",
   },
   missed: {
-    badge: "bg-tz-amber-soft text-tz-amber",
-    button: "v5-ink-btn",
+    badge: "bg-tk-amber-soft text-tk-amber",
+    button: "gs-ink-btn",
   },
 };
 
@@ -131,7 +131,7 @@ export function MotivationPopup({
         className="glass-strong fixed! top-auto bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 translate-y-0 gap-3 overflow-y-auto rounded-t-[1.75rem] rounded-b-none border-x-0 border-b-0 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_-18px_60px_-12px_rgba(25,25,35,0.5)] duration-250 thin-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8"
       >
         {/* Pegangan sheet */}
-        <span aria-hidden className="mx-auto mb-0.5 block h-1 w-10 shrink-0 rounded-full bg-tz-line-strong/70" />
+        <span aria-hidden className="mx-auto mb-0.5 block h-1 w-10 shrink-0 rounded-full bg-tk-line-strong/70" />
 
         {/* ---------- Medali ikon + kilau ---------- */}
         <div className="relative mx-auto mt-1 flex h-24 w-24 items-center justify-center">
@@ -151,13 +151,13 @@ export function MotivationPopup({
             )}
           </span>
           {/* cincin garis dekoratif */}
-          <span aria-hidden className="absolute inset-1 rounded-full border border-dashed border-tz-line-strong" />
+          <span aria-hidden className="absolute inset-1 rounded-full border border-dashed border-tk-line-strong" />
           {/* Partikel kilau (sekali-jalan, hormati reduced motion) */}
           {SPARKS.map((s, i) => (
             <span
               key={i}
               aria-hidden
-              className="tz-sparkle absolute left-0 top-0 rounded-full bg-tz-lime"
+              className="tk-sparkle absolute left-0 top-0 rounded-full bg-tk-lime"
               style={
                 {
                   left: s.x,
@@ -174,13 +174,13 @@ export function MotivationPopup({
         </div>
 
         <DialogHeader className="items-center text-center">
-          <DialogTitle className="font-display text-[24px] font-bold tracking-[-0.02em] text-tz-ink">
+          <DialogTitle className="font-display text-[24px] font-bold tracking-[-0.02em] text-tk-ink">
             {MESSAGES[variant].title}
           </DialogTitle>
-          <p className="flex items-center justify-center gap-1.5 text-[11px] font-medium text-tz-muted">
+          <p className="flex items-center justify-center gap-1.5 text-[11px] font-medium text-tk-muted">
             {prayerLabel} · {dateLabel}
           </p>
-          <p className="mt-1 text-[12.5px] leading-relaxed text-tz-ink/90">{msg}</p>
+          <p className="mt-1 text-[12.5px] leading-relaxed text-tk-ink/90">{msg}</p>
         </DialogHeader>
 
         <button

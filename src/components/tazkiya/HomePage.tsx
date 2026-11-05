@@ -1,36 +1,47 @@
 "use client";
 
 /**
- * Tazkiya v6 — Beranda "Ember" — DIBANGUN DARI NOL mengikuti bahasa visual
- * referensi (task planner premium gelap + aksen orange):
- * A. Header personal: avatar bulat + sapaan, nama tegas, tanggal Masehi &
- *    Hijriah.
- * B. Compact date selector: tujuh pil tanggal pekan ini — hari ini ORANGE;
- *    hari ber-catatan diberi titik hijau; ketuk hari → detail hari itu
- *    (DayDetailSheet, data nyata).
- * C. Featured Sholat Berikutnya: blok ORANGE pekat — countdown Manrope
- *    besar, lima slot status hari ini.
- * D. Ringkasan Ibadah: kartu cincin persentase + tiga baris progres
- *    (Salat, Al-Qur'an, Zikir) menuju halaman masing-masing.
- * E. Target Hari Ini: daftar periksa gaya "Today's Task" (logika utuh).
- * F. Mood Check-in (MoodSection).
- * G. Pekan Ini: batang konsistensi tujuh hari.
- * H. Jelajahi Aktivitas (JelajahiAktivitas).
- * I. Doa Hari Ini + Daily Barakah: blok editorial tenang.
- * Pencatatan salat tetap di halaman Sholat. Semua logika data tidak berubah.
+ * Tazkiya v7 — Beranda DIBANGUN ULANG mengikuti komposisi layar tengah
+ * referensi task-planner premium, bukan menyusun ulang desain v6:
+ * A. Header personal: avatar kiri, sapaan + nama di TENGAH, tombol lonceng
+ *    bulat kanan (sheet pengingat salat — data nyata).
+ * B. Bar pencarian kapsul: sheet pencarian nyata (aktivitas, surah, jurnal).
+ * C. "Jadwal Anda" + dropdown bulan: pil tanggal BULAT pekan ini (hari ini
+ *    ORANGE, hari ber-catatan titik hijau) — ketuk hari → DayDetailSheet;
+ *    chevron bulan → kalender bulan nyata.
+ * D. Trio kartu referensi: kartu PUTIH (periksa salat lima waktu) + kartu
+ *    cincin gelap di bawahnya, dan kartu ORANGE (ibadah pendukung).
+ * E. "Tugas Hari Ini": kartu abu terang dengan tombol cek gelap — logika
+ *    target harian utuh (toggle, target otomatis, editor).
+ * F. Mood check-in, Jelajahi aktivitas, Doa hari ini, Daily Barakah.
+ * Semua logika data (store, jadwal salat, target) tidak berubah.
  */
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, ChevronRight, Plus, Settings2, Sparkles, Trash2 } from "lucide-react";
+import {
+  Bell,
+  BookOpen,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Search,
+  Settings2,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import type { PrayerId } from "@/lib/tazkiya/types";
-import { formatGregorian, formatHijri, todayKey } from "@/lib/tazkiya/dates";
+import { formatGregorian, formatHijri, formatDayFull, todayKey } from "@/lib/tazkiya/dates";
 import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { formatCountdown, goalStatuses, nextPrayerState } from "@/lib/tazkiya/goals";
+import { SURAH_LIST } from "@/lib/tazkiya/quran";
 import { barakahOfTheDay } from "@/lib/tazkiya/barakah";
 import { duaOfTheDay } from "@/lib/tazkiya/duas";
-import { ConfirmButton, ProgressBar, SectionHeader } from "./ui-bits";
+import { ConfirmButton } from "./ui-bits";
 import { MoodSection } from "./MoodSection";
 import { JelajahiAktivitas } from "./JelajahiAktivitas";
 import { DayDetailSheet } from "./DayDetailSheet";
@@ -43,6 +54,12 @@ const PRAYER_ORDER: { id: PrayerId; label: string }[] = [
   { id: "asar", label: "Asar" },
   { id: "magrib", label: "Magrib" },
   { id: "isya", label: "Isya" },
+];
+
+const DOW_LABELS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
+const MONTH_LABELS = [
+  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+  "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
 
 /** Tanggal & jam hari ini (YYYY-MM-DD lokal); diperbarui tiap 30 detik / saat tab aktif. */
@@ -68,13 +85,13 @@ function useToday(): string {
   return today;
 }
 
-/* ---------------- B. Compact date selector — tujuh pil tanggal ---------------- */
+/* ---------------- C. Pil tanggal BULAT — gaya referensi ---------------- */
 
-function WeekDateStrip({ today }: { today: string }) {
+function CircleDateStrip({ today }: { today: string }) {
   const logs = useWorshipStore((s) => s.logs);
   const [selected, setSelected] = useState<string | null>(null);
 
-  /** Senin-minggu pekan ini (kronologis) — tanggal lokal dari lib dates. */
+  /** Senin-minggu pekan ini (kronologis). */
   const week = useMemo(() => {
     const now = new Date();
     const dow = (now.getDay() + 6) % 7; // Senin = 0
@@ -82,13 +99,13 @@ function WeekDateStrip({ today }: { today: string }) {
       const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow + i);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
       const count = Object.values(logs[key]?.prayers ?? {}).filter(Boolean).length;
-      return { key, dayNum: d.getDate(), label: ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"][i], count, isToday: key === today, isFuture: key > today };
+      return { key, dayNum: d.getDate(), label: DOW_LABELS[i], count, isToday: key === today, isFuture: key > today };
     });
   }, [logs, today]);
 
   return (
-    <section aria-label="Pilih tanggal pekan ini" className="animate-tz-fade-up">
-      <div className="no-scrollbar flex items-stretch gap-1.5 overflow-x-auto" role="group">
+    <section aria-label="Pilih tanggal pekan ini" className="animate-tk-fade-up">
+      <div className="no-scrollbar flex items-stretch justify-between gap-1 overflow-x-auto" role="group">
         {week.map(({ key, dayNum, label, count, isToday, isFuture }) => (
           <button
             key={key}
@@ -98,22 +115,22 @@ function WeekDateStrip({ today }: { today: string }) {
             aria-pressed={isToday}
             onClick={() => !isFuture && setSelected(key)}
             className={cn(
-              "tap flex min-w-[46px] flex-1 flex-col items-center gap-1 rounded-[0.95rem] px-1 py-2.5 transition-colors",
-              isToday ? "bg-tz-violet" : "bg-tz-panel",
+              "tap flex aspect-square w-full max-w-[52px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-full transition-colors",
+              isToday ? "bg-tk-violet" : "bg-tk-panel",
               isFuture ? "opacity-40" : "cursor-pointer"
             )}
           >
-            <span className={cn("v5-display text-[16px] font-extrabold leading-none", isToday ? "text-white" : "text-tz-ink")}>
+            <span className={cn("gs-display text-[17px] font-bold leading-none", isToday ? "text-white" : "text-tk-ink")}>
               {dayNum}
             </span>
-            <span className={cn("text-[9.5px] font-semibold leading-none", isToday ? "text-white/85" : "text-tz-muted")}>
+            <span className={cn("text-[9.5px] font-medium leading-none", isToday ? "text-white/85" : "text-tk-muted")}>
               {label}
             </span>
             <span
               aria-hidden
               className={cn(
                 "h-[4px] w-[4px] rounded-full",
-                isToday ? "bg-white/90" : count > 0 ? "bg-tz-green" : "bg-transparent"
+                isToday ? "bg-white/90" : count > 0 ? "bg-tk-green" : "bg-transparent"
               )}
             />
           </button>
@@ -124,13 +141,40 @@ function WeekDateStrip({ today }: { today: string }) {
   );
 }
 
-/* ---------------- C. Featured Sholat Berikutnya (blok ORANGE) ---------------- */
+/* ---------------- Sheet dasar (pola bottom sheet DayDetailSheet) ---------------- */
 
-function NextPrayerHero({ today }: { today: string }) {
+function BottomSheet({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Dialog open onOpenChange={(v) => !v && onClose()}>
+      <DialogContent
+        showCloseButton={false}
+        aria-describedby={undefined}
+        className="glass-strong fixed! top-auto bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 translate-y-0 gap-3 overflow-y-auto rounded-t-[1.75rem] rounded-b-none border-x-0 border-b-0 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_-18px_60px_-12px_rgba(15,15,20,0.55)] duration-250 thin-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8"
+      >
+        <span aria-hidden className="mx-auto mb-0.5 block h-1 w-10 shrink-0 rounded-full bg-tk-line-strong/70" />
+        <DialogHeader>
+          <DialogTitle className="font-display text-lg text-tk-ink">{title}</DialogTitle>
+        </DialogHeader>
+        {children}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ---------------- A. Sheet lonceng — pengingat salat (data nyata) ---------------- */
+
+function ReminderSheet({ today, onClose }: { today: string; onClose: () => void }) {
   const settings = useWorshipStore((s) => s.settings);
-  const prayerDetails = useWorshipStore((s) => s.prayerDetails);
   const logs = useWorshipStore((s) => s.logs);
-  const animations = useWorshipStore((s) => s.settings.animations);
+  const prayerDetails = useWorshipStore((s) => s.prayerDetails);
 
   const times = useMemo(() => resolvePrayerSchedule(settings, today), [settings, today]);
   const [now, setNow] = useState(() => new Date());
@@ -138,86 +182,439 @@ function NextPrayerHero({ today }: { today: string }) {
     const iv = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(iv);
   }, []);
-
   const state = nextPrayerState(times, now);
   const nextLabel = PRAYER_ORDER.find((p) => p.id === state.next)?.label ?? state.next;
 
-  /** Status satu slot waktu: lewat / berjalan / berikutnya / belum. */
-  const slotState = (id: PrayerId): "past" | "current" | "next" | "future" => {
-    if (id === state.next) return "next";
-    if (state.current === id) return "current";
-    const idx = PRAYER_ORDER.findIndex((p) => p.id === id);
-    const nextIdx = PRAYER_ORDER.findIndex((p) => p.id === state.next);
-    if (idx < nextIdx) return "past";
-    return "future";
-  };
-
-  const scheduleSource = settings.geo
-    ? `Jadwal otomatis · ${settings.geo.label ?? "lokasi perangkat"}`
-    : "Jadwal manual — atur lokasi di Profil";
-
   return (
-    <section aria-label="Salat berikutnya" className="animate-tz-fade-up">
-      <div className="glass-hero rounded-[1.6rem] p-5 sm:p-7">
+    <BottomSheet title="Pengingat Ibadah" onClose={onClose}>
+      <div className="glass-hero rounded-[1.4rem] p-4">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-white/75">Sholat Berikutnya</p>
-          <span
-            className={cn(
-              "rounded-full bg-white/18 px-3 py-1.5 text-[11.5px] font-bold text-white backdrop-blur-sm",
-              animations && "animate-tz-pulse"
-            )}
-          >
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/75">Sholat Berikutnya</p>
+          <span className="rounded-full bg-white/18 px-2.5 py-1 text-[11px] font-bold text-white">
             {formatCountdown(state.secondsLeft)} lagi
           </span>
         </div>
-
-        <div className="mt-4 flex flex-wrap items-end gap-x-4 gap-y-2">
-          <p className="v5-display text-[52px] font-extrabold leading-[0.9] text-white sm:text-[60px]">
-            {state.nextTime}
+        <div className="mt-3 flex items-end gap-3">
+          <p className="gs-display text-[44px] font-bold leading-[0.9] text-white">{state.nextTime}</p>
+          <p className="pb-1 text-[15px] font-bold text-white">
+            {nextLabel}
+            {state.tomorrow ? <span className="text-[11px] font-semibold text-white/75"> · besok</span> : null}
           </p>
-          <div className="pb-1.5">
-            <p className="text-[17px] font-bold leading-tight tracking-[-0.01em] text-white">
-              {nextLabel}
-              {state.tomorrow ? <span className="text-[12.5px] font-semibold text-white/75"> · besok</span> : null}
-            </p>
-            <p className="mt-0.5 text-[11.5px] font-medium text-white/75">
-              {state.tomorrow
-                ? "Menunggu Subuh esok hari"
-                : `${PRAYER_ORDER.find((p) => p.id === state.current)?.label ?? "-"} sedang berlangsung`}
-            </p>
-          </div>
         </div>
-
-        {/* Lima slot status hari ini */}
-        <div className="mt-5 flex items-center gap-1.5" role="img" aria-label="Status lima waktu salat hari ini">
-          {PRAYER_ORDER.map(({ id }) => {
-            const st = slotState(id);
-            const done = prayerDetails[today]?.[id]?.status === "done" || logs[today]?.prayers?.[id];
-            const missed = prayerDetails[today]?.[id]?.status === "missed";
-            return (
-              <span
-                key={id}
-                aria-hidden
-                className={cn(
-                  "h-1.5 flex-1 rounded-full",
-                  done ? "bg-white" : missed ? "bg-[#FFD8A8]" : st === "next" ? "bg-white/85" : "bg-white/25"
-                )}
-              />
-            );
-          })}
-        </div>
-        <p className="mt-4 flex items-center gap-1.5 text-[10.5px] font-medium text-white/70">
-          <Sparkles size={11} className="shrink-0 text-white/80" />
-          {scheduleSource}
-        </p>
       </div>
-    </section>
+
+      <ul className="mt-1">
+        {PRAYER_ORDER.map(({ id, label }) => {
+          const done = prayerDetails[today]?.[id]?.status === "done" || logs[today]?.prayers?.[id];
+          const missed = prayerDetails[today]?.[id]?.status === "missed";
+          return (
+            <li key={id} className="flex items-center justify-between gap-3 border-b border-tk-line-soft py-2.5 last:border-0">
+              <span className="flex items-center gap-2.5">
+                <span
+                  aria-hidden
+                  className={cn(
+                    "h-2 w-2 rounded-full",
+                    done ? "bg-tk-green" : missed ? "bg-tk-rose" : "bg-tk-line-strong"
+                  )}
+                />
+                <span className={cn("text-[13.5px]", done ? "font-semibold text-tk-ink" : "font-medium text-tk-ink/85")}>
+                  {label}
+                </span>
+              </span>
+              <span className={cn("tnum text-[12.5px] font-semibold", done ? "text-tk-green" : missed ? "text-tk-rose" : "text-tk-muted")}>
+                {times[id].time}
+                {done ? " · selesai" : missed ? " · terlewat" : ""}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+
+      <button
+        type="button"
+        onClick={onClose}
+        className="tap mt-2 min-h-[42px] w-full rounded-full bg-tk-panel-strong px-4 text-sm font-bold text-tk-ink"
+      >
+        Tutup
+      </button>
+    </BottomSheet>
   );
 }
 
-/* ---------------- D. Ringkasan Ibadah — kartu ring + tiga progres ---------------- */
+/* ---------------- B. Sheet pencarian nyata: aktivitas, surah, jurnal ---------------- */
 
-function DailyOverview({
+function SearchSheet({
+  onClose,
+  onNavigate,
+  onOpenSubpage,
+}: {
+  onClose: () => void;
+  onNavigate: (tab: TabId) => void;
+  onOpenSubpage: (sub: SubPageId) => void;
+}) {
+  const journal = useWorshipStore((s) => s.journal);
+  const [q, setQ] = useState("");
+
+  const activities: { label: string; sub: string; go: () => void }[] = useMemo(
+    () => [
+      { label: "Catat Salat", sub: "Halaman Sholat", go: () => onNavigate("sholat") },
+      { label: "Baca Al-Qur'an", sub: "Halaman Al-Qur'an", go: () => onNavigate("quran") },
+      { label: "Jurnal Syukur", sub: "Refleksi", go: () => onOpenSubpage("jurnal") },
+      { label: "Zikir & Doa", sub: "Refleksi", go: () => onOpenSubpage("zikir-doa") },
+      { label: "Tasbih Digital", sub: "Zikir & Doa", go: () => onOpenSubpage("zikir-doa") },
+      { label: "Rizq & Amal", sub: "Refleksi", go: () => onOpenSubpage("rizq-amal") },
+      { label: "Analitik Ibadah", sub: "Halaman Progress", go: () => onNavigate("progress") },
+    ],
+    [onNavigate, onOpenSubpage]
+  );
+
+  const needle = q.trim().toLowerCase();
+  const acts = needle ? activities.filter((a) => a.label.toLowerCase().includes(needle)) : activities.slice(0, 4);
+  const surahs = needle
+    ? SURAH_LIST.filter(
+        (s) => s.latin.toLowerCase().includes(needle) || String(s.number) === needle || s.meaning.toLowerCase().includes(needle)
+      ).slice(0, 6)
+    : [];
+  const journals = needle
+    ? Object.entries(journal)
+        .sort((a, b) => (a[0] < b[0] ? 1 : -1))
+        .filter(([, entry]) => entry.items.some((it) => it && it.toLowerCase().includes(needle)))
+        .slice(0, 4)
+    : [];
+  const empty = needle && acts.length === 0 && surahs.length === 0 && journals.length === 0;
+
+  const go = (fn: () => void) => {
+    onClose();
+    fn();
+  };
+
+  return (
+    <BottomSheet title="Cari" onClose={onClose}>
+      <div className="flex items-center gap-2.5 rounded-full bg-tk-panel-strong px-4 py-3">
+        <Search size={16} className="shrink-0 text-tk-muted" />
+        <input
+          autoFocus
+          type="text"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Cari surah, aktivitas, catatan jurnal…"
+          aria-label="Kata kunci pencarian"
+          className="w-full bg-transparent text-[13.5px] text-tk-ink outline-none placeholder:text-tk-deep"
+        />
+      </div>
+
+      <div className="tk-fade-in mt-2 max-h-[46vh] space-y-4 overflow-y-auto thin-scrollbar" role="list">
+        {empty ? (
+          <p className="rounded-2xl bg-tk-panel-soft p-4 text-center text-[12px] text-tk-muted">
+            Tidak ada hasil untuk &ldquo;{q.trim()}&rdquo;. Coba kata lain.
+          </p>
+        ) : null}
+
+        {acts.length > 0 ? (
+          <section>
+            <p className="gs-overline mb-1.5 px-1">Aktivitas</p>
+            <ul>
+              {acts.map((a) => (
+                <li key={a.label}>
+                  <button
+                    type="button"
+                    onClick={() => go(a.go)}
+                    className="tap flex w-full items-center justify-between gap-3 rounded-xl px-2 py-2.5 text-left hover:bg-tk-panel-soft"
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate text-[13.5px] font-semibold text-tk-ink">{a.label}</span>
+                      <span className="block text-[10.5px] text-tk-muted">{a.sub}</span>
+                    </span>
+                    <ChevronRight size={14} className="shrink-0 text-tk-muted" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {surahs.length > 0 ? (
+          <section>
+            <p className="gs-overline mb-1.5 px-1">Surah Al-Qur&apos;an</p>
+            <ul>
+              {surahs.map((s) => (
+                <li key={s.number}>
+                  <button
+                    type="button"
+                    onClick={() => go(() => onNavigate("quran"))}
+                    className="tap flex w-full items-center justify-between gap-3 rounded-xl px-2 py-2.5 text-left hover:bg-tk-panel-soft"
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate text-[13.5px] font-semibold text-tk-ink">
+                        {s.number}. {s.latin}
+                      </span>
+                      <span className="block text-[10.5px] text-tk-muted">
+                        {s.meaning} · {s.verses} ayat · {s.place}
+                      </span>
+                    </span>
+                    <span className="quran-arabic shrink-0 text-[16px] text-tk-ink/85">{s.arabic}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {journals.length > 0 ? (
+          <section>
+            <p className="gs-overline mb-1.5 px-1">Catatan Jurnal</p>
+            <ul>
+              {journals.map(([date, entry]) => {
+                const hit = entry.items.find((it) => it && it.toLowerCase().includes(needle)) ?? "";
+                return (
+                  <li key={date}>
+                    <button
+                      type="button"
+                      onClick={() => go(() => onOpenSubpage("jurnal"))}
+                      className="tap flex w-full items-center justify-between gap-3 rounded-xl px-2 py-2.5 text-left hover:bg-tk-panel-soft"
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate text-[13px] font-medium text-tk-ink">{hit}</span>
+                        <span className="block text-[10.5px] text-tk-muted">{formatDayFull(date)}</span>
+                      </span>
+                      <ChevronRight size={14} className="shrink-0 text-tk-muted" />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ) : null}
+      </div>
+    </BottomSheet>
+  );
+}
+
+/* ---------------- C. Sheet kalender bulan (dropdown "Juni ⌄") ---------------- */
+
+function MonthSheet({
+  today,
+  onClose,
+  onPickDay,
+}: {
+  today: string;
+  onClose: () => void;
+  onPickDay: (date: string) => void;
+}) {
+  const logs = useWorshipStore((s) => s.logs);
+  const moods = useWorshipStore((s) => s.moods);
+  const now = new Date();
+  const [ym, setYm] = useState({ y: now.getFullYear(), m: now.getMonth() });
+
+  const cells = useMemo(() => {
+    const first = new Date(ym.y, ym.m, 1);
+    const daysInMonth = new Date(ym.y, ym.m + 1, 0).getDate();
+    const lead = (first.getDay() + 6) % 7; // Senin = 0
+    const arr: (string | null)[] = Array.from({ length: lead }, () => null);
+    for (let d = 1; d <= daysInMonth; d++) {
+      arr.push(`${ym.y}-${String(ym.m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`);
+    }
+    return arr;
+  }, [ym]);
+
+  const shift = (delta: number) =>
+    setYm(({ y, m }) => {
+      const nm = m + delta;
+      return { y: y + Math.floor(nm / 12), m: ((nm % 12) + 12) % 12 };
+    });
+
+  return (
+    <BottomSheet title={`${MONTH_LABELS[ym.m]} ${ym.y}`} onClose={onClose}>
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          aria-label="Bulan sebelumnya"
+          onClick={() => shift(-1)}
+          className="tap flex h-9 w-9 items-center justify-center rounded-full bg-tk-panel-strong text-tk-ink"
+        >
+          <ChevronLeft size={16} />
+        </button>
+        <p className="text-[13.5px] font-bold text-tk-ink">
+          {MONTH_LABELS[ym.m]} {ym.y}
+        </p>
+        <button
+          type="button"
+          aria-label="Bulan berikutnya"
+          onClick={() => shift(1)}
+          className="tap flex h-9 w-9 items-center justify-center rounded-full bg-tk-panel-strong text-tk-ink"
+        >
+          <ChevronRight size={16} />
+        </button>
+      </div>
+
+      <div className="mt-3 grid grid-cols-7 gap-y-1 text-center" role="grid" aria-label={`Kalender ${MONTH_LABELS[ym.m]} ${ym.y}`}>
+        {DOW_LABELS.map((d) => (
+          <span key={d} className="pb-1 text-[10px] font-semibold uppercase tracking-wide text-tk-deep">
+            {d}
+          </span>
+        ))}
+        {cells.map((key, i) => {
+          if (!key) return <span key={`pad-${i}`} aria-hidden />;
+          const dayNum = Number(key.slice(-2));
+          const isFuture = key > today;
+          const isToday = key === today;
+          const recorded =
+            (!!logs[key] &&
+              (Object.values(logs[key].prayers).some(Boolean) ||
+                logs[key].quranPages > 0 ||
+                logs[key].zikirCount > 0)) ||
+            !!moods[key];
+          return (
+            <button
+              key={key}
+              type="button"
+              disabled={isFuture}
+              aria-label={`Tanggal ${key}${recorded ? " — ada catatan" : ""}`}
+              onClick={() => {
+                onClose();
+                onPickDay(key);
+              }}
+              className={cn(
+                "tap mx-auto flex h-9 w-9 flex-col items-center justify-center rounded-full text-[12.5px] transition-colors",
+                isToday ? "bg-tk-violet font-bold text-white" : "font-medium text-tk-ink/90",
+                isFuture ? "opacity-35" : "cursor-pointer hover:bg-tk-panel-strong",
+                recorded && !isToday && "bg-tk-panel-strong"
+              )}
+            >
+              {dayNum}
+              <span aria-hidden className={cn("h-[3px] w-[3px] rounded-full", recorded ? "bg-tk-green" : "bg-transparent")} />
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-2 text-center text-[10.5px] text-tk-deep">Titik hijau = ada catatan ibadah · ketuk tanggal untuk rincian</p>
+    </BottomSheet>
+  );
+}
+
+/* ---------------- D1. Kartu PUTIH — periksa salat lima waktu ---------------- */
+
+function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab: TabId) => void }) {
+  const settings = useWorshipStore((s) => s.settings);
+  const logs = useWorshipStore((s) => s.logs);
+  const prayerDetails = useWorshipStore((s) => s.prayerDetails);
+
+  const times = useMemo(() => resolvePrayerSchedule(settings, today), [settings, today]);
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const iv = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(iv);
+  }, []);
+  const state = nextPrayerState(times, now);
+  const nextLabel = PRAYER_ORDER.find((p) => p.id === state.next)?.label ?? state.next;
+
+  return (
+    <button
+      type="button"
+      onClick={() => onNavigate("sholat")}
+      aria-label="Salat lima waktu — buka halaman Sholat"
+      className="tap tk-card-white block w-full rounded-[1.4rem] p-4 text-left"
+    >
+      <p className="text-[13.5px] font-bold tracking-[-0.01em] text-[#17171B]">Salat Lima Waktu</p>
+      <ul className="mt-2.5 space-y-2" role="group" aria-label="Status salat hari ini">
+        {PRAYER_ORDER.map(({ id, label }) => {
+          const done = prayerDetails[today]?.[id]?.status === "done" || logs[today]?.prayers?.[id];
+          const missed = prayerDetails[today]?.[id]?.status === "missed";
+          return (
+            <li key={id} className="flex items-center gap-2.5">
+              {/* Radio bulat gaya kartu putih referensi */}
+              <span
+                aria-hidden
+                className={cn(
+                  "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px]",
+                  done ? "border-[#17171B] bg-[#17171B]" : missed ? "border-[#FA5200]" : "border-[#D6D6DA]"
+                )}
+              >
+                {done ? <Check size={10} strokeWidth={3.2} className="text-white" /> : null}
+              </span>
+              <span className={cn("min-w-0 flex-1 truncate text-[12px]", done ? "font-semibold text-[#17171B]" : "font-medium text-[#55555C]")}>
+                {label}
+                {missed ? " · terlewat" : ""}
+              </span>
+              <span className="tnum shrink-0 text-[10px] font-semibold text-[#9A9AA1]">{times[id].time}</span>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="mt-3 flex items-center gap-1 border-t border-[#ECECEE] pt-2.5 text-[10.5px] font-semibold text-[#8A8A91]">
+        <Bell size={10} className="shrink-0" />
+        Berikutnya · {nextLabel} {state.nextTime}
+      </p>
+    </button>
+  );
+}
+
+/* ---------------- D2. Kartu cincin gelap — ringkasan target ---------------- */
+
+function RingCard({ today, onNavigate }: { today: string; onNavigate: (tab: TabId) => void }) {
+  const dailyGoals = useWorshipStore((s) => s.dailyGoals);
+  const logs = useWorshipStore((s) => s.logs);
+  const prayerDetails = useWorshipStore((s) => s.prayerDetails);
+  const zikirSessions = useWorshipStore((s) => s.zikirSessions);
+  const amalEntries = useWorshipStore((s) => s.amalEntries);
+  const goalDone = useWorshipStore((s) => s.goalDone);
+
+  const statuses = useMemo(
+    () =>
+      goalStatuses(dailyGoals, today, {
+        logs,
+        prayerDetails,
+        zikirSessions,
+        amalEntries,
+        goalDone,
+        subuhOntime: null,
+      }),
+    [dailyGoals, today, logs, prayerDetails, zikirSessions, amalEntries, goalDone]
+  );
+  const done = statuses.filter((g) => g.done).length;
+  const pct = statuses.length > 0 ? Math.round((done / statuses.length) * 100) : 0;
+
+  return (
+    <button
+      type="button"
+      onClick={() => onNavigate("progress")}
+      aria-label={`Target harian ${done} dari ${statuses.length} selesai — buka analitik`}
+      className="tap glass block w-full rounded-[1.4rem] p-4 text-left"
+    >
+      <div className="flex items-center gap-3.5">
+        <div className="relative inline-flex shrink-0 items-center justify-center" style={{ width: 64, height: 64 }}>
+          <svg width={64} height={64} className="-rotate-90">
+            <circle cx={32} cy={32} r={27} fill="none" strokeWidth={6} className="stroke-tk-line-strong" />
+            <circle
+              cx={32}
+              cy={32}
+              r={27}
+              fill="none"
+              strokeWidth={6}
+              strokeLinecap="round"
+              className="stroke-tk-violet"
+              strokeDasharray={`${(Math.max(0, Math.min(100, pct)) / 100) * 2 * Math.PI * 27} ${2 * Math.PI * 27}`}
+              style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.22, 1, 0.36, 1)" }}
+            />
+          </svg>
+          <span className="gs-display absolute inset-0 flex items-center justify-center text-[15px] font-bold text-tk-ink">{pct}%</span>
+        </div>
+        <span className="min-w-0">
+          <span className="block text-[13px] font-bold text-tk-ink">Target Harian</span>
+          <span className="mt-0.5 block text-[11px] leading-snug text-tk-muted">
+            <span className="tnum font-bold text-tk-ink">
+              {done}/{statuses.length}
+            </span>{" "}
+            selesai hari ini
+          </span>        </span>
+      </div>
+    </button>
+  );
+}
+
+/* ---------------- D3. Kartu ORANGE — ibadah pendukung ---------------- */
+
+function KebaikanCard({
   today,
   onNavigate,
   onOpenSubpage,
@@ -228,194 +625,79 @@ function DailyOverview({
 }) {
   const settings = useWorshipStore((s) => s.settings);
   const log = useWorshipStore((s) => s.logs[today]);
-  const dailyGoals = useWorshipStore((s) => s.dailyGoals);
-  const prayerDetails = useWorshipStore((s) => s.prayerDetails);
-  const zikirSessions = useWorshipStore((s) => s.zikirSessions);
   const amalEntries = useWorshipStore((s) => s.amalEntries);
-  const goalDone = useWorshipStore((s) => s.goalDone);
+  const journal = useWorshipStore((s) => s.journal);
 
-  const prayersDone = PRAYER_ORDER.filter((p) => log?.prayers?.[p.id]).length;
   const quran = log?.quranPages ?? 0;
   const zikir = log?.zikirCount ?? 0;
-
-  const quranPct = Math.min(100, (quran / Math.max(1, settings.quranDailyTarget)) * 100);
-  const zikirPct = Math.min(100, (zikir / Math.max(1, settings.zikirTarget)) * 100);
-  const salatPct = (prayersDone / 5) * 100;
-  const overall = Math.round((salatPct + quranPct + zikirPct) / 3);
-  const recorded = [prayersDone > 0, quran > 0, zikir > 0].filter(Boolean).length;
-
-  const goalStatusesToday = useMemo(
-    () =>
-      goalStatuses(dailyGoals, today, {
-        logs: useWorshipStore.getState().logs,
-        prayerDetails,
-        zikirSessions,
-        amalEntries,
-        goalDone,
-        subuhOntime: null,
-      }),
-    [dailyGoals, today, prayerDetails, zikirSessions, amalEntries, goalDone]
-  );
-  const goalsDone = goalStatusesToday.filter((g) => g.done).length;
+  const amal = amalEntries.filter((a) => a.date === today).length;
+  const jurnal = journal[today]?.items.filter(Boolean).length ?? 0;
 
   const rows = [
     {
-      label: "Salat lima waktu",
-      value: `${prayersDone}/5`,
-      pct: salatPct,
-      onClick: () => onNavigate("sholat"),
-    },
-    {
-      label: "Bacaan Al-Qur'an",
+      label: "Al-Qur'an",
       value: `${quran}/${settings.quranDailyTarget} hlm`,
-      pct: quranPct,
-      onClick: () => onNavigate("quran"),
+      done: quran >= settings.quranDailyTarget && settings.quranDailyTarget > 0,
+      go: () => onNavigate("quran"),
     },
     {
-      label: "Zikir hari ini",
+      label: "Zikir & Doa",
       value: zikir.toLocaleString("id-ID"),
-      pct: zikirPct,
-      onClick: () => onOpenSubpage("zikir-doa"),
+      done: zikir >= settings.zikirTarget && settings.zikirTarget > 0,
+      go: () => onOpenSubpage("zikir-doa"),
+    },
+    {
+      label: "Amal",
+      value: `${amal} amal`,
+      done: amal > 0,
+      go: () => onOpenSubpage("rizq-amal"),
+    },
+    {
+      label: "Jurnal",
+      value: jurnal > 0 ? `${jurnal} syukur` : "kosong",
+      done: jurnal > 0,
+      go: () => onOpenSubpage("jurnal"),
     },
   ];
 
   return (
-    <section aria-label="Ringkasan ibadah hari ini" className="animate-tz-fade-up">
-      <SectionHeader
-        title="Ibadah Hari Ini"
-        caption="Semua yang kamu catat sejak bangun pagi"
-        action={
-          <button
-            type="button"
-            onClick={() => onNavigate("progress")}
-            className="tap flex items-center gap-0.5 text-[12px] font-bold text-tz-accent"
-          >
-            Analitik <ChevronRight size={14} />
-          </button>
-        }
-      />
-
-      <div className="glass rounded-[1.5rem] p-4 sm:p-5">
-        <div className="flex items-center gap-5 sm:gap-7">
-          {/* Cincin persentase — ORANGE */}
-          <div className="relative inline-flex shrink-0 items-center justify-center" style={{ width: 96, height: 96 }}>
-            <svg width={96} height={96} className="-rotate-90">
-              <circle cx={48} cy={48} r={42} fill="none" strokeWidth={8} className="stroke-tz-track" />
-              <circle
-                cx={48}
-                cy={48}
-                r={42}
-                fill="none"
-                strokeWidth={8}
-                strokeLinecap="round"
-                className="stroke-tz-violet"
-                strokeDasharray={`${(Math.max(0, Math.min(100, overall)) / 100) * 2 * Math.PI * 42} ${2 * Math.PI * 42}`}
-                style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.22, 1, 0.36, 1)" }}
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="v5-display text-[24px] font-extrabold leading-none text-tz-ink">{overall}%</span>
-              <span className="mt-1 text-[9px] font-bold uppercase tracking-[0.14em] text-tz-muted">Hari ini</span>
-            </div>
-          </div>
-
-          {/* Baris aktivitas — hairline tipis */}
-          <div className="w-full min-w-0 flex-1">
-            {rows.map(({ label, value, pct, onClick }, i) => (
-              <button
-                key={label}
-                type="button"
-                onClick={onClick}
-                aria-label={`${label}: ${value} — buka detail`}
-                className={cn("tap block w-full py-2.5 text-left", i > 0 && "border-t border-tz-line-soft")}
+    <section aria-label="Ibadah pendukung hari ini" className="glass-hero flex h-full flex-col rounded-[1.4rem] p-4">
+      <p className="text-[13.5px] font-bold tracking-[-0.01em] text-white">Kebaikan Hari Ini</p>
+      <ul className="mt-2.5 flex-1 space-y-2" role="group">
+        {rows.map(({ label, value, done, go }) => (
+          <li key={label}>
+            <button
+              type="button"
+              onClick={go}
+              aria-label={`${label}: ${value} — buka`}
+              className="tap flex w-full items-center gap-2 text-left"
+            >
+              <span
+                aria-hidden
+                className={cn(
+                  "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-white/45",
+                  done && "border-white bg-white"
+                )}
               >
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="truncate text-[12.5px] font-medium text-tz-ink/90">{label}</span>
-                  <span className="tnum shrink-0 text-[13px] font-bold text-tz-ink">{value}</span>
-                </div>
-                <ProgressBar value={pct} className="mt-1.5 h-1" />
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <p className="mt-4 border-t border-tz-line-soft pt-3 text-[11px] leading-relaxed text-tz-muted">
-          <span className="tnum font-bold text-tz-ink">{recorded}</span> jenis aktivitas tercatat · target harian{" "}
-          <span className="tnum font-bold text-tz-ink">
-            {goalsDone}/{goalStatusesToday.length}
-          </span>
-        </p>
-      </div>
+                {done ? <Check size={10} strokeWidth={3.2} className="text-tk-violet" /> : null}
+              </span>
+              <span className="min-w-0 flex-1 truncate text-[11.5px] font-medium text-white/95">{label}</span>
+              <span className="tnum shrink-0 whitespace-nowrap text-[9.5px] font-bold text-white/85">{value}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2.5 flex items-center gap-1 border-t border-white/20 pt-2.5 text-[10.5px] font-medium text-white/80">
+        <Sparkles size={10} className="shrink-0" />
+        Ketuk untuk mencatat
+      </p>
     </section>
   );
 }
 
-/* ---------------- G. Pekan Ini — batang tipis ---------------- */
+/* ---------------- E. Tugas Hari Ini — kartu abu terang gaya referensi ---------------- */
 
-function WeeklyBars({ today }: { today: string }) {
-  const logs = useWorshipStore((s) => s.logs);
-  /** Senin-minggu pekan ini (kronologis) — tanggal lokal dari lib dates. */
-  const week = useMemo(() => {
-    const now = new Date();
-    const dow = (now.getDay() + 6) % 7; // Senin = 0
-    return Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow + i);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-      const count = Object.values(logs[key]?.prayers ?? {}).filter(Boolean).length;
-      return { key, label: ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"][i], count, isToday: key === today, isFuture: key > today };
-    });
-  }, [logs, today]);
-
-  const total = week.reduce((a, w) => a + w.count, 0);
-  const best = Math.max(1, ...week.map((w) => w.count));
-
-  return (
-    <section aria-label="Pekan ini" className="animate-tz-fade-up">
-      <SectionHeader
-        title="Pekan Ini"
-        caption="Konsistensi salat tujuh hari terakhir"
-        action={<span className="tnum text-[12px] font-bold text-tz-ink">{total} salat</span>}
-      />
-      <div className="glass rounded-[1.5rem] p-4">
-        <div className="grid grid-cols-7 gap-2 sm:gap-3" role="group" aria-label="Salat tercatat per hari pekan ini">
-          {week.map(({ label, count, isToday, isFuture }) => (
-            <div key={label} className="flex flex-col items-center gap-2">
-              <span
-                className={cn(
-                  "tnum text-[10.5px] font-bold leading-none",
-                  isFuture ? "text-transparent" : count > 0 ? "text-tz-ink" : "text-tz-deep"
-                )}
-              >
-                {count === 0 ? "–" : count}
-              </span>
-              <div aria-hidden className="flex h-[62px] w-full items-end justify-center">
-                <span
-                  className={cn(
-                    "tz-bar-grow w-full max-w-[24px] rounded-full",
-                    count === 0 ? "h-[3px] bg-tz-track" : isToday ? "bg-tz-violet" : "bg-tz-line-strong"
-                  )}
-                  style={{ height: count === 0 ? 3 : `${Math.max(8, (count / best) * 100)}%` }}
-                />
-              </div>
-              <span
-                className={cn(
-                  "text-[10px] font-semibold leading-none",
-                  isToday ? "font-bold text-tz-ink" : isFuture ? "text-tz-deep" : "text-tz-muted"
-                )}
-              >
-                {label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------- E. Target Hari Ini — daftar periksa "Today's Task" ---------------- */
-
-function DailyJourney({ today }: { today: string }) {
+function TodayTasks({ today }: { today: string }) {
   const dailyGoals = useWorshipStore((s) => s.dailyGoals);
   const logs = useWorshipStore((s) => s.logs);
   const prayerDetails = useWorshipStore((s) => s.prayerDetails);
@@ -427,6 +709,7 @@ function DailyJourney({ today }: { today: string }) {
   const addDailyGoal = useWorshipStore((s) => s.addDailyGoal);
   const deleteDailyGoal = useWorshipStore((s) => s.deleteDailyGoal);
 
+  const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
 
@@ -444,75 +727,72 @@ function DailyJourney({ today }: { today: string }) {
   );
 
   const doneCount = statuses.filter((s) => s.done).length;
-  const pct = statuses.length > 0 ? Math.round((doneCount / statuses.length) * 100) : 0;
+  const visible = expanded ? statuses : statuses.slice(0, 3);
 
   return (
-    <section aria-label="Target harian" className="animate-tz-fade-up">
-      <SectionHeader
-        title="Target Hari Ini"
-        caption="Perjalanan kecil yang menjaga istiqamah — bukan penilaian diri"
-        action={
-          <span className="tnum text-[12px] font-bold text-tz-ink">
-            {doneCount}/{statuses.length}
-          </span>
-        }
-      />
-      <div className="glass overflow-hidden rounded-[1.5rem]">
-        <div className="px-4 pt-3.5">
-          <ProgressBar value={pct} className="h-1" />
-        </div>
-        <ul role="group" aria-label="Daftar target harian" className="mt-1 px-1 pb-1">
-          {statuses.map(({ goal, done, auto }) => (
-            <li key={goal.id}>
-              <button
-                type="button"
-                role="checkbox"
-                aria-checked={done}
-                aria-label={`Target: ${goal.label} — ${done ? "tercapai" : "belum tercapai"}`}
-                onClick={() => {
-                  // Target otomatis yang sudah tercapai dari catatan nyata tidak
-                  // bisa "dibatalkan" lewat ketukan — beri penjelasan, jangan
-                  // biarkan tombol terasa mati.
-                  if (goal.auto && done) {
-                    toast.info("Target ini tercapai otomatis dari catatan ibadahmu hari ini");
-                    return;
-                  }
-                  toggleGoalDone(today, goal.id);
-                  if (!done && goal.auto === "amal-hari-ini") {
-                    toast.success("MasyaAllah, satu kebaikan tercatat hari ini");
-                  }
-                }}
-                className="tap flex w-full items-center gap-3.5 rounded-[1rem] px-3 py-3 text-left"
-              >
-                <span
-                  aria-hidden
-                  className={cn(
-                    "flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full transition-all",
-                    done ? "bg-tz-violet text-white" : "border-[1.5px] border-dashed border-tz-line-strong text-transparent"
-                  )}
-                >
-                  <Check size={12} strokeWidth={3} />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className={cn("block text-[13.5px] leading-snug", done ? "font-semibold text-tz-ink" : "font-medium text-tz-ink/85")}>
-                    {goal.label}
-                  </span>
-                  {auto ? (
-                    <span className="mt-0.5 block text-[10px] font-medium text-tz-deep">
-                      Otomatis dari catatan ibadahmu
-                    </span>
-                  ) : null}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
+    <section aria-label="Tugas hari ini" className="animate-tk-fade-up">
+      <div className="mb-3 flex items-end justify-between gap-3 px-0.5">
+        <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Tugas Hari Ini</h2>
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          className="tap flex shrink-0 items-center gap-0.5 text-[12px] font-bold text-tk-accent"
+        >
+          {expanded ? "Tutup" : "Lihat semua"} {!expanded ? <ChevronRight size={14} /> : null}
+        </button>
       </div>
 
-      {/* Editor target */}
+      <ul className="space-y-2.5" role="group" aria-label="Daftar tugas harian">
+        {visible.map(({ goal, done, auto }) => (
+          <li
+            key={goal.id}
+            className={cn(
+              "tk-card-light flex items-center gap-3 rounded-[1.15rem] px-4 py-3.5",
+              done && "opacity-80"
+            )}
+          >
+            <button
+              type="button"
+              role="checkbox"
+              aria-checked={done}
+              aria-label={`Tugas: ${goal.label} — ${done ? "tercapai" : "belum tercapai"}`}
+              onClick={() => {
+                // Target otomatis yang sudah tercapai dari catatan nyata tidak
+                // bisa "dibatalkan" lewat ketukan — beri penjelasan, jangan
+                // biarkan tombol terasa mati.
+                if (goal.auto && done) {
+                  toast.info("Tugas ini tercapai otomatis dari catatan ibadahmu hari ini");
+                  return;
+                }
+                toggleGoalDone(today, goal.id);
+                if (!done && goal.auto === "amal-hari-ini") {
+                  toast.success("MasyaAllah, satu kebaikan tercatat hari ini");
+                }
+              }}
+              className={cn(
+                "tap flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors",
+                done ? "bg-[#17171B] text-white" : "bg-[#17171B]/8 text-transparent hover:bg-[#17171B]/14"
+              )}
+            >
+              <Check size={14} strokeWidth={3} />
+            </button>
+            <span className="min-w-0 flex-1">
+              <span className={cn("block text-[13px] leading-snug", done ? "font-semibold text-[#17171B] line-through opacity-60" : "font-semibold text-[#17171B]")}>
+                {goal.label}
+              </span>
+              <span className={cn("mt-0.5 block text-[10.5px] font-medium", auto ? "text-[#8A8A91]" : "text-[#A4A4AA]")}>
+                {auto ? "Otomatis dari catatan ibadahmu" : "Tugas pribadi"}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      {/* Editor target — logika utuh dari v6 */}
       {editing ? (
-        <div className="tz-fade-in mt-3 space-y-2.5 rounded-[1.25rem] border border-tz-line bg-tz-panel-soft p-3.5">
-          <p className="v5-overline">Atur target harian</p>
+        <div className="tk-fade-in mt-3 space-y-2.5 rounded-[1.25rem] border border-tk-line bg-tk-panel-soft p-3.5">
+          <p className="gs-overline">Atur tugas harian</p>
           <ul className="space-y-1">
             {dailyGoals.map((g) => (
               <li key={g.id} className="flex items-center gap-2.5 py-1">
@@ -521,8 +801,8 @@ function DailyJourney({ today }: { today: string }) {
                   role="switch"
                   aria-checked={g.enabled}
                   onClick={() => toggleDailyGoalEnabled(g.id)}
-                  className={cn("tap relative h-5 w-9 shrink-0 rounded-full transition-colors", g.enabled ? "bg-tz-violet" : "bg-tz-track")}
-                  aria-label={`${g.enabled ? "Matikan" : "Aktifkan"} target ${g.label}`}
+                  className={cn("tap relative h-5 w-9 shrink-0 rounded-full transition-colors", g.enabled ? "bg-tk-violet" : "bg-tk-track")}
+                  aria-label={`${g.enabled ? "Matikan" : "Aktifkan"} tugas ${g.label}`}
                 >
                   <span
                     aria-hidden
@@ -532,16 +812,16 @@ function DailyJourney({ today }: { today: string }) {
                     )}
                   />
                 </button>
-                <span className={cn("min-w-0 flex-1 truncate text-[12.5px]", g.enabled ? "text-tz-ink" : "text-tz-muted line-through")}>
+                <span className={cn("min-w-0 flex-1 truncate text-[12.5px]", g.enabled ? "text-tk-ink" : "text-tk-muted line-through")}>
                   {g.label}
                 </span>
                 {g.custom ? (
                   <ConfirmButton
-                    label={`Hapus target ${g.label}`}
-                    title={`Hapus target "${g.label}"?`}
-                    description="Target pribadi ini akan dihapus dari daftar. Catatan ibadah yang sudah ada tidak terpengaruh."
+                    label={`Hapus tugas ${g.label}`}
+                    title={`Hapus tugas "${g.label}"?`}
+                    description="Tugas pribadi ini akan dihapus dari daftar. Catatan ibadah yang sudah ada tidak terpengaruh."
                     onConfirm={() => deleteDailyGoal(g.id)}
-                    className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-[#E5484D]/10 hover:text-[#E5484D]"
+                    className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tk-muted/70 transition-colors hover:bg-[#E5484D]/10 hover:text-[#E5484D]"
                   >
                     <Trash2 size={13} />
                   </ConfirmButton>
@@ -561,20 +841,20 @@ function DailyJourney({ today }: { today: string }) {
                   setDraft("");
                 }
               }}
-              placeholder="Tambah target pribadi…"
-              aria-label="Tambah target pribadi"
-              className="tz-field flex-1 py-2 text-[12.5px]"
+              placeholder="Tambah tugas pribadi…"
+              aria-label="Tambah tugas pribadi"
+              className="tk-field flex-1 py-2 text-[12.5px]"
             />
             <button
               type="button"
-              aria-label="Simpan target baru"
+              aria-label="Simpan tugas baru"
               onClick={() => {
                 if (!draft.trim()) return;
                 addDailyGoal(draft);
                 setDraft("");
-                toast.success("Target pribadi ditambahkan");
+                toast.success("Tugas pribadi ditambahkan");
               }}
-              className="tap v5-ink-btn flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+              className="tap gs-ink-btn flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
             >
               <Plus size={16} />
             </button>
@@ -583,16 +863,16 @@ function DailyJourney({ today }: { today: string }) {
       ) : null}
 
       <div className="mt-3 flex items-center justify-between gap-3">
-        <p className="text-[10.5px] leading-relaxed text-tz-deep">
+        <p className="text-[10.5px] leading-relaxed text-tk-deep">
           {doneCount === statuses.length && statuses.length > 0
-            ? "MasyaAllah, semua target hari ini tercapai — syukur itu dari Allah."
-            : "Satu langkah kecil setiap hari sudah berarti."}
+            ? "MasyaAllah, semua tugas hari ini tercapai — syukur itu dari Allah."
+            : `Progress hari ini ${doneCount}/${statuses.length} — satu langkah kecil sudah berarti.`}
         </p>
         <button
           type="button"
           aria-expanded={editing}
           onClick={() => setEditing((v) => !v)}
-          className="tap flex shrink-0 items-center gap-1 rounded-full bg-tz-panel px-3 py-1.5 text-[11px] font-bold text-tz-ink"
+          className="tap flex shrink-0 items-center gap-1 rounded-full bg-tk-panel px-3 py-1.5 text-[11px] font-bold text-tk-ink"
         >
           <Settings2 size={12} /> Atur
         </button>
@@ -601,25 +881,23 @@ function DailyJourney({ today }: { today: string }) {
   );
 }
 
-/* ---------------- I. Doa Hari Ini — editorial ---------------- */
+/* ---------------- F. Doa hari ini + Daily Barakah — compact ---------------- */
 
-function DoaEditorial() {
+function DoaCompact() {
   const dua = duaOfTheDay(todayKey());
   return (
-    <section aria-label="Doa hari ini" className="animate-tz-fade-up glass rounded-[1.5rem] p-5">
-      <p className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-tz-accent">Doa Hari Ini</p>
-      {dua.title ? <p className="mt-2.5 text-[15px] font-bold tracking-[-0.01em] text-tz-ink">{dua.title}</p> : null}
-      {dua.arabic ? <p className="quran-arabic mt-4 text-right text-[24px] leading-[2.05] text-tz-ink">{dua.arabic}</p> : null}
+    <section aria-label="Doa hari ini" className="animate-tk-fade-up glass rounded-[1.4rem] p-4.5">
+      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-tk-accent">Doa Hari Ini</p>
+      {dua.title ? <p className="mt-2 text-[14.5px] font-bold tracking-[-0.01em] text-tk-ink">{dua.title}</p> : null}
+      {dua.arabic ? <p className="quran-arabic mt-3 text-right text-[22px] leading-[2] text-tk-ink">{dua.arabic}</p> : null}
       {dua.transliteration ? (
-        <p className="mt-3 text-[12.5px] italic leading-relaxed text-tz-muted">&ldquo;{dua.transliteration}&rdquo;</p>
+        <p className="mt-2.5 text-[12px] italic leading-relaxed text-tk-muted">&ldquo;{dua.transliteration}&rdquo;</p>
       ) : null}
-      <p className="mt-2.5 text-[13.5px] leading-relaxed text-tz-ink/90">{dua.meaning}</p>
-      {dua.source ? <p className="mt-3.5 text-[11px] font-semibold text-tz-accent">{dua.source}</p> : null}
+      <p className="mt-2 text-[13px] leading-relaxed text-tk-ink/90">{dua.meaning}</p>
+      {dua.source ? <p className="mt-3 text-[10.5px] font-semibold text-tk-accent">{dua.source}</p> : null}
     </section>
   );
 }
-
-/* ---------------- J. Daily Barakah — daftar bernomor ---------------- */
 
 function DailyBarakah() {
   const today = todayKey();
@@ -631,17 +909,19 @@ function DailyBarakah() {
     { label: "Target kecil", text: b.target },
   ];
   return (
-    <section aria-label="Daily Barakah" className="animate-tz-fade-up">
-      <SectionHeader title="Daily Barakah" caption="Pengingat & refleksi untuk hari ini" />
+    <section aria-label="Daily Barakah" className="animate-tk-fade-up">
+      <div className="mb-1 flex items-end justify-between gap-3 px-0.5">
+        <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Daily Barakah</h2>
+      </div>
       <ol>
         {rows.map(({ label, text }, i) => (
-          <li key={label} className={cn("flex items-start gap-4 py-3.5", i > 0 && "border-t border-tz-line-soft")}>
-            <span aria-hidden className="v5-display shrink-0 pt-0.5 text-[13px] font-bold text-tz-deep">
+          <li key={label} className={cn("flex items-start gap-4 py-3", i > 0 && "border-t border-tk-line-soft")}>
+            <span aria-hidden className="gs-display shrink-0 pt-0.5 text-[13px] font-bold text-tk-deep">
               {String(i + 1).padStart(2, "0")}
             </span>
             <span className="min-w-0">
-              <span className="block text-[10.5px] font-bold uppercase tracking-[0.16em] text-tz-accent">{label}</span>
-              <span className="mt-1 block text-[13px] leading-relaxed text-tz-ink/90">{text}</span>
+              <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-tk-accent">{label}</span>
+              <span className="mt-1 block text-[13px] leading-relaxed text-tk-ink/90">{text}</span>
             </span>
           </li>
         ))}
@@ -660,6 +940,11 @@ export function HomePage({
   onOpenSubpage: (sub: SubPageId) => void;
 }) {
   const settings = useWorshipStore((s) => s.settings);
+  const [reminderOpen, setReminderOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [monthOpen, setMonthOpen] = useState(false);
+  const [pickedDay, setPickedDay] = useState<string | null>(null);
+
   const greeting = (() => {
     const h = new Date().getHours();
     if (h >= 4 && h < 11) return "Selamat pagi";
@@ -669,92 +954,132 @@ export function HomePage({
   })();
 
   const today = useToday();
-  const hijri = formatHijri(new Date());
+  const now = new Date();
+  const hijri = formatHijri(now);
 
   return (
     <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
-      {/* ---------- A. Header personal ---------- */}
-      <header className="animate-tz-fade-up pt-1 lg:col-span-12">
-        <div className="flex items-center gap-4">
+      {/* ---------- A. Header: avatar / sapaan + nama / lonceng ---------- */}
+      <header className="animate-tk-fade-up pt-1 lg:col-span-12">
+        <div className="grid grid-cols-[52px_1fr_44px] items-center gap-3">
           <button type="button" aria-label="Buka profil" onClick={() => onNavigate("profil")} className="tap relative shrink-0">
             {settings.avatarDataUrl ? (
               <img
                 src={settings.avatarDataUrl}
                 alt={`Foto profil ${settings.name}`}
-                className="h-[52px] w-[52px] rounded-full object-cover ring-2 ring-tz-line-strong"
+                className="h-[52px] w-[52px] rounded-full object-cover ring-2 ring-tk-line-strong"
               />
             ) : (
-              <span className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-tz-panel-strong text-[18px] font-bold text-tz-ink ring-2 ring-tz-line-strong">
+              <span className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-tk-panel-strong text-[18px] font-bold text-tk-ink ring-2 ring-tk-line-strong">
                 {settings.name.trim().charAt(0).toUpperCase() || "T"}
               </span>
             )}
           </button>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] font-medium text-tz-muted">Assalamu&apos;alaikum, {greeting.toLowerCase()}</p>
-            <h1 className="truncate text-[22px] font-extrabold leading-tight tracking-[-0.03em] text-tz-ink sm:text-[26px]">
+          <div className="min-w-0 text-center">
+            <p className="truncate text-[12px] font-medium text-tk-muted">
+              Assalamu&apos;alaikum, {greeting.toLowerCase()}
+            </p>
+            <h1 className="truncate text-[19px] font-bold leading-tight tracking-[-0.02em] text-tk-ink">
               {settings.name || "Sahabat Tazkiya"}
             </h1>
           </div>
-          <div className="hidden shrink-0 text-right sm:block">
-            <p className="text-[11.5px] font-semibold text-tz-ink/90">{formatGregorian(new Date())}</p>
-            {hijri ? <p className="mt-0.5 text-[10.5px] font-medium text-tz-accent">{hijri}</p> : null}
-          </div>
+          <button
+            type="button"
+            aria-label="Buka pengingat ibadah"
+            onClick={() => setReminderOpen(true)}
+            className="tap flex h-[44px] w-[44px] items-center justify-center justify-self-end rounded-full bg-tk-panel-strong text-tk-ink"
+          >
+            <Bell size={19} strokeWidth={1.9} />
+          </button>
         </div>
-        <p className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11.5px] font-medium text-tz-muted sm:hidden">
-          <span>{formatGregorian(new Date())}</span>
+        <p className="mt-2.5 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 text-[11px] font-medium text-tk-muted">
+          <span>{formatGregorian(now)}</span>
           {hijri ? (
             <>
-              <span aria-hidden className="text-tz-line-strong">·</span>
-              <span className="text-tz-accent">{hijri}</span>
+              <span aria-hidden className="text-tk-line-strong">·</span>
+              <span className="font-semibold text-tk-accent">{hijri}</span>
             </>
           ) : null}
         </p>
       </header>
 
-      {/* ---------- B. Compact date selector ---------- */}
-      <div className="mt-5 lg:col-span-12">
-        <WeekDateStrip today={today} />
+      {/* ---------- B. Bar pencarian ---------- */}
+      <div className="mt-4 lg:col-span-12">
+        <button
+          type="button"
+          aria-label="Buka pencarian"
+          onClick={() => setSearchOpen(true)}
+          className="tap flex w-full items-center gap-3 rounded-full bg-tk-panel-strong px-4.5 py-3.5 text-left"
+        >
+          <Search size={17} className="shrink-0 text-tk-muted" />
+          <span className="text-[13.5px] text-tk-deep">Cari surah, aktivitas, catatan…</span>
+        </button>
       </div>
 
-      {/* ---------- C. Featured sholat berikutnya ---------- */}
-      <div className="mt-5 lg:col-span-12">
-        <NextPrayerHero today={today} />
+      {/* ---------- C. Jadwal Anda + dropdown bulan + pil bulat ---------- */}
+      <div className="mt-6 lg:col-span-12">
+        <div className="mb-3.5 flex items-center justify-between gap-3 px-0.5">
+          <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Jadwal Anda</h2>
+          <button
+            type="button"
+            aria-label="Buka kalender bulan"
+            aria-expanded={monthOpen}
+            onClick={() => setMonthOpen(true)}
+            className="tap flex shrink-0 items-center gap-1 text-[12.5px] font-bold text-tk-ink"
+          >
+            {MONTH_LABELS[now.getMonth()]} <ChevronDown size={14} className="text-tk-muted" />
+          </button>
+        </div>
+        <CircleDateStrip today={today} />
       </div>
 
-      {/* ---------- D. Ringkasan ibadah ---------- */}
-      <div className="mt-8 lg:col-span-7">
-        <DailyOverview today={today} onNavigate={onNavigate} onOpenSubpage={onOpenSubpage} />
+      {/* ---------- D. Trio kartu: putih+cincin | orange ---------- */}
+      <div className="mt-6 grid grid-cols-2 gap-3 lg:col-span-12">
+        <div className="flex flex-col gap-3">
+          <SalatCheckCard today={today} onNavigate={onNavigate} />
+          <RingCard today={today} onNavigate={onNavigate} />
+        </div>
+        <KebaikanCard today={today} onNavigate={onNavigate} onOpenSubpage={onOpenSubpage} />
+      </div>
+
+      {/* ---------- E. Tugas Hari Ini ---------- */}
+      <div className="mt-8 lg:col-span-12">
+        <TodayTasks today={today} />
       </div>
 
       {/* ---------- F. Mood check-in ---------- */}
-      <div className="mt-8 lg:col-span-5">
+      <div className="mt-8 lg:col-span-12">
         <MoodSection today={today} onOpenSubpage={onOpenSubpage} />
       </div>
 
-      {/* ---------- E. Target hari ini (Today's Task) ---------- */}
-      <div className="mt-8 lg:col-span-7">
-        <DailyJourney today={today} />
-      </div>
-
-      {/* ---------- H. Jelajahi aktivitas ---------- */}
-      <div className="mt-8 lg:col-span-5">
+      {/* ---------- G. Jelajahi aktivitas ---------- */}
+      <div className="mt-8 lg:col-span-12">
         <JelajahiAktivitas today={today} onOpen={onOpenSubpage} />
       </div>
 
-      {/* ---------- G. Pekan ini ---------- */}
-      <div className="mt-8 lg:col-span-7">
-        <WeeklyBars today={today} />
+      {/* ---------- H. Doa hari ini ---------- */}
+      <div className="mt-8 lg:col-span-12">
+        <DoaCompact />
       </div>
 
-      {/* ---------- I. Doa hari ini ---------- */}
-      <div className="mt-8 lg:col-span-5">
-        <DoaEditorial />
-      </div>
-
-      {/* ---------- J. Daily Barakah ---------- */}
+      {/* ---------- I. Daily Barakah ---------- */}
       <div className="mt-8 lg:col-span-12">
         <DailyBarakah />
       </div>
+
+      {/* ---------- Sheets ---------- */}
+      {reminderOpen ? <ReminderSheet today={today} onClose={() => setReminderOpen(false)} /> : null}
+      {searchOpen ? (
+        <SearchSheet onClose={() => setSearchOpen(false)} onNavigate={onNavigate} onOpenSubpage={onOpenSubpage} />
+      ) : null}
+      {monthOpen ? (
+        <MonthSheet
+          today={today}
+          onClose={() => setMonthOpen(false)}
+          onPickDay={(key) => setPickedDay(key)}
+        />
+      ) : null}
+      {pickedDay ? <DayDetailSheet date={pickedDay} onClose={() => setPickedDay(null)} /> : null}
     </div>
   );
 }

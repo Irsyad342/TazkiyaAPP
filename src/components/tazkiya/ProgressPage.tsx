@@ -113,11 +113,11 @@ function statusForOf(
 /** Baris statistik editorial: angka besar Outfit + label kecil, sekat hairline. */
 function StatRow({ items }: { items: { value: number | string; label: string }[] }) {
   return (
-    <div className="grid grid-cols-3 divide-x divide-tz-line">
+    <div className="grid grid-cols-3 divide-x divide-tk-line">
       {items.map(({ value, label }, i) => (
         <div key={label} className={cn("px-3 text-center sm:px-5", i === 0 && "pl-0 text-left")}>
-          <p className="tnum font-display text-[24px] font-bold leading-none tracking-tight text-tz-ink sm:text-[28px]">{value}</p>
-          <p className="mt-1 text-[9.5px] font-semibold uppercase tracking-[0.1em] text-tz-muted">{label}</p>
+          <p className="tnum font-display text-[24px] font-bold leading-none tracking-tight text-tk-ink sm:text-[28px]">{value}</p>
+          <p className="mt-1 text-[9.5px] font-semibold uppercase tracking-[0.1em] text-tk-muted">{label}</p>
         </div>
       ))}
     </div>
@@ -234,10 +234,10 @@ export function ProgressPage() {
   return (
     <div className="space-y-6">
       {/* ---------- Judul ---------- */}
-      <header className="animate-tz-fade-up pt-1">
+      <header className="animate-tk-fade-up pt-1">
         <div>
-          <h1 className="text-[28px] font-extrabold tracking-[-0.03em] text-tz-ink">Progress</h1>
-          <p className="mt-1 text-[12.5px] text-tz-muted">Perjalanan ibadahmu — satu langkah kecil setiap hari</p>
+          <h1 className="text-[28px] font-extrabold tracking-[-0.03em] text-tk-ink">Progress</h1>
+          <p className="mt-1 text-[12.5px] text-tk-muted">Perjalanan ibadahmu — satu langkah kecil setiap hari</p>
         </div>
       </header>
 
@@ -255,21 +255,21 @@ export function ProgressPage() {
 
       {/* ================= HARI INI ================= */}
       {period === "harian" ? (
-        <div key="harian" className="tz-fade-in lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
+        <div key="harian" className="tk-fade-in lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
           <div className="space-y-5 lg:col-span-7">
             {/* Panel analitik utama: cincin + baris statistik */}
-            <GlassCard className="animate-tz-fade-up p-5">
+            <GlassCard className="animate-tk-fade-up p-5">
               <div className="flex flex-col items-center gap-6 sm:flex-row sm:gap-7">
                 <ProgressRing value={barsIn ? todayPct : 0} size={128} stroke={11} className="shrink-0">
-                  <span className="tnum font-display text-[30px] font-bold leading-none text-tz-ink">{todayPct}%</span>
-                  <span className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-tz-muted">terlaksana</span>
+                  <span className="tnum font-display text-[30px] font-bold leading-none text-tk-ink">{todayPct}%</span>
+                  <span className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-tk-muted">terlaksana</span>
                 </ProgressRing>
                 <div className="w-full min-w-0 flex-1">
-                  <p className="font-display text-[15px] font-bold text-tz-ink">Progres Ibadah Hari Ini</p>
-                  <p className="mt-0.5 text-[11.5px] leading-snug text-tz-muted">
+                  <p className="font-display text-[15px] font-bold text-tk-ink">Progres Ibadah Hari Ini</p>
+                  <p className="mt-0.5 text-[11.5px] leading-snug text-tk-muted">
                     {todayScore.done} dari {todayScore.total} ibadah terlaksana
                   </p>
-                  <div className="mt-4 border-t border-tz-line pt-3.5">
+                  <div className="mt-4 border-t border-tk-line pt-3.5">
                     <StatRow
                       items={[
                         { value: streak, label: "hari beruntun" },
@@ -280,7 +280,7 @@ export function ProgressPage() {
                   </div>
                 </div>
               </div>
-              <p className="mt-4 text-[10.5px] leading-tight text-tz-muted">
+              <p className="mt-4 text-[10.5px] leading-tight text-tk-muted">
                 Terus bertumbuh dalam istiqamah — setiap catatan hari ini berarti.
               </p>
             </GlassCard>
@@ -293,26 +293,26 @@ export function ProgressPage() {
                   {/* Salat */}
                   <li>
                     <div className="flex items-center justify-between gap-2">
-                      <p className="flex items-center gap-2 text-[12.5px] font-bold text-tz-ink">
-                        <span aria-hidden className="flex h-7 w-7 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                      <p className="flex items-center gap-2 text-[12.5px] font-bold text-tk-ink">
+                        <span aria-hidden className="flex h-7 w-7 items-center justify-center rounded-full bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent">
                           <Activity size={13} />
                         </span>
                         Salat
                       </p>
-                      <p className="tnum text-[12px] font-bold text-tz-ink">{salatDone}/5</p>
+                      <p className="tnum text-[12px] font-bold text-tk-ink">{salatDone}/5</p>
                     </div>
                     <ProgressBar value={(salatDone / 5) * 100} className="mt-2 h-1.5" />
                   </li>
                   {/* Al-Qur'an */}
                   <li>
                     <div className="flex items-center justify-between gap-2">
-                      <p className="flex items-center gap-2 text-[12.5px] font-bold text-tz-ink">
-                        <span aria-hidden className="flex h-7 w-7 items-center justify-center rounded-full bg-tz-blue-soft text-tz-blue dark:bg-tz-blue/20 dark:text-[#aebcff]">
+                      <p className="flex items-center gap-2 text-[12.5px] font-bold text-tk-ink">
+                        <span aria-hidden className="flex h-7 w-7 items-center justify-center rounded-full bg-tk-blue-soft text-tk-blue dark:bg-tk-blue/20 dark:text-[#aebcff]">
                           <BookOpen size={13} />
                         </span>
                         Bacaan Al-Qur&apos;an
                       </p>
-                      <p className="tnum text-[12px] font-bold text-tz-ink">
+                      <p className="tnum text-[12px] font-bold text-tk-ink">
                         {(todayLog?.quranPages ?? 0).toLocaleString("id-ID")} hlm · {(todayLog?.quranVerses ?? 0).toLocaleString("id-ID")} ayat
                       </p>
                     </div>
@@ -321,34 +321,34 @@ export function ProgressPage() {
                   {/* Zikir */}
                   <li>
                     <div className="flex items-center justify-between gap-2">
-                      <p className="flex items-center gap-2 text-[12.5px] font-bold text-tz-ink">
-                        <span aria-hidden className="flex h-7 w-7 items-center justify-center rounded-full bg-tz-lime/40 text-tz-lime-ink dark:bg-tz-lime/15 dark:text-tz-lime">
+                      <p className="flex items-center gap-2 text-[12.5px] font-bold text-tk-ink">
+                        <span aria-hidden className="flex h-7 w-7 items-center justify-center rounded-full bg-tk-lime/40 text-tk-lime-ink dark:bg-tk-lime/15 dark:text-tk-lime">
                           <CircleDot size={13} />
                         </span>
                         Zikir
                       </p>
-                      <p className="tnum text-[12px] font-bold text-tz-ink">
+                      <p className="tnum text-[12px] font-bold text-tk-ink">
                         {(todayLog?.zikirCount ?? 0).toLocaleString("id-ID")} / {settings.zikirTarget.toLocaleString("id-ID")}
                       </p>
                     </div>
-                    <ProgressBar value={zikirPct} className="mt-2 h-1.5" fillClass="bg-tz-lime" />
+                    <ProgressBar value={zikirPct} className="mt-2 h-1.5" fillClass="bg-tk-lime" />
                   </li>
                   {/* Target harian */}
                   <li>
                     <div className="flex items-center justify-between gap-2">
-                      <p className="flex items-center gap-2 text-[12.5px] font-bold text-tz-ink">
-                        <span aria-hidden className="flex h-7 w-7 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                      <p className="flex items-center gap-2 text-[12.5px] font-bold text-tk-ink">
+                        <span aria-hidden className="flex h-7 w-7 items-center justify-center rounded-full bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent">
                           <Target size={13} />
                         </span>
                         Target Harian
                       </p>
-                      <p className="tnum text-[12px] font-bold text-tz-ink">
+                      <p className="tnum text-[12px] font-bold text-tk-ink">
                         {goalsDone}/{goalStats.length}
                       </p>
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1">
                       {goalStats.map((g) => (
-                        <Chip key={g.goal.id} className={cn(g.done ? "border-tz-violet/35 bg-tz-lavender/60 text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent" : "border-tz-line")}>
+                        <Chip key={g.goal.id} className={cn(g.done ? "border-tk-violet/35 bg-tk-lavender/60 text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent" : "border-tk-line")}>
                           {g.done ? "✓" : "○"} {g.goal.label.length > 18 ? `${g.goal.label.slice(0, 18)}…` : g.goal.label}
                         </Chip>
                       ))}
@@ -357,20 +357,20 @@ export function ProgressPage() {
                 </ul>
 
                 {/* Amal & Jurnal: dua statistik inline */}
-                <div className="mt-5 grid grid-cols-2 gap-3 border-t border-tz-line pt-4">
+                <div className="mt-5 grid grid-cols-2 gap-3 border-t border-tk-line pt-4">
                   <div>
-                    <span aria-hidden className="flex h-8 w-8 items-center justify-center rounded-full bg-tz-green-soft text-tz-green">
+                    <span aria-hidden className="flex h-8 w-8 items-center justify-center rounded-full bg-tk-green-soft text-tk-green">
                       <HandCoins size={15} />
                     </span>
-                    <p className="tnum mt-2 font-display text-[26px] font-bold leading-none text-tz-ink">{todayAmal}</p>
-                    <p className="mt-1 text-[10.5px] leading-tight text-tz-muted">kebaikan dicatat hari ini</p>
+                    <p className="tnum mt-2 font-display text-[26px] font-bold leading-none text-tk-ink">{todayAmal}</p>
+                    <p className="mt-1 text-[10.5px] leading-tight text-tk-muted">kebaikan dicatat hari ini</p>
                   </div>
                   <div>
-                    <span aria-hidden className="flex h-8 w-8 items-center justify-center rounded-full bg-tz-blue-soft text-tz-blue dark:bg-tz-blue/20 dark:text-[#aebcff]">
+                    <span aria-hidden className="flex h-8 w-8 items-center justify-center rounded-full bg-tk-blue-soft text-tk-blue dark:bg-tk-blue/20 dark:text-[#aebcff]">
                       <BookHeart size={15} />
                     </span>
-                    <p className="mt-2 font-display text-[26px] font-bold leading-none text-tz-ink">{journal[today] ? "✓" : "–"}</p>
-                    <p className="mt-1 text-[10.5px] leading-tight text-tz-muted">
+                    <p className="mt-2 font-display text-[26px] font-bold leading-none text-tk-ink">{journal[today] ? "✓" : "–"}</p>
+                    <p className="mt-1 text-[10.5px] leading-tight text-tk-muted">
                       {journal[today] ? `Jurnal syukur tersimpan${todayMood ? ` · mood ${moodLabel(todayMood)}` : ""}` : "Jurnal syukur belum diisi"}
                     </p>
                   </div>
@@ -381,17 +381,17 @@ export function ProgressPage() {
 
           {/* Panel kanan desktop: dua statistik — blok editorial, bukan kartu kembar */}
           <div className="mt-5 space-y-5 lg:col-span-5 lg:mt-0">
-            <div className="rounded-[1.75rem] bg-tz-lavender p-5">
-              <p className="v5-overline">Streak</p>
-              <p className="v5-display mt-3 text-[44px] font-extrabold leading-none text-tz-ink">{streak}</p>
-              <p className="mt-1.5 text-[12px] font-semibold text-tz-ink/80">Hari beruntun 5 salat</p>
-              <p className="mt-1 text-[10.5px] leading-relaxed text-tz-muted">Salah satu ukuran — bukan satu-satunya.</p>
+            <div className="rounded-[1.75rem] bg-tk-lavender p-5">
+              <p className="gs-overline">Streak</p>
+              <p className="gs-display mt-3 text-[44px] font-extrabold leading-none text-tk-ink">{streak}</p>
+              <p className="mt-1.5 text-[12px] font-semibold text-tk-ink/80">Hari beruntun 5 salat</p>
+              <p className="mt-1 text-[10.5px] leading-relaxed text-tk-muted">Salah satu ukuran — bukan satu-satunya.</p>
             </div>
             <div className="glass rounded-[1.75rem] p-5">
-              <p className="v5-overline">Minggu ini</p>
-              <p className="v5-display mt-3 text-[44px] font-extrabold leading-none text-tz-ink">{weekStreak}</p>
-              <p className="mt-1.5 text-[12px] font-semibold text-tz-ink/80">Hari lengkap minggu ini</p>
-              <p className="mt-1 text-[10.5px] leading-relaxed text-tz-muted">Hari dengan seluruh salat wajib tercatat.</p>
+              <p className="gs-overline">Minggu ini</p>
+              <p className="gs-display mt-3 text-[44px] font-extrabold leading-none text-tk-ink">{weekStreak}</p>
+              <p className="mt-1.5 text-[12px] font-semibold text-tk-ink/80">Hari lengkap minggu ini</p>
+              <p className="mt-1 text-[10.5px] leading-relaxed text-tk-muted">Hari dengan seluruh salat wajib tercatat.</p>
             </div>
           </div>
         </div>
@@ -399,7 +399,7 @@ export function ProgressPage() {
 
       {/* ================= MINGGUAN ================= */}
       {period === "mingguan" ? (
-        <div key="mingguan" className="tz-fade-in lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
+        <div key="mingguan" className="tk-fade-in lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
           <div className="space-y-5 lg:col-span-7">
             {/* Pola salat 7 hari */}
             <section aria-label="Pola salat minggu ini">
@@ -422,46 +422,46 @@ export function ProgressPage() {
                         aria-label={`Rincian ${isToday ? "hari ini" : relativeDayLabel(d.date, today)} — ${d.done} salat terlaksana`}
                         className={cn("flex h-full flex-1 cursor-pointer flex-col items-center gap-1.5", isFuture && "opacity-45")}
                       >
-                        <span className={cn("tnum text-[9.5px] font-bold", isToday ? "text-tz-ink" : "text-tz-muted/80")}>
+                        <span className={cn("tnum text-[9.5px] font-bold", isToday ? "text-tk-ink" : "text-tk-muted/80")}>
                           {d.done > 0 ? d.done : ""}
                         </span>
                         <div className="flex min-h-0 w-full flex-1 items-end">
-                          <div className="mx-auto flex h-full w-full max-w-[26px] flex-col justify-end overflow-hidden rounded-full bg-tz-panel-soft">
+                          <div className="mx-auto flex h-full w-full max-w-[26px] flex-col justify-end overflow-hidden rounded-full bg-tk-panel-soft">
                             {totalH > 0 ? (
                               <div
-                                className="tz-bar-grow flex w-full flex-col justify-end"
+                                className="tk-bar-grow flex w-full flex-col justify-end"
                                 style={{ height: barsIn ? `${Math.max(6, totalH)}%` : "0%", transitionDelay: `${idx * 55}ms` }}
                               >
-                                {jamaahH > 0.5 ? <span className="w-full shrink-0 bg-tz-violet" style={{ height: `${(jamaahH / totalH) * 100}%` }} /> : null}
-                                {mandiriH > 0.5 ? <span className="w-full shrink-0 bg-tz-violet/45" style={{ height: `${(mandiriH / totalH) * 100}%` }} /> : null}
-                                {missedH > 0.5 ? <span className="w-full shrink-0 bg-tz-amber/60" style={{ height: `${(missedH / totalH) * 100}%` }} /> : null}
-                                {unrecH > 0.5 ? <span className="w-full shrink-0 border-t border-dashed border-tz-line-strong bg-tz-track" style={{ height: `${(unrecH / totalH) * 100}%` }} /> : null}
+                                {jamaahH > 0.5 ? <span className="w-full shrink-0 bg-tk-violet" style={{ height: `${(jamaahH / totalH) * 100}%` }} /> : null}
+                                {mandiriH > 0.5 ? <span className="w-full shrink-0 bg-tk-violet/45" style={{ height: `${(mandiriH / totalH) * 100}%` }} /> : null}
+                                {missedH > 0.5 ? <span className="w-full shrink-0 bg-tk-amber/60" style={{ height: `${(missedH / totalH) * 100}%` }} /> : null}
+                                {unrecH > 0.5 ? <span className="w-full shrink-0 border-t border-dashed border-tk-line-strong bg-tk-track" style={{ height: `${(unrecH / totalH) * 100}%` }} /> : null}
                               </div>
                             ) : (
-                              <span className="w-full border-t border-dashed border-tz-line-strong" />
+                              <span className="w-full border-t border-dashed border-tk-line-strong" />
                             )}
                           </div>
                         </div>
-                        <span className={cn("text-[10px] leading-tight", isToday ? "font-bold text-tz-ink" : "text-tz-muted")}>
+                        <span className={cn("text-[10px] leading-tight", isToday ? "font-bold text-tk-ink" : "text-tk-muted")}>
                           {weekdayShort(d.date)}
-                          <span className={cn("tnum block text-[8.5px]", isToday ? "font-semibold text-tz-ink/80" : "text-tz-muted/70")}>{d.date.slice(-2)}</span>
+                          <span className={cn("tnum block text-[8.5px]", isToday ? "font-semibold text-tk-ink/80" : "text-tk-muted/70")}>{d.date.slice(-2)}</span>
                         </span>
                       </button>
                     );
                   })}
                 </div>
-                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-tz-line pt-3 text-[9.5px] text-tz-muted">
+                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-tk-line pt-3 text-[9.5px] text-tk-muted">
                   <span className="flex items-center gap-1">
-                    <span aria-hidden className="h-2 w-2 rounded-full bg-tz-violet" /> Berjamaah
+                    <span aria-hidden className="h-2 w-2 rounded-full bg-tk-violet" /> Berjamaah
                   </span>
                   <span className="flex items-center gap-1">
-                    <span aria-hidden className="h-2 w-2 rounded-full bg-tz-violet/45" /> Mandiri
+                    <span aria-hidden className="h-2 w-2 rounded-full bg-tk-violet/45" /> Mandiri
                   </span>
                   <span className="flex items-center gap-1">
-                    <span aria-hidden className="h-2 w-2 rounded-full bg-tz-amber/60" /> Tidak dilaksanakan
+                    <span aria-hidden className="h-2 w-2 rounded-full bg-tk-amber/60" /> Tidak dilaksanakan
                   </span>
                   <span className="flex items-center gap-1">
-                    <span aria-hidden className="h-2 w-2 rounded-full border border-dashed border-tz-line-strong" /> Belum dicatat
+                    <span aria-hidden className="h-2 w-2 rounded-full border border-dashed border-tk-line-strong" /> Belum dicatat
                   </span>
                 </div>
               </GlassCard>
@@ -470,7 +470,7 @@ export function ProgressPage() {
             {/* Ringkasan kategori mingguan — baris daftar */}
             <section aria-label="Ringkasan kategori mingguan">
               <SectionHeader title="Aktivitas Minggu Ini" caption="Setiap kategori punya jalannya sendiri" />
-              <GlassCard className="divide-y divide-tz-line-soft">
+              <GlassCard className="divide-y divide-tk-line-soft">
                 {[
                   { icon: BookOpen, label: "Al-Qur'an", value: `${weekQuran.pages.toLocaleString("id-ID")} halaman · ${weekQuran.verses.toLocaleString("id-ID")} ayat` },
                   { icon: CircleDot, label: "Zikir", value: `${weekQuran.zikir.toLocaleString("id-ID")} hitungan` },
@@ -478,15 +478,15 @@ export function ProgressPage() {
                   { icon: HandCoins, label: "Amal & Sedekah", value: `${weekAmal} kebaikan` },
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label} className="flex items-center gap-3 px-4 py-3">
-                    <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">
+                    <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent">
                       <Icon size={15} />
                     </span>
-                    <p className="min-w-0 flex-1 text-[12.5px] font-semibold text-tz-ink">{label}</p>
-                    <p className="shrink-0 text-[12px] font-bold text-tz-ink/85">{value}</p>
+                    <p className="min-w-0 flex-1 text-[12.5px] font-semibold text-tk-ink">{label}</p>
+                    <p className="shrink-0 text-[12px] font-bold text-tk-ink/85">{value}</p>
                   </div>
                 ))}
               </GlassCard>
-              <p className="mt-2 px-1 text-[10px] leading-relaxed text-tz-muted/80">
+              <p className="mt-2 px-1 text-[10px] leading-relaxed text-tk-muted/80">
                 Hari tanpa catatan tidak dihitung sebagai hari gagal — ia hanya hari yang belum mempunyai catatan.
               </p>
             </section>
@@ -503,7 +503,7 @@ export function ProgressPage() {
                     type="button"
                     aria-label="Minggu sebelumnya"
                     onClick={() => setWeekOffset((w) => w - 1)}
-                    className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tz-line bg-tz-panel-soft text-tz-muted"
+                    className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tk-line bg-tk-panel-soft text-tk-muted"
                   >
                     ‹
                   </button>
@@ -512,7 +512,7 @@ export function ProgressPage() {
                     aria-label="Minggu berikutnya"
                     disabled={!canGoNextWeek}
                     onClick={() => canGoNextWeek && setWeekOffset((w) => w + 1)}
-                    className={cn("tap flex h-8 w-8 items-center justify-center rounded-full border border-tz-line bg-tz-panel-soft text-tz-muted", !canGoNextWeek && "opacity-30")}
+                    className={cn("tap flex h-8 w-8 items-center justify-center rounded-full border border-tk-line bg-tk-panel-soft text-tk-muted", !canGoNextWeek && "opacity-30")}
                   >
                     ›
                   </button>
@@ -523,27 +523,27 @@ export function ProgressPage() {
               <div className="grid grid-cols-7 gap-1.5">
                 {weekDays.map((d) => {
                   const dotCls = !d.hasData
-                    ? "border border-dashed border-tz-line-strong"
+                    ? "border border-dashed border-tk-line-strong"
                     : d.jamaah > 0
-                      ? "bg-tz-violet"
+                      ? "bg-tk-violet"
                       : d.mandiri > 0
-                        ? "bg-tz-violet/45"
-                        : "bg-tz-amber";
+                        ? "bg-tk-violet/45"
+                        : "bg-tk-amber";
                   return (
                     <button
                       key={d.key}
                       type="button"
                       onClick={() => !d.isFuture && setSelectedDate(d.key)}
                       aria-label={`Pilih ${formatDayFull(d.key)}`}
-                      className={cn("tap flex flex-col items-center gap-1.5 rounded-2xl px-0.5 py-2 transition-colors hover:bg-tz-panel-soft", d.isFuture && "opacity-40")}
+                      className={cn("tap flex flex-col items-center gap-1.5 rounded-2xl px-0.5 py-2 transition-colors hover:bg-tk-panel-soft", d.isFuture && "opacity-40")}
                     >
-                      <span className={cn("text-[9.5px] font-semibold uppercase", d.isToday ? "text-tz-violet" : "text-tz-muted")}>
+                      <span className={cn("text-[9.5px] font-semibold uppercase", d.isToday ? "text-tk-violet" : "text-tk-muted")}>
                         {weekdayShort(d.key)}
                       </span>
                       <span
                         className={cn(
                           "tnum flex h-9 w-9 items-center justify-center rounded-full text-[12px] font-bold transition-colors",
-                          d.isToday ? "v5-ink-btn" : "bg-tz-panel-soft text-tz-ink/85"
+                          d.isToday ? "gs-ink-btn" : "bg-tk-panel-soft text-tk-ink/85"
                         )}
                       >
                         {Number(d.key.slice(-2))}
@@ -553,7 +553,7 @@ export function ProgressPage() {
                   );
                 })}
               </div>
-              <p className="mt-3 border-t border-tz-line pt-2.5 text-[10px] leading-relaxed text-tz-muted">
+              <p className="mt-3 border-t border-tk-line pt-2.5 text-[10px] leading-relaxed text-tk-muted">
                 Titik menunjukkan cara salat terbanyak hari itu: orange penuh = berjamaah, orange redup = mandiri,
                 amber = ada yang tidak dilaksanakan.
               </p>
@@ -564,7 +564,7 @@ export function ProgressPage() {
 
       {/* ================= BULANAN ================= */}
       {period === "bulanan" ? (
-        <div key="bulanan" className="tz-fade-in lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
+        <div key="bulanan" className="tk-fade-in lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
           <div className="space-y-5 lg:col-span-7">
             <section aria-label="Ringkasan bulanan">
               <GlassCard className="p-5">
@@ -588,7 +588,7 @@ export function ProgressPage() {
                       type="button"
                       aria-label="Bulan sebelumnya"
                       onClick={() => setMonthOffset((m) => m - 1)}
-                      className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tz-line bg-tz-panel-soft text-tz-muted"
+                      className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tk-line bg-tk-panel-soft text-tk-muted"
                     >
                       ‹
                     </button>
@@ -597,7 +597,7 @@ export function ProgressPage() {
                       aria-label="Bulan berikutnya"
                       disabled={!canGoNextMonth}
                       onClick={() => canGoNextMonth && setMonthOffset((m) => m + 1)}
-                      className={cn("tap flex h-8 w-8 items-center justify-center rounded-full border border-tz-line bg-tz-panel-soft text-tz-muted", !canGoNextMonth && "opacity-30")}
+                      className={cn("tap flex h-8 w-8 items-center justify-center rounded-full border border-tk-line bg-tk-panel-soft text-tk-muted", !canGoNextMonth && "opacity-30")}
                     >
                       ›
                     </button>
@@ -608,7 +608,7 @@ export function ProgressPage() {
                 {/* Heatmap pil: skala lavender + cincin hari ini */}
                 <div className="grid grid-cols-7 gap-x-1 gap-y-2 text-center">
                   {DAY_LABELS.map((d) => (
-                    <span key={d} className="pb-1 text-[10px] font-bold uppercase tracking-wide text-tz-muted/80">
+                    <span key={d} className="pb-1 text-[10px] font-bold uppercase tracking-wide text-tk-muted/80">
                       {d}
                     </span>
                   ))}
@@ -617,11 +617,11 @@ export function ProgressPage() {
                     const intensity = cell.done / 5;
                     let tint: string | undefined;
                     if (!cell.isFuture && cell.hasData) {
-                      if (cell.jamaah > 0) tint = `color-mix(in srgb, var(--color-tz-violet) ${Math.round(16 + intensity * 66)}%, transparent)`;
-                      else if (cell.mandiri > 0) tint = `color-mix(in srgb, var(--color-tz-violet) ${Math.round(10 + intensity * 40)}%, transparent)`;
-                      else tint = `color-mix(in srgb, var(--color-tz-amber) ${Math.round(12 + (cell.missed / 5) * 30)}%, transparent)`;
+                      if (cell.jamaah > 0) tint = `color-mix(in srgb, var(--color-tk-violet) ${Math.round(16 + intensity * 66)}%, transparent)`;
+                      else if (cell.mandiri > 0) tint = `color-mix(in srgb, var(--color-tk-violet) ${Math.round(10 + intensity * 40)}%, transparent)`;
+                      else tint = `color-mix(in srgb, var(--color-tk-amber) ${Math.round(12 + (cell.missed / 5) * 30)}%, transparent)`;
                     } else if (!cell.isFuture) {
-                      tint = "var(--tz-empty-cell)";
+                      tint = "var(--tk-empty-cell)";
                     }
                     return (
                       <button
@@ -633,14 +633,14 @@ export function ProgressPage() {
                         }}
                         className={cn(
                           "tap relative flex aspect-[3/4] flex-col items-center justify-center rounded-[0.9rem] text-[11px] font-semibold transition-colors",
-                          cell.isFuture ? "opacity-35" : "text-tz-ink/90",
-                          cell.isToday && "ring-2 ring-tz-violet"
+                          cell.isFuture ? "opacity-35" : "text-tk-ink/90",
+                          cell.isToday && "ring-2 ring-tk-violet"
                         )}
                         style={{ background: tint }}
                       >
                         <span className="tnum leading-none">{cell.day}</span>
                         {cell.hasData && !cell.isFuture ? (
-                          <span aria-hidden className={cn("mt-1 h-[4px] w-[4px] rounded-full", cell.jamaah > 0 ? "bg-white" : "bg-tz-violet")} />
+                          <span aria-hidden className={cn("mt-1 h-[4px] w-[4px] rounded-full", cell.jamaah > 0 ? "bg-white" : "bg-tk-violet")} />
                         ) : (
                           <span aria-hidden className="mt-1 h-[4px] w-[4px] rounded-full bg-transparent" />
                         )}
@@ -650,25 +650,25 @@ export function ProgressPage() {
                 </div>
 
                 {/* Ringkasan tanggal terpilih */}
-                <div key={selectedDate} className="tz-fade-in mt-4 rounded-2xl bg-tz-panel-soft p-3.5">
+                <div key={selectedDate} className="tk-fade-in mt-4 rounded-2xl bg-tk-panel-soft p-3.5">
                   {selFuture ? (
-                    <p className="text-center text-[11.5px] leading-relaxed text-tz-muted">
+                    <p className="text-center text-[11.5px] leading-relaxed text-tk-muted">
                       Tanggal ini belum berjalan — belum ada catatan, bukan hari gagal.
                     </p>
                   ) : selStatus.hasData || (selLog && ((selLog.quranPages ?? 0) > 0 || (selLog.quranVerses ?? 0) > 0 || (selLog.zikirCount ?? 0) > 0)) ? (
                     <>
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-[12.5px] font-bold text-tz-ink">{relativeDayLabel(selectedDate, today)}</p>
-                        <p className="text-[10px] text-tz-muted">{formatDayFull(selectedDate)}</p>
+                        <p className="text-[12.5px] font-bold text-tk-ink">{relativeDayLabel(selectedDate, today)}</p>
+                        <p className="text-[10px] text-tk-muted">{formatDayFull(selectedDate)}</p>
                       </div>
                       <div className="mt-2 flex flex-wrap gap-1.5">
-                        <Chip className="border-tz-violet/30 bg-tz-lavender/60 text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">Berjamaah {selStatus.jamaah}</Chip>
-                        <Chip className="border-tz-line">Mandiri {selStatus.mandiri}</Chip>
+                        <Chip className="border-tk-violet/30 bg-tk-lavender/60 text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent">Berjamaah {selStatus.jamaah}</Chip>
+                        <Chip className="border-tk-line">Mandiri {selStatus.mandiri}</Chip>
                         {selStatus.missed > 0 ? (
-                          <Chip className="border-tz-amber/40 bg-tz-amber-soft text-tz-amber">Tidak dilaksanakan {selStatus.missed}</Chip>
+                          <Chip className="border-tk-amber/40 bg-tk-amber-soft text-tk-amber">Tidak dilaksanakan {selStatus.missed}</Chip>
                         ) : null}
                       </div>
-                      <p className="mt-2 text-[10.5px] leading-relaxed text-tz-muted">
+                      <p className="mt-2 text-[10.5px] leading-relaxed text-tk-muted">
                         Al-Qur&apos;an:{" "}
                         {selLog && ((selLog.quranPages ?? 0) > 0 || (selLog.quranVerses ?? 0) > 0)
                           ? `${selLog.quranPages.toLocaleString("id-ID")} hlm · ${selLog.quranVerses.toLocaleString("id-ID")} ayat`
@@ -679,7 +679,7 @@ export function ProgressPage() {
                       </p>
                     </>
                   ) : (
-                    <p className="text-center text-[11.5px] leading-relaxed text-tz-muted">
+                    <p className="text-center text-[11.5px] leading-relaxed text-tk-muted">
                       {relativeDayLabel(selectedDate, today)} — belum ada catatan ibadah (bukan hari gagal).
                     </p>
                   )}
@@ -696,15 +696,15 @@ export function ProgressPage() {
                   <span
                     className={cn(
                       "tnum flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10.5px] font-bold",
-                      idx === 0 ? "v5-ink-btn" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
+                      idx === 0 ? "gs-ink-btn" : "bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent"
                     )}
                   >
                     {idx + 1}
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="mb-1 flex items-center justify-between gap-2">
-                      <p className="truncate text-xs font-semibold text-tz-ink/90">{a.label}</p>
-                      <p className="tnum text-[11px] font-bold text-tz-muted">{a.count}x</p>
+                      <p className="truncate text-xs font-semibold text-tk-ink/90">{a.label}</p>
+                      <p className="tnum text-[11px] font-bold text-tk-muted">{a.count}x</p>
                     </div>
                     <ProgressBar value={(a.count / maxActivity) * 100} className="h-1.5" />
                   </div>
@@ -715,7 +715,7 @@ export function ProgressPage() {
         </div>
       ) : null}
 
-      <p className="flex items-center justify-center gap-1.5 pb-1 text-center text-[10px] text-tz-muted/60">
+      <p className="flex items-center justify-center gap-1.5 pb-1 text-center text-[10px] text-tk-muted/60">
         <CalendarDays size={11} />
         Progress dihitung langsung dari catatan ibadah Anda — bukan perkiraan.
       </p>
