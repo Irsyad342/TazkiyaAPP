@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Tazkiya — Zikir & Doa (halaman tersendiri dari menu Lainnya).
+ * Tazkiya — Zikir & Doa (halaman tersendiri dari Beranda).
  * Tab Zikir: tasbih digital (dengan slot zikir), set zikir pagi/petang/
  * setelah salat/harian dengan teks bersumber, dan riwayat sesi zikir.
  * Tab Doa: Doa Hari Ini (fitur lama, diintegrasi) + kategori doa dengan
@@ -40,11 +40,11 @@ function ZikirSetCard({ set, onOpenTasbih }: { set: ZikirSet; onOpenTasbih: (slo
         aria-expanded={open}
         className="tap flex w-full items-center gap-3 px-4 py-3.5 text-left"
       >
-        <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-tz-violet/25 bg-tz-violet/12 text-tz-violet">
+        <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-tz-violet/12 text-tz-violet">
           <Sparkles size={17} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[14px] font-bold text-tz-ink">{set.title}</span>
+          <span className="block text-[14px] font-extrabold text-tz-ink">{set.title}</span>
           <span className="block truncate text-[11px] text-tz-muted">{set.caption}</span>
         </span>
         <ChevronDown size={16} className={cn("shrink-0 text-tz-muted/70 transition-transform", open && "rotate-180")} />
@@ -54,13 +54,13 @@ function ZikirSetCard({ set, onOpenTasbih }: { set: ZikirSet; onOpenTasbih: (slo
           <ul className="divide-y divide-tz-line-soft">
             {set.items.map((it) => (
               <li key={it.id} className="px-4 py-3.5">
-                {it.name ? <p className="text-[11px] font-bold uppercase tracking-wide text-tz-accent">{it.name}</p> : null}
+                {it.name ? <p className="text-[11px] font-extrabold uppercase tracking-wide text-tz-accent">{it.name}</p> : null}
                 {it.arabic ? <p className="quran-arabic mt-1.5 text-right text-[19px] leading-[1.95] text-tz-ink">{it.arabic}</p> : null}
                 <p className="mt-1.5 text-[12px] font-semibold italic leading-relaxed text-tz-muted">{it.latin}</p>
                 {it.meaning ? <p className="mt-1 text-[11.5px] leading-relaxed text-tz-ink/90">{it.meaning}</p> : null}
                 <div className="mt-2 flex flex-wrap gap-1.5">
-                  {it.count ? <Chip className="border-tz-violet/25 bg-tz-violet/10 text-tz-accent">{it.count}</Chip> : null}
-                  {it.source ? <Chip className="border-tz-line">{it.source}</Chip> : null}
+                  {it.count ? <Chip className="bg-tz-lime/40 font-bold text-tz-lime-ink">{it.count}</Chip> : null}
+                  {it.source ? <Chip>{it.source}</Chip> : null}
                 </div>
               </li>
             ))}
@@ -69,11 +69,11 @@ function ZikirSetCard({ set, onOpenTasbih }: { set: ZikirSet; onOpenTasbih: (slo
             <button
               type="button"
               onClick={() => onOpenTasbih(set.slot)}
-              className="tap flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-tz-purple to-tz-violet text-[12.5px] font-semibold text-white shadow-[0_6px_18px_-6px_rgba(85,51,154,0.9)]"
+              className="tap tz-btn-ink flex min-h-[42px] w-full items-center justify-center gap-2 rounded-full text-[12.5px] font-bold"
             >
               <CircleDot size={15} /> Buka tasbih — {set.title.toLowerCase()}
             </button>
-            <p className="mt-1.5 text-center text-[9.5px] text-tz-muted/80">
+            <p className="mt-1.5 text-center text-[9.5px] text-tz-muted/85">
               Hitungan yang disimpan akan tercatat sebagai {SLOT_LABEL[set.slot].toLowerCase()}.
             </p>
           </div>
@@ -93,13 +93,13 @@ function DoaCard({ title, arabic, transliteration, meaning, source }: {
 }) {
   return (
     <GlassCard className="p-4">
-      <p className="text-[13px] font-bold text-tz-ink">{title}</p>
+      <p className="text-[13px] font-extrabold text-tz-ink">{title}</p>
       {arabic ? <p className="quran-arabic mt-2.5 text-right text-[19px] leading-[1.95] text-tz-ink">{arabic}</p> : null}
       {transliteration ? <p className="mt-1.5 text-[11.5px] italic leading-relaxed text-tz-muted">&ldquo;{transliteration}&rdquo;</p> : null}
       <p className="mt-1.5 text-[12px] leading-relaxed text-tz-ink/90">{meaning}</p>
       {source ? (
         <div className="mt-2.5">
-          <Chip className="border-tz-violet/25 bg-tz-violet/10 text-tz-accent">{source}</Chip>
+          <Chip className="bg-tz-violet/12 font-bold text-tz-accent">{source}</Chip>
         </div>
       ) : null}
     </GlassCard>
@@ -135,7 +135,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
       <SubPageHeader title="Zikir & Doa" caption="Pengingat hati — pagi, petang, dan sepanjang hari" onBack={onBack} />
 
       {/* Tab */}
-      <div className="grid grid-cols-2 gap-1.5 rounded-xl border border-tz-line bg-tz-panel-soft p-1.5" role="tablist" aria-label="Bagian zikir dan doa">
+      <div className="grid grid-cols-2 gap-1.5 rounded-full border border-tz-line bg-tz-panel-soft p-1.5" role="tablist" aria-label="Bagian zikir dan doa">
         {(
           [
             { id: "zikir" as const, label: "Zikir", icon: CircleDot },
@@ -149,10 +149,8 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
             aria-selected={tab === id}
             onClick={() => setTab(id)}
             className={cn(
-              "tap flex min-h-[40px] items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all",
-              tab === id
-                ? "bg-gradient-to-r from-tz-purple to-tz-violet text-white shadow-[0_4px_14px_-4px_rgba(85,51,154,0.8)]"
-                : "text-tz-muted hover:text-tz-accent"
+              "tap flex min-h-[40px] items-center justify-center gap-1.5 rounded-full text-[13px] font-bold transition-all",
+              tab === id ? "tz-btn-ink" : "text-tz-muted hover:text-tz-accent"
             )}
           >
             <Icon size={15} /> {label}
@@ -163,23 +161,23 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
       {tab === "zikir" ? (
         <div key="zikir" className="tz-fade-in space-y-5">
           {/* Tasbih digital */}
-          <GlassCard variant="clean" className="tap cursor-pointer p-5" onClick={() => onOpenTasbih("harian")}>
+          <GlassCard className="tap cursor-pointer p-5" onClick={() => onOpenTasbih("harian")}>
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-tz-muted">Tasbih Digital</p>
-                <p className="mt-1 truncate text-[13px] font-semibold text-tz-ink">{tasbih.dhikr}</p>
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-tz-muted">Tasbih Digital</p>
+                <p className="mt-1 truncate text-[13px] font-bold text-tz-ink">{tasbih.dhikr}</p>
                 <p className="mt-0.5 text-[11px] text-tz-muted">
                   {tasbih.count.toLocaleString("id-ID")} / {tasbih.target.toLocaleString("id-ID")} hitungan
                 </p>
               </div>
               <span
                 aria-hidden
-                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-tz-violet/40 bg-gradient-to-br from-tz-violet/40 to-tz-purple/30 font-display text-[17px] font-extrabold text-white"
+                className="tz-stat flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-tz-lime text-[17px] text-tz-lime-ink"
               >
                 {tasbih.count}
               </span>
             </div>
-            <p className="mt-3 text-[10.5px] leading-relaxed text-tz-muted/85">
+            <p className="mt-3 text-[10.5px] leading-relaxed text-tz-muted/90">
               Ketuk kartu untuk berzikir. Tombol “Simpan Harian” di dalam tasbih mencatat hitungan ke hari ini dan riwayat.
             </p>
           </GlassCard>
@@ -206,11 +204,11 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
                 <ul className="divide-y divide-tz-line-soft">
                   {zikirSessions.slice(0, 25).map((s) => (
                     <li key={s.id} className="flex items-center gap-3 px-4 py-2.5">
-                      <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-tz-violet/25 bg-tz-violet/12 text-tz-violet">
+                      <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-tz-violet/12 text-tz-violet">
                         <CircleDot size={14} />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[12.5px] font-semibold text-tz-ink">
+                        <span className="block truncate text-[12.5px] font-bold text-tz-ink">
                           {s.count.toLocaleString("id-ID")}× {s.dhikr}
                         </span>
                         <span className="block text-[10px] text-tz-muted">
@@ -229,11 +227,11 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
           {/* Doa Hari Ini — fitur lama dipertahankan & diintegrasikan */}
           <GlassCard variant="violet" className="p-5">
             <div className="flex items-center gap-2.5">
-              <span aria-hidden className="flex h-9 w-9 items-center justify-center rounded-xl border border-tz-lavender/25 bg-tz-lavender/12 text-tz-lavender">
+              <span aria-hidden className="flex h-9 w-9 items-center justify-center rounded-xl bg-tz-violet/12 text-tz-violet">
                 <BookOpen size={16} />
               </span>
               <div className="min-w-0">
-                <p className="font-display text-[15px] font-bold text-tz-ink">Doa Hari Ini</p>
+                <p className="font-display text-[15px] font-extrabold text-tz-ink">Doa Hari Ini</p>
                 <p className="text-[10.5px] text-tz-muted">{dua.title}</p>
               </div>
             </div>
@@ -242,7 +240,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
             <p className="mt-2 text-[12px] leading-relaxed text-tz-ink/95">{dua.meaning}</p>
             {dua.source ? (
               <div className="mt-3">
-                <Chip className="border-tz-violet/30 bg-tz-violet/10 text-tz-accent">{dua.source}</Chip>
+                <Chip className="bg-tz-panel font-bold text-tz-accent">{dua.source}</Chip>
               </div>
             ) : null}
           </GlassCard>
@@ -256,9 +254,9 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
                 aria-pressed={cat === k.id}
                 onClick={() => setCat(k.id)}
                 className={cn(
-                  "tap shrink-0 rounded-full border px-3.5 py-1.5 text-[11.5px] font-semibold transition-all",
+                  "tap shrink-0 rounded-full border px-3.5 py-1.5 text-[11.5px] font-bold transition-all",
                   cat === k.id
-                    ? "border-tz-violet/60 bg-tz-violet text-white shadow-[0_4px_14px_-6px_rgba(85,51,154,0.9)]"
+                    ? "border-transparent bg-tz-ink text-white"
                     : "border-tz-line bg-tz-panel-soft text-tz-muted hover:text-tz-accent"
                 )}
               >
@@ -270,7 +268,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
 
           <div className="space-y-3">
             {doaList.length === 0 ? (
-              <p className="rounded-2xl border border-tz-line bg-tz-panel-soft px-4 py-5 text-center text-[12px] text-tz-muted">
+              <p className="rounded-2xl bg-tz-panel-soft px-4 py-5 text-center text-[12px] text-tz-muted">
                 Belum ada doa pada kategori ini.
               </p>
             ) : (
@@ -278,7 +276,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
             )}
           </div>
 
-          <p className="pb-1 text-center text-[10px] leading-relaxed text-tz-muted/60">
+          <p className="pb-1 text-center text-[10px] leading-relaxed text-tz-muted/70">
             Bacaan dikurasi dari Al-Qur&apos;an dan riwayat masyhur dengan sumber tertulis — tanpa teks karangan.
           </p>
         </div>

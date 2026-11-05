@@ -5,7 +5,7 @@
  * Modal/overlay di dalam aplikasi (bukan notifikasi sistem) dengan tiga
  * varian sesuai status yang benar-benar dipilih pengguna:
  *  - "jamaah"  → MasyaAllah! (ilustrasi masjid + kilau, aksen teal)
- *  - "mandiri" → Alhamdulillah! (bulan bintang, aksen biru)
+ *  - "mandiri" → Alhamdulillah! (bulan bintang, aksen lavender)
  *  - "missed"  → Tetap Semangat (hati lembut, aksen amber — menenangkan,
  *                bukan menghakimi)
  * Pesan memiliki beberapa variasi (dipilih acak sekali saat mount) agar
@@ -84,25 +84,25 @@ const VARIANT_ACCENT: Record<
   { badge: string; glow: string; spark: string; button: string; ring: string }
 > = {
   jamaah: {
-    badge: "border-teal-300/40 bg-gradient-to-br from-teal-400/25 to-emerald-500/12 text-teal-200 light:border-teal-500/30 light:from-teal-400/20 light:to-emerald-500/10 light:text-teal-600",
+    badge: "border border-teal-400/40 bg-teal-400/15 text-teal-600 light:border-teal-500/40 light:bg-teal-100 light:text-teal-700",
     glow: "bg-teal-400/25",
-    spark: "bg-teal-300 light:bg-teal-400",
-    button: "from-teal-500 to-emerald-500 shadow-[0_6px_18px_-6px_rgba(20,184,166,0.7),inset_0_1px_0_rgba(255,255,255,0.22)]",
-    ring: "shadow-[0_0_34px_-8px_rgba(45,212,191,0.55)]",
+    spark: "bg-teal-400 light:bg-teal-500",
+    button: "bg-teal-500 text-white shadow-[0_12px_28px_-12px_rgba(20,184,166,0.7)]",
+    ring: "",
   },
   mandiri: {
-    badge: "border-sky-300/40 bg-gradient-to-br from-sky-400/25 to-blue-500/12 text-sky-200 light:border-sky-500/30 light:from-sky-400/20 light:to-blue-500/10 light:text-sky-600",
-    glow: "bg-sky-400/25",
-    spark: "bg-sky-300 light:bg-sky-400",
-    button: "from-sky-500 to-blue-500 shadow-[0_6px_18px_-6px_rgba(14,165,233,0.7),inset_0_1px_0_rgba(255,255,255,0.22)]",
-    ring: "shadow-[0_0_34px_-8px_rgba(56,189,248,0.55)]",
+    badge: "border border-tz-violet/35 bg-tz-violet/12 text-tz-violet",
+    glow: "bg-tz-violet/20",
+    spark: "bg-tz-violet",
+    button: "tz-btn-ink",
+    ring: "",
   },
   missed: {
-    badge: "border-amber-300/40 bg-gradient-to-br from-amber-400/22 to-rose-400/10 text-amber-200 light:border-amber-500/30 light:from-amber-400/18 light:to-rose-400/10 light:text-amber-600",
-    glow: "bg-amber-400/22",
-    spark: "bg-amber-300 light:bg-amber-400",
-    button: "from-amber-500 to-orange-500 shadow-[0_6px_18px_-6px_rgba(245,158,11,0.65),inset_0_1px_0_rgba(255,255,255,0.22)]",
-    ring: "shadow-[0_0_34px_-8px_rgba(251,191,36,0.5)]",
+    badge: "border border-amber-400/40 bg-amber-400/15 text-amber-600 light:bg-amber-100 light:text-amber-700",
+    glow: "bg-amber-400/25",
+    spark: "bg-amber-400 light:bg-amber-500",
+    button: "bg-amber-500 text-white shadow-[0_12px_28px_-12px_rgba(245,158,11,0.6)]",
+    ring: "",
   },
 };
 
@@ -140,10 +140,10 @@ export function MotivationPopup({
       <DialogContent
         showCloseButton={false}
         aria-describedby={undefined}
-        className="glass-strong fixed! top-auto bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 translate-y-0 gap-3 overflow-y-auto rounded-t-[1.65rem] rounded-b-none border-x-0 border-b-0 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_-18px_60px_-12px_rgba(8,5,15,0.8)] duration-250 thin-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8"
+        className="glass-strong fixed! top-auto bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 translate-y-0 gap-3 overflow-y-auto rounded-t-[1.85rem] rounded-b-none border-x-0 border-b-0 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_-24px_70px_-20px_rgba(16,12,32,0.5)] duration-250 thin-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8"
       >
         {/* Pegangan sheet */}
-        <span aria-hidden className="mx-auto mb-0.5 block h-1 w-10 shrink-0 rounded-full bg-tz-line-strong/70" />
+        <span aria-hidden className="mx-auto mb-0.5 block h-1 w-10 shrink-0 rounded-full bg-tz-line-strong" />
 
         {/* ---------- Ilustrasi + kilau ---------- */}
         <div className="relative mx-auto mt-1 flex h-24 w-24 items-center justify-center">
@@ -151,9 +151,8 @@ export function MotivationPopup({
           <span
             aria-hidden
             className={cn(
-              "relative flex h-[76px] w-[76px] items-center justify-center rounded-[1.4rem] border",
-              accent.badge,
-              accent.ring
+              "relative flex h-[76px] w-[76px] items-center justify-center rounded-[1.5rem] border",
+              accent.badge
             )}
           >
             {variant === "jamaah" ? (
@@ -186,10 +185,10 @@ export function MotivationPopup({
         </div>
 
         <DialogHeader className="items-center text-center">
-          <DialogTitle className="font-display text-[22px] font-bold text-gradient-violet">
+          <DialogTitle className="tz-stat text-[22px] font-extrabold text-tz-ink">
             {MESSAGES[variant].title}
           </DialogTitle>
-          <p className="flex items-center justify-center gap-1.5 text-[11px] font-medium text-tz-muted">
+          <p className="flex items-center justify-center gap-1.5 text-[11px] font-semibold text-tz-muted">
             {prayerLabel} · {dateLabel}
           </p>
           <p className="mt-1 text-[12.5px] leading-relaxed text-tz-ink/90">{msg}</p>
@@ -199,7 +198,7 @@ export function MotivationPopup({
           type="button"
           onClick={onClose}
           className={cn(
-            "tap min-h-[44px] w-full rounded-xl bg-gradient-to-r text-sm font-semibold text-white transition-all",
+            "tap min-h-[44px] w-full rounded-full text-sm font-bold transition-all",
             accent.button
           )}
         >

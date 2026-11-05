@@ -660,3 +660,25 @@ Local `main` stale di Task 33; pekerjaan berlanjut di `fitur/nur-companion` (= o
 
 ### Pengujian (agent-browser, produksi build lokal; skrip di scripts/uji-final-*)
 14 alur lulus semua: (1) 5 menu utama tanpa Lainnya; (2) 3 highlight Beranda; (3) mood pilih→timpa→1 entri/hari→CTA; (4) simpan jurnal (+edit & scroll); (5) catat salat done+berjamaah (popup MasyaAllah); (6) ubah status mandiri (popup Alhamdulillah); (7) qada tambah→selesai→buka kembali→hapus (konfirmasi batal/ya); (8) Al-Qur'an bookmark ayat toggle + sesi otomatis (ayat 1–6) + penanda otomatis; (9) tasbih hitung→simpan harian (zikir 5 + sesi)→reset (konfirmasi, batal aman); (10) Progress 3 periode + DayDetailSheet; (11) edit nama profil tersimpan; (12) tema gelap↔terang; (13) modal buka/tutup (dialog salat Batal tak mengubah, TargetSheet, TasbihSheet, alert konfirmasi); (14) kartu akun & tautan /auth terverifikasi (login riil tidak dilakukan — tidak ada kredensial uji). Responsif 360/420/768/1280: tanpa scroll horizontal, nav & modal dalam layar, tombol simpan terjangkau. Light 360px baik. Konsol: 0 error. Temuan proses: server standalone lama menahan port 3000 sehingga bundle baru tak tersaji (dua kali) — diatasi kill proses + verifikasi chunk tersaji memuat string baru; skrip uji butuh native value setter React untuk input terkontrol.
+
+## Task 37 — Redesign Total v3 "Lavender & Lime" (branch `redesign/lavender-lime`, backup `backup/pre-redesign-20261105`)
+
+Transformasi visual menyeluruh sesuai 3 referensi (editorial productivity + Islamic lifestyle): palet baru (Primary Lavender #8879E8, Lime #D5F76A, bg terang #F7F7FC, gelap #15121D), tipografi Plus Jakarta Sans + Manrope (display) + Amiri Quran, kartu rounded 24–28px dengan bayangan lembut, tombol pill tinta, chip aktif lime, bottom nav floating pill dengan lingkaran aktif, tanpa glassmorphism gelap.
+
+### Yang berubah (presentation layer saja — logika/store/data tidak disentuh)
+- `globals.css` ditulis ulang: token `tz-*` dipetakan ke palet baru, kelas `glass*` kini kartu solid bersih, `.tz-btn-ink/lime/violet`, blob pastel, animasi hemat GPU; mode Liquid Glass kini kartu transparan-blur tipis.
+- `layout.tsx`: font display Sora → Manrope; theme-color #F7F7FC/#15121D.
+- Shell `page.tsx`: kanvas lavender, loading screen baru, Toaster restyle; semua logika tema/anim/Capacitor/sub-halaman dipertahankan.
+- `BottomNav`: floating pill, item aktif lingkaran tinta + label; `ui-bits`: SectionHeader editorial, IconBox pastel (+tone lime), ProgressBar lime, ProgressRing gradasi lavender→lime, EmptyState, ConfirmButton.
+- Beranda: header editorial (nama besar), hero Sholat Berikutnya gradasi lavender + chip countdown lime + timeline 5 titik, strip 3 statistik angka-dominan, Daily Journey (cek lime), MoodSection kartu putih + CTA tinta, Jelajahi Aktivitas editorial (blok lime Jurnal Syukur + kartu lavender Zikir & Doa + kartu putih Rizq & Amal), Daily Barakah lavender, Doa Hari Ini.
+- Al-Qur'an: kartu target hero lavender (angka besar + bar lime), tombol "Mulai Membaca" tinta dengan aksen lime, sorotan violet, grid surah/juz putih; Reader: kepala putih bersih, kartu bismillah hero, terjemahan dalam panel lembut, penanda nomor ayat lavender, bookmark lime; semua logika sesi otomatis/bookmark/pengaturan utuh.
+- Sholat: tab segmented pill tinta, ring lavender→lime, baris salat (ikon lime bila selesai), kalender bulanan (berjamaah teal / mandiri lavender / terlewat amber, ring hari ini), Qada (tombol "Sudah diqada" lime), PrayerRecordDialog sheet baru.
+- Progress: tab pill, ring skor, kategori (bar lime), pola salat bertumpuk (teal/lavender/amber), strip minggu + kalender bulanan, kebiasaan bulanan.
+- Profil: kartu hero lavender (avatar ring putih + badge kamera lime, tombol pill kaca putih), Fokus Ibadah (indikator lime), Akun/Target/Riwayat/Pengingat/Lokasi/Preferensi/Tentang restyle; pratinjau tema baru.
+- Sub-halaman & sheet: Jurnal Syukur, Zikir & Doa, Rizq & Amal, TasbihSheet (piringan cincin lavender→lime, tombol simpan lime), TargetSheet, MotivationPopup (aksen teal/lavender/amber), AuthGate, halaman /auth (kartu putih + segmented pill + tombol tinta).
+
+### Dipertahankan (tidak berubah)
+Store `tazkiya-store-v1` + merge/partialize, Supabase auth & sync (RLS, migrasi, gabung anti-duplikat), jadwal salat GPS (prayerTimes), kalender Hijriah, logika Qada, sumber ayat/hadis/doa/zikir, semua angka dari data nyata + empty state.
+
+### Pengujian
+tsc --noEmit: bersih · ESLint src: bersih · `next build` sukses (6/6 halaman). agent-browser (produksi build lokal, 390px; juga 360/768 tanpa overflow horizontal): navigasi 5 menu + sub-halaman; mood check-in tersimpan; catat Subuh done+berjamaah (popup MasyaAllah, status "Terlambat · dilaksanakan" muncul sesuai jam); tasbih 3 hitungan → Simpan Harian (sesi 1, zikirCount 3, count reset); jurnal simpan; qada tambah; persistensi localStorage setelah reload; tema light↔dark; 0 error console/halaman. Screenshot light+dark semua halaman tersimpan di `download/screenshots/`.

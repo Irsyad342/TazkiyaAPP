@@ -1,9 +1,10 @@
 "use client";
 
 /**
- * Tazkiya — Komponen visual dasar bergaya Dark Purple Glassmorphism.
- * Variant "clean" (Task 33): kartu solid bersih ala dashboard modern
- * (referensi Iconiy) — permukaan datar + bayangan lembut, dua tema.
+ * Tazkiya — Komponen visual dasar (design system "Lavender & Lime").
+ * Kartu permukaan bersih dengan sudut besar, aksen lime untuk progres &
+ * keberhasilan, ikon dalam wadah pastel. API komponen dipertahankan dari
+ * versi sebelumnya agar seluruh halaman tetap kompatibel.
  */
 
 import { useId, type ReactNode } from "react";
@@ -95,7 +96,7 @@ export function ConfirmButton({
           {children}
         </button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="glass-strong max-w-[320px]! rounded-[1.4rem]! border-tz-line p-5!">
+      <AlertDialogContent className="glass-strong max-w-[320px]! rounded-[1.5rem]! border-tz-line p-5!">
         <AlertDialogHeader className="gap-1.5!">
           <AlertDialogTitle className="font-display! text-[16px]! text-tz-ink">{title}</AlertDialogTitle>
           <AlertDialogDescription className="text-[12px]! leading-relaxed! text-tz-muted">
@@ -103,12 +104,12 @@ export function ConfirmButton({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-row! gap-2!">
-          <AlertDialogCancel className="mt-0! min-h-[42px] flex-1 rounded-xl border-tz-line bg-tz-panel-soft text-[13px] font-semibold text-tz-muted">
+          <AlertDialogCancel className="mt-0! min-h-[42px] flex-1 rounded-2xl border-tz-line bg-tz-panel-soft text-[13px] font-semibold text-tz-muted">
             Batal
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
-            className="mt-0! min-h-[42px] flex-1 rounded-xl bg-rose-500 text-[13px] font-semibold text-white hover:bg-rose-500/90"
+            className="mt-0! min-h-[42px] flex-1 rounded-2xl bg-rose-500 text-[13px] font-semibold text-white hover:bg-rose-500/90"
           >
             {confirmLabel}
           </AlertDialogAction>
@@ -132,17 +133,12 @@ export function SectionHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("mb-3 flex items-center justify-between gap-3 px-1", className)}>
-      <div className="flex min-w-0 items-center gap-2.5">
-        <span aria-hidden className="w-1 shrink-0 self-stretch rounded-full bg-tz-violet" />
-        <div className="min-w-0">
-          <h2 className="font-display text-[16px] font-semibold tracking-tight text-tz-ink">{title}</h2>
-          {caption ? <p className="mt-0.5 text-[11px] leading-snug text-tz-muted">{caption}</p> : null}
-        </div>
+    <div className={cn("mb-3 flex items-end justify-between gap-3 px-0.5", className)}>
+      <div className="min-w-0">
+        <h2 className="font-display text-[17px] font-extrabold tracking-tight text-tz-ink">{title}</h2>
+        {caption ? <p className="mt-0.5 text-[11px] leading-snug text-tz-muted">{caption}</p> : null}
       </div>
-      {action ? (
-        <div className="flex shrink-0 items-center whitespace-nowrap">{action}</div>
-      ) : null}
+      {action ? <div className="flex shrink-0 items-center whitespace-nowrap">{action}</div> : null}
     </div>
   );
 }
@@ -156,7 +152,7 @@ export function IconBox({
   className,
 }: {
   children: ReactNode;
-  tone?: "violet" | "solid" | "ghost" | "lavender";
+  tone?: "violet" | "solid" | "ghost" | "lavender" | "lime";
   size?: "xs" | "sm" | "md" | "lg";
   className?: string;
 }) {
@@ -165,19 +161,21 @@ export function IconBox({
       className={cn(
         "flex shrink-0 items-center justify-center",
         size === "xs"
-          ? "h-7 w-7 rounded-lg [&>svg]:h-3.5 [&>svg]:w-3.5"
+          ? "h-7 w-7 rounded-[0.55rem] [&>svg]:h-3.5 [&>svg]:w-3.5"
           : size === "sm"
             ? "h-9 w-9 rounded-xl [&>svg]:h-4 [&>svg]:w-4"
             : size === "lg"
               ? "h-12 w-12 rounded-2xl [&>svg]:h-[22px] [&>svg]:w-[22px]"
-              : "h-10 w-10 rounded-[0.8rem] [&>svg]:h-[18px] [&>svg]:w-[18px]",
+              : "h-10 w-10 rounded-[0.85rem] [&>svg]:h-[18px] [&>svg]:w-[18px]",
         tone === "solid"
-          ? "border border-tz-violet bg-tz-violet text-white"
+          ? "bg-tz-violet text-white light:text-white"
           : tone === "ghost"
-            ? "border border-tz-line bg-tz-panel text-tz-muted"
+            ? "bg-tz-panel-soft text-tz-muted"
             : tone === "lavender"
-              ? "border border-tz-lavender/25 bg-tz-lavender/12 text-tz-lavender"
-              : "border border-tz-violet/25 bg-tz-violet/12 text-tz-violet",
+              ? "bg-tz-lavender/25 text-tz-violet light:bg-tz-lavender/30 light:text-[#6c5bd4]"
+              : tone === "lime"
+                ? "bg-tz-lime text-tz-lime-ink"
+                : "bg-tz-violet/12 text-tz-violet",
         className
       )}
     >
@@ -195,8 +193,8 @@ export function ProgressRing({
   children,
   className,
   trackClass = "stroke-tz-track",
-  from = "#9C72EF",
-  to = "#D8C5FF",
+  from = "#8879E8",
+  to = "#D5F76A",
 }: {
   value: number; // 0..100
   size?: number;
@@ -248,7 +246,7 @@ export function ProgressBar({ value, className, fillClass }: { value: number; cl
   return (
     <div className={cn("h-2 w-full overflow-hidden rounded-full bg-tz-track", className)}>
       <div
-        className={cn("h-full rounded-full bg-gradient-to-r from-tz-purple via-tz-violet to-tz-lavender", fillClass)}
+        className={cn("h-full rounded-full bg-tz-lime", fillClass)}
         style={{
           width: `${clamped}%`,
           transition: "width 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
@@ -264,7 +262,7 @@ export function Chip({ children, className }: { children: ReactNode; className?:
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border border-tz-line bg-tz-panel-strong px-2.5 py-1 text-[11px] font-medium text-tz-accent",
+        "inline-flex items-center gap-1 rounded-full bg-tz-panel-soft px-2.5 py-1 text-[11px] font-semibold text-tz-muted",
         className
       )}
     >
@@ -277,22 +275,29 @@ export function Chip({ children, className }: { children: ReactNode; className?:
 
 export function EmptyState({ icon, title, caption }: { icon: ReactNode; title: string; caption?: string }) {
   return (
-    <div className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[1.25rem] border border-dashed border-tz-violet/25 bg-tz-violet/[0.05] px-4 py-7 text-center">
-      <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-tz-violet/25 bg-tz-violet/12 text-tz-violet">
+    <div className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[1.4rem] border border-dashed border-tz-line-strong bg-tz-panel-soft/60 px-4 py-7 text-center">
+      <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-tz-violet/12 text-tz-violet">
         {icon}
       </div>
-      <p className="text-sm font-medium text-tz-ink/90">{title}</p>
+      <p className="text-sm font-bold text-tz-ink/90">{title}</p>
       {caption ? <p className="max-w-[270px] text-xs leading-relaxed text-tz-muted">{caption}</p> : null}
     </div>
   );
 }
 
-/* ---------------- Orb dekoratif ---------------- */
+/* ---------------- Blob dekoratif ---------------- */
 
 export function GlowOrb({ className }: { className?: string }) {
-  // Mode 2D datar (Task 16): ornamen blur yang memberi kesan 3D/berat
-  // tidak dirender lagi. API komponen dipertahankan agar pemakaian lama
-  // di semua halaman tidak perlu diubah.
-  void className;
-  return null;
+  // Design system v3: ornamen blur kini blob pastel lembut (statis, satu
+  // lapisan radial) — API dipertahankan agar pemakaian lama tetap bekerja.
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "pointer-events-none absolute rounded-full blur-2xl",
+        "bg-tz-violet/15 light:bg-tz-violet/12",
+        className
+      )}
+    />
+  );
 }

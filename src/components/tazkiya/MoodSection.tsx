@@ -15,41 +15,41 @@ import { MOODS, moodLabel, type MoodId } from "@/lib/tazkiya/types";
 import type { SubPageId } from "./BottomNav";
 import { cn } from "@/lib/utils";
 
-/** Aksen warna per karakter mood — ungu Tazkiya tetap warna utama. */
+/** Aksen warna per karakter mood — lavender Tazkiya tetap warna utama. */
 const TONE: Record<MoodId, { text: string; selBg: string; selBorder: string }> = {
   bahagia: {
-    text: "text-amber-300 light:text-amber-600",
-    selBg: "bg-amber-400/[0.13] light:bg-amber-400/20",
-    selBorder: "border-amber-300/60 light:border-amber-500/50",
+    text: "text-amber-500 dark:text-amber-300 light:text-amber-500",
+    selBg: "bg-amber-400/[0.14] light:bg-amber-400/20",
+    selBorder: "border-amber-400/50",
   },
   tenang: {
-    text: "text-teal-300 light:text-teal-600",
-    selBg: "bg-teal-400/[0.13] light:bg-teal-400/20",
-    selBorder: "border-teal-300/60 light:border-teal-500/50",
+    text: "text-teal-500 dark:text-teal-300 light:text-teal-600",
+    selBg: "bg-teal-400/[0.14] light:bg-teal-400/20",
+    selBorder: "border-teal-400/50",
   },
   bersyukur: {
-    text: "text-pink-300 light:text-pink-600",
-    selBg: "bg-pink-400/[0.13] light:bg-pink-400/20",
-    selBorder: "border-pink-300/60 light:border-pink-500/50",
+    text: "text-pink-500 dark:text-pink-300 light:text-pink-600",
+    selBg: "bg-pink-400/[0.14] light:bg-pink-400/20",
+    selBorder: "border-pink-400/50",
   },
   lelah: {
-    text: "text-slate-300 light:text-slate-500",
-    selBg: "bg-slate-400/[0.14] light:bg-slate-400/20",
-    selBorder: "border-slate-300/60 light:border-slate-500/50",
+    text: "text-slate-500 dark:text-slate-300 light:text-slate-500",
+    selBg: "bg-slate-400/[0.15] light:bg-slate-400/20",
+    selBorder: "border-slate-400/50",
   },
   sedih: {
-    text: "text-sky-300 light:text-sky-600",
-    selBg: "bg-sky-400/[0.13] light:bg-sky-400/20",
-    selBorder: "border-sky-300/60 light:border-sky-500/50",
+    text: "text-sky-500 dark:text-sky-300 light:text-sky-600",
+    selBg: "bg-sky-400/[0.14] light:bg-sky-400/20",
+    selBorder: "border-sky-400/50",
   },
   cemas: {
-    text: "text-indigo-300 light:text-indigo-500",
-    selBg: "bg-indigo-400/[0.14] light:bg-indigo-400/20",
-    selBorder: "border-indigo-300/60 light:border-indigo-500/50",
+    text: "text-indigo-500 dark:text-indigo-300 light:text-indigo-500",
+    selBg: "bg-indigo-400/[0.15] light:bg-indigo-400/20",
+    selBorder: "border-indigo-400/50",
   },
   "campur-aduk": {
-    text: "text-tz-violet light:text-[#7546c8]",
-    selBg: "bg-tz-violet/[0.13] light:bg-tz-violet/15",
+    text: "text-tz-violet",
+    selBg: "bg-tz-violet/[0.12]",
     selBorder: "border-tz-violet/55",
   },
 };
@@ -155,82 +155,79 @@ export function MoodSection({
   };
 
   return (
-    <section
-      aria-label="Mood check-in"
-      className="animate-tz-fade-up rounded-[1.5rem] border border-tz-line-soft bg-tz-panel-soft/70 p-4"
-    >
-      <div className="mb-3.5 px-0.5">
-        <h2 className="font-display text-[17px] font-bold tracking-tight text-tz-ink">
-          Bagaimana perasaanmu hari ini?
-        </h2>
-        <p className="mt-0.5 text-[11.5px] text-tz-muted">Luangkan waktu sejenak untuk memahami dirimu.</p>
-      </div>
+    <section aria-label="Mood check-in" className="animate-tz-fade-up">
+      <div className="glass rounded-[1.65rem] p-4">
+        <div className="mb-3.5 px-0.5">
+          <h2 className="font-display text-[17px] font-extrabold tracking-tight text-tz-ink">
+            Bagaimana perasaanmu hari ini?
+          </h2>
+          <p className="mt-0.5 text-[11.5px] text-tz-muted">Luangkan waktu sejenak untuk memahami dirimu.</p>
+        </div>
 
-      <div
-        role="radiogroup"
-        aria-label="Pilih mood hari ini"
-        className="no-scrollbar -mx-1 flex snap-x gap-2.5 overflow-x-auto px-1 pb-1.5"
-      >
-        {MOODS.map((m) => {
-          const tone = TONE[m.id];
-          const active = moodToday === m.id;
-          return (
-            <button
-              key={m.id}
-              type="button"
-              role="radio"
-              aria-checked={active}
-              aria-label={`Mood ${m.label}`}
-              onClick={() => select(m.id, m.label)}
-              className={cn(
-                "tap flex w-[86px] shrink-0 snap-start flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 transition-all duration-200 active:scale-95",
-                active
-                  ? cn("shadow-[0_10px_22px_-14px_rgba(85,51,154,0.6)]", tone.selBg, tone.selBorder)
-                  : "border-tz-line bg-tz-panel hover:border-tz-line-strong"
-              )}
-            >
-              <MoodFace
-                id={m.id}
-                className={cn("h-[52px] w-[52px] transition-transform duration-200", tone.text, active && "scale-105")}
-              />
-              <span className={cn("text-[11px] font-semibold leading-none", active ? tone.text : "text-tz-muted")}>
-                {m.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+        <div
+          role="radiogroup"
+          aria-label="Pilih mood hari ini"
+          className="no-scrollbar -mx-1 flex snap-x gap-2.5 overflow-x-auto px-1 pb-1.5"
+        >
+          {MOODS.map((m) => {
+            const tone = TONE[m.id];
+            const active = moodToday === m.id;
+            return (
+              <button
+                key={m.id}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                aria-label={`Mood ${m.label}`}
+                onClick={() => select(m.id, m.label)}
+                className={cn(
+                  "tap flex w-[86px] shrink-0 snap-start flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 transition-all duration-200 active:scale-95",
+                  active ? cn("border-2", tone.selBg, tone.selBorder) : "border-tz-line bg-tz-panel-soft/50 hover:border-tz-line-strong"
+                )}
+              >
+                <MoodFace
+                  id={m.id}
+                  className={cn("h-[52px] w-[52px] transition-transform duration-200", tone.text, active && "scale-105")}
+                />
+                <span className={cn("text-[11px] font-bold leading-none", active ? tone.text : "text-tz-muted")}>
+                  {m.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
-      <div className="mt-2.5 min-h-[76px] px-0.5">
-        {moodToday ? (
-          <div className="tz-fade-in">
-            <p className="text-[12.5px] leading-relaxed text-tz-ink/95">
-              <span className="font-bold">{moodLabel(moodToday)}</span>
-              <span className="text-tz-muted"> — {REFLEKSI[moodToday]}</span>
+        <div className="mt-2.5 min-h-[76px] px-0.5">
+          {moodToday ? (
+            <div className="tz-fade-in">
+              <p className="text-[12.5px] leading-relaxed text-tz-ink/95">
+                <span className="font-bold">{moodLabel(moodToday)}</span>
+                <span className="text-tz-muted"> — {REFLEKSI[moodToday]}</span>
+              </p>
+              <p className="mt-0.5 text-[10px] text-tz-muted/90">
+                Kamu sudah check-in hari ini. Ketuk mood lain bila perasaanmu berubah.
+              </p>
+              <button
+                type="button"
+                onClick={() => onOpenSubpage("jurnal")}
+                className="tap tz-btn-ink mt-2.5 flex h-11 w-full items-center justify-center gap-1.5 rounded-full text-[12.5px] font-bold"
+              >
+                <BookHeart size={15} />
+                Lanjut ke Jurnal Syukur
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          ) : (
+            <p className="pt-1 text-[11px] leading-relaxed text-tz-muted/90">
+              Pilih yang paling mendekati — boleh diganti kapan saja.
             </p>
-            <p className="mt-0.5 text-[10px] text-tz-muted/85">
-              Kamu sudah check-in hari ini. Ketuk mood lain bila perasaanmu berubah.
-            </p>
-            <button
-              type="button"
-              onClick={() => onOpenSubpage("jurnal")}
-              className="tap mt-2.5 flex h-10 w-full items-center justify-center gap-1.5 rounded-xl border border-tz-violet/30 bg-tz-violet/12 text-[12px] font-semibold text-tz-accent transition-all hover:bg-tz-violet/20"
-            >
-              <BookHeart size={15} />
-              Lanjut ke Jurnal Syukur
-              <ChevronRight size={14} />
-            </button>
-          </div>
-        ) : (
-          <p className="pt-1 text-[11px] leading-relaxed text-tz-muted/80">
-            Pilih yang paling mendekati — boleh diganti kapan saja.
-          </p>
-        )}
-      </div>
+          )}
+        </div>
 
-      <p className="mt-1 px-0.5 text-[9.5px] leading-relaxed text-tz-muted/60">
-        Mood membantu refleksi diri — bukan alat diagnosis psikologis.
-      </p>
+        <p className="mt-1 px-0.5 text-[9.5px] leading-relaxed text-tz-muted/70">
+          Mood membantu refleksi diri — bukan alat diagnosis psikologis.
+        </p>
+      </div>
     </section>
   );
 }

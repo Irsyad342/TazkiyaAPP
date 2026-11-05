@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * Tazkiya — "Jelajahi Aktivitas" di Beranda: pintasan refleksi & kebaikan
- * yang sebelumnya ada di menu Lainnya. Disusun editorial — tiga komposisi
- * berbeda (blok utama, band cermin, baris tenang), bukan grid kartu seragam.
- * Semua tombol membuka halaman penuh yang sudah ada.
+ * Tazkiya — "Jelajahi Aktivitas" di Beranda: pintasan refleksi & kebaikan.
+ * Komposisi editorial — blok utama lime (Jurnal Syukur), kartu lavender
+ * (Zikir & Doa), dan baris kartu putih (Rizq & Amal) — bukan grid kartu
+ * seragam. Semua tombol membuka halaman penuh yang sudah ada.
  */
 
-import { BookHeart, ChevronRight, HandCoins, HandHeart } from "lucide-react";
+import { ArrowUpRight, BookHeart, HandCoins, HandHeart } from "lucide-react";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import type { SubPageId } from "./BottomNav";
 import { cn } from "@/lib/utils";
@@ -23,89 +23,89 @@ export function JelajahiAktivitas({
 
   return (
     <section aria-label="Jelajahi aktivitas" className="animate-tz-fade-up">
-      <div className="mb-3 px-1">
-        <h2 className="font-display text-[16px] font-semibold tracking-tight text-tz-ink">Jelajahi Aktivitas</h2>
+      <div className="mb-3 px-0.5">
+        <h2 className="font-display text-[17px] font-extrabold tracking-tight text-tz-ink">Jelajahi Aktivitas</h2>
         <p className="mt-0.5 text-[11px] leading-snug text-tz-muted">
-          Temukan ruang untuk terus bertumbuh dalam ibadah dan kebaikan.
+          Ruang untuk terus bertumbuh dalam ibadah dan kebaikan.
         </p>
       </div>
 
       <div className="space-y-2.5">
-        {/* A. Jurnal Syukur — blok utama, permukaan ungu lembut */}
+        {/* A. Jurnal Syukur — blok utama lime (satu-satunya aksen lime besar) */}
         <button
           type="button"
           onClick={() => onOpen("jurnal")}
           aria-label="Buka halaman Jurnal Syukur"
-          className="tap block w-full rounded-[1.5rem] border border-tz-violet/25 bg-tz-violet/[0.10] p-4 text-left transition-all hover:border-tz-violet/45 active:scale-[0.985]"
+          className="tap block w-full rounded-[1.65rem] bg-tz-lime p-4 text-left shadow-[0_20px_44px_-20px_rgba(163,199,60,0.65)] transition-all active:scale-[0.985]"
         >
           <div className="flex items-center gap-3.5">
             <span
               aria-hidden
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-tz-violet text-white"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-tz-lime-ink/90 text-tz-lime"
             >
               <BookHeart size={21} strokeWidth={1.9} />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-bold text-tz-ink">Jurnal Syukur</span>
-              <span className="mt-0.5 block text-[11.5px] leading-relaxed text-tz-muted">
-                Tuliskan hal-hal yang kamu syukuri hari ini.
-              </span>
-              <span className="mt-1 block text-[10px] font-semibold text-tz-accent/90">
-                {sudahMenulis ? "Ditulis hari ini ✓" : "Tiga hal kecil menantimu"}
+              <span className="block text-[15px] font-extrabold text-tz-lime-ink">Jurnal Syukur</span>
+              <span className="mt-0.5 block text-[11.5px] font-medium leading-relaxed text-tz-lime-ink/75">
+                {sudahMenulis ? "Ditulis hari ini ✓ — terima kasih sudah merenung" : "Tiga hal kecil yang layak disyukuri"}
               </span>
             </span>
-            <ChevronRight size={17} className="shrink-0 text-tz-muted/70" />
+            <span
+              aria-hidden
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-tz-lime-ink text-tz-lime"
+            >
+              <ArrowUpRight size={16} strokeWidth={2.4} />
+            </span>
           </div>
         </button>
 
-        {/* B. Zikir & Doa — band cermin (ikon di kanan), permukaan teal lembut */}
+        {/* B. Zikir & Doa — kartu lavender lembut, ikon di kanan */}
         <button
           type="button"
           onClick={() => onOpen("zikir-doa")}
           aria-label="Buka halaman Zikir & Doa"
-          className="tap block w-full rounded-[1.4rem] border border-tz-line bg-teal-400/[0.07] p-4 text-left transition-all hover:border-teal-400/40 light:bg-teal-400/[0.12] active:scale-[0.985]"
+          className="tap block w-full rounded-[1.5rem] border border-tz-violet/20 bg-tz-violet/[0.08] p-4 text-left transition-all hover:border-tz-violet/40 light:bg-tz-violet/[0.1] active:scale-[0.985]"
         >
           <div className="flex items-center gap-3.5">
             <span className="min-w-0 flex-1">
-              <span className="block text-[14.5px] font-bold text-tz-ink">Zikir &amp; Doa</span>
-              <span className="mt-0.5 block text-[11.5px] leading-relaxed text-tz-muted">
+              <span className="block text-[14.5px] font-extrabold text-tz-ink">Zikir &amp; Doa</span>
+              <span className="mt-0.5 block text-[11.5px] font-medium leading-relaxed text-tz-muted">
                 Temani harimu dengan zikir dan doa.
               </span>
             </span>
             <span
               aria-hidden
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-teal-400/15 text-teal-300 light:bg-teal-400/20 light:text-teal-600"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-tz-violet text-white"
             >
               <HandHeart size={20} strokeWidth={1.9} />
             </span>
           </div>
         </button>
 
-        {/* C. Rizq & Amal — baris tenang tanpa kartu, aksen amber terbatas */}
-        <div className="border-t border-tz-line-soft pt-2.5">
-          <button
-            type="button"
-            onClick={() => onOpen("rizq-amal")}
-            aria-label="Buka halaman Rizq & Amal"
-            className={cn(
-              "tap flex w-full items-center gap-3.5 rounded-2xl px-1 py-2.5 text-left transition-all hover:bg-tz-panel-soft active:scale-[0.985]"
-            )}
+        {/* C. Rizq & Amal — kartu putih datar */}
+        <button
+          type="button"
+          onClick={() => onOpen("rizq-amal")}
+          aria-label="Buka halaman Rizq & Amal"
+          className={cn(
+            "tap flex w-full items-center gap-3.5 rounded-[1.5rem] border border-tz-line bg-tz-panel p-4 text-left transition-all hover:border-tz-line-strong active:scale-[0.985]"
+          )}
+        >
+          <span
+            aria-hidden
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400/15 text-amber-600 dark:bg-amber-400/12 dark:text-amber-300"
           >
-            <span
-              aria-hidden
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400/12 text-amber-300 light:bg-amber-400/20 light:text-amber-600"
-            >
-              <HandCoins size={19} strokeWidth={1.9} />
+            <HandCoins size={19} strokeWidth={1.9} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[14px] font-extrabold text-tz-ink">Rizq &amp; Amal</span>
+            <span className="mt-0.5 block text-[11px] font-medium leading-relaxed text-tz-muted">
+              Catat langkah kecil dalam berbagi kebaikan.
             </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[14px] font-bold text-tz-ink">Rizq &amp; Amal</span>
-              <span className="mt-0.5 block text-[11px] leading-relaxed text-tz-muted">
-                Catat langkah kecil dalam berbagi kebaikan.
-              </span>
-            </span>
-            <ChevronRight size={16} className="shrink-0 text-tz-muted/60" />
-          </button>
-        </div>
+          </span>
+          <ArrowUpRight size={16} className="shrink-0 text-tz-muted/70" />
+        </button>
       </div>
     </section>
   );

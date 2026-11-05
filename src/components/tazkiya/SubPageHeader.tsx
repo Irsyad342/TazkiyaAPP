@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Tazkiya — Kepala halaman sub-menu (Jurnal Syukur, Zikir & Doa, Rizq & Amal,
- * Profil): tombol kembali + judul, dipakai seragam di seluruh sub-halaman.
+ * Tazkiya — Kepala halaman sub-menu (Jurnal Syukur, Zikir & Doa, Rizq & Amal):
+ * tombol kembali + judul editorial, dipakai seragam di seluruh sub-halaman.
  */
 
 import { ChevronLeft } from "lucide-react";
@@ -27,13 +27,13 @@ export function SubPageHeader({
         type="button"
         aria-label="Kembali"
         onClick={onBack}
-        className="tap glass flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-tz-accent"
+        className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tz-line bg-tz-panel text-tz-ink"
       >
         <ChevronLeft size={19} />
       </button>
       <div className="min-w-0 flex-1">
-        <h1 className="truncate font-display text-[21px] font-bold leading-tight text-gradient-violet">{title}</h1>
-        {caption ? <p className="mt-0.5 truncate text-[11.5px] text-tz-muted">{caption}</p> : null}
+        <h1 className="tz-stat truncate text-[22px] font-extrabold leading-tight text-tz-ink">{title}</h1>
+        {caption ? <p className="mt-0.5 truncate text-[11.5px] font-medium text-tz-muted">{caption}</p> : null}
       </div>
       {action}
     </header>

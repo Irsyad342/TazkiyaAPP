@@ -95,14 +95,14 @@ export function PrayerRecordDialog({
       <DialogContent
         showCloseButton={false}
         aria-describedby={undefined}
-        className="glass-strong fixed! top-auto bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 translate-y-0 gap-3 overflow-y-auto rounded-t-[1.65rem] rounded-b-none border-x-0 border-b-0 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_-18px_60px_-12px_rgba(8,5,15,0.8)] duration-250 thin-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8"
+        className="glass-strong fixed! top-auto bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 translate-y-0 gap-3 overflow-y-auto rounded-t-[1.85rem] rounded-b-none border-x-0 border-b-0 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_-24px_70px_-20px_rgba(16,12,32,0.5)] duration-250 thin-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8"
       >
         {/* Pegangan sheet */}
-        <span aria-hidden className="mx-auto mb-0.5 block h-1 w-10 shrink-0 rounded-full bg-tz-line-strong/70" />
+        <span aria-hidden className="mx-auto mb-0.5 block h-1 w-10 shrink-0 rounded-full bg-tz-line-strong" />
 
         <DialogHeader>
-          <DialogTitle className="font-display text-lg text-tz-ink">Catat {fullName}</DialogTitle>
-          <DialogDescription className="flex items-center gap-1.5 text-[11.5px] text-tz-muted">
+          <DialogTitle className="font-display text-lg font-extrabold text-tz-ink">Catat {fullName}</DialogTitle>
+          <DialogDescription className="flex items-center gap-1.5 text-[11.5px] font-medium text-tz-muted">
             <CalendarDays size={12} className="text-tz-violet" />
             {formatDayFull(date)}
           </DialogDescription>
@@ -125,21 +125,19 @@ export function PrayerRecordDialog({
                 }}
                 className={cn(
                   "tap flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition-all",
-                  active
-                    ? "border-tz-violet/60 bg-tz-violet/12 shadow-[0_0_18px_-6px_rgba(156,114,239,0.55)]"
-                    : "border-tz-line bg-tz-panel-soft hover:border-tz-violet/35"
+                  active ? "border-tz-violet/50 bg-tz-violet/[0.08]" : "border-tz-line bg-tz-panel-soft hover:border-tz-line-strong"
                 )}
               >
                 <span
                   className={cn(
-                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
-                    active ? "border-tz-violet/50 bg-tz-violet/18 text-tz-violet" : "border-tz-line bg-tz-panel text-tz-muted"
+                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+                    active ? "bg-tz-violet text-white" : "bg-tz-panel text-tz-muted"
                   )}
                 >
                   <Icon size={17} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[13.5px] font-semibold text-tz-ink">{label}</span>
+                  <span className="block text-[13.5px] font-bold text-tz-ink">{label}</span>
                   <span className="block text-[11px] text-tz-muted">{caption}</span>
                 </span>
                 <span
@@ -159,12 +157,12 @@ export function PrayerRecordDialog({
         {/* ---------- Jenis pelaksanaan (sudah dilaksanakan) ---------- */}
         {status === "done" ? (
           <div className="rounded-2xl border border-tz-line bg-tz-panel-soft p-3">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-tz-muted">Jenis pelaksanaan</p>
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-tz-muted">Jenis pelaksanaan</p>
             {isJumat ? (
               <div className="flex items-center gap-2.5 rounded-xl border border-tz-violet/40 bg-tz-violet/12 px-3 py-2.5">
                 <Users size={16} className="shrink-0 text-tz-violet" />
                 <div>
-                  <p className="text-[12.5px] font-semibold text-tz-ink">Salat berjamaah</p>
+                  <p className="text-[12.5px] font-bold text-tz-ink">Salat berjamaah</p>
                   <p className="text-[10.5px] text-tz-muted">Salat Jumat dilaksanakan berjamaah di masjid</p>
                 </div>
               </div>
@@ -187,13 +185,13 @@ export function PrayerRecordDialog({
                       className={cn(
                         "tap flex flex-col items-center gap-1.5 rounded-xl border p-2.5 text-center transition-all",
                         active
-                          ? "border-tz-violet/60 bg-tz-violet/12 text-tz-ink"
-                          : "border-tz-line bg-tz-panel-strong text-tz-muted hover:border-tz-violet/35"
+                          ? "border-tz-violet/50 bg-tz-violet/[0.08] text-tz-ink"
+                          : "border-tz-line bg-tz-panel text-tz-muted hover:border-tz-line-strong"
                       )}
                     >
                       <Icon size={17} className={active ? "text-tz-violet" : "text-tz-muted"} />
-                      <span className="text-[12px] font-semibold">{label}</span>
-                      <span className="text-[10px] text-tz-muted">{caption}</span>
+                      <span className="text-[12px] font-bold">{label}</span>
+                      <span className="text-[10px] font-medium text-tz-muted">{caption}</span>
                     </button>
                   );
                 })}
@@ -205,7 +203,7 @@ export function PrayerRecordDialog({
         {/* ---------- Alasan (tidak dilaksanakan) ---------- */}
         {status === "missed" ? (
           <div className="rounded-2xl border border-tz-line bg-tz-panel-soft p-3">
-            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-tz-muted">Alasan</p>
+            <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-tz-muted">Alasan</p>
             <p className="mb-2.5 text-[10.5px] leading-relaxed text-tz-muted">
               Catatan ini hanya untuk introspeksi dan evaluasi kebiasaan — bukan untuk menyalahkan diri sendiri.
             </p>
@@ -220,10 +218,10 @@ export function PrayerRecordDialog({
                     aria-checked={active}
                     onClick={() => setReason(active ? undefined : r.id)}
                     className={cn(
-                      "tap rounded-xl border px-2.5 py-2 text-left text-[11.5px] font-medium leading-snug transition-all",
+                      "tap rounded-xl border px-2.5 py-2 text-left text-[11.5px] font-semibold leading-snug transition-all",
                       active
-                        ? "border-tz-violet/60 bg-tz-violet/12 text-tz-ink"
-                        : "border-tz-line bg-tz-panel-strong text-tz-muted hover:border-tz-violet/35"
+                        ? "border-tz-violet/50 bg-tz-violet/[0.08] text-tz-ink"
+                        : "border-tz-line bg-tz-panel text-tz-muted hover:border-tz-line-strong"
                     )}
                   >
                     {r.label}
@@ -251,20 +249,20 @@ export function PrayerRecordDialog({
               onClick={() => setAddToQada((v) => !v)}
               className={cn(
                 "tap mt-2.5 flex w-full items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition-all",
-                addToQada ? "border-tz-violet/60 bg-tz-violet/12" : "border-tz-line bg-tz-panel-strong"
+                addToQada ? "border-tz-violet/50 bg-tz-violet/[0.08]" : "border-tz-line bg-tz-panel"
               )}
             >
               <span
                 aria-hidden
                 className={cn(
                   "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border transition-all",
-                  addToQada ? "border-tz-violet bg-tz-violet text-white" : "border-tz-line-strong text-transparent"
+                  addToQada ? "border-transparent bg-tz-lime text-tz-lime-ink" : "border-tz-line-strong text-transparent"
                 )}
               >
                 <Check size={12} strokeWidth={3.4} />
               </span>
               <span className="min-w-0">
-                <span className="block text-[12px] font-semibold text-tz-ink">Masukkan ke daftar Qada</span>
+                <span className="block text-[12px] font-bold text-tz-ink">Masukkan ke daftar Qada</span>
                 <span className="block text-[10.5px] leading-relaxed text-tz-muted">
                   Tidak apa-apa, selalu ada kesempatan untuk memperbaiki diri.
                 </span>
@@ -277,7 +275,7 @@ export function PrayerRecordDialog({
           <button
             type="button"
             onClick={onClose}
-            className="tap min-h-[42px] flex-1 rounded-xl border border-tz-line bg-tz-panel-soft px-4 text-sm font-semibold text-tz-muted"
+            className="tap min-h-[42px] flex-1 rounded-full border border-tz-line bg-tz-panel-soft px-4 text-sm font-bold text-tz-muted"
           >
             Batal
           </button>
@@ -286,10 +284,8 @@ export function PrayerRecordDialog({
             disabled={!canSave}
             onClick={save}
             className={cn(
-              "tap min-h-[42px] flex-1 rounded-xl px-4 text-sm font-semibold text-white transition-all",
-              canSave
-                ? "bg-gradient-to-r from-tz-purple to-tz-violet shadow-[0_6px_18px_-6px_rgba(85,51,154,0.9),inset_0_1px_0_rgba(255,255,255,0.22)]"
-                : "cursor-not-allowed opacity-40"
+              "tap min-h-[42px] flex-1 rounded-full px-4 text-sm font-bold transition-all",
+              canSave ? "tz-btn-ink" : "cursor-not-allowed bg-tz-panel-soft text-tz-muted opacity-50"
             )}
           >
             Simpan

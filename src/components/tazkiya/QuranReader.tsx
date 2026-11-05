@@ -4,6 +4,7 @@
  * Tazkiya — Pembaca Al-Qur'an (overlay layar penuh).
  * Teks Uthmani + terjemahan Kemenag, penanda per-ayat, pengaturan tampilan,
  * dan pencatatan progres OTOMATIS (ayat awal → ayat akhir yang terbaca).
+ * Tampilan baru: kertas tenang, kepala putih bersih, penanda nomor ayat.
  * Ringan: tanpa audio/murottal.
  */
 
@@ -217,12 +218,8 @@ export function QuranReader({
       role="dialog"
       aria-label={`Pembaca surah ${meta?.latin ?? ""}`}
     >
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="tz-aurora animate-tz-aurora absolute inset-0 opacity-70" />
-      </div>
-
-      {/* ---------- Kepala pembaca ---------- */}
-      <header className="glass-strong relative z-20 rounded-none border-0 border-b border-tz-line px-3 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+      {/* ---------- Kepala pembaca — bilah putih bersih ---------- */}
+      <header className="relative z-20 border-b border-tz-line bg-tz-panel px-3 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -231,16 +228,16 @@ export function QuranReader({
               onClose();
             }}
             aria-label="Kembali ke daftar surah"
-            className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tz-line bg-tz-panel text-tz-ink transition-colors hover:text-tz-accent"
+            className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-tz-panel-soft text-tz-ink transition-colors hover:text-tz-accent"
           >
             <X size={18} />
           </button>
           <div className="min-w-0 flex-1 text-center">
-            <p className="truncate text-[14.5px] font-bold leading-tight text-tz-ink">
+            <p className="truncate text-[14.5px] font-extrabold leading-tight text-tz-ink">
               {meta?.latin}{" "}
-              <span className="quran-arabic text-[15px] font-normal text-tz-accent">{meta?.arabic}</span>
+              <span className="quran-arabic text-[15px] font-normal text-tz-violet">{meta?.arabic}</span>
             </p>
-            <p className="text-[10.5px] text-tz-muted">
+            <p className="text-[10.5px] font-medium text-tz-muted">
               Surah {surah} · {meta?.verses} ayat · {meta?.place}
             </p>
           </div>
@@ -251,7 +248,7 @@ export function QuranReader({
               toast.success(`Penanda disimpan: ${meta?.latin} ayat ${currentAyah}`);
             }}
             aria-label="Simpan penanda posisi ini"
-            className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tz-line bg-tz-panel text-tz-accent transition-colors hover:border-tz-violet/50"
+            className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-tz-lime text-tz-lime-ink transition-transform active:scale-95"
           >
             <BookmarkIcon size={17} />
           </button>
@@ -261,8 +258,8 @@ export function QuranReader({
             aria-label="Pengaturan tampilan bacaan"
             aria-expanded={settingsOpen}
             className={cn(
-              "tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors",
-              settingsOpen ? "border-tz-violet/60 bg-tz-violet/20 text-tz-accent" : "border-tz-line bg-tz-panel text-tz-ink hover:text-tz-accent"
+              "tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors",
+              settingsOpen ? "bg-tz-violet text-white" : "bg-tz-panel-soft text-tz-ink hover:text-tz-accent"
             )}
           >
             <Settings2 size={17} />
@@ -270,9 +267,9 @@ export function QuranReader({
         </div>
 
         {settingsOpen ? (
-          <div className="mt-2.5 space-y-2.5 rounded-2xl border border-tz-line bg-tz-panel-soft p-3">
+          <div className="tz-fade-in mt-2.5 space-y-2.5 rounded-2xl border border-tz-line bg-tz-panel-soft p-3">
             <div className="flex items-center justify-between gap-2">
-              <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-tz-muted">
+              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-tz-muted">
                 <Type size={12} /> Ukuran teks Arab
               </p>
               <div className="flex items-center gap-1.5">
@@ -284,7 +281,7 @@ export function QuranReader({
                 >
                   <Minus size={13} />
                 </button>
-                <span className="w-10 text-center text-xs font-semibold text-tz-ink">{settings.readerArabicSize}px</span>
+                <span className="w-10 text-center text-xs font-bold text-tz-ink">{settings.readerArabicSize}px</span>
                 <button
                   type="button"
                   aria-label="Perbesar teks Arab"
@@ -296,7 +293,7 @@ export function QuranReader({
               </div>
             </div>
             <div className="flex items-center justify-between gap-2">
-              <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-tz-muted">
+              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-tz-muted">
                 <Type size={12} /> Ukuran terjemahan
               </p>
               <div className="flex items-center gap-1.5">
@@ -308,7 +305,7 @@ export function QuranReader({
                 >
                   <Minus size={13} />
                 </button>
-                <span className="w-10 text-center text-xs font-semibold text-tz-ink">{settings.readerTransSize}px</span>
+                <span className="w-10 text-center text-xs font-bold text-tz-ink">{settings.readerTransSize}px</span>
                 <button
                   type="button"
                   aria-label="Perbesar terjemahan"
@@ -320,17 +317,17 @@ export function QuranReader({
               </div>
             </div>
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-tz-muted">Jarak antarbaris</p>
+              <p className="text-[11px] font-bold uppercase tracking-wide text-tz-muted">Jarak antarbaris</p>
               <button
                 type="button"
                 onClick={() => updateSettings({ readerLineHeight: LINE_HEIGHTS[(lhIdx + 1) % LINE_HEIGHTS.length] })}
-                className="tap rounded-lg border border-tz-line bg-tz-panel px-3 py-1.5 text-xs font-semibold text-tz-ink"
+                className="tap rounded-full border border-tz-line bg-tz-panel px-3 py-1.5 text-xs font-bold text-tz-ink"
               >
                 {settings.readerLineHeight === 1.7 ? "Rapat" : settings.readerLineHeight === 1.9 ? "Sedang" : "Lega"}
               </button>
             </div>
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-tz-muted">Tampilkan terjemahan</p>
+              <p className="text-[11px] font-bold uppercase tracking-wide text-tz-muted">Tampilkan terjemahan</p>
               <button
                 type="button"
                 role="switch"
@@ -338,12 +335,12 @@ export function QuranReader({
                 onClick={() => updateSettings({ readerShowTranslation: !settings.readerShowTranslation })}
                 className={cn(
                   "tap relative h-6 w-11 rounded-full border transition-colors",
-                  settings.readerShowTranslation ? "border-tz-violet/60 bg-tz-violet" : "border-tz-line bg-tz-panel"
+                  settings.readerShowTranslation ? "border-transparent bg-tz-violet" : "border-tz-line bg-tz-panel"
                 )}
               >
                 <span
                   className={cn(
-                    "absolute top-0.5 h-4.5 w-4.5 rounded-full bg-white shadow transition-all",
+                    "absolute top-0.5 rounded-full bg-white shadow transition-all",
                     settings.readerShowTranslation ? "left-[22px]" : "left-0.5"
                   )}
                   style={{ height: 18, width: 18 }}
@@ -358,37 +355,37 @@ export function QuranReader({
         ) : null}
       </header>
 
-      {/* ---------- Isi ayat ---------- */}
-      <div ref={scrollRef} className="thin-scrollbar relative z-10 flex-1 overflow-y-auto px-5 pb-40 pt-4">
+      {/* ---------- Isi ayat — kertas tenang ---------- */}
+      <div ref={scrollRef} className="thin-scrollbar relative z-10 flex-1 overflow-y-auto px-5 pb-40 pt-5">
         {loading ? (
           <div className="flex flex-col items-center gap-3 pt-24 text-center">
             <LoaderCircle size={30} className="animate-spin text-tz-violet" />
-            <p className="text-sm text-tz-muted">Mengambil {meta?.latin}…</p>
+            <p className="text-sm font-medium text-tz-muted">Mengambil {meta?.latin}…</p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center gap-3 pt-20 text-center">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-400/30 bg-amber-400/10 text-amber-400">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-400/15 text-amber-500">
               <TriangleAlert size={22} />
             </span>
-            <p className="max-w-[280px] text-sm font-medium text-tz-ink">Gagal memuat surah</p>
+            <p className="max-w-[280px] text-sm font-bold text-tz-ink">Gagal memuat surah</p>
             <p className="max-w-[280px] text-xs leading-relaxed text-tz-muted">{error}</p>
             <button
               type="button"
               onClick={() => void reload(true)}
-              className="tap mt-1 flex min-h-[42px] items-center gap-2 rounded-xl border border-tz-violet/50 bg-gradient-to-r from-tz-purple to-tz-violet px-4 text-sm font-semibold text-white"
+              className="tap tz-btn-ink mt-1 flex min-h-[42px] items-center gap-2 rounded-full px-5 text-sm font-bold"
             >
               <RotateCcw size={15} /> Coba lagi
             </button>
           </div>
         ) : data ? (
           <>
-            <div className="mb-4 text-center">
-              <p className="quran-arabic text-[26px] leading-[1.7] text-tz-ink">{data.surah.arabic}</p>
+            <div className="glass-hero mb-5 rounded-[1.5rem] px-4 py-5 text-center">
+              <p className="quran-arabic text-[26px] leading-[1.7] text-white">{data.surah.arabic}</p>
               {data.bismillah ? (
-                <p className="quran-bismillah mt-1 text-[22px] leading-[1.9] text-tz-accent">{data.bismillah}</p>
+                <p className="quran-bismillah mt-1 text-[22px] leading-[1.9] text-white/95">{data.bismillah}</p>
               ) : null}
               {data.fromCache ? (
-                <p className="mt-1 text-[10px] text-tz-muted">Dibaca dari simpanan perangkat (offline)</p>
+                <p className="mt-1.5 text-[10px] font-semibold text-white/75">Dibaca dari simpanan perangkat (offline)</p>
               ) : null}
             </div>
             {data.ayahs.map((ayah) => (
@@ -399,9 +396,9 @@ export function QuranReader({
                   if (el) ayahRefs.current.set(ayah.number, el);
                   else ayahRefs.current.delete(ayah.number);
                 }}
-                className="border-b border-tz-line-soft py-4 transition-colors last:border-b-0"
+                className="border-b border-tz-line-soft py-5 transition-colors last:border-b-0"
               >
-                <div className="mb-2 flex items-center justify-between gap-2">
+                <div className="mb-2.5 flex items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => toggleAyahBookmark(surah, ayah.number)}
@@ -409,13 +406,13 @@ export function QuranReader({
                     className={cn(
                       "tap flex h-8 w-8 items-center justify-center rounded-full border transition-colors",
                       bookmarkSet.has(ayah.number)
-                        ? "border-tz-violet/60 bg-tz-violet/25 text-tz-accent"
-                        : "border-tz-line bg-tz-panel text-tz-muted hover:text-tz-accent"
+                        ? "border-transparent bg-tz-violet text-white"
+                        : "border-tz-line bg-tz-panel-soft text-tz-muted hover:text-tz-accent"
                     )}
                   >
                     <BookmarkIcon size={13} />
                   </button>
-                  <span className="flex min-h-[22px] items-center rounded-full border border-tz-violet/25 bg-tz-violet/10 px-2.5 text-[11px] font-semibold text-tz-accent">
+                  <span className="flex min-h-[24px] items-center rounded-full bg-tz-violet/12 px-2.5 text-[11px] font-extrabold text-tz-violet">
                     {String(ayah.number).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[Number(d)])} · {ayah.number}
                   </span>
                 </div>
@@ -426,14 +423,14 @@ export function QuranReader({
                   {ayah.text}
                 </p>
                 {settings.readerShowTranslation && ayah.translation ? (
-                  <p className="mt-2.5 text-left leading-relaxed text-tz-muted" style={{ fontSize: settings.readerTransSize }}>
-                    <span className="mr-1.5 font-semibold text-tz-accent/80">{ayah.number}.</span>
+                  <p className="mt-3 rounded-2xl bg-tz-panel-soft px-3.5 py-2.5 text-left leading-relaxed text-tz-ink/85" style={{ fontSize: settings.readerTransSize }}>
+                    <span className="mr-1.5 font-extrabold text-tz-violet">{ayah.number}.</span>
                     {ayah.translation}
                   </p>
                 ) : null}
               </div>
             ))}
-            <p className="pb-2 pt-3 text-center text-[10.5px] text-tz-muted">
+            <p className="pb-2 pt-3 text-center text-[10.5px] font-medium text-tz-muted">
               Sumber: AlQuran Cloud — teks Uthmani (Tanzil) &amp; terjemahan Kemenag RI
             </p>
           </>

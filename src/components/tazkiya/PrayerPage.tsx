@@ -101,20 +101,20 @@ function PrayerRow({
   if (isDone) {
     statusChips.push(
       timing === "ontime"
-        ? { text: "Tepat waktu", cls: "border-emerald-300/35 bg-emerald-400/10 text-emerald-700 light:border-emerald-500/40 light:bg-emerald-50 light:text-emerald-700" }
+        ? { text: "Tepat waktu", cls: "bg-emerald-400/15 text-emerald-700 light:bg-emerald-100 light:text-emerald-700" }
         : timing === "late"
-          ? { text: "Terlambat · dilaksanakan", cls: "border-amber-300/40 bg-amber-400/10 text-amber-700 light:border-amber-500/40 light:bg-amber-50 light:text-amber-700" }
-          : { text: "Dilaksanakan", cls: "border-tz-violet/40 bg-tz-violet/12 text-tz-accent" }
+          ? { text: "Terlambat · dilaksanakan", cls: "bg-amber-400/15 text-amber-700 light:bg-amber-100 light:text-amber-700" }
+          : { text: "Dilaksanakan", cls: "bg-tz-violet/12 text-tz-accent" }
     );
     if (detail.kind === "berjamaah") {
-      statusChips.push({ text: "Berjamaah", cls: "border-teal-300/35 bg-teal-400/10 text-teal-700 light:border-teal-500/40 light:bg-teal-50 light:text-teal-700" });
+      statusChips.push({ text: "Berjamaah", cls: "bg-teal-400/15 text-teal-700 light:bg-teal-100 light:text-teal-700" });
     } else if (detail.kind === "mandiri") {
-      statusChips.push({ text: "Mandiri", cls: "border-sky-300/35 bg-sky-400/10 text-sky-700 light:border-sky-500/40 light:bg-sky-50 light:text-sky-700" });
+      statusChips.push({ text: "Mandiri", cls: "bg-sky-400/15 text-sky-700 light:bg-sky-100 light:text-sky-700" });
     }
   } else if (isMissed) {
-    statusChips.push({ text: "Tidak dilaksanakan", cls: "border-rose-300/35 bg-rose-400/[0.08] text-rose-600 light:border-rose-400 light:bg-rose-50 light:text-rose-700" });
+    statusChips.push({ text: "Tidak dilaksanakan", cls: "bg-rose-400/10 text-rose-600 light:bg-rose-100 light:text-rose-700" });
   } else {
-    statusChips.push({ text: "Belum dicatat", cls: "border-tz-line bg-tz-panel-soft text-tz-muted" });
+    statusChips.push({ text: "Belum dicatat", cls: "bg-tz-panel-soft text-tz-muted" });
   }
 
   return (
@@ -123,33 +123,33 @@ function PrayerRow({
       onClick={onPress}
       aria-label={`Catat ${meta.label} — ${isDone ? "dilaksanakan" : isMissed ? "tidak dilaksanakan" : "belum dicatat"}`}
       className={cn(
-        "tap flex w-full items-center gap-3 rounded-[1.1rem] border p-3 text-left transition-all hover:border-tz-violet/45",
-        isDone ? "border-tz-violet/35 bg-tz-violet/[0.08]" : "border-tz-line bg-tz-panel-soft"
+        "tap flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition-all hover:border-tz-violet/45",
+        isDone ? "border-tz-violet/30 bg-tz-violet/[0.06]" : "border-tz-line bg-tz-panel"
       )}
     >
       <span
         aria-hidden
         className={cn(
-          "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border",
+          "flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl",
           isDone
-            ? "border-transparent bg-gradient-to-br from-tz-purple to-tz-violet text-white shadow-[0_0_14px_-4px_rgba(156,114,239,0.8)]"
+            ? "bg-tz-lime text-tz-lime-ink"
             : isMissed
-              ? "border-rose-300/30 bg-rose-400/10 text-rose-500 light:text-rose-600"
-              : "border-tz-line bg-tz-panel text-tz-muted"
+              ? "bg-rose-400/12 text-rose-500"
+              : "bg-tz-panel-soft text-tz-muted"
         )}
       >
         <Icon size={17} strokeWidth={1.9} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[13.5px] font-bold text-tz-ink">{meta.label}</span>
+        <span className="block text-[13.5px] font-extrabold text-tz-ink">{meta.label}</span>
         <span className="mt-0.5 flex flex-wrap items-center gap-1.5">
           {time ? (
-            <span className="inline-flex items-center gap-1 text-[10.5px] font-medium text-tz-muted">
+            <span className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-tz-muted">
               <Clock size={10} /> {time}
             </span>
           ) : null}
           {isDone && detail.kind ? (
-            <span className="inline-flex items-center gap-0.5 text-[10px] text-tz-accent/90">
+            <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-tz-accent">
               <KindIcon size={10} /> {detail.kind === "berjamaah" ? "Berjamaah" : "Mandiri"}
             </span>
           ) : null}
@@ -157,7 +157,7 @@ function PrayerRow({
       </span>
       <span className="flex max-w-[45%] shrink-0 flex-wrap justify-end gap-1">
         {statusChips.map((c) => (
-          <span key={c.text} className={cn("rounded-full border px-2 py-0.5 text-[9.5px] font-bold leading-tight", c.cls)}>
+          <span key={c.text} className={cn("rounded-full px-2 py-0.5 text-[9.5px] font-extrabold leading-tight", c.cls)}>
             {c.text}
           </span>
         ))}
@@ -208,15 +208,15 @@ function TodayTab({
   return (
     <div className="space-y-5">
       {/* Ringkasan */}
-      <GlassCard variant="clean" className="p-5">
+      <GlassCard className="p-5">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-tz-muted">Salat hari ini</p>
-            <p className="mt-1 font-display text-[38px] font-extrabold leading-none tabular-nums text-tz-ink">
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-tz-muted">Sholat hari ini</p>
+            <p className="tz-stat mt-1 text-[38px] font-extrabold leading-none text-tz-ink">
               {doneCount}
               <span className="text-[20px] font-bold text-tz-muted"> / 5</span>
             </p>
-            <p className="mt-1.5 text-[11px] leading-snug text-tz-muted">
+            <p className="mt-1.5 text-[11px] font-medium leading-snug text-tz-muted">
               {nextEntry
                 ? `Berikutnya: ${nextEntry.label} pukul ${schedule[nextEntry.id]?.time}`
                 : "Kelima waktu telah berlalu — terima kasih telah menjaga hari ini"}
@@ -239,8 +239,8 @@ function TodayTab({
               />
               <defs>
                 <linearGradient id="prayer-ring" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#9C72EF" />
-                  <stop offset="100%" stopColor="#D8C5FF" />
+                  <stop offset="0%" stopColor="#8879E8" />
+                  <stop offset="100%" stopColor="#D5F76A" />
                 </linearGradient>
               </defs>
             </svg>
@@ -250,13 +250,13 @@ function TodayTab({
           </div>
         </div>
         <div className="mt-3 flex flex-wrap gap-1.5">
-          <Chip className="border-tz-violet/30 bg-tz-violet/10 text-tz-accent">Berjamaah {jamaah}</Chip>
+          <Chip className="bg-tz-violet/12 font-bold text-tz-accent">Berjamaah {jamaah}</Chip>
           {ontime > 0 ? (
-            <Chip className="border-emerald-300/35 bg-emerald-400/10 text-emerald-700 light:border-emerald-500/40 light:bg-emerald-50 light:text-emerald-700">
+            <Chip className="bg-emerald-400/15 font-bold text-emerald-700 light:bg-emerald-100 light:text-emerald-700">
               Tepat waktu {ontime}
             </Chip>
           ) : null}
-          <Chip className="border-tz-line">{formatHijri(new Date()) || formatDayFullOf(today)}</Chip>
+          <Chip>{formatHijri(new Date()) || formatDayFullOf(today)}</Chip>
         </div>
       </GlassCard>
 
@@ -323,21 +323,21 @@ function SunnahChip({
         toast[done ? "info" : "success"](done ? `${label} ditandai belum selesai` : `${label} tercatat selesai`);
       }}
       className={cn(
-        "tap flex items-center gap-3 rounded-[1.1rem] border p-3 text-left transition-all",
-        done ? "border-tz-violet/45 bg-tz-violet/12" : "border-tz-line bg-tz-panel-soft"
+        "tap flex items-center gap-3 rounded-2xl border p-3 text-left transition-all",
+        done ? "border-tz-violet/30 bg-tz-violet/[0.06]" : "border-tz-line bg-tz-panel"
       )}
     >
       <span
         aria-hidden
         className={cn(
-          "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
-          done ? "border-transparent bg-tz-violet text-white" : "border-tz-line bg-tz-panel text-tz-muted"
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+          done ? "bg-tz-lime text-tz-lime-ink" : "bg-tz-panel-soft text-tz-muted"
         )}
       >
         {done ? <Check size={16} strokeWidth={3} /> : <Icon size={16} />}
       </span>
       <span className="min-w-0">
-        <span className="block text-[12.5px] font-semibold text-tz-ink">{label}</span>
+        <span className="block text-[12.5px] font-bold text-tz-ink">{label}</span>
         <span className="block truncate text-[10px] text-tz-muted">{caption}</span>
       </span>
     </button>
@@ -389,13 +389,13 @@ function MonthTab({ today }: { today: string }) {
             type="button"
             aria-label="Bulan sebelumnya"
             onClick={() => setOffset((o) => o - 1)}
-            className="tap flex h-9 w-9 items-center justify-center rounded-full border border-tz-line bg-tz-panel-soft text-tz-muted transition-colors hover:text-tz-accent"
+            className="tap flex h-9 w-9 items-center justify-center rounded-full bg-tz-panel-soft text-tz-muted transition-colors hover:text-tz-accent"
           >
             <ChevronLeft size={17} />
           </button>
           <div className="min-w-0 text-center">
-            <p className="truncate font-display text-[15px] font-semibold text-tz-ink">{monthLabel}</p>
-            <p className="text-[10px] text-tz-muted">{daysWithAny} hari dengan salat tercatat</p>
+            <p className="truncate font-display text-[15px] font-extrabold text-tz-ink">{monthLabel}</p>
+            <p className="text-[10px] font-medium text-tz-muted">{daysWithAny} hari dengan salat tercatat</p>
           </div>
           <button
             type="button"
@@ -403,7 +403,7 @@ function MonthTab({ today }: { today: string }) {
             disabled={!canGoNext}
             onClick={() => canGoNext && setOffset((o) => o + 1)}
             className={cn(
-              "tap flex h-9 w-9 items-center justify-center rounded-full border border-tz-line bg-tz-panel-soft text-tz-muted transition-colors hover:text-tz-accent",
+              "tap flex h-9 w-9 items-center justify-center rounded-full bg-tz-panel-soft text-tz-muted transition-colors hover:text-tz-accent",
               !canGoNext && "opacity-30"
             )}
           >
@@ -413,7 +413,7 @@ function MonthTab({ today }: { today: string }) {
 
         <div className="mt-3 grid grid-cols-7 gap-1.5 text-center" key={offset}>
           {["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"].map((d) => (
-            <span key={d} className="pb-1 text-[10px] font-medium text-tz-muted">
+            <span key={d} className="pb-1 text-[10px] font-bold text-tz-muted">
               {d}
             </span>
           ))}
@@ -423,9 +423,9 @@ function MonthTab({ today }: { today: string }) {
             const st = isFuture ? { jamaah: 0, mandiri: 0, missed: 0, done: 0, hasData: false } : statusFor(key);
             const intensity = st.done / 5;
             let bg: string | undefined;
-            if (!isFuture && st.jamaah > 0) bg = `rgba(45,212,191,${(0.17 + intensity * 0.58).toFixed(3)})`;
-            else if (!isFuture && st.mandiri > 0) bg = `rgba(56,189,248,${(0.15 + intensity * 0.52).toFixed(3)})`;
-            else if (!isFuture && st.missed > 0) bg = `rgba(251,191,36,${(0.15 + (st.missed / 5) * 0.35).toFixed(3)})`;
+            if (!isFuture && st.jamaah > 0) bg = `rgba(45,212,191,${(0.2 + intensity * 0.58).toFixed(3)})`;
+            else if (!isFuture && st.mandiri > 0) bg = `rgba(136,121,232,${(0.18 + intensity * 0.55).toFixed(3)})`;
+            else if (!isFuture && st.missed > 0) bg = `rgba(251,191,36,${(0.16 + (st.missed / 5) * 0.35).toFixed(3)})`;
             else if (!isFuture) bg = "var(--tz-empty-cell)";
             return (
               <button
@@ -434,10 +434,10 @@ function MonthTab({ today }: { today: string }) {
                 aria-label={`Rincian tanggal ${key}`}
                 onClick={() => setSelected(key)}
                 className={cn(
-                  "tap relative flex aspect-square items-center justify-center rounded-full text-[10.5px] font-semibold transition-colors",
-                  key === today ? "text-white" : "text-tz-ink/90",
-                  isFuture && "text-tz-ink/20",
-                  key === today && !st.hasData && "bg-tz-violet text-white"
+                  "tap relative flex aspect-square items-center justify-center rounded-full text-[10.5px] font-bold transition-colors",
+                  key === today && "ring-2 ring-tz-violet ring-offset-2 ring-offset-tz-panel",
+                  isFuture ? "text-tz-ink/20 light:text-tz-ink/25" : "text-tz-ink/90",
+                  key === today && !st.hasData && "bg-tz-violet text-white light:text-white"
                 )}
                 style={{ background: key === today && !st.hasData ? undefined : bg }}
               >
@@ -447,15 +447,15 @@ function MonthTab({ today }: { today: string }) {
           })}
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[10px] text-tz-muted">
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[10px] font-semibold text-tz-muted">
           <span className="flex items-center gap-1">
             <span aria-hidden className="h-2 w-2 rounded-full bg-teal-400/90" /> Berjamaah
           </span>
           <span className="flex items-center gap-1">
-            <span aria-hidden className="h-2 w-2 rounded-full bg-sky-400/90" /> Mandiri
+            <span aria-hidden className="h-2 w-2 rounded-full bg-tz-violet/80" /> Mandiri
           </span>
           <span className="flex items-center gap-1">
-            <span aria-hidden className="h-2 w-2 rounded-full bg-amber-400/80" /> Ada yang tidak dilaksanakan
+            <span aria-hidden className="h-2 w-2 rounded-full bg-amber-400/85" /> Ada yang tidak dilaksanakan
           </span>
           <span className="flex items-center gap-1">
             <span aria-hidden className="h-2 w-2 rounded-full border border-dashed border-tz-line-strong" /> Tanpa catatan (bukan gagal)
@@ -511,12 +511,12 @@ function QadaTab({ today }: { today: string }) {
   return (
     <div className="space-y-5">
       {/* Ringkasan lembut */}
-      <GlassCard variant="clean" className="p-5">
-        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-tz-muted">Qada — salat yang ingin dimakbulkan</p>
-        <p className="mt-1 font-display text-[34px] font-extrabold leading-none tabular-nums text-tz-ink">
+      <GlassCard className="p-5">
+        <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-tz-muted">Qada — salat yang ingin dimakbulkan</p>
+        <p className="tz-stat mt-1 text-[34px] font-extrabold leading-none text-tz-ink">
           {pending.length} <span className="text-[15px] font-bold text-tz-muted">belum selesai</span>
         </p>
-        <p className="mt-1.5 text-[11px] leading-relaxed text-tz-muted">
+        <p className="mt-1.5 text-[11px] font-medium leading-relaxed text-tz-muted">
           {completedThisMonth > 0
             ? `Bulan ini kamu sudah mencatat ${completedThisMonth} qada selesai. Terus bertumbuh, satu per satu.`
             : "Tidak apa-apa, selalu ada kesempatan untuk memperbaiki diri."}
@@ -525,11 +525,11 @@ function QadaTab({ today }: { today: string }) {
 
       {/* Pengingat hadis — sumber eksplisit */}
       <GlassCard variant="violet" className="p-4">
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-tz-accent">{HADITH_QADA.tag}</p>
+        <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-tz-accent">{HADITH_QADA.tag}</p>
         <p className="quran-arabic mt-2.5 text-right text-[19px] leading-[1.9] text-tz-ink">{HADITH_QADA.arabic}</p>
         <p className="mt-2 text-[12px] leading-relaxed text-tz-ink/90">&ldquo;{HADITH_QADA.text}&rdquo;</p>
         <div className="mt-2.5">
-          <Chip className="border-tz-violet/30 bg-tz-violet/10 text-tz-accent">{HADITH_QADA.source}</Chip>
+          <Chip className="bg-tz-panel font-bold text-tz-accent">{HADITH_QADA.source}</Chip>
         </div>
       </GlassCard>
 
@@ -538,18 +538,18 @@ function QadaTab({ today }: { today: string }) {
         <section aria-label="Daftar qada berjalan" className="space-y-3">
           {grouped.map(({ id, items }) => (
             <div key={id}>
-              <p className="mb-1.5 flex items-center gap-2 px-1 text-[12px] font-bold text-tz-ink">
+              <p className="mb-1.5 flex items-center gap-2 px-1 text-[12px] font-extrabold text-tz-ink">
                 {prayerMetaFor(today, id, true).label}
-                <Chip className="border-tz-line">{items.length}</Chip>
+                <Chip>{items.length}</Chip>
               </p>
               <div className="space-y-1.5">
                 {items.map((q) => (
-                  <div key={q.id} className="flex items-center gap-2.5 rounded-xl border border-tz-line bg-tz-panel-soft px-3 py-2.5">
-                    <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-300/30 bg-amber-400/10 text-amber-500 light:text-amber-600">
+                  <div key={q.id} className="flex items-center gap-2.5 rounded-2xl border border-tz-line bg-tz-panel px-3 py-2.5">
+                    <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-400/15 text-amber-600 dark:text-amber-300">
                       <BookMarked size={14} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[12px] font-semibold text-tz-ink">{formatDayFullOf(q.missedDate)}</span>
+                      <span className="block text-[12px] font-bold text-tz-ink">{formatDayFullOf(q.missedDate)}</span>
                       {q.note ? <span className="block truncate text-[10px] text-tz-muted">{q.note}</span> : null}
                     </span>
                     <button
@@ -558,7 +558,7 @@ function QadaTab({ today }: { today: string }) {
                         completeQada(q.id);
                         toast.success("Alhamdulillah, qada tercatat selesai");
                       }}
-                      className="tap flex shrink-0 items-center gap-1 rounded-full bg-gradient-to-r from-tz-purple to-tz-violet px-3 py-1.5 text-[10.5px] font-bold text-white"
+                      className="tap tz-btn-lime flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-[10.5px] font-extrabold"
                     >
                       <Check size={12} strokeWidth={3} /> Sudah diqada
                     </button>
@@ -570,7 +570,7 @@ function QadaTab({ today }: { today: string }) {
                         deleteQada(q.id);
                         toast.info("Catatan qada dihapus");
                       }}
-                      className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-400"
+                      className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-500"
                     >
                       <Trash2 size={14} />
                     </ConfirmButton>
@@ -581,7 +581,7 @@ function QadaTab({ today }: { today: string }) {
           ))}
         </section>
       ) : (
-        <p className="rounded-2xl border border-dashed border-tz-violet/25 bg-tz-violet/[0.05] px-4 py-6 text-center text-[12px] leading-relaxed text-tz-muted">
+        <p className="rounded-2xl border border-dashed border-tz-line-strong bg-tz-panel-soft/60 px-4 py-6 text-center text-[12px] leading-relaxed text-tz-muted">
           Daftar qada masih kosong. Bila ada salat yang terlewat, kamu bisa menandainya dari tab Hari Ini atau menambahkan
           manual di bawah ini.
         </p>
@@ -593,7 +593,7 @@ function QadaTab({ today }: { today: string }) {
         <GlassCard className="space-y-3 p-4">
           <div className="grid grid-cols-2 gap-2.5">
             <div>
-              <label htmlFor="qada-prayer" className="mb-1 block text-[10.5px] font-semibold uppercase tracking-wide text-tz-muted">
+              <label htmlFor="qada-prayer" className="mb-1 block text-[10.5px] font-bold uppercase tracking-wide text-tz-muted">
                 Waktu salat
               </label>
               <select
@@ -610,7 +610,7 @@ function QadaTab({ today }: { today: string }) {
               </select>
             </div>
             <div>
-              <label htmlFor="qada-date" className="mb-1 block text-[10.5px] font-semibold uppercase tracking-wide text-tz-muted">
+              <label htmlFor="qada-date" className="mb-1 block text-[10.5px] font-bold uppercase tracking-wide text-tz-muted">
                 Tanggal salat
               </label>
               <input
@@ -635,7 +635,7 @@ function QadaTab({ today }: { today: string }) {
           <button
             type="button"
             onClick={submit}
-            className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-tz-purple to-tz-violet text-sm font-semibold text-white shadow-[0_6px_18px_-6px_rgba(85,51,154,0.9)]"
+            className="tap tz-btn-ink flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full text-sm font-bold"
           >
             <Plus size={16} /> Tambah ke Daftar Qada
           </button>
@@ -650,11 +650,11 @@ function QadaTab({ today }: { today: string }) {
             <ul className="divide-y divide-tz-line-soft">
               {completed.slice(0, 40).map((q) => (
                 <li key={q.id} className="flex items-center gap-3 px-4 py-2.5">
-                  <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-300/30 bg-emerald-400/10 text-emerald-600 light:text-emerald-700">
+                  <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-400/15 text-emerald-600 light:text-emerald-700">
                     <Check size={14} strokeWidth={3} />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[12px] font-semibold text-tz-ink">
+                    <span className="block truncate text-[12px] font-bold text-tz-ink">
                       {PRAYERS.find((p) => p.id === q.prayer)?.label ?? q.prayer} · {formatDayFullOf(q.missedDate)}
                     </span>
                     <span className="block text-[10px] text-tz-muted">
@@ -722,13 +722,13 @@ export function PrayerPage() {
   return (
     <div className="space-y-5">
       <header className="animate-tz-fade-up pt-1">
-        <h1 className="font-display text-[26px] font-bold tracking-tight text-gradient-violet">Sholat</h1>
-        <p className="mt-1 text-sm text-tz-muted">Catat lima waktu salat dan kelola qada dengan tenang</p>
+        <h1 className="tz-stat text-[27px] font-extrabold tracking-tight text-tz-ink">Sholat</h1>
+        <p className="mt-1 text-[12.5px] font-medium text-tz-muted">Catat lima waktu salat dan kelola qada dengan tenang</p>
       </header>
 
       {/* Tab */}
       <div
-        className="grid grid-cols-3 gap-1.5 rounded-xl border border-tz-line bg-tz-panel-soft p-1.5"
+        className="grid grid-cols-3 gap-1.5 rounded-full border border-tz-line bg-tz-panel-soft p-1.5"
         role="tablist"
         aria-label="Bagian halaman sholat"
       >
@@ -746,10 +746,8 @@ export function PrayerPage() {
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
             className={cn(
-              "tap min-h-[38px] rounded-lg text-[12.5px] font-semibold transition-all",
-              tab === t.id
-                ? "bg-gradient-to-r from-tz-purple to-tz-violet text-white shadow-[0_4px_14px_-4px_rgba(85,51,154,0.8)]"
-                : "text-tz-muted hover:text-tz-accent"
+              "tap min-h-[38px] rounded-full text-[12.5px] font-bold transition-all",
+              tab === t.id ? "tz-btn-ink" : "text-tz-muted hover:text-tz-accent"
             )}
           >
             {t.label}

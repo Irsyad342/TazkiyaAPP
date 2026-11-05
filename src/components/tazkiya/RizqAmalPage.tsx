@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Tazkiya — Rizq & Amal (halaman tersendiri dari menu Lainnya).
+ * Tazkiya — Rizq & Amal (halaman tersendiri dari Beranda).
  * Target kebaikan harian (default + pribadi), catatan amal/sedekah,
  * riwayat kegiatan kebaikan, dan ringkasan mingguan.
  * Prinsip: tanpa penilaian keimanan, tanpa kompetisi, tanpa perhitungan
@@ -70,7 +70,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
               type="button"
               aria-expanded={managing}
               onClick={() => setManaging((v) => !v)}
-              className="tap flex shrink-0 items-center gap-1 rounded-full border border-tz-violet/25 bg-tz-violet/10 px-2.5 py-1 text-[10.5px] font-semibold text-tz-accent"
+              className="tap flex shrink-0 items-center gap-1 rounded-full border border-tz-violet/30 bg-tz-violet/10 px-2.5 py-1 text-[10.5px] font-bold text-tz-accent"
             >
               {managing ? <X size={12} /> : null} {managing ? "Selesai" : "Atur"}
             </button>
@@ -88,7 +88,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                   setTitle(g.label);
                   toast.info(`Menulis catatan: ${g.label}`);
                 }}
-                className="tap rounded-full border border-tz-violet/30 bg-tz-violet/10 px-3 py-1.5 text-[11.5px] font-semibold text-tz-accent transition-all hover:bg-tz-violet/18"
+                className="tap rounded-full border border-tz-violet/25 bg-tz-violet/10 px-3 py-1.5 text-[11.5px] font-bold text-tz-accent transition-all hover:bg-tz-violet/18"
               >
                 + {g.label}
               </button>
@@ -96,8 +96,8 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
           </div>
 
           {managing ? (
-            <div className="tz-fade-in mt-3 space-y-2.5 rounded-xl border border-tz-line bg-tz-panel-soft p-3">
-              <p className="text-[10.5px] font-semibold uppercase tracking-wide text-tz-muted">Kelola target (hapus hanya di mode ini)</p>
+            <div className="tz-fade-in mt-3 space-y-2.5 rounded-2xl bg-tz-panel-soft p-3">
+              <p className="text-[10.5px] font-bold uppercase tracking-wide text-tz-muted">Kelola target (hapus hanya di mode ini)</p>
               <ul className="space-y-1.5">
                 {amalGoals.map((g) => (
                   <li key={g.id} className="flex items-center gap-2">
@@ -108,7 +108,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                         title={`Hapus target "${g.label}"?`}
                         description="Target kebaikan pribadi ini akan dihapus dari daftar. Catatan amal yang sudah ada tidak terpengaruh."
                         onConfirm={() => deleteAmalGoal(g.id)}
-                        className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-400"
+                        className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-500"
                       >
                         <Trash2 size={13} />
                       </ConfirmButton>
@@ -135,7 +135,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                     setGoalDraft("");
                     toast.success("Target pribadi ditambahkan");
                   }}
-                  className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-tz-purple to-tz-violet text-white"
+                  className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-tz-violet text-white"
                 >
                   <Plus size={16} />
                 </button>
@@ -150,7 +150,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
         <SectionHeader title="Catat Amal Hari Ini" caption="Sedekah, bantuan, silaturahmi — semua sama berharganya" />
         <GlassCard className="space-y-3 p-4">
           <div>
-            <p className="mb-1.5 block text-[10.5px] font-semibold uppercase tracking-wide text-tz-muted/90">Jenis kebaikan</p>
+            <p className="mb-1.5 block text-[10.5px] font-bold uppercase tracking-wide text-tz-muted/90">Jenis kebaikan</p>
             <div className="flex flex-wrap gap-1.5">
               {AMAL_KINDS.map((k) => (
                 <button
@@ -159,9 +159,9 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                   aria-pressed={kind === k.id}
                   onClick={() => setKind(k.id)}
                   className={cn(
-                    "tap rounded-full border px-3 py-1.5 text-[11.5px] font-semibold transition-all",
+                    "tap rounded-full border px-3 py-1.5 text-[11.5px] font-bold transition-all",
                     kind === k.id
-                      ? "border-tz-violet/60 bg-tz-violet text-white shadow-[0_4px_14px_-6px_rgba(85,51,154,0.9)]"
+                      ? "border-transparent bg-tz-ink text-white"
                       : "border-tz-line bg-tz-panel-soft text-tz-muted hover:text-tz-accent"
                   )}
                 >
@@ -191,11 +191,11 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
           <button
             type="button"
             onClick={submit}
-            className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-tz-purple to-tz-violet text-sm font-semibold text-white shadow-[0_8px_22px_-8px_rgba(85,51,154,0.9)]"
+            className="tap tz-btn-lime flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full text-sm font-extrabold"
           >
             <Check size={16} strokeWidth={3} /> Simpan Catatan
           </button>
-          <p className="text-[10px] leading-relaxed text-tz-muted/80">
+          <p className="text-[10px] leading-relaxed text-tz-muted/85">
             Tidak ada penilaian atas jumlah atau nilai — setiap kebaikan dicatat setara, untuk kesadaranmu sendiri.
           </p>
         </GlassCard>
@@ -213,12 +213,12 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
         ) : (
           <div className="space-y-2">
             {todayEntries.map((e) => (
-              <div key={e.id} className="flex items-center gap-3 rounded-xl border border-tz-line bg-tz-panel-soft px-3 py-2.5">
-                <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-tz-violet/25 bg-tz-violet/12 text-[14px]">
+              <div key={e.id} className="flex items-center gap-3 rounded-2xl border border-tz-line bg-tz-panel px-3 py-2.5">
+                <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-tz-violet/12 text-[14px]">
                   {AMAL_KINDS.find((k) => k.id === e.kind)?.emoji ?? "✨"}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[12.5px] font-semibold text-tz-ink">{e.title}</span>
+                  <span className="block truncate text-[12.5px] font-bold text-tz-ink">{e.title}</span>
                   <span className="block text-[10.5px] text-tz-muted">
                     {amalKindLabel(e.kind)}
                     {e.note ? ` · ${e.note}` : ""}
@@ -232,7 +232,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                     deleteAmalEntry(e.id);
                     toast.info("Catatan dihapus");
                   }}
-                  className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-400"
+                  className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-500"
                 >
                   <Trash2 size={14} />
                 </ConfirmButton>
@@ -249,20 +249,23 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
           <div className="flex items-end justify-between gap-2" aria-hidden>
             {weekCounts.map((c, i) => (
               <div key={week[i]} className="flex flex-1 flex-col items-center gap-1.5">
-                <span className="text-[9.5px] font-semibold tabular-nums text-tz-muted/80">{c > 0 ? c : ""}</span>
+                <span className="text-[9.5px] font-bold tabular-nums text-tz-muted/85">{c > 0 ? c : ""}</span>
                 <div className="flex h-20 w-full items-end">
                   <div
-                    className="tz-bar-grow-x mx-auto w-full max-w-[22px] rounded-full bg-gradient-to-t from-tz-purple to-tz-violet"
+                    className={cn(
+                      "tz-bar-grow-x mx-auto w-full max-w-[22px] rounded-full",
+                      week[i] === today ? "bg-tz-lime" : "bg-tz-violet/70"
+                    )}
                     style={{ height: `${Math.max(c > 0 ? 10 : 2, (c / maxDay) * 100)}%`, opacity: c > 0 ? 1 : 0.35 }}
                   />
                 </div>
-                <span className={cn("text-[9.5px]", week[i] === today ? "font-bold text-tz-accent" : "text-tz-muted")}>
+                <span className={cn("text-[9.5px] font-semibold", week[i] === today ? "font-bold text-tz-accent" : "text-tz-muted")}>
                   {weekdayShort(week[i])}
                 </span>
               </div>
             ))}
           </div>
-          <p className="mt-3 flex items-center gap-1.5 text-[12px] font-semibold text-tz-ink">
+          <p className="mt-3 flex items-center gap-1.5 text-[12px] font-bold text-tz-ink">
             <Sparkles size={13} className="text-tz-violet" />
             {weekTotal > 0 ? `${weekTotal} kebaikan dalam 7 hari terakhir` : "Belum ada catatan minggu ini — buka jalan dengan satu kebaikan kecil"}
           </p>
@@ -283,7 +286,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                     {AMAL_KINDS.find((k) => k.id === e.kind)?.emoji ?? "✨"}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[12px] font-medium text-tz-ink/90">{e.title}</span>
+                    <span className="block truncate text-[12px] font-semibold text-tz-ink/90">{e.title}</span>
                     <span className="block text-[10px] text-tz-muted">
                       {relativeDayLabel(e.date, today)} · {amalKindLabel(e.kind)}
                     </span>
@@ -296,7 +299,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                       deleteAmalEntry(e.id);
                       toast.info("Catatan dihapus");
                     }}
-                    className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-400"
+                    className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-500"
                   >
                     <Trash2 size={13} />
                   </ConfirmButton>
@@ -307,7 +310,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
         )}
       </section>
 
-      <p className="pb-1 text-center text-[10px] leading-relaxed text-tz-muted/60">
+      <p className="pb-1 text-center text-[10px] leading-relaxed text-tz-muted/70">
         Rizq &amp; Amal membantu membangun kebiasaan — bukan kompetisi, bukan pengukuran keimanan. {formatDayFull(today)}.
       </p>
     </div>

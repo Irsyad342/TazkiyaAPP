@@ -44,25 +44,25 @@ export function DayDetailSheet({ date, onClose }: { date: string; onClose: () =>
       <DialogContent
         showCloseButton={false}
         aria-describedby={undefined}
-        className="glass-strong fixed! top-auto bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 translate-y-0 gap-3 overflow-y-auto rounded-t-[1.65rem] rounded-b-none border-x-0 border-b-0 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_-18px_60px_-12px_rgba(8,5,15,0.8)] duration-250 thin-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8"
+        className="glass-strong fixed! top-auto bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 translate-y-0 gap-3 overflow-y-auto rounded-t-[1.85rem] rounded-b-none border-x-0 border-b-0 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_-24px_70px_-20px_rgba(16,12,32,0.5)] duration-250 thin-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8"
       >
-        <span aria-hidden className="mx-auto mb-0.5 block h-1 w-10 shrink-0 rounded-full bg-tz-line-strong/70" />
+        <span aria-hidden className="mx-auto mb-0.5 block h-1 w-10 shrink-0 rounded-full bg-tz-line-strong" />
         <DialogHeader>
-          <DialogTitle className="font-display text-lg text-tz-ink">Rincian {relativeDayLabel(date, today)}</DialogTitle>
-          <p className="flex items-center gap-1.5 text-[11.5px] text-tz-muted">
+          <DialogTitle className="font-display text-lg font-extrabold text-tz-ink">Rincian {relativeDayLabel(date, today)}</DialogTitle>
+          <p className="flex items-center gap-1.5 text-[11.5px] font-medium text-tz-muted">
             <CalendarDays size={12} className="text-tz-violet" />
             {formatDayFull(date)}
           </p>
         </DialogHeader>
 
         {!hasLog && !hasDetails ? (
-          <p className="rounded-2xl border border-tz-line bg-tz-panel-soft p-4 text-center text-[12px] leading-relaxed text-tz-muted">
+          <p className="rounded-2xl bg-tz-panel-soft p-4 text-center text-[12px] leading-relaxed text-tz-muted">
             Belum ada catatan aktivitas pada tanggal ini.
           </p>
         ) : (
           <>
             <div className="space-y-1.5">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-tz-muted">Salat wajib</p>
+              <p className="text-[11px] font-bold uppercase tracking-wide text-tz-muted">Salat wajib</p>
               {PRAYERS.map((p) => {
                 const meta = prayerMetaFor(date, p.id, !!fridayZuhurAlt?.[date]);
                 const d = selectPrayerDetail(prayerDetails, logs, date, p.id);
@@ -81,17 +81,17 @@ export function DayDetailSheet({ date, onClose }: { date: string; onClose: () =>
                 return (
                   <div
                     key={p.id}
-                    className="flex items-center justify-between gap-2 rounded-xl border border-tz-line bg-tz-panel-soft px-3 py-2"
+                    className="flex items-center justify-between gap-2 rounded-xl bg-tz-panel-soft px-3 py-2"
                   >
-                    <p className="min-w-0 truncate text-[12px] font-semibold text-tz-ink">{meta.label}</p>
+                    <p className="min-w-0 truncate text-[12px] font-bold text-tz-ink">{meta.label}</p>
                     <p
                       className={cn(
-                        "shrink-0 text-right text-[10.5px]",
+                        "shrink-0 text-right text-[10.5px] font-semibold",
                         d.status === "done"
                           ? "text-tz-accent"
                           : d.status === "missed"
                             ? "text-rose-500 light:text-rose-600"
-                            : "text-tz-muted/70"
+                            : "text-tz-muted/75"
                       )}
                     >
                       {statusText}
@@ -101,28 +101,28 @@ export function DayDetailSheet({ date, onClose }: { date: string; onClose: () =>
               })}
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="rounded-xl border border-tz-line bg-tz-panel-soft p-2.5">
-                <p className="flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-wide text-tz-muted">
+              <div className="rounded-xl bg-tz-panel-soft p-2.5">
+                <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-wide text-tz-muted">
                   <BookOpen size={12} className="text-tz-violet" /> Bacaan Al-Qur&apos;an
                 </p>
-                <p className="mt-1 text-[12px] font-semibold text-tz-ink">
+                <p className="mt-1 text-[12px] font-extrabold text-tz-ink">
                   {log && (log.quranPages > 0 || log.quranVerses > 0)
                     ? `${log.quranPages.toLocaleString("id-ID")} halaman · ${log.quranVerses.toLocaleString("id-ID")} ayat`
                     : "Belum ada catatan"}
                 </p>
               </div>
-              <div className="rounded-xl border border-tz-line bg-tz-panel-soft p-2.5">
-                <p className="flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-wide text-tz-muted">
+              <div className="rounded-xl bg-tz-panel-soft p-2.5">
+                <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-wide text-tz-muted">
                   <CircleDot size={12} className="text-tz-violet" /> Zikir
                 </p>
-                <p className="mt-1 text-[12px] font-semibold text-tz-ink">
+                <p className="mt-1 text-[12px] font-extrabold text-tz-ink">
                   {log && log.zikirCount > 0 ? `${log.zikirCount.toLocaleString("id-ID")} hitungan` : "Belum ada catatan"}
                 </p>
               </div>
             </div>
             {entry ? (
-              <div className="rounded-xl border border-tz-line bg-tz-panel-soft p-2.5">
-                <p className="text-[10.5px] font-semibold uppercase tracking-wide text-tz-muted">Jurnal Syukur</p>
+              <div className="rounded-xl bg-tz-panel-soft p-2.5">
+                <p className="text-[10.5px] font-bold uppercase tracking-wide text-tz-muted">Jurnal Syukur</p>
                 <ul className="mt-1 space-y-0.5">
                   {entry.items.filter(Boolean).map((it, i) => (
                     <li key={i} className="text-[11.5px] leading-relaxed text-tz-ink/90">
@@ -133,9 +133,9 @@ export function DayDetailSheet({ date, onClose }: { date: string; onClose: () =>
               </div>
             ) : null}
             {amalToday > 0 ? (
-              <div className="rounded-xl border border-tz-line bg-tz-panel-soft p-2.5">
-                <p className="text-[10.5px] font-semibold uppercase tracking-wide text-tz-muted">Rizq &amp; Amal</p>
-                <p className="mt-1 text-[12px] font-semibold text-tz-ink">{amalToday} kebaikan tercatat</p>
+              <div className="rounded-xl bg-tz-panel-soft p-2.5">
+                <p className="text-[10.5px] font-bold uppercase tracking-wide text-tz-muted">Rizq &amp; Amal</p>
+                <p className="mt-1 text-[12px] font-extrabold text-tz-ink">{amalToday} kebaikan tercatat</p>
               </div>
             ) : null}
           </>
@@ -144,7 +144,7 @@ export function DayDetailSheet({ date, onClose }: { date: string; onClose: () =>
         <button
           type="button"
           onClick={onClose}
-          className="tap mt-1 min-h-[42px] w-full rounded-xl border border-tz-line bg-tz-panel-soft px-4 text-sm font-semibold text-tz-muted"
+          className="tap mt-1 min-h-[42px] w-full rounded-full bg-tz-panel-soft px-4 text-sm font-bold text-tz-muted"
         >
           Tutup
         </button>

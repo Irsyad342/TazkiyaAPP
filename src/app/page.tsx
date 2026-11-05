@@ -3,9 +3,9 @@
 /**
  * Tazkiya — Kerangka aplikasi (Islamic Daily Companion).
  * Gerbang hidrasi, bingkai ponsel mobile-first, tema (gelap/terang/sistem),
- * mode Liquid Glass, transisi antartab, lima menu utama (Beranda, Al-Qur'an,
- * Sholat, Progress, Profil) + sub-halaman refleksi dari Beranda (Jurnal
- * Syukur, Zikir & Doa, Rizq & Amal), pembaca Al-Qur'an, dan Tasbih Digital.
+ * transisi antartab, lima menu utama (Beranda, Al-Qur'an, Sholat, Progress,
+ * Profil) + sub-halaman refleksi dari Beranda (Jurnal Syukur, Zikir & Doa,
+ * Rizq & Amal), pembaca Al-Qur'an, dan Tasbih Digital.
  */
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -48,13 +48,6 @@ const ProgressPage = dynamic(() => import("@/components/tazkiya/ProgressPage").t
     </div>
   ),
 });
-
-/* Orb dekoratif untuk latar luar bingkai (desktop).
-   Radius blur diatur lewat className agar bisa berbeda antara HP (blur-2xl,
-   lebih murah) dan desktop (blur-3xl) tanpa konflik kelas Tailwind. */
-function OuterOrb({ className }: { className?: string }) {
-  return <div aria-hidden className={`pointer-events-none absolute rounded-full ${className ?? ""}`} />;
-}
 
 const TAB_TITLES: Record<TabId, string> = {
   beranda: "Tazkiya — Beranda",
@@ -122,7 +115,7 @@ export default function Page() {
       // Warna bilah status/URL browser mengikuti tema aktif.
       document
         .querySelector('meta[name="theme-color"]')
-        ?.setAttribute("content", resolved === "light" ? "#F5F1F5" : "#171321");
+        ?.setAttribute("content", resolved === "light" ? "#F7F7FC" : "#15121D");
     };
     apply();
     if (theme === "system") {
@@ -131,13 +124,13 @@ export default function Page() {
     }
   }, [theme]);
 
-  // Saklar "Animasi transisi" juga menghentikan animasi CSS dekoratif (glow bergerak)
+  // Saklar "Animasi transisi" juga menghentikan animasi CSS dekoratif
   // agar perangkat lambat tetap ringan bila pengguna mematikan animasi.
   useEffect(() => {
     document.documentElement.dataset.anim = animations ? "on" : "off";
   }, [animations]);
 
-  // Liquid Glass: data-glass pada <html>.
+  // Liquid Glass: data-glass pada <html> (mengubah permukaan kartu).
   useEffect(() => {
     document.documentElement.dataset.glass = liquidGlass ? "liquid" : "classic";
   }, [liquidGlass]);
@@ -207,16 +200,16 @@ export default function Page() {
   if (!hydrated) {
     return (
       <main className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-tz-stage">
-        <div
-          aria-hidden
-          className="animate-tz-aurora absolute left-1/2 top-1/3 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-tz-purple/30 blur-[90px] md:h-[420px] md:w-[420px] md:blur-[130px]"
-        />
-        <div aria-hidden className="absolute bottom-10 right-1/4 h-44 w-44 rounded-full bg-tz-violet/16 blur-[70px] md:h-64 md:w-64 md:blur-[110px]" />
+        <div aria-hidden className="tz-blob left-1/2 top-1/3 h-72 w-72 -translate-x-1/2 bg-tz-violet/25 md:h-[420px] md:w-[420px]" />
+        <div aria-hidden className="tz-blob bottom-10 right-1/4 h-44 w-44 bg-tz-lime/25" />
         <div className="relative flex flex-col items-center gap-4">
-          <div className="animate-tz-pulse relative flex h-[72px] w-[72px] items-center justify-center rounded-[1.6rem] border border-tz-violet/40 bg-gradient-to-br from-tz-purple to-tz-violet font-display text-3xl font-bold text-white">
+          <div className="animate-tz-pulse relative flex h-[76px] w-[76px] items-center justify-center rounded-[1.7rem] bg-gradient-to-br from-tz-violet to-tz-lavender font-display text-3xl font-extrabold text-white shadow-[0_24px_50px_-20px_rgba(122,104,224,0.65)]">
             ت
+            <span aria-hidden className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-tz-lime text-[9px] font-black text-tz-lime-ink">
+              ✓
+            </span>
           </div>
-          <p className="text-glow font-display text-sm font-semibold uppercase tracking-[0.22em] text-tz-accent">Tazkiya</p>
+          <p className="font-display text-sm font-extrabold uppercase tracking-[0.24em] text-tz-muted">Tazkiya</p>
         </div>
       </main>
     );
@@ -225,31 +218,25 @@ export default function Page() {
   return (
     <LazyMotion features={domAnimation} strict>
     <main className="relative flex min-h-dvh w-full items-center justify-center bg-tz-stage" aria-label="Aplikasi Tazkiya">
-      {/* Aura latar (desktop / area di luar bingkai) — disembunyikan di HP:
-          di layar ≤430px bingkai menutupi seluruh layar sehingga aura ini tak
-          terlihat, tetapi 3 lapisan blur besar tetap memakan memori & GPU. */}
+      {/* Blob pastel di luar bingkai (desktop) — statis & murah */}
       <div aria-hidden className="pointer-events-none fixed inset-0 hidden overflow-hidden md:block">
-        <div className="animate-tz-aurora absolute left-1/2 top-[28%] h-[340px] w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-tz-purple/30 blur-[90px] md:h-[560px] md:w-[560px] md:blur-[150px]" />
-        <div className="absolute bottom-0 right-[16%] h-52 w-52 rounded-full bg-tz-violet/16 blur-[80px] md:h-80 md:w-80 md:blur-[130px]" />
-        <div className="absolute left-[8%] top-[12%] h-44 w-44 rounded-full bg-tz-orb-deep/30 blur-[70px] md:h-64 md:w-64 md:blur-[120px]" />
+        <div className="tz-blob left-[10%] top-[12%] h-72 w-72 bg-tz-violet/20" />
+        <div className="tz-blob bottom-[8%] right-[12%] h-64 w-64 bg-tz-lime/25" />
+        <div className="tz-blob bottom-[30%] left-[24%] h-44 w-44 bg-tz-lavender/25" />
       </div>
 
       {/* Bingkai ponsel */}
       <div
         role="application"
-        className="relative flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-tz-frame md:h-[min(880px,94dvh)] md:rounded-[2.4rem] md:border md:border-tz-line md:shadow-[0_50px_140px_-30px_rgba(85,51,154,0.55)]"
+        className="relative flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-tz-frame md:h-[min(880px,94dvh)] md:rounded-[2.6rem] md:border md:border-tz-line md:shadow-[0_60px_140px_-40px_rgba(84,70,160,0.45)]"
       >
+        {/* Sorot lavender lembut di tepi atas — statis, memberi kedalaman tipis */}
         <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="tz-aurora animate-tz-aurora absolute inset-0" />
-          {/* Orb dekoratif: versi HP lebih kecil & blur lebih tipis — area filter
-              blur tumbuh kuadratik, 4 lapisan besar berarti biaya komposit tinggi. */}
-          <OuterOrb className="-right-20 -top-20 h-52 w-52 bg-tz-violet/20 blur-2xl md:-right-28 md:-top-28 md:h-80 md:w-80 md:blur-3xl" />
-          <OuterOrb className="-left-24 top-1/3 h-48 w-48 bg-tz-purple/25 blur-2xl md:-left-32 md:h-72 md:w-72 md:blur-3xl" />
-          <OuterOrb className="bottom-16 right-0 h-40 w-40 bg-tz-violet/10 blur-2xl md:h-60 md:w-60 md:blur-3xl" />
-          <div className="absolute inset-0 bg-gradient-to-b from-tz-aurora-a via-transparent to-tz-aurora-b" />
+          <div className="tz-blob -right-16 -top-16 h-56 w-56 bg-tz-violet/10 light:bg-tz-violet/15" />
+          <div className="tz-blob -left-20 bottom-24 h-48 w-48 bg-tz-lime/10 light:bg-tz-lime/15" />
         </div>
 
-        <div id="konten-tazkiya" className="no-scrollbar relative z-10 flex-1 overflow-y-auto px-5 pb-36 pt-[max(1rem,env(safe-area-inset-top))]">
+        <div id="konten-tazkiya" className="no-scrollbar relative z-10 flex-1 overflow-y-auto px-5 pb-36 pt-[max(1.25rem,env(safe-area-inset-top))]">
           <AnimatePresence mode="wait" initial={false}>
             <m.div
               key={subpage ?? tab}
@@ -310,25 +297,25 @@ export default function Page() {
             ? {
                 duration: 2600,
                 style: {
-                  background: "rgba(255,255,255,0.97)",
-                  border: "1px solid rgba(117,70,200,0.28)",
-                  color: "#292331",
-                  borderRadius: "16px",
+                  background: "#ffffff",
+                  border: "1px solid #EEEAF5",
+                  color: "#1D1C27",
+                  borderRadius: "18px",
                   fontSize: "13px",
-                  backdropFilter: "blur(10px)",
-                  boxShadow: "0 12px 40px rgba(85,51,154,0.22)",
+                  fontWeight: 600,
+                  boxShadow: "0 18px 44px -18px rgba(84,70,160,0.35)",
                 },
               }
             : {
                 duration: 2600,
                 style: {
-                  background: "rgba(36,27,58,0.95)",
-                  border: "1px solid rgba(156,114,239,0.35)",
-                  color: "#F2EEFB",
-                  borderRadius: "16px",
+                  background: "#2B2338",
+                  border: "1px solid #3A3152",
+                  color: "#F7F4FF",
+                  borderRadius: "18px",
                   fontSize: "13px",
-                  backdropFilter: "blur(12px)",
-                  boxShadow: "0 12px 40px rgba(13,10,20,0.6)",
+                  fontWeight: 600,
+                  boxShadow: "0 18px 44px -18px rgba(0,0,0,0.65)",
                 },
               }
         }

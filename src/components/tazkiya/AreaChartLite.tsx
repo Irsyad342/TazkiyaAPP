@@ -90,10 +90,10 @@ export function AreaChartLite({
   const pw = Math.max(0, width - PAD.left - PAD.right);
   const ph = H - PAD.top - PAD.bottom;
   const n = data.length;
-  const lineColor = isLight ? "#7546C8" : "#9C72EF";
-  const dotFill = isLight ? "#A98AE8" : "#D8C5FF";
-  const gridColor = isLight ? "rgba(41,35,49,0.08)" : "rgba(255,255,255,0.06)";
-  const axisColor = isLight ? "#706778" : "#A79BC6";
+  const lineColor = isLight ? "#8879E8" : "#A99AF5";
+  const dotFill = isLight ? "#D5F76A" : "#D5F76A";
+  const gridColor = isLight ? "rgba(29,28,39,0.07)" : "rgba(255,255,255,0.06)";
+  const axisColor = isLight ? "#858392" : "#AAA4B8";
 
   const xy: XY[] =
     n === 0 || pw === 0
@@ -203,12 +203,12 @@ export function AreaChartLite({
       {tip ? (
         <div
           className={cn(
-            "pointer-events-none absolute z-10 rounded-xl border px-2.5 py-1.5 text-[11px] leading-snug shadow-lg",
-            isLight ? "border-[rgba(117,70,200,0.3)] bg-white/95 text-[#292331]" : "border-[rgba(156,114,239,0.35)] bg-[rgba(36,27,58,0.95)] text-white"
+            "pointer-events-none absolute z-10 rounded-xl border px-2.5 py-1.5 text-[11px] font-semibold leading-snug shadow-lg",
+            isLight ? "border-[#EEEAF5] bg-white text-[#1D1C27]" : "border-[#3A3152] bg-[#2B2338] text-[#F7F4FF]"
           )}
           style={{ left: tipLeft, top: Math.max(-6, tipY - 58) }}
         >
-          <p className="font-semibold" style={{ color: isLight ? "#5C3AA4" : "#D8C5FF" }}>
+          <p className="font-extrabold" style={{ color: isLight ? "#6C5BD4" : "#C9BCFF" }}>
             {tip.label} · {tip.date.slice(-2)}/{tip.date.slice(5, 7)}
           </p>
           <p>{tip.pct}% Penyelesaian</p>

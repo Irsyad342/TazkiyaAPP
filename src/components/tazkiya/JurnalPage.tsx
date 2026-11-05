@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Tazkiya — Jurnal Syukur (halaman tersendiri dari menu Lainnya).
+ * Tazkiya — Jurnal Syukur (halaman tersendiri dari Beranda).
  * A. Today's Shukr: tiga hal yang disyukuri + tombol simpan.
  * B. Mood check-in: pilihan perasaan oleh pengguna (bukan diagnosis).
  * C. Hadith for Your Heart: hadis dengan sumber kitab + nomor yang jelas —
@@ -80,8 +80,8 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
 
       {/* ---------- A. Today's Shukr ---------- */}
       <section aria-label="Jurnal hari ini" className="animate-tz-fade-up">
-        <GlassCard variant="clean" className="p-5">
-          <p className="font-display text-[17px] font-bold leading-snug text-tz-ink">
+        <GlassCard className="p-5">
+          <p className="font-display text-[17px] font-extrabold leading-snug text-tz-ink">
             Hal apa yang kamu syukuri hari ini?
           </p>
           <p className="mt-1 text-[11.5px] leading-relaxed text-tz-muted">
@@ -94,10 +94,8 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                 <span
                   aria-hidden
                   className={cn(
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-[12px] font-bold",
-                    items[i]?.trim()
-                      ? "border-transparent bg-gradient-to-br from-tz-purple to-tz-violet text-white"
-                      : "border-tz-line bg-tz-panel text-tz-muted"
+                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[12px] font-extrabold",
+                    items[i]?.trim() ? "bg-tz-lime text-tz-lime-ink" : "bg-tz-panel-soft text-tz-muted"
                   )}
                 >
                   {items[i]?.trim() ? <Check size={14} strokeWidth={3} /> : i + 1}
@@ -124,15 +122,13 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
             onClick={save}
             disabled={!canSave}
             className={cn(
-              "tap mt-4 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white transition-all",
-              canSave
-                ? "bg-gradient-to-r from-tz-purple to-tz-violet shadow-[0_8px_22px_-8px_rgba(85,51,154,0.9)]"
-                : "cursor-not-allowed opacity-40"
+              "tap mt-4 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full text-sm font-bold transition-all",
+              canSave ? "tz-btn-ink" : "cursor-not-allowed bg-tz-panel-soft text-tz-muted opacity-60"
             )}
           >
             <BookHeart size={16} /> Simpan Jurnal
           </button>
-          <p className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-tz-muted/80">
+          <p className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-tz-muted/85">
             <Lock size={10} />
             {savedAt ? `Tersimpan hari ini — kamu bisa mengeditnya kapan saja.` : "Privat — hanya kamu yang bisa membacanya."}
           </p>
@@ -159,21 +155,21 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                   className={cn(
                     "tap flex flex-col items-center gap-1.5 rounded-2xl border px-1 py-3 transition-all",
                     active
-                      ? "border-tz-violet/60 bg-tz-violet/12 shadow-[0_0_16px_-6px_rgba(156,114,239,0.7)]"
-                      : "border-tz-line bg-tz-panel-soft hover:border-tz-violet/35"
+                      ? "border-tz-violet/50 bg-tz-violet/[0.08]"
+                      : "border-tz-line bg-tz-panel-soft/50 hover:border-tz-line-strong"
                   )}
                 >
                   <span aria-hidden className="text-[22px] leading-none">
                     {m.emoji}
                   </span>
-                  <span className={cn("text-[10px] font-semibold leading-tight", active ? "text-tz-ink" : "text-tz-muted")}>
+                  <span className={cn("text-[10px] font-bold leading-tight", active ? "text-tz-ink" : "text-tz-muted")}>
                     {m.label}
                   </span>
                 </button>
               );
             })}
           </div>
-          <p className="mt-2.5 text-[10px] leading-relaxed text-tz-muted/80">
+          <p className="mt-2.5 text-[10px] leading-relaxed text-tz-muted/85">
             Mood membantu memilih pengingat yang sesuai — bukan penilaian atau diagnosis psikologis.
           </p>
         </GlassCard>
@@ -185,32 +181,32 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
           title="Hadith for Your Heart"
           caption={activeMood ? `Pengingat yang selaras dengan mood "${moodLabel(activeMood)}"` : "Pengingat untuk hatimu hari ini"}
         />
-        <GlassCard variant="clean" className="p-5">
-          <Chip className="border-tz-violet/30 bg-tz-violet/10 text-tz-accent">{hadith.tag}</Chip>
+        <GlassCard variant="violet" className="p-5">
+          <Chip className="bg-tz-panel font-bold text-tz-accent">{hadith.tag}</Chip>
           <p className="quran-arabic mt-3.5 text-right text-[21px] leading-[1.95] text-tz-ink">{hadith.arabic}</p>
           <p className="mt-3 text-[13px] leading-relaxed text-tz-ink/95">&ldquo;{hadith.text}&rdquo;</p>
           <div className="mt-3 flex flex-wrap items-center gap-1.5">
-            <Chip className="border-tz-violet/30 bg-tz-violet/10 text-tz-accent">{hadith.source}</Chip>
-            <Chip className="border-tz-line">Dinukil apa adanya</Chip>
+            <Chip className="bg-tz-panel font-bold text-tz-accent">{hadith.source}</Chip>
+            <Chip>Dinukil apa adanya</Chip>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => void shareQuote(`"${hadith.text}"\n— ${hadith.source}`)}
-              className="tap flex min-h-[40px] items-center gap-1.5 rounded-xl bg-gradient-to-r from-tz-purple to-tz-violet px-3.5 text-[12px] font-semibold text-white"
+              className="tap tz-btn-ink flex min-h-[40px] items-center gap-1.5 rounded-full px-3.5 text-[12px] font-bold"
             >
               <Share2 size={14} /> Simpan / Bagikan
             </button>
             <button
               type="button"
               onClick={() => setHadithOffset((o) => o + 1)}
-              className="tap flex min-h-[40px] items-center gap-1.5 rounded-xl border border-tz-line bg-tz-panel-soft px-3.5 text-[12px] font-semibold text-tz-accent"
+              className="tap flex min-h-[40px] items-center gap-1.5 rounded-full border border-tz-line bg-tz-panel px-3.5 text-[12px] font-bold text-tz-accent"
             >
               <Sparkles size={14} /> Lihat hadis lainnya
             </button>
           </div>
-          <p className="mt-2.5 text-[10px] leading-relaxed text-tz-muted/80">
+          <p className="mt-2.5 text-[10px] leading-relaxed text-tz-muted/85">
             Kutipan diambil dari koleksi riwayat masyhur dengan sumber tertulis. Tidak ada teks yang dihasilkan otomatis.
           </p>
         </GlassCard>
@@ -233,7 +229,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                 return (
                   <li key={d} className="px-4 py-3">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-[12.5px] font-bold text-tz-ink">{relativeDayLabel(d, today)}</p>
+                      <p className="text-[12.5px] font-extrabold text-tz-ink">{relativeDayLabel(d, today)}</p>
                       <div className="flex items-center gap-1.5">
                         {e.mood ? (
                           <span aria-label={`Mood ${moodLabel(e.mood)}`} className="text-[14px]">
@@ -251,7 +247,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                             // Konten aplikasi bergulir di dalam bingkai, bukan di window.
                             document.getElementById("konten-tazkiya")?.scrollTo({ top: 0, behavior: "smooth" });
                           }}
-                          className="tap rounded-lg border border-tz-line bg-tz-panel-soft px-2 py-1 text-[10px] font-semibold text-tz-accent"
+                          className="tap rounded-lg bg-tz-panel-soft px-2 py-1 text-[10px] font-bold text-tz-accent"
                         >
                           Edit
                         </button>
@@ -263,7 +259,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                             deleteJournal(d);
                             toast.info("Jurnal dihapus");
                           }}
-                          className="tap flex h-9 w-9 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-400"
+                          className="tap flex h-9 w-9 items-center justify-center rounded-full text-tz-muted/70 transition-colors hover:bg-rose-400/10 hover:text-rose-500"
                         >
                           <Trash2 size={13} />
                         </ConfirmButton>
@@ -272,7 +268,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                     <ul className="mt-1 space-y-0.5">
                       {e.items.filter(Boolean).map((it, i) => (
                         <li key={i} className="flex items-start gap-1.5 text-[11.5px] leading-relaxed text-tz-ink/85">
-                          <Heart size={10} className="mt-1 shrink-0 text-tz-violet/70" aria-hidden />
+                          <Heart size={10} className="mt-1 shrink-0 text-tz-violet/80" aria-hidden />
                           <span>{it}</span>
                         </li>
                       ))}
@@ -285,7 +281,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
         )}
       </section>
 
-      <p className="flex items-center justify-center gap-1.5 pb-1 text-center text-[10px] leading-relaxed text-tz-muted/60">
+      <p className="flex items-center justify-center gap-1.5 pb-1 text-center text-[10px] leading-relaxed text-tz-muted/70">
         <Lock size={10} />
         Jurnal tersimpan di perangkat &amp; akunmu — tidak dikirim ke layanan analisis mana pun.
       </p>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Sora, Amiri_Quran } from "next/font/google";
+import { Plus_Jakarta_Sans, Manrope, Amiri_Quran } from "next/font/google";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -9,11 +9,12 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 /*
- * Sora dimuat sebagai font variabel (satu berkas untuk semua weight) —
- * lima berkas weight statis memperlambat muat pertama di jaringan HP.
+ * Manrope sebagai font display (judul, angka statistik) — karakter geometris
+ * tegas yang cocok dengan hierarki editorial Tazkiya; dimuat sebagai font
+ * variabel (satu berkas untuk semua weight).
  */
-const sora = Sora({
-  variable: "--font-sora",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
   display: "swap",
 });
@@ -46,18 +47,18 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#171321",
+  themeColor: "#15121D",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
 };
 
 /**
- * Terapkan tema & Liquid Glass lebih awal (sebelum hidrasi React) agar tidak
- * ada kilatan tema gelap pada pengguna tema terang. Membaca langsung dari
- * localStorage yang sama dengan store Tazkiya; gagal parse → biarkan default.
+ * Terapkan tema lebih awal (sebelum hidrasi React) agar tidak ada kilatan
+ * tema gelap pada pengguna tema terang. Membaca langsung dari localStorage
+ * yang sama dengan store Tazkiya; gagal parse → biarkan default.
  */
-const themeInitScript = `(function(){try{var r=localStorage.getItem("tazkiya-store-v1");if(!r)return;var s=JSON.parse(r).state&&JSON.parse(r).state.settings;if(!s)return;var t=s.theme||"dark";if(t==="system"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.dataset.theme=t;document.documentElement.dataset.glass=s.liquidGlass?"liquid":"classic";document.documentElement.dataset.anim=s.animations===false?"off":"on";var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#F5F1F5":"#171321");}catch(e){}})();`;
+const themeInitScript = `(function(){try{var r=localStorage.getItem("tazkiya-store-v1");if(!r)return;var s=JSON.parse(r).state&&JSON.parse(r).state.settings;if(!s)return;var t=s.theme||"dark";if(t==="system"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.dataset.theme=t;document.documentElement.dataset.glass=s.liquidGlass?"liquid":"classic";document.documentElement.dataset.anim=s.animations===false?"off":"on";var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#F7F7FC":"#15121D");}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -70,7 +71,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body
-        className={`${jakarta.variable} ${sora.variable} ${amiriQuran.variable} antialiased bg-background text-foreground`}
+        className={`${jakarta.variable} ${manrope.variable} ${amiriQuran.variable} antialiased bg-background text-foreground`}
       >
         {children}
       </body>

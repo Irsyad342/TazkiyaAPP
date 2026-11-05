@@ -1,12 +1,12 @@
 "use client";
 
 /**
- * Tazkiya — Halaman Progress (pengganti "Statistik").
- * Pusat ringkasan seluruh perkembangan aktivitas ibadah:
- * - Hari Ini: progres tiap kategori (salat, Al-Qur'an, zikir, target harian,
+ * Tazkiya — Halaman Progress (pusat perkembangan ibadah).
+ * Hari Ini: progres tiap kategori (salat, Al-Qur'an, zikir, target harian,
  *   amal, jurnal) dengan visual berbeda per jenis.
- * - Mingguan: pola 7 hari kronologis + ringkasan per kategori.
- * - Bulanan: kalender aktivitas + hari aktif + aktivitas paling sering.
+ * Mingguan: pola 7 hari kronologis (batang bertumpuk) + ringkasan kategori
+ *   + strip minggu yang bisa digeser.
+ * Bulanan: kalender aktivitas + hari aktif + aktivitas paling sering.
  * Prinsip: bahasa positif & suportif, hari tanpa catatan BUKAN hari gagal,
  * kategori tidak saling tercampur, semua angka dari catatan nyata.
  */
@@ -16,7 +16,6 @@ import {
   Activity,
   BookOpen,
   CalendarDays,
-  Check,
   CircleDot,
   Flame,
   HandCoins,
@@ -218,13 +217,13 @@ export function ProgressPage() {
       {/* ---------- Judul ---------- */}
       <header className="animate-tz-fade-up flex items-end justify-between pt-1">
         <div>
-          <h1 className="font-display text-[26px] font-bold tracking-tight text-gradient-violet">Progress</h1>
-          <p className="mt-1 text-sm text-tz-muted">Perjalanan ibadahmu — satu langkah kecil setiap hari</p>
+          <h1 className="tz-stat text-[27px] font-extrabold tracking-tight text-tz-ink">Progress</h1>
+          <p className="mt-1 text-[12.5px] font-medium text-tz-muted">Perjalanan ibadahmu — satu langkah kecil setiap hari</p>
         </div>
       </header>
 
       {/* Tab */}
-      <div className="grid grid-cols-3 gap-1.5 rounded-xl border border-tz-line bg-tz-panel-soft p-1.5" role="tablist" aria-label="Periode progress">
+      <div className="grid grid-cols-3 gap-1.5 rounded-full border border-tz-line bg-tz-panel-soft p-1.5" role="tablist" aria-label="Periode progress">
         {(
           [
             { id: "harian" as const, label: "Hari Ini" },
@@ -239,10 +238,8 @@ export function ProgressPage() {
             aria-selected={period === t.id}
             onClick={() => setPeriod(t.id)}
             className={cn(
-              "tap min-h-[38px] rounded-lg text-[12.5px] font-semibold transition-all",
-              period === t.id
-                ? "bg-gradient-to-r from-tz-purple to-tz-violet text-white shadow-[0_4px_14px_-4px_rgba(85,51,154,0.8)]"
-                : "text-tz-muted hover:text-tz-accent"
+              "tap min-h-[38px] rounded-full text-[12.5px] font-bold transition-all",
+              period === t.id ? "tz-btn-ink" : "text-tz-muted hover:text-tz-accent"
             )}
           >
             {t.label}
@@ -253,38 +250,23 @@ export function ProgressPage() {
       {/* ================= HARI INI ================= */}
       {period === "harian" ? (
         <div key="harian" className="tz-fade-in space-y-5">
-          {/* Kartu utama ala Task 33 */}
-          <GlassCard variant="clean" className="animate-tz-fade-up p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex min-w-0 items-center gap-3">
-                <IconBox className="shrink-0 border-transparent shadow-none">
-                  <Activity />
-                </IconBox>
-                <div className="min-w-0">
-                  <p className="text-[14px] font-bold text-tz-ink">Progres Ibadah Hari Ini</p>
-                  <p className="mt-0.5 text-[11.5px] leading-snug text-tz-muted">
-                    {todayScore.done} dari {todayScore.total} ibadah terlaksana
-                  </p>
-                </div>
+          {/* Kartu utama: skor hari ini */}
+          <GlassCard className="animate-tz-fade-up p-5">
+            <div className="flex items-center gap-4">
+              <ProgressRing value={todayScore.pct} size={96} stroke={9}>
+                <p className="tz-stat text-[24px] font-extrabold leading-none text-tz-ink">{todayPct}</p>
+                <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-tz-muted">hari ini</p>
+              </ProgressRing>
+              <div className="min-w-0 flex-1">
+                <p className="font-display text-[15px] font-extrabold text-tz-ink">Progres Ibadah Hari Ini</p>
+                <p className="mt-0.5 text-[11.5px] font-medium leading-snug text-tz-muted">
+                  {todayScore.done} dari {todayScore.total} ibadah terlaksana
+                </p>
+                <p className="mt-2 text-[10.5px] leading-tight text-tz-muted/90">
+                  Terus bertumbuh dalam istiqamah — setiap catatan hari ini berarti.
+                </p>
               </div>
-              <p className="shrink-0 font-display text-[40px] font-extrabold leading-none tabular-nums text-gradient-violet">
-                {todayPct}
-                <span className="ml-0.5 text-[15px] font-bold text-tz-muted">%</span>
-              </p>
             </div>
-            <div
-              className="mt-4 h-2 w-full overflow-hidden rounded-full bg-tz-track"
-              role="img"
-              aria-label={`Ibadah hari ini ${todayScore.pct}% dari target`}
-            >
-              <div
-                className="tz-bar-grow-x h-full rounded-full bg-gradient-to-r from-tz-purple to-tz-violet"
-                style={{ width: `${barsIn ? todayScore.pct : 0}%` }}
-              />
-            </div>
-            <p className="mt-2.5 text-[10.5px] leading-tight text-tz-muted">
-              Terus bertumbuh dalam istiqamah — setiap catatan hari ini berarti.
-            </p>
           </GlassCard>
 
           {/* Progres per kategori — visual berbeda per jenis */}
@@ -293,13 +275,13 @@ export function ProgressPage() {
             <div className="space-y-2.5">
               {/* Salat */}
               <GlassCard className="flex items-center gap-3 p-4">
-                <IconBox size="sm" className="border-transparent bg-tz-violet/12 text-tz-violet shadow-none">
+                <IconBox size="sm" tone="violet">
                   <Activity />
                 </IconBox>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-[12.5px] font-bold text-tz-ink">Salat</p>
-                    <p className="text-[11px] font-semibold text-tz-muted">{["subuh", "zuhur", "asar", "magrib", "isya"].filter((p) => todayLog?.prayers?.[p as keyof typeof todayLog.prayers]).length}/5</p>
+                    <p className="text-[12.5px] font-extrabold text-tz-ink">Salat</p>
+                    <p className="text-[11px] font-bold text-tz-muted">{["subuh", "zuhur", "asar", "magrib", "isya"].filter((p) => todayLog?.prayers?.[p as keyof typeof todayLog.prayers]).length}/5</p>
                   </div>
                   <ProgressBar value={(["subuh", "zuhur", "asar", "magrib", "isya"].filter((p) => todayLog?.prayers?.[p as keyof typeof todayLog.prayers]).length / 5) * 100} className="mt-2 h-1.5" />
                 </div>
@@ -307,13 +289,13 @@ export function ProgressPage() {
 
               {/* Al-Qur'an */}
               <GlassCard className="flex items-center gap-3 p-4">
-                <IconBox size="sm" className="border-transparent bg-teal-400/15 text-teal-300 shadow-none light:bg-teal-400/20 light:text-teal-600">
+                <IconBox size="sm" tone="lavender">
                   <BookOpen />
                 </IconBox>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-[12.5px] font-bold text-tz-ink">Bacaan Al-Qur&apos;an</p>
-                    <p className="text-[11px] font-semibold text-tz-muted">
+                    <p className="text-[12.5px] font-extrabold text-tz-ink">Bacaan Al-Qur&apos;an</p>
+                    <p className="text-[11px] font-bold text-tz-muted">
                       {(todayLog?.quranPages ?? 0).toLocaleString("id-ID")} hlm · {(todayLog?.quranVerses ?? 0).toLocaleString("id-ID")} ayat
                     </p>
                   </div>
@@ -323,13 +305,13 @@ export function ProgressPage() {
 
               {/* Zikir */}
               <GlassCard className="flex items-center gap-3 p-4">
-                <IconBox size="sm" className="border-transparent bg-amber-400/15 text-amber-300 shadow-none light:bg-amber-400/20 light:text-amber-600">
+                <IconBox size="sm" tone="lime">
                   <CircleDot />
                 </IconBox>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-[12.5px] font-bold text-tz-ink">Zikir</p>
-                    <p className="text-[11px] font-semibold text-tz-muted">
+                    <p className="text-[12.5px] font-extrabold text-tz-ink">Zikir</p>
+                    <p className="text-[11px] font-bold text-tz-muted">
                       {(todayLog?.zikirCount ?? 0).toLocaleString("id-ID")} / {settings.zikirTarget.toLocaleString("id-ID")}
                     </p>
                   </div>
@@ -338,42 +320,51 @@ export function ProgressPage() {
               </GlassCard>
 
               {/* Target harian */}
-              <GlassCard className="flex items-center gap-3 p-4">
-                <IconBox size="sm" className="border-transparent bg-violet-400/15 text-violet-300 shadow-none light:bg-violet-400/20 light:text-violet-600">
-                  <Target />
-                </IconBox>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-[12.5px] font-bold text-tz-ink">Target Harian</p>
-                    <p className="text-[11px] font-semibold text-tz-muted">{goalsDone}/{goalStats.length}</p>
+              <GlassCard className="p-4">
+                <div className="flex items-center gap-3">
+                  <IconBox size="sm" tone="violet">
+                    <Target />
+                  </IconBox>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[12.5px] font-extrabold text-tz-ink">Target Harian</p>
+                      <p className="text-[11px] font-bold text-tz-muted">{goalsDone}/{goalStats.length}</p>
+                    </div>
+                    <ProgressBar value={(goalsDone / Math.max(1, goalStats.length)) * 100} className="mt-2 h-1.5" />
                   </div>
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {goalStats.map((g) => (
-                      <Chip key={g.goal.id} className={cn(g.done ? "border-tz-violet/40 bg-tz-violet/12 text-tz-accent" : "border-tz-line")}>
-                        {g.done ? "✓" : "○"} {g.goal.label.length > 18 ? `${g.goal.label.slice(0, 18)}…` : g.goal.label}
-                      </Chip>
-                    ))}
-                  </div>
+                </div>
+                <div className="mt-2.5 flex flex-wrap gap-1">
+                  {goalStats.map((g) => (
+                    <Chip
+                      key={g.goal.id}
+                      className={cn(
+                        g.done ? "bg-tz-lime/50 font-bold text-tz-lime-ink" : "bg-tz-panel-soft",
+                        "border-0"
+                      )}
+                    >
+                      {g.done ? "✓" : "○"} {g.goal.label.length > 18 ? `${g.goal.label.slice(0, 18)}…` : g.goal.label}
+                    </Chip>
+                  ))}
                 </div>
               </GlassCard>
 
               {/* Amal & Jurnal */}
               <div className="grid grid-cols-2 gap-2.5">
                 <GlassCard className="p-4">
-                  <IconBox size="sm" className="border-transparent bg-emerald-400/15 text-emerald-300 shadow-none light:bg-emerald-400/20 light:text-emerald-600">
+                  <IconBox size="sm" tone="lime">
                     <HandCoins />
                   </IconBox>
-                  <p className="mt-2.5 font-display text-[24px] font-extrabold leading-none tabular-nums text-tz-ink">{todayAmal}</p>
-                  <p className="mt-1 text-[10.5px] leading-tight text-tz-muted">kebaikan dicatat hari ini</p>
+                  <p className="tz-stat mt-2.5 text-[24px] font-extrabold leading-none text-tz-ink">{todayAmal}</p>
+                  <p className="mt-1 text-[10.5px] font-medium leading-tight text-tz-muted">kebaikan dicatat hari ini</p>
                 </GlassCard>
                 <GlassCard className="p-4">
-                  <IconBox size="sm" className="border-transparent bg-sky-400/15 text-sky-300 shadow-none light:bg-sky-400/20 light:text-sky-600">
+                  <IconBox size="sm" tone="lavender">
                     <BookHeart />
                   </IconBox>
-                  <p className="mt-2.5 font-display text-[24px] font-extrabold leading-none tabular-nums text-tz-ink">
+                  <p className="tz-stat mt-2.5 text-[24px] font-extrabold leading-none text-tz-ink">
                     {journal[today] ? "✓" : "–"}
                   </p>
-                  <p className="mt-1 text-[10.5px] leading-tight text-tz-muted">
+                  <p className="mt-1 text-[10.5px] font-medium leading-tight text-tz-muted">
                     {journal[today] ? `Jurnal syukur tersimpan${todayMood ? ` · mood ${moodLabel(todayMood)}` : ""}` : "Jurnal syukur belum diisi"}
                   </p>
                 </GlassCard>
@@ -381,22 +372,22 @@ export function ProgressPage() {
             </div>
           </section>
 
-          {/* Dua kartu pendukung (dipertahankan dari Statistik) */}
+          {/* Dua kartu pendukung */}
           <div className="grid grid-cols-2 gap-3">
-            <GlassCard variant="clean" className="animate-tz-fade-up p-4">
-              <IconBox size="sm" className="border-transparent bg-amber-400/15 text-amber-300 shadow-none light:bg-amber-400/20 light:text-amber-600">
+            <GlassCard variant="violet" className="animate-tz-fade-up p-4">
+              <IconBox size="sm" className="bg-white/70 text-tz-violet light:bg-white/15">
                 <Flame />
               </IconBox>
-              <p className="mt-3 font-display text-[30px] font-extrabold leading-none tabular-nums text-tz-ink">{streak}</p>
-              <p className="mt-1.5 text-[11px] leading-tight text-tz-muted">Hari beruntun 5 salat</p>
-              <p className="mt-1 text-[9.5px] leading-relaxed text-tz-muted/80">Salah satu ukuran — bukan satu-satunya.</p>
+              <p className="tz-stat mt-3 text-[30px] font-extrabold leading-none text-tz-ink">{streak}</p>
+              <p className="mt-1.5 text-[11px] font-semibold leading-tight text-tz-ink/85">Hari beruntun 5 salat</p>
+              <p className="mt-1 text-[9.5px] leading-relaxed text-tz-muted">Salah satu ukuran — bukan satu-satunya.</p>
             </GlassCard>
-            <GlassCard variant="clean" className="animate-tz-fade-up p-4">
-              <IconBox size="sm" className="border-transparent bg-teal-400/15 text-teal-300 shadow-none light:bg-teal-400/20 light:text-teal-600">
+            <GlassCard className="animate-tz-fade-up p-4">
+              <IconBox size="sm" tone="lime">
                 <Trophy />
               </IconBox>
-              <p className="mt-3 font-display text-[30px] font-extrabold leading-none tabular-nums text-tz-ink">{weekStreak}</p>
-              <p className="mt-1.5 text-[11px] leading-tight text-tz-muted">Hari lengkap minggu ini</p>
+              <p className="tz-stat mt-3 text-[30px] font-extrabold leading-none text-tz-ink">{weekStreak}</p>
+              <p className="mt-1.5 text-[11px] font-semibold leading-tight text-tz-muted">Hari lengkap minggu ini</p>
             </GlassCard>
           </div>
         </div>
@@ -405,7 +396,7 @@ export function ProgressPage() {
       {/* ================= MINGGUAN ================= */}
       {period === "mingguan" ? (
         <div key="mingguan" className="tz-fade-in space-y-5">
-          {/* Pola salat 7 hari — dipertahankan dari Statistik */}
+          {/* Pola salat 7 hari */}
           <section aria-label="Pola salat minggu ini">
             <SectionHeader title="Perjalanan Salat Minggu Ini" caption="Senin sampai Minggu — kronologis kiri ke kanan" />
             <GlassCard className="p-4">
@@ -426,19 +417,19 @@ export function ProgressPage() {
                       aria-label={`Rincian ${isToday ? "hari ini" : relativeDayLabel(d.date, today)} — ${d.done} salat terlaksana`}
                       className={cn("flex h-full flex-1 cursor-pointer flex-col items-center gap-1.5", isFuture && "opacity-45")}
                     >
-                      <span className={cn("text-[9.5px] font-semibold tabular-nums", isToday ? "text-tz-accent" : "text-tz-muted/80")}>
+                      <span className={cn("text-[9.5px] font-bold tabular-nums", isToday ? "text-tz-accent" : "text-tz-muted/85")}>
                         {d.done > 0 ? d.done : ""}
                       </span>
                       <div className="flex min-h-0 w-full flex-1 items-end">
-                        <div className="mx-auto flex h-full w-full max-w-[26px] flex-col justify-end overflow-hidden rounded-full border border-tz-line/70 bg-tz-track/40">
+                        <div className="mx-auto flex h-full w-full max-w-[26px] flex-col justify-end overflow-hidden rounded-full bg-tz-track/40">
                           {totalH > 0 ? (
                             <div
                               className="tz-bar-grow flex w-full flex-col justify-end"
                               style={{ height: barsIn ? `${Math.max(6, totalH)}%` : "0%", transitionDelay: `${idx * 55}ms` }}
                             >
-                              {jamaahH > 0.5 ? <span className="w-full shrink-0 bg-gradient-to-t from-tz-purple to-tz-violet" style={{ height: `${(jamaahH / totalH) * 100}%` }} /> : null}
-                              {mandiriH > 0.5 ? <span className="w-full shrink-0 bg-tz-lavender/75" style={{ height: `${(mandiriH / totalH) * 100}%` }} /> : null}
-                              {missedH > 0.5 ? <span className="w-full shrink-0 bg-rose-400/45 light:bg-rose-300" style={{ height: `${(missedH / totalH) * 100}%` }} /> : null}
+                              {jamaahH > 0.5 ? <span className="w-full shrink-0 bg-teal-400" style={{ height: `${(jamaahH / totalH) * 100}%` }} /> : null}
+                              {mandiriH > 0.5 ? <span className="w-full shrink-0 bg-tz-violet" style={{ height: `${(mandiriH / totalH) * 100}%` }} /> : null}
+                              {missedH > 0.5 ? <span className="w-full shrink-0 bg-amber-400/70" style={{ height: `${(missedH / totalH) * 100}%` }} /> : null}
                               {unrecH > 0.5 ? <span className="w-full shrink-0 border-t border-dashed border-tz-line-strong bg-tz-track" style={{ height: `${(unrecH / totalH) * 100}%` }} /> : null}
                             </div>
                           ) : (
@@ -446,23 +437,23 @@ export function ProgressPage() {
                           )}
                         </div>
                       </div>
-                      <span className={cn("text-[10px] leading-tight", isToday ? "font-bold text-tz-accent" : "text-tz-muted")}>
+                      <span className={cn("text-[10px] font-semibold leading-tight", isToday ? "font-bold text-tz-accent" : "text-tz-muted")}>
                         {weekdayShort(d.date)}
-                        <span className={cn("block text-[8.5px]", isToday ? "font-semibold text-tz-accent/80" : "text-tz-muted/70")}>{d.date.slice(-2)}</span>
+                        <span className={cn("block text-[8.5px]", isToday ? "font-bold text-tz-accent/85" : "text-tz-muted/70")}>{d.date.slice(-2)}</span>
                       </span>
                     </button>
                   );
                 })}
               </div>
-              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[9.5px] text-tz-muted">
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[9.5px] font-semibold text-tz-muted">
                 <span className="flex items-center gap-1">
-                  <span aria-hidden className="h-2 w-2 rounded-full bg-gradient-to-t from-tz-purple to-tz-violet" /> Berjamaah
+                  <span aria-hidden className="h-2 w-2 rounded-full bg-teal-400" /> Berjamaah
                 </span>
                 <span className="flex items-center gap-1">
-                  <span aria-hidden className="h-2 w-2 rounded-full bg-tz-lavender/80" /> Mandiri
+                  <span aria-hidden className="h-2 w-2 rounded-full bg-tz-violet" /> Mandiri
                 </span>
                 <span className="flex items-center gap-1">
-                  <span aria-hidden className="h-2 w-2 rounded-full bg-rose-400/60 light:bg-rose-300" /> Tidak dilaksanakan
+                  <span aria-hidden className="h-2 w-2 rounded-full bg-amber-400/80" /> Tidak dilaksanakan
                 </span>
                 <span className="flex items-center gap-1">
                   <span aria-hidden className="h-2 w-2 rounded-full border border-dashed border-tz-line-strong" /> Belum dicatat
@@ -476,23 +467,23 @@ export function ProgressPage() {
             <SectionHeader title="Aktivitas Minggu Ini" caption="Setiap kategori punya jalannya sendiri" />
             <div className="grid grid-cols-2 gap-2.5">
               {[
-                { icon: BookOpen, label: "Al-Qur'an", value: `${weekQuran.pages.toLocaleString("id-ID")} hlm · ${weekQuran.verses.toLocaleString("id-ID")} ayat` },
-                { icon: CircleDot, label: "Zikir", value: `${weekQuran.zikir.toLocaleString("id-ID")} hitungan` },
-                { icon: BookHeart, label: "Jurnal Syukur", value: `${weekJurnal} hari terisi` },
-                { icon: HandCoins, label: "Amal & Sedekah", value: `${weekAmal} kebaikan` },
-              ].map(({ icon: Icon, label, value }) => (
+                { icon: BookOpen, tone: "lavender" as const, label: "Al-Qur'an", value: `${weekQuran.pages.toLocaleString("id-ID")} hlm · ${weekQuran.verses.toLocaleString("id-ID")} ayat` },
+                { icon: CircleDot, tone: "lime" as const, label: "Zikir", value: `${weekQuran.zikir.toLocaleString("id-ID")} hitungan` },
+                { icon: BookHeart, tone: "violet" as const, label: "Jurnal Syukur", value: `${weekJurnal} hari terisi` },
+                { icon: HandCoins, tone: "violet" as const, label: "Amal & Sedekah", value: `${weekAmal} kebaikan` },
+              ].map(({ icon: Icon, tone, label, value }) => (
                 <GlassCard key={label} className="p-3.5">
                   <div className="flex items-center gap-2">
-                    <span aria-hidden className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-tz-violet/25 bg-tz-violet/12 text-tz-violet">
-                      <Icon size={13} />
-                    </span>
-                    <p className="text-[10.5px] font-semibold text-tz-muted">{label}</p>
+                    <IconBox size="xs" tone={tone}>
+                      <Icon />
+                    </IconBox>
+                    <p className="text-[10.5px] font-bold text-tz-muted">{label}</p>
                   </div>
-                  <p className="mt-2 text-[12.5px] font-bold leading-snug text-tz-ink">{value}</p>
+                  <p className="mt-2 text-[12.5px] font-extrabold leading-snug text-tz-ink">{value}</p>
                 </GlassCard>
               ))}
             </div>
-            <p className="mt-2 px-1 text-[10px] leading-relaxed text-tz-muted/80">
+            <p className="mt-2 px-1 text-[10px] leading-relaxed text-tz-muted/90">
               Hari tanpa catatan tidak dihitung sebagai hari gagal — ia hanya hari yang belum mempunyai catatan.
             </p>
           </section>
@@ -508,7 +499,7 @@ export function ProgressPage() {
                     type="button"
                     aria-label="Minggu sebelumnya"
                     onClick={() => setWeekOffset((w) => w - 1)}
-                    className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tz-line bg-tz-panel-soft text-tz-muted"
+                    className="tap flex h-8 w-8 items-center justify-center rounded-full bg-tz-panel-soft text-tz-muted"
                   >
                     ‹
                   </button>
@@ -517,7 +508,7 @@ export function ProgressPage() {
                     aria-label="Minggu berikutnya"
                     disabled={!canGoNextWeek}
                     onClick={() => canGoNextWeek && setWeekOffset((w) => w + 1)}
-                    className={cn("tap flex h-8 w-8 items-center justify-center rounded-full border border-tz-line bg-tz-panel-soft text-tz-muted", !canGoNextWeek && "opacity-30")}
+                    className={cn("tap flex h-8 w-8 items-center justify-center rounded-full bg-tz-panel-soft text-tz-muted", !canGoNextWeek && "opacity-30")}
                   >
                     ›
                   </button>
@@ -530,10 +521,10 @@ export function ProgressPage() {
                   const dotCls = !d.hasData
                     ? "border border-dashed border-tz-line-strong"
                     : d.jamaah > 0
-                      ? "bg-teal-400 light:bg-teal-500"
+                      ? "bg-teal-400"
                       : d.mandiri > 0
-                        ? "bg-sky-400 light:bg-sky-500"
-                        : "bg-amber-400 light:bg-amber-500";
+                        ? "bg-tz-violet"
+                        : "bg-amber-400";
                   return (
                     <button
                       key={d.key}
@@ -542,13 +533,13 @@ export function ProgressPage() {
                       aria-label={`Pilih ${formatDayFull(d.key)}`}
                       className={cn("tap flex flex-col items-center gap-1.5 rounded-xl px-0.5 py-1.5 transition-colors hover:bg-tz-panel-soft", d.isFuture && "opacity-40")}
                     >
-                      <span className={cn("text-[9.5px] font-semibold uppercase", d.isToday ? "text-tz-accent" : "text-tz-muted")}>
+                      <span className={cn("text-[9.5px] font-bold uppercase", d.isToday ? "text-tz-accent" : "text-tz-muted")}>
                         {weekdayShort(d.key)}
                       </span>
                       <span
                         className={cn(
-                          "flex h-9 w-9 items-center justify-center rounded-full text-[12px] font-bold transition-colors",
-                          d.isToday ? "bg-tz-violet text-white" : "bg-tz-panel-strong text-tz-ink/85"
+                          "flex h-9 w-9 items-center justify-center rounded-full text-[12px] font-extrabold transition-colors",
+                          d.isToday ? "tz-btn-violet" : "bg-tz-panel-soft text-tz-ink/85"
                         )}
                       >
                         {Number(d.key.slice(-2))}
@@ -572,9 +563,9 @@ export function ProgressPage() {
               { value: perfectN, label: "hari lengkap" },
               { value: summary.quranPages.toLocaleString("id-ID"), label: "halaman Qur'an" },
             ].map(({ value, label }) => (
-              <GlassCard key={label} variant="clean" className="p-4">
-                <p className="font-display text-[26px] font-extrabold leading-none tabular-nums text-tz-ink">{value}</p>
-                <p className="mt-1 text-[10.5px] leading-tight text-tz-muted">{label}</p>
+              <GlassCard key={label} className="p-4">
+                <p className="tz-stat text-[26px] font-extrabold leading-none text-tz-ink">{value}</p>
+                <p className="mt-1 text-[10.5px] font-semibold leading-tight text-tz-muted">{label}</p>
               </GlassCard>
             ))}
           </section>
@@ -589,7 +580,7 @@ export function ProgressPage() {
                     type="button"
                     aria-label="Bulan sebelumnya"
                     onClick={() => setMonthOffset((m) => m - 1)}
-                    className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tz-line bg-tz-panel-soft text-tz-muted"
+                    className="tap flex h-8 w-8 items-center justify-center rounded-full bg-tz-panel-soft text-tz-muted"
                   >
                     ‹
                   </button>
@@ -598,7 +589,7 @@ export function ProgressPage() {
                     aria-label="Bulan berikutnya"
                     disabled={!canGoNextMonth}
                     onClick={() => canGoNextMonth && setMonthOffset((m) => m + 1)}
-                    className={cn("tap flex h-8 w-8 items-center justify-center rounded-full border border-tz-line bg-tz-panel-soft text-tz-muted", !canGoNextMonth && "opacity-30")}
+                    className={cn("tap flex h-8 w-8 items-center justify-center rounded-full bg-tz-panel-soft text-tz-muted", !canGoNextMonth && "opacity-30")}
                   >
                     ›
                   </button>
@@ -608,7 +599,7 @@ export function ProgressPage() {
             <GlassCard className="p-4">
               <div className="grid grid-cols-7 gap-1.5 text-center">
                 {DAY_LABELS.map((d) => (
-                  <span key={d} className="pb-1 text-[10px] font-medium text-tz-muted">
+                  <span key={d} className="pb-1 text-[10px] font-bold text-tz-muted">
                     {d}
                   </span>
                 ))}
@@ -617,11 +608,11 @@ export function ProgressPage() {
                   const intensity = cell.done / 5;
                   let bg: string | undefined;
                   if (!cell.isFuture && cell.isToday) {
-                    bg = cell.jamaah > 0 ? "#14b8a6" : cell.mandiri > 0 ? "#0ea5e9" : cell.missed > 0 ? "#f59e0b" : "#0ea5e9";
+                    bg = cell.jamaah > 0 ? "#14b8a6" : cell.mandiri > 0 ? "#8879e8" : cell.missed > 0 ? "#f59e0b" : "#8879e8";
                   } else if (cell.hasData) {
-                    if (cell.jamaah > 0) bg = `rgba(45,212,191,${(0.17 + intensity * 0.58).toFixed(3)})`;
-                    else if (cell.mandiri > 0) bg = `rgba(56,189,248,${(0.15 + intensity * 0.52).toFixed(3)})`;
-                    else bg = `rgba(251,191,36,${(0.15 + (cell.missed / 5) * 0.35).toFixed(3)})`;
+                    if (cell.jamaah > 0) bg = `rgba(45,212,191,${(0.2 + intensity * 0.58).toFixed(3)})`;
+                    else if (cell.mandiri > 0) bg = `rgba(136,121,232,${(0.18 + intensity * 0.55).toFixed(3)})`;
+                    else bg = `rgba(251,191,36,${(0.16 + (cell.missed / 5) * 0.35).toFixed(3)})`;
                   } else if (!cell.isFuture) {
                     bg = "var(--tz-empty-cell)";
                   }
@@ -634,8 +625,8 @@ export function ProgressPage() {
                         if (cell.key && !cell.isFuture) setSelectedDate(cell.key);
                       }}
                       className={cn(
-                        "tap flex aspect-square items-center justify-center rounded-full text-[10px] font-semibold transition-colors",
-                        cell.isFuture ? "bg-tz-panel-soft text-tz-ink/20" : cell.isToday ? "text-white" : "text-tz-ink/90"
+                        "tap flex aspect-square items-center justify-center rounded-full text-[10px] font-bold transition-colors",
+                        cell.isFuture ? "bg-tz-panel-soft text-tz-ink/20" : cell.isToday ? "text-white light:text-white ring-2 ring-tz-violet ring-offset-2 ring-offset-tz-panel" : "text-tz-ink/90"
                       )}
                       style={{ background: bg }}
                     >
@@ -646,7 +637,7 @@ export function ProgressPage() {
               </div>
 
               {/* Ringkasan tanggal terpilih */}
-              <div key={selectedDate} className="tz-fade-in mt-4 rounded-2xl border border-tz-line bg-tz-panel-soft p-3">
+              <div key={selectedDate} className="tz-fade-in mt-4 rounded-2xl bg-tz-panel-soft p-3">
                 {selFuture ? (
                   <p className="text-center text-[11.5px] leading-relaxed text-tz-muted">
                     Tanggal ini belum berjalan — belum ada catatan, bukan hari gagal.
@@ -654,14 +645,14 @@ export function ProgressPage() {
                 ) : selStatus.hasData || (selLog && ((selLog.quranPages ?? 0) > 0 || (selLog.quranVerses ?? 0) > 0 || (selLog.zikirCount ?? 0) > 0)) ? (
                   <>
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-[12.5px] font-semibold text-tz-ink">{relativeDayLabel(selectedDate, today)}</p>
-                      <p className="text-[10px] text-tz-muted">{formatDayFull(selectedDate)}</p>
+                      <p className="text-[12.5px] font-extrabold text-tz-ink">{relativeDayLabel(selectedDate, today)}</p>
+                      <p className="text-[10px] font-medium text-tz-muted">{formatDayFull(selectedDate)}</p>
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1.5">
-                      <Chip className="border-teal-400/30 bg-teal-400/10 text-teal-300 light:text-teal-700">Berjamaah {selStatus.jamaah}</Chip>
-                      <Chip className="border-sky-400/30 bg-sky-400/10 text-sky-300 light:text-sky-700">Mandiri {selStatus.mandiri}</Chip>
+                      <Chip className="bg-teal-400/15 font-bold text-teal-700 light:bg-teal-100 light:text-teal-700">Berjamaah {selStatus.jamaah}</Chip>
+                      <Chip className="bg-tz-violet/12 font-bold text-tz-accent">Mandiri {selStatus.mandiri}</Chip>
                       {selStatus.missed > 0 ? (
-                        <Chip className="border-amber-400/30 bg-amber-400/10 text-amber-300 light:text-amber-700">Tidak dilaksanakan {selStatus.missed}</Chip>
+                        <Chip className="bg-amber-400/15 font-bold text-amber-700 light:bg-amber-100 light:text-amber-700">Tidak dilaksanakan {selStatus.missed}</Chip>
                       ) : null}
                     </div>
                     <p className="mt-2 text-[10.5px] leading-relaxed text-tz-muted">
@@ -690,16 +681,16 @@ export function ProgressPage() {
                 <div key={a.id} className="flex items-center gap-3">
                   <span
                     className={cn(
-                      "flex h-6 w-6 shrink-0 items-center justify-center rounded-[0.5rem] text-[10px] font-bold",
-                      idx === 0 ? "bg-tz-violet text-white" : "border border-white/8 bg-tz-panel text-tz-muted light:border-tz-line light:bg-tz-panel-soft"
+                      "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[10px] font-extrabold",
+                      idx === 0 ? "bg-tz-violet text-white light:text-white" : "bg-tz-panel-soft text-tz-muted"
                     )}
                   >
                     {idx + 1}
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="mb-1 flex items-center justify-between gap-2">
-                      <p className="truncate text-xs font-medium text-tz-ink/90">{a.label}</p>
-                      <p className="text-[11px] text-tz-muted">{a.count}x</p>
+                      <p className="truncate text-xs font-bold text-tz-ink/90">{a.label}</p>
+                      <p className="text-[11px] font-semibold text-tz-muted">{a.count}x</p>
                     </div>
                     <ProgressBar value={(a.count / maxActivity) * 100} className="h-1.5" />
                   </div>
@@ -710,7 +701,7 @@ export function ProgressPage() {
         </div>
       ) : null}
 
-      <p className="flex items-center justify-center gap-1.5 pb-1 text-center text-[10px] text-tz-muted/60">
+      <p className="flex items-center justify-center gap-1.5 pb-1 text-center text-[10px] font-medium text-tz-muted/70">
         <CalendarDays size={11} />
         Progress dihitung langsung dari catatan ibadah Anda — bukan perkiraan.
       </p>
