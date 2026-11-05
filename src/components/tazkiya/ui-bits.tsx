@@ -160,7 +160,9 @@ export function SectionHeader({
 
 /**
  * Tab garis-bawah minimalis (Hari Ini / Bulanan / Qada, Zikir / Doa, dst.) —
- * label tegas, garis aktif lavender 2px tanpa ornamen tambahan.
+ * label tegas; garis aktif ORANGE 2px yang MENGGESER mulus ke tab tujuan
+ * (satu elemen indikator + transform, kurva out-quint 320ms) alih-alih
+ * muncul-hilang per tombol.
  */
 export function SegmentedTabs<T extends string>({
   items,
@@ -175,12 +177,26 @@ export function SegmentedTabs<T extends string>({
   ariaLabel: string;
   className?: string;
 }) {
+  const activeIdx = Math.max(
+    0,
+    items.findIndex((it) => it.id === value)
+  );
+  const gap = 4; // gap-1
   return (
     <div
-      className={cn("flex items-stretch gap-1 border-b border-tk-line", className)}
+      className={cn("relative flex items-stretch gap-1 border-b border-tk-line", className)}
       role="tablist"
       aria-label={ariaLabel}
     >
+      {/* Indikator geser: lebar = satu slot, translasi = indeks × (slot + gap) */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 left-0 h-[2px] rounded-full bg-tk-violet transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
+        style={{
+          width: `calc((100% - ${(items.length - 1) * gap}px) / ${items.length})`,
+          transform: `translateX(calc(${activeIdx} * (100% + ${gap}px)))`,
+        }}
+      />
       {items.map(({ id, label, icon: Icon }) => {
         const active = value === id;
         return (
@@ -191,19 +207,12 @@ export function SegmentedTabs<T extends string>({
             aria-selected={active}
             onClick={() => onChange(id)}
             className={cn(
-              "tap relative flex min-h-[46px] flex-1 items-center justify-center gap-1.5 px-3 text-[13.5px] transition-colors sm:flex-none sm:min-w-[120px]",
+              "tap relative flex min-h-[46px] flex-1 items-center justify-center gap-1.5 px-3 text-[13.5px] transition-colors duration-200",
               active ? "font-bold text-tk-ink" : "font-medium text-tk-muted hover:text-tk-ink/80"
             )}
           >
             {Icon ? <Icon size={15} className={active ? "text-tk-violet" : ""} /> : null}
             {label}
-            <span
-              aria-hidden
-              className={cn(
-                "absolute inset-x-3 bottom-0 h-[2px] rounded-full transition-all duration-200",
-                active ? "bg-tk-violet" : "bg-transparent"
-              )}
-            />
           </button>
         );
       })}

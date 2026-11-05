@@ -1,6 +1,8 @@
-▲ Next.js 16.1.3
-- Local:         http://localhost:3000
-- Network:       http://0.0.0.0:3000
-
-✓ Starting...
-✓ Ready in 70ms
+⨯ Failed to start server
+Error: Failed to start server. Is port 3000 in use?
+    at Promise (unknown:1:11)
+    at <anonymous> (server.js:27) {
+  code: 'EADDRINUSE',
+  syscall: 'listen',
+  errno: 0
+}

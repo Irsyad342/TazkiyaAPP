@@ -1,13 +1,14 @@
 "use client";
 
 /**
- * Tazkiya v4 — "A Better Daily Journey" — Kerangka aplikasi.
- * Rekonstruksi tata letak: kanvas penuh tanpa bingkai ponsel.
- * Mobile: viewport penuh + navigasi kapsul mengambang + safe area.
- * Desktop (lg+): sidebar navigasi proporsional + dashboard lebar
- * multi-kolom. Gerbang hidrasi, tema (gelap/terang/sistem), mode
- * Liquid Glass, transisi antartab, lima menu utama + sub-halaman,
- * pembaca Al-Qur'an, dan Tasbih Digital tetap di satu kerangka ini.
+ * Tazkiya v8 — kerangka aplikasi MOBILE-ONLY.
+ * Seluruh aplikasi selalu tampil sebagai kolom HP (maks 430px) di tengah
+ * layar — di perangkat mobile penuh, di desktop terbingkai rapi di atas
+ * panggung yang lebih gelap/terang. Navigasi selalu BottomNav kapsul;
+ * tata letak desktop/sidebar dihapus total (v7 ke bawah).
+ * Gerbang hidrasi, tema (gelap/terang/sistem), mode Liquid Glass, transisi
+ * antartab, lima menu utama + sub-halaman, pembaca Al-Qur'an, dan Tasbih
+ * Digital tetap di satu kerangka ini.
  */
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -16,7 +17,7 @@ import { AnimatePresence, LazyMotion, domAnimation, m } from "framer-motion";
 import { LoaderCircle } from "lucide-react";
 import { Toaster } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
-import { BottomNav, SidebarNav, type SubPageId, type TabId } from "@/components/tazkiya/BottomNav";
+import { BottomNav, type SubPageId, type TabId } from "@/components/tazkiya/BottomNav";
 import { AuthGate } from "@/components/tazkiya/AuthGate";
 import { HomePage } from "@/components/tazkiya/HomePage";
 import { QuranPage } from "@/components/tazkiya/QuranPage";
@@ -201,13 +202,13 @@ export default function Page() {
 
   if (!hydrated) {
     return (
-      <main className="flex min-h-dvh items-center justify-center bg-tk-stage" aria-label="Memuat Tazkiya">
+      <main className="flex min-h-dvh items-center justify-center bg-[#101013] light:bg-[#e8e8ec]" aria-label="Memuat Tazkiya">
         <div className="flex flex-col items-center gap-4">
           <span className="animate-tk-pulse flex h-14 w-14 items-center justify-center rounded-[1.1rem] bg-tk-violet text-2xl font-bold text-white">
             ت
           </span>
           <div className="text-center">
-            <p className="text-[15px] font-bold tracking-[-0.01em] text-tk-ink">Tazkiya</p>
+            <p className="text-[15px] font-bold tracking-[-0.01em] text-white light:text-[#17171b]">Tazkiya</p>
             <p className="gs-overline mt-1.5">A Better Daily Journey</p>
           </div>
         </div>
@@ -217,47 +218,42 @@ export default function Page() {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <main className="relative min-h-dvh w-full bg-tk-stage" aria-label="Aplikasi Tazkiya">
-        <div className="flex w-full">
-          {/* Sidebar desktop — navigasi vertikal proporsional (lg+) */}
-          <SidebarNav active={tab} onChange={(t) => { setSubpage(null); setTab(t); }} subpage={subpage} onOpenSubpage={setSubpage} />
+      {/* Panggung luar (terlihat hanya di layar lebar): rona lebih pekat dari
+          kanvas aplikasi agar kolom HP terbingkai jelas, bukan tampak salah. */}
+      <main className="relative min-h-dvh w-full bg-[#101013] light:bg-[#e8e8ec]" aria-label="Aplikasi Tazkiya">
+        {/* Kolom aplikasi — selalu selebar HP, di tengah, semua viewport. */}
+        <div className="relative mx-auto min-h-dvh w-full max-w-[430px] bg-tk-stage desktop:shadow-[0_0_0_1px_var(--color-tk-line),0_40px_90px_-40px_rgba(0,0,0,0.6)]">
+          <div
+            id="konten-tazkiya"
+            className="no-scrollbar relative z-10 mx-auto w-full px-4 pb-44 pt-[max(1.25rem,env(safe-area-inset-top))]"
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <m.div
+                key={subpage ?? tab}
+                initial={{ opacity: 0, y: 14 * (animations ? 1 : 0) }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: animations ? -10 : 0 }}
+                transition={{ duration: 0.22 * (animations ? 1 : 0), ease: [0.22, 1, 0.36, 1] }}
+              >
+                {subpage === null && tab === "beranda" && (
+                  <HomePage
+                    onNavigate={(t) => {
+                      setSubpage(null);
+                      setTab(t);
+                    }}
+                    onOpenSubpage={setSubpage}
+                  />
+                )}
+                {subpage === null && tab === "quran" && <QuranPage onOpenReader={openReader} />}
+                {subpage === null && tab === "sholat" && <PrayerPage />}
+                {subpage === null && tab === "progress" && <ProgressPage />}
+                {subpage === null && tab === "profil" && <ProfilePage onOpenTargets={openTargets} onGoTracker={goTracker} />}
 
-          {/* Kanvas konten: mobile penuh, desktop dashboard lebar.
-              min-w-0: hentikan penyebaran min-content dari scroller horizontal
-              (baris mood) agar tidak memaksa lebar dokumen melebihi viewport. */}
-          <div className="relative min-h-dvh min-w-0 flex-1">
-            <div
-              id="konten-tazkiya"
-              className="no-scrollbar relative z-10 mx-auto w-full max-w-[1120px] px-4 pb-40 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-6 lg:px-10 lg:pb-14 lg:pt-10"
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                <m.div
-                  key={subpage ?? tab}
-                  initial={{ opacity: 0, y: 10 * (animations ? 1 : 0) }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: animations ? -8 : 0 }}
-                  transition={{ duration: 0.16 * (animations ? 1 : 0), ease: "easeOut" }}
-                >
-                  {subpage === null && tab === "beranda" && (
-                    <HomePage
-                      onNavigate={(t) => {
-                        setSubpage(null);
-                        setTab(t);
-                      }}
-                      onOpenSubpage={setSubpage}
-                    />
-                  )}
-                  {subpage === null && tab === "quran" && <QuranPage onOpenReader={openReader} />}
-                  {subpage === null && tab === "sholat" && <PrayerPage />}
-                  {subpage === null && tab === "progress" && <ProgressPage />}
-                  {subpage === null && tab === "profil" && <ProfilePage onOpenTargets={openTargets} onGoTracker={goTracker} />}
-
-                  {subpage === "jurnal" && <JurnalPage onBack={() => setSubpage(null)} />}
-                  {subpage === "zikir-doa" && <ZikirDoaPage onBack={() => setSubpage(null)} onOpenTasbih={openTasbih} />}
-                  {subpage === "rizq-amal" && <RizqAmalPage onBack={() => setSubpage(null)} />}
-                </m.div>
-              </AnimatePresence>
-            </div>
+                {subpage === "jurnal" && <JurnalPage onBack={() => setSubpage(null)} />}
+                {subpage === "zikir-doa" && <ZikirDoaPage onBack={() => setSubpage(null)} onOpenTasbih={openTasbih} />}
+                {subpage === "rizq-amal" && <RizqAmalPage onBack={() => setSubpage(null)} />}
+              </m.div>
+            </AnimatePresence>
           </div>
         </div>
 
@@ -274,7 +270,7 @@ export default function Page() {
         {/* Gerbang akun: inisialisasi sesi + dialog keputusan data (migrasi/gabung). */}
         <AuthGate />
 
-        {/* Navigasi kapsul mengambang (mobile & tablet) */}
+        {/* Navigasi kapsul mengambang — satu-satunya navigasi, semua perangkat. */}
         <BottomNav
           active={tab}
           onChange={(t) => {

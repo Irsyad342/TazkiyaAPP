@@ -3,6 +3,9 @@
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+/* Varian lebar layar yang TIDAK ikut dipatok — hanya untuk pembingkaian
+   kolom aplikasi di desktop (bayangan kolom, dsb.). */
+@custom-variant desktop (@media (min-width: 480px));
 
 @theme inline {
   --color-background: var(--background);
@@ -55,6 +58,15 @@
      (body + display), Amiri Quran untuk Arab.
      Nama token tk-* / gs-* adalah API kelas internal.
      ============================================================ */
+  /* Aplikasi MOBILE-ONLY: semua breakpoint responsif dipatok jauh di atas
+     viewport mana pun sehingga varian sm:/md:/lg:/xl: TIDAK PERNAH aktif.
+     Tampilan selalu kolom HP (maks 430px, di tengah) — di desktop maupun
+     mobile. Framing desktop memakai varian `desktop:` tersendiri. */
+  --breakpoint-sm: 300rem;
+  --breakpoint-md: 301rem;
+  --breakpoint-lg: 302rem;
+  --breakpoint-xl: 303rem;
+  --breakpoint-2xl: 304rem;
   --color-tk-ink: #ffffff;
   --color-tk-muted: #a5a5ad;
   --color-tk-deep: #6f6f78;
@@ -618,4 +630,69 @@ html[data-anim="off"] .tk-bar-grow-x {
 html[data-anim="off"] .tk-pop,
 html[data-anim="off"] .tk-fade-in {
   animation: none !important;
+}
+
+/* ============================================================
+   SISTEM GERAK V8 — kurva & durasi baku untuk seluruh aplikasi
+   (kurva dasar memakai keyframes tk-fade-up yang sudah ada)
+   ============================================================ */
+/* Stagger kartu: anak elemen .tk-stagger masuk berurutan 45ms sekali jalan. */
+.tk-stagger > * {
+  animation: tk-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.tk-stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.tk-stagger > *:nth-child(2) { animation-delay: 0.07s; }
+.tk-stagger > *:nth-child(3) { animation-delay: 0.12s; }
+.tk-stagger > *:nth-child(4) { animation-delay: 0.17s; }
+.tk-stagger > *:nth-child(5) { animation-delay: 0.22s; }
+.tk-stagger > *:nth-child(6) { animation-delay: 0.27s; }
+.tk-stagger > *:nth-child(7) { animation-delay: 0.32s; }
+.tk-stagger > *:nth-child(8) { animation-delay: 0.37s; }
+.tk-stagger > *:nth-child(n + 9) { animation-delay: 0.42s; }
+/* Pop pil nav aktif: overshoot kecil ala spring — sekali jalan saat pindah tab. */
+@keyframes tk-nav-pop {
+  0% {
+    transform: scale(0.84);
+  }
+  55% {
+    transform: scale(1.055);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.animate-tk-nav-pop {
+  animation: tk-nav-pop 0.42s cubic-bezier(0.34, 1.4, 0.5, 1) both;
+}
+/* Denyut lembut ikon notifikasi lonceng (beranda). */
+@keyframes tk-bell-swing {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(9deg);
+  }
+  60% {
+    transform: rotate(-7deg);
+  }
+  80% {
+    transform: rotate(3deg);
+  }
+}
+.animate-tk-bell-swing {
+  animation: tk-bell-swing 2.8s ease-in-out infinite;
+  transform-origin: 50% 12%;
+}
+html[data-anim="off"] .tk-stagger > *,
+html[data-anim="off"] .animate-tk-nav-pop,
+html[data-anim="off"] .animate-tk-bell-swing {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html .tk-stagger > *,
+  html .animate-tk-nav-pop,
+  html .animate-tk-bell-swing {
+    animation: none !important;
+  }
 }
