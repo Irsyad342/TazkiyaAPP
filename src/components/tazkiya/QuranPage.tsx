@@ -31,6 +31,7 @@ import { JUZ_RANGES, SURAH_LIST, getSurah, normalizeArabic } from "@/lib/tazkiya
 import { surahProgressOnDate } from "@/lib/tazkiya/stats";
 import { relativeDayLabel, lastNDays, todayKey, weekdayShort } from "@/lib/tazkiya/dates";
 import { Chip, ConfirmButton, EmptyState, GlassCard, SectionHeader, SegmentedTabs } from "./ui-bits";
+import { Star8, OrnamentDivider } from "./ornaments";
 import { cn } from "@/lib/utils";
 
 const inputCls = "tk-field";
@@ -73,15 +74,30 @@ function SurahRow({
         type="button"
         onClick={onOpen}
         className="tap group flex w-full items-center gap-3.5 rounded-2xl px-2.5 py-3 text-left transition-colors hover:bg-tk-panel-soft"
-        aria-label={`Buka ${surah.latin}`}
+        aria-label={`Buka ${surah.latin} — surah ke-${surah.number}`}
       >
-        <span
-          className={cn(
-            "tnum relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.85rem] font-display text-[13px] font-bold",
-            isLastRead ? "bg-tk-violet text-white" : "bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent"
-          )}
-        >
-          {surah.number}
+        {/* Chip nomor khatam: bintang segi delapan berlapis, tepi rambut hangat */}
+        <span aria-hidden className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+          <span
+            className={cn(
+              "tk-octagram absolute inset-0",
+              isLastRead ? "bg-tk-violet" : "bg-tk-lav-deco"
+            )}
+          />
+          <span
+            className={cn(
+              "tk-octagram absolute inset-[1.5px]",
+              isLastRead ? "bg-tk-violet" : "bg-tk-lavender"
+            )}
+          />
+          <span
+            className={cn(
+              "gs-display tnum relative text-[12.5px] font-bold",
+              isLastRead ? "text-white" : "text-tk-accent"
+            )}
+          >
+            {surah.number}
+          </span>
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-1.5">
@@ -98,7 +114,7 @@ function SurahRow({
           </span>
         </span>
         {showArabic ? (
-          <span className="quran-arabic shrink-0 text-[19px] leading-snug text-tk-violet dark:text-tk-accent">{surah.arabic}</span>
+          <span className="quran-arabic shrink-0 text-[20px] leading-snug text-tk-violet dark:text-tk-accent">{surah.arabic}</span>
         ) : (
           <ChevronRight size={16} className="shrink-0 text-tk-muted/60" />
         )}
@@ -119,8 +135,10 @@ function JuzRow({ juz, onOpen }: { juz: (typeof JUZ_RANGES)[number]; onOpen: () 
         className="tap flex w-full items-center gap-3.5 rounded-2xl px-2.5 py-3 text-left transition-colors hover:bg-tk-panel-soft"
         aria-label={`Buka Juz ${juz.juz} dari ${start?.latin}`}
       >
-        <span className="tnum flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.85rem] bg-tk-lavender font-display text-[13px] font-bold text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent">
-          {juz.juz}
+        <span aria-hidden className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+          <span className="tk-octagram absolute inset-0 bg-tk-lav-deco" />
+          <span className="tk-octagram absolute inset-[1.5px] bg-tk-lavender" />
+          <span className="gs-display tnum relative text-[12.5px] font-bold text-tk-accent">{juz.juz}</span>
         </span>
         <span className="min-w-0 flex-1">
           <span className="block truncate font-display text-[14.5px] font-bold text-tk-ink">Juz {juz.juz}</span>
@@ -305,18 +323,34 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
     <div className="space-y-6">
       {/* ---------- Judul halaman ---------- */}
       <header className="animate-tk-fade-up pt-1">
-        <div>
-          <h1 className="text-[28px] font-extrabold tracking-[-0.03em] text-tk-ink">Al-Qur&apos;an</h1>
-          <p className="mt-1 text-[12.5px] text-tk-muted">Temukan ketenangan dalam setiap ayat</p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-[28px] font-extrabold tracking-[-0.03em] text-tk-ink">Al-Qur&apos;an</h1>
+            <p className="mt-1 text-[12.5px] text-tk-muted">Temukan ketenangan dalam setiap ayat</p>
+          </div>
+          {/* Aksen kaligrafi: nama kitab dalam naskh Amiri */}
+          <span aria-hidden className="quran-arabic shrink-0 pt-1 text-[21px] leading-none text-tk-accent/80">
+            القرآن الكريم
+          </span>
         </div>
+        <OrnamentDivider className="mt-4" />
       </header>
 
       <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
         {/* ---------- Hero lanjutkan bacaan (featured blok lavender lembut) ---------- */}
         <section aria-label="Lanjutkan bacaan" className="animate-tk-fade-up lg:col-span-7">
           <div className="relative flex h-full flex-col justify-between overflow-hidden rounded-[1.6rem] bg-tk-lavender p-5 sm:p-6">
+            {/* Ornamen latar: kisi khatam samar di sudut kanan atas */}
+            <div
+              aria-hidden
+              className="tk-geo-pattern absolute -right-7 -top-7 h-40 w-40"
+              style={{ maskSize: "52px 52px", WebkitMaskSize: "52px 52px" }}
+            />
             <div className="relative">
-              <p className="gs-overline">{lastPos ? "Lanjutkan Bacaan" : "Mulai Membaca"}</p>
+              <p className="gs-overline flex items-center gap-1.5">
+                <Star8 size={10} className="text-tk-accent/75" />
+                {lastPos ? "Lanjutkan Bacaan" : "Mulai Membaca"}
+              </p>
               <div className="mt-2.5 flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate text-[25px] font-extrabold tracking-[-0.025em] text-tk-ink">
@@ -401,14 +435,20 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
               { value: daysRead.toLocaleString("id-ID"), label: "Hari membaca" },
             ].map(({ value, label }, i) => (
               <div key={label} className={cn("min-w-0 px-4", i === 0 && "pl-0", i > 0 && "border-l border-tk-line")}>
-                <p className="gs-display truncate text-[26px] font-extrabold leading-none text-tk-ink sm:text-[30px]">{value}</p>
+                <p className="flex items-start gap-1.5">
+                  <span className="gs-display truncate text-[26px] font-extrabold leading-none text-tk-ink sm:text-[30px]">
+                    {value}
+                  </span>
+                  <Star8 size={9} className="mt-1 shrink-0 text-tk-accent/65" />
+                </p>
                 <p className="gs-overline mt-2">{label}</p>
               </div>
             ))}
           </div>
 
           {/* Batang 7 hari — kronologis kiri ke kanan, tanpa kartu */}
-          <div className="mt-6 flex items-end justify-between gap-1.5 border-t border-tk-line pt-5" aria-hidden>
+          <OrnamentDivider className="mt-7" />
+          <div className="mt-5 flex items-end justify-between gap-1.5" aria-hidden>
             {lastNDays(7, today).map((k) => {
               const pages = logs[k]?.quranPages ?? 0;
               const verses = logs[k]?.quranVerses ?? 0;
@@ -449,6 +489,12 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
               aria-label={`Buka ${topMeta.latin} — dibaca ${topEntry[1].count} kali`}
             >
               <div className="relative h-full overflow-hidden rounded-[1.75rem] bg-tk-lavender p-5">
+                {/* Ornamen latar: kisi khatam samar di sudut kanan atas */}
+                <div
+                  aria-hidden
+                  className="tk-geo-pattern absolute -right-6 -top-6 h-32 w-32"
+                  style={{ maskSize: "48px 48px", WebkitMaskSize: "48px 48px" }}
+                />
                 <div className="relative flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="flex items-baseline gap-2">

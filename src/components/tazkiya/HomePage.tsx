@@ -45,6 +45,7 @@ import { ConfirmButton } from "./ui-bits";
 import { MoodSection } from "./MoodSection";
 import { JelajahiAktivitas } from "./JelajahiAktivitas";
 import { DayDetailSheet } from "./DayDetailSheet";
+import { Star8, OrnamentDivider } from "./ornaments";
 import type { SubPageId, TabId } from "./BottomNav";
 import { cn } from "@/lib/utils";
 
@@ -945,23 +946,41 @@ function DailyBarakah() {
     { label: "Target kecil", text: b.target },
   ];
   return (
-    <section aria-label="Daily Barakah" className="animate-tk-fade-up">
-      <div className="mb-1 flex items-end justify-between gap-3 px-0.5">
-        <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Daily Barakah</h2>
+    <section aria-label="Daily Barakah" className="animate-tk-fade-up relative">
+      {/* Ornamen latar: kisi khatam samar di sudut kanan atas — isi ruang kosong */}
+      <div
+        aria-hidden
+        className="tk-geo-pattern absolute right-0 top-0 h-28 w-28"
+        style={{ maskSize: "44px 44px", WebkitMaskSize: "44px 44px" }}
+      />
+      <div className="relative mb-1 flex items-end justify-between gap-3 px-0.5">
+        <div className="flex items-baseline gap-2">
+          <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Daily Barakah</h2>
+          <span aria-hidden className="quran-arabic text-[14px] leading-none text-tk-accent/85">
+            بركة
+          </span>
+        </div>
+        <Star8 size={13} className="mb-0.5 text-tk-accent/70" />
       </div>
-      <ol>
+      <ol className="relative">
         {rows.map(({ label, text }, i) => (
-          <li key={label} className={cn("flex items-start gap-4 py-3", i > 0 && "border-t border-tk-line-soft")}>
-            <span aria-hidden className="gs-display shrink-0 pt-0.5 text-[13px] font-bold text-tk-deep">
-              {String(i + 1).padStart(2, "0")}
+          <li key={label} className={cn("flex items-start gap-4 py-3.5", i > 0 && "border-t border-tk-line-soft")}>
+            {/* Chip nomor khatam: lapisan bintang luar + dalam = tepi rambut */}
+            <span aria-hidden className="relative flex h-9 w-9 shrink-0 items-center justify-center">
+              <span className="tk-octagram absolute inset-0 bg-tk-lav-deco" />
+              <span className="tk-octagram absolute inset-[1.5px] bg-tk-lavender" />
+              <span className="gs-display relative text-[11.5px] font-bold text-tk-accent">
+                {String(i + 1).padStart(2, "0")}
+              </span>
             </span>
             <span className="min-w-0">
-              <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-tk-accent">{label}</span>
-              <span className="mt-1 block text-[13px] leading-relaxed text-tk-ink/90">{text}</span>
+              <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-tk-accent">{label}</span>
+              <span className="mt-1.5 block text-[13.5px] leading-relaxed text-tk-ink/90">{text}</span>
             </span>
           </li>
         ))}
       </ol>
+      <OrnamentDivider className="relative mt-1.5" />
     </section>
   );
 }

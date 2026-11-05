@@ -669,3 +669,31 @@ html[data-anim="off"] .animate-tk-bell-swing {
     animation: none !important;
   }
 }
+
+/* ============================================================
+   ORNAMEN ISLAMI V11 — khatam & pola geometris (murni dekoratif)
+   ============================================================ */
+/* Khatam: bintang segi delapan (silang dua persegi) sebagai bentuk
+   chip nomor — radius luar 50%, dalam 26%, langkah 22,5°. */
+.tk-octagram {
+  clip-path: polygon(
+    100% 50%, 74.02% 59.95%, 85.36% 85.36%, 59.95% 74.02%,
+    50% 100%, 40.05% 74.02%, 14.64% 85.36%, 25.98% 59.95%,
+    0% 50%, 25.98% 40.05%, 14.64% 14.64%, 40.05% 25.98%,
+    50% 0%, 59.95% 25.98%, 85.36% 14.64%, 74.02% 40.05%
+  );
+}
+/* Pola khatam berulang, dicat warna aksen lalu disamarkan (mask) —
+   transparan terhadap latar di belakangnya sehingga aman untuk tema
+   gelap dan terang. Pakai pada <div aria-hidden> absolut. */
+.tk-geo-pattern {
+  background-color: var(--color-tk-accent);
+  opacity: 0.07;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cpath d='M58,36 L46.16,40.21 L51.56,51.56 L40.21,46.16 L36,58 L31.79,46.16 L20.44,51.56 L25.84,40.21 L14,36 L25.84,31.79 L20.44,20.44 L31.79,25.84 L36,14 L40.21,25.84 L51.56,20.44 L46.16,31.79 Z'/%3E%3Ccircle cx='0' cy='0' r='2.2'/%3E%3Ccircle cx='72' cy='0' r='2.2'/%3E%3Ccircle cx='0' cy='72' r='2.2'/%3E%3Ccircle cx='72' cy='72' r='2.2'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cpath d='M58,36 L46.16,40.21 L51.56,51.56 L40.21,46.16 L36,58 L31.79,46.16 L20.44,51.56 L25.84,40.21 L14,36 L25.84,31.79 L20.44,20.44 L31.79,25.84 L36,14 L40.21,25.84 L51.56,20.44 L46.16,31.79 Z'/%3E%3Ccircle cx='0' cy='0' r='2.2'/%3E%3Ccircle cx='72' cy='0' r='2.2'/%3E%3Ccircle cx='0' cy='72' r='2.2'/%3E%3Ccircle cx='72' cy='72' r='2.2'/%3E%3C/svg%3E");
+  -webkit-mask-size: 72px 72px;
+  mask-size: 72px 72px;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  pointer-events: none;
+}

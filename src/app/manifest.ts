@@ -7,8 +7,11 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Pelacak Ibadah Harian",
     start_url: "/",
     display: "standalone",
-    background_color: "#0B1512",
-    theme_color: "#16A34A",
+    /* Identitas v7 (kanvas #1B1B1E) — bukan hijau lama. Chrome/Android
+       mencat area navigasi sistem bawah PWA dari theme_color manifest ini,
+       sehingga #16A34A lama tampil sebagai garis hijau di bawah Beranda. */
+    background_color: "#1B1B1E",
+    theme_color: "#1B1B1E",
     icons: [
       {
         src: "/icons/icon-192.png",
