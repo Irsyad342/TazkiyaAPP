@@ -804,3 +804,44 @@ tsc 0 · eslint bersih · build sukses (setelah perbaikan standalone .next basi 
 manifest menunjuk chunk CSS yang tak ada; clear rebuild). agent-browser: font body = "generalSans" ✓; alur catat
 Subuh via blok timeline → jenis pelaksanaan → popup → header 1/5 ✓; search "fatihah" → navigasi Al-Qur'an ✓;
 pil tanggal → DayDetailSheet ✓; tema terang dari Profil ✓; overflow 0px di 360/390/430 × 5 tab; konsol 0 error.
+
+## Task 43 — v8: mobile-only + mood baru + animasi presisi + Progress kartu (branch `redesign/ember-v8`)
+
+Umpan balik pengguna: (1) tampilan jadi desktop, (2) emoticon "Bagaimana perasaanmu" & ikonnya tidak sesuai selera,
+(3) minta animasi yang presisi, (4) halaman Progress didesain ulang menjadi kartu-kartu.
+
+### Mobile-only — akar masalah & perbaikan permanen
+v7 masih merender `SidebarNav` di layar lebar + konten `max-w-[1120px]`, dan seluruh varian `sm:`/`lg:` aktif
+mengikuti viewport. Perbaikan menyeluruh:
+- Semua breakpoint Tailwind DIPATOK jauh di atas viewport (300rem+) di `@theme` — varian `sm:`/`md:`/`lg:`/`xl:`
+  tidak pernah aktif lagi; aplikasi selalu memakai tata letak HP di perangkat apa pun.
+- `SidebarNav` dihapus total dari `page.tsx` & `BottomNav.tsx`; konten menjadi kolom `max-w-[430px]` di tengah;
+  di desktop kolom dibingkai panggung lebih pekat (#101013 / terang #e8e8ec) + hairline via varian `desktop:` khusus.
+- BottomNav: `max-w-[430px]` terpusat (fixed), tanpa `lg:hidden` — satu-satunya navigasi di semua perangkat.
+- Default `DialogContent`/`AlertDialogContent` shadcn diberi cap absolut `max-w-[min(100%-2rem,26rem)]` (mengganti
+  `sm:max-w-lg` yang mati) agar dialog tidak melebar di desktop.
+
+### Mood baru (MoodFace v8)
+Tujuh ekspresi digambar ulang bergaya "sticker" modern: tanpa garis lingkaran luar; bidang wajah warna lembut
+(currentColor 11%), fitur tegas stroke 2.6 membulat, pipi blush, satu aksen kecil per karakter (kilau, hati, zZz,
+air mata, keringat, pusaran). Grid berubah dari baris geser menjadi 4+3 SIMETRIS (semua terlihat tanpa menggulir).
+
+### Animasi presisi (sistem gerak baku)
+- Stagger kartu `.tk-stagger`: anak masuk berurutan 45ms, kurva out-quint 0.5s — dipakai di seluruh periode Progress.
+- Pil nav aktif: pop spring overshoot (`tk-nav-pop`, replay tiap pindah tab via key).
+- Indikator `SegmentedTabs` kini MENGGESER (satu elemen transform translateX, 320ms out-quint) alih-alih
+  muncul-hilang per tombol — dipakai Progress, Sholat, Qur'an, Zikir.
+- Lonceng beranda: ayun lembut periodik (`tk-bell-swing`). Semua hormat `data-anim=off` & `prefers-reduced-motion`.
+- Transisi antartab disempurnakan (y 14px, 0.22s out-quint).
+
+### Progress → deretan kartu
+Hari Ini: kartu utama cincin+3 statistik bersekat; grid kartu 2-kolom Salat (bar segmen 5 bagian per status),
+Al-Qur'an, Zikir, Target Harian, Kebaikan, Jurnal Syukur. Mingguan: kartu grafik, kartu kalender geser, kartu
+aktivitas. Bulanan: 3 kartu statistik, kartu kalender heatmap, kartu kebiasaan. Semua single-column HP.
+BUG v7 ikut diperbaiki: pindah tab periode otomatis membuka sheet "Rincian Hari Ini" (selectedDate default truthy)
+— kini sheet hanya terbuka lewat ketukan sengaja (state sheetDate terpisah).
+
+### QA
+tsc 0 · eslint bersih · build sukses. Browser (1280 desktop & 360/390/430): kolom 430px terpusat tanpa sidebar,
+overflow 0px semua tab & lebar, siklus tab Progress bersih tanpa auto-sheet, mood terpilih ber-ring orange,
+tema terang/gelap konsisten, 0 error konsol.

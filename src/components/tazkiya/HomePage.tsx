@@ -989,7 +989,7 @@ export function HomePage({
             onClick={() => setReminderOpen(true)}
             className="tap flex h-[44px] w-[44px] items-center justify-center justify-self-end rounded-full bg-tk-panel-strong text-tk-ink"
           >
-            <Bell size={19} strokeWidth={1.9} />
+            <Bell size={19} strokeWidth={1.9} className="animate-tk-bell-swing" />
           </button>
         </div>
         <p className="mt-2.5 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 text-[11px] font-medium text-tk-muted">

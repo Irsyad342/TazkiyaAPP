@@ -45,47 +45,53 @@ export function MoodSection({
   };
 
   return (
-    <section aria-label="Mood check-in" className="animate-tk-fade-up flex h-full flex-col">
+    <section aria-label="Mood check-in" className="flex h-full flex-col">
       <div className="mb-4">
         <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Bagaimana perasaanmu hari ini?</h2>
         <p className="mt-1 text-[12px] text-tk-muted">Luangkan waktu sejenak untuk memahami dirimu.</p>
       </div>
 
-      <div
-        role="radiogroup"
-        aria-label="Pilih mood hari ini"
-        className="no-scrollbar -mx-1.5 flex w-full min-w-0 snap-x gap-1.5 overflow-x-auto px-1.5 pb-1 sm:grid sm:grid-cols-4 sm:gap-2 sm:overflow-visible"
-      >
-        {MOODS.map((mo) => {
-          const tone = MOOD_TONE[mo.id];
-          const active = moodToday === mo.id;
-          return (
-            <button
-              key={mo.id}
-              type="button"
-              role="radio"
-              aria-checked={active}
-              aria-label={`Mood ${mo.label}`}
-              onClick={() => select(mo.id, mo.label)}
-              className="tap flex w-[76px] shrink-0 snap-start flex-col items-center gap-2 rounded-2xl px-1.5 py-2.5 sm:w-auto"
-            >
-              <m.span
-                aria-hidden
-                animate={{ scale: active ? 1.07 : 1 }}
-                transition={{ type: "spring", stiffness: 420, damping: 22 }}
-                className={cn(
-                  "flex h-[58px] w-[58px] items-center justify-center rounded-full transition-colors duration-200",
-                  active ? cn(tone.activeBg, "ring-2 ring-tk-violet") : "bg-tk-panel-soft"
-                )}
-              >
-                <MoodFace id={mo.id} className={cn("h-[44px] w-[44px]", tone.face)} />
-              </m.span>
-              <span className={cn("text-[10.5px] leading-none", active ? "font-bold text-tk-ink" : "font-medium text-tk-muted")}>
-                {mo.label}
-              </span>
-            </button>
-          );
-        })}
+      <div role="radiogroup" aria-label="Pilih mood hari ini" className="flex flex-col gap-2.5">
+        {/* Baris 4 + 3 simetris — semua ekspresi terlihat tanpa menggulir */}
+        {[MOODS.slice(0, 4), MOODS.slice(4)].map((row, r) => (
+          <div key={r} className="flex items-start justify-center gap-1">
+            {row.map((mo, i) => {
+              const tone = MOOD_TONE[mo.id];
+              const active = moodToday === mo.id;
+              const order = r * 4 + i;
+              return (
+                <m.button
+                  key={mo.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  aria-label={`Mood ${mo.label}`}
+                  onClick={() => select(mo.id, mo.label)}
+                  initial={{ opacity: 0, scale: 0.55, y: 8 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 420, damping: 24, delay: 0.05 + order * 0.05 }}
+                  whileTap={{ scale: 0.88 }}
+                  className="tap flex w-[80px] shrink-0 flex-col items-center gap-2 rounded-2xl px-1 py-2"
+                >
+                  <m.span
+                    aria-hidden
+                    animate={{ scale: active ? 1.1 : 1 }}
+                    transition={{ type: "spring", stiffness: 420, damping: 20 }}
+                    className={cn(
+                      "flex h-[62px] w-[62px] items-center justify-center rounded-full transition-[background-color,box-shadow] duration-300",
+                      active ? cn(tone.activeBg, "ring-2 ring-tk-violet ring-offset-2 ring-offset-tk-stage") : "bg-tk-panel-soft"
+                    )}
+                  >
+                    <MoodFace id={mo.id} className={cn("h-[50px] w-[50px]", tone.face)} />
+                  </m.span>
+                  <span className={cn("text-[10.5px] leading-none", active ? "font-bold text-tk-ink" : "font-medium text-tk-muted")}>
+                    {mo.label}
+                  </span>
+                </m.button>
+              );
+            })}
+          </div>
+        ))}
       </div>
 
       <div className="mt-auto min-h-[74px] pt-4">
