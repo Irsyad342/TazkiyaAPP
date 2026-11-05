@@ -10,15 +10,15 @@
 
 import type { MoodId } from "@/lib/tazkiya/types";
 
-/** Aksen warna per karakter mood — lembut, satu keluarga pastel. */
+/** Aksen warna per karakter mood — pastel di tema terang, muatan gelap di tema gelap. */
 export const MOOD_TONE: Record<MoodId, { face: string; activeBg: string }> = {
-  bahagia: { face: "text-[#e8a23d]", activeBg: "bg-[#fbf3e4]" },
-  tenang: { face: "text-[#5b8def]", activeBg: "bg-[#edf3fe]" },
-  bersyukur: { face: "text-[#e8698d]", activeBg: "bg-[#fdeef2]" },
-  lelah: { face: "text-[#888795]", activeBg: "bg-[#f4f5f9]" },
-  sedih: { face: "text-[#6a89c9]", activeBg: "bg-[#eef2fa]" },
-  cemas: { face: "text-[#8a79d9]", activeBg: "bg-[#f0edff]" },
-  "campur-aduk": { face: "text-[#8d7be8]", activeBg: "bg-[#e6e0ff]" },
+  bahagia: { face: "text-tz-amber", activeBg: "bg-tz-amber-soft" },
+  tenang: { face: "text-tz-blue", activeBg: "bg-tz-blue-soft" },
+  bersyukur: { face: "text-[#d95f80] dark:text-[#ef8aa4]", activeBg: "bg-[#fdeef2] dark:bg-[#2f1d22]" },
+  lelah: { face: "text-tz-muted", activeBg: "bg-tz-panel-soft" },
+  sedih: { face: "text-[#6a89c9] dark:text-[#89a8e0]", activeBg: "bg-[#eef2fa] dark:bg-[#1e2634]" },
+  cemas: { face: "text-[#8a79d9] dark:text-[#a99cf2]", activeBg: "bg-[#f0edff] dark:bg-[#26223a]" },
+  "campur-aduk": { face: "text-[#e8722e] dark:text-[#ff8a50]", activeBg: "bg-tz-lavender" },
 };
 
 export function MoodFace({ id, className }: { id: MoodId; className?: string }) {

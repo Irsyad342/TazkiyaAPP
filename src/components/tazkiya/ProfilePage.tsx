@@ -81,9 +81,9 @@ import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { cn } from "@/lib/utils";
 
 const THEME_OPTIONS: { id: ThemeMode; label: string; hint: string; bg: string; dot: string }[] = [
-  { id: "light", label: "Terang", hint: "Kanvas putih", bg: "linear-gradient(140deg,#ffffff,#f4f5f9)", dot: "#8D7BE8" },
-  { id: "dark", label: "Gelap", hint: "Arang lembut", bg: "linear-gradient(140deg,#1C1C24,#101014)", dot: "#A99CF2" },
-  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#101014 50%,#f8f9fc 50%)", dot: "#D9F477" },
+  { id: "light", label: "Terang", hint: "Kanvas putih", bg: "linear-gradient(140deg,#ffffff,#f1f1f3)", dot: "#FF5A00" },
+  { id: "dark", label: "Gelap", hint: "Arang ember", bg: "linear-gradient(140deg,#252525,#161616)", dot: "#FF5A00" },
+  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#161616 50%,#f6f6f7 50%)", dot: "#FF5A00" },
 ];
 
 /** Jam perangkat HH:mm — aksen kanan-atas kepala profil. */
@@ -336,7 +336,7 @@ export function ProfilePage({
               type="button"
               aria-label="Ubah foto profil"
               onClick={() => fileRef.current?.click()}
-              className="tap absolute -bottom-0.5 -right-0.5 flex h-8 w-8 items-center justify-center rounded-full border-[3px] border-tz-stage v5-ink-btn text-tz-lime"
+              className="tap absolute -bottom-0.5 -right-0.5 flex h-8 w-8 items-center justify-center rounded-full border-[3px] border-tz-stage v5-ink-btn"
             >
               <Camera size={14} />
             </button>
@@ -368,7 +368,7 @@ export function ProfilePage({
                     setEditingName(false);
                     toast.success("Nama diperbarui");
                   }}
-                  className="tap flex h-11 w-11 shrink-0 items-center justify-center rounded-full v5-ink-btn text-tz-lime"
+                  className="tap flex h-11 w-11 shrink-0 items-center justify-center rounded-full v5-ink-btn"
                 >
                   <Check size={17} />
                 </button>
@@ -508,7 +508,7 @@ export function ProfilePage({
             onClick={onGoTracker}
             className="tap mt-4 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn text-[13.5px] font-bold"
           >
-            <ListChecks size={15} className="text-tz-lime" aria-hidden />
+            <ListChecks size={15} aria-hidden />
             Lanjutkan Tracker
             <ChevronRight size={15} aria-hidden />
           </button>
@@ -612,7 +612,7 @@ export function ProfilePage({
                   href="/auth"
                   className="tap flex min-h-[44px] items-center justify-center gap-2 rounded-full v5-ink-btn text-[13px] font-bold"
                 >
-                  <LogIn size={15} className="text-tz-lime" />
+                  <LogIn size={15} />
                   Masuk
                 </Link>
                 <Link
@@ -893,7 +893,7 @@ export function ProfilePage({
                 disabled={geoBusy}
                 className="tap mt-2.5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn text-[13px] font-bold disabled:opacity-50"
               >
-                {geoBusy ? <LoaderCircle size={16} className="animate-spin" /> : <LocateFixed size={16} className="text-tz-lime" />}
+                {geoBusy ? <LoaderCircle size={16} className="animate-spin" /> : <LocateFixed size={16} />}
                 {geoBusy ? "Mencari lokasi…" : settings.geo ? "Perbarui Lokasi Saat Ini" : "Aktifkan Lokasi Otomatis"}
               </button>
 

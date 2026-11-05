@@ -314,7 +314,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
       <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
         {/* ---------- Hero lanjutkan bacaan (featured blok lavender lembut) ---------- */}
         <section aria-label="Lanjutkan bacaan" className="animate-tz-fade-up lg:col-span-7">
-          <div className="relative flex h-full flex-col justify-between overflow-hidden rounded-[2rem] bg-tz-lavender p-5 sm:p-6">
+          <div className="relative flex h-full flex-col justify-between overflow-hidden rounded-[1.6rem] bg-tz-lavender p-5 sm:p-6">
             <div className="relative">
               <p className="v5-overline">{lastPos ? "Lanjutkan Bacaan" : "Mulai Membaca"}</p>
               <div className="mt-2.5 flex items-start justify-between gap-3">
@@ -340,7 +340,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                 onClick={() => onOpenReader(lastPos?.surah ?? 1, lastPos?.ayah ?? 1)}
                 className="tap flex min-h-[46px] items-center gap-2 rounded-full v5-ink-btn px-5 text-[13px] font-bold transition-all hover:opacity-90"
               >
-                <Play size={15} className="text-tz-lime" />
+                <Play size={15} />
                 {lastPos ? "Lanjutkan" : "Buka Qur'an"}
               </button>
               {manualBookmark ? (
@@ -659,7 +659,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
               className="tap flex w-full items-center gap-3 px-4 py-3.5 text-left sm:px-5"
               aria-expanded={formOpen}
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full v5-ink-btn text-tz-lime">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full v5-ink-btn">
                 <Plus size={18} />
               </span>
               <span className="min-w-0 flex-1">
@@ -728,7 +728,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                     onClick={saveCatatan}
                     className="tap mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn font-display text-[14px] font-bold transition-all hover:opacity-90"
                   >
-                    <Check size={17} className="text-tz-lime" /> Simpan Bacaan
+                    <Check size={17} /> Simpan Bacaan
                   </button>
                 </div>
               </div>

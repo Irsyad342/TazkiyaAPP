@@ -739,3 +739,29 @@ Pembongkaran total bahasa visual atas revisi pengguna: v4 dinilai masih memperta
 
 ### QA
 tsc 0 · eslint bersih · build sukses · alur: mood, catat salat selesai+berjamaah+popup, tasbih hitung→simpan→riwayat, jurnal simpan, reader buka→gulir→tutup→tercatat otomatis, auth validasi register, tema live; overflow 360/390/430 = 0 di semua halaman uji; screenshot 20+ file (light+dark) + 2 contact sheet di download/screenshots/v5/.
+
+## Task 41 — "EMBER" v6 (branch `redesign/ember-v6`, deploy produksi)
+
+Pembongkaran total bahasa visual sesuai referensi task-planner premium pengguna: DARK CHARCOAL + ORANGE. Bukan skin change
+pada v5: design system ditulis ulang, default tema kini DARK, komposisi Beranda dibangun ulang dari nol, dan semua
+permukaan berpindah ke palet arang-oranye. 100% business logic, store, Supabase, qada, sesi baca otomatis, mood, tasbih —
+tidak disentuh.
+
+### Design system v6 (globals.css ditulis ulang, API kelas tz-* dipertahankan)
+- Dark utama: kanvas #161616, panel #252525 / #1D1D1D / #303030, border #2E2E2E–#3D3D3D, teks #FFFFFF / #A5A5A5 / #747474.
+- Aksen ORANGE #FF5A00 (fill) + #FF7A3D (teks kecil dark); light counterpart setara (#F6F6F7 kanvas, kartu putih, orange #E64A00 untuk teks).
+- Success muted green (#22422F/#9FE0B5 chip), warning amber #E0A458, biru info #6E9FE8 — semua muted, tanpa neon.
+- glass-hero = kartu ORANGE pekat (satu per layar: featured salat, kartu Zikir & Doa); glass = kartu arang hairline; v5-ink-btn kini CTA ORANGE.
+- Ornamen dihapus (lingkaran dekoratif auth dibuang), bayangan hanya untuk lapisan mengambang + hero orange.
+- layout.tsx: data-v="6", default data-theme="dark", theme-color #161616/#F6F6F7; store: default theme="dark" (pengguna lama mempertahankan preferensinya).
+
+### Halaman & komponen (semua disentuh)
+- Beranda DARI NOL gaya referensi: header avatar+sapaan+nama+tanggal Masehi/Hijriah, COMPACT DATE SELECTOR 7 pil (hari ini ORANGE, hari ber-catatan titik hijau, ketuk → DayDetailSheet data nyata), featured blok ORANGE (countdown + 5 slot status), kartu ringkasan ring+3 baris progres, Target Hari Ini gaya "Today's Task" (checklist dalam kartu), Mood, Pekan Ini, Jelajahi (kartu Zikir ORANGE), Doa Hari Ini kartu, Daily Barakah bernomor.
+- Sholat: featured ORANGE + badge "BERIKUTNYA" orange pada salat aktif di timeline, chip Catat aktif orange; Bulanan & Qada mengalir via token (ringkasan qada blok hangat).
+- Al-Qur'an + Reader: daftar/reader arang, ayat aktif warm highlight + badge orange, grafik/area chart di-recolor orange.
+- Progress: ring orange, heatmap orange, perbaikan dot/legend; Profil: preview tema digambar ulang (Terang/Gelap Ember/Sistem), avatar & CTA orange.
+- Jurnal/Zikir/Rizq/Tasbih/Mood/Dialog/Sheet/Auth: kartu arang + aksen orange; MoodFace theme-aware (dark: latar muatan gelap); MotivationPopup & semua sheet glass-strong gelap.
+- BottomNav: bar kapsul gelap mengambang, item aktif PIL ORANGE ikon+label putih (gaya referensi); SidebarNav gelap aktif orange.
+
+### QA
+tsc 0 · eslint bersih · build sukses · agent-browser 390/360/430: alur catat Subuh (dialog→done+mandiri→popup→timeline ter-update), reader buka→tutup→1 ayat tercatat otomatis (Progress 11%), tasbih 3×→Simpan Harian (store zikirCount=3), pil tanggal→DayDetailSheet, tema Gelap↔Terang live dari Profil; overflow horizontal = 0 di semua tab+subpage 360/390/430; konsol 0 error; dark & light diverifikasi visual.

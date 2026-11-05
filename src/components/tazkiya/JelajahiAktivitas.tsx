@@ -61,25 +61,25 @@ export function JelajahiAktivitas({
           </span>
         </button>
 
-        {/* 2. Zikir & Doa — kartu ringkas + widget cincin */}
+        {/* 2. Zikir & Doa — kartu ORANGE pekat + widget cincin */}
         <button
           type="button"
           onClick={() => onOpen("zikir-doa")}
           aria-label="Buka halaman Zikir & Doa"
-          className="tap glass flex items-center gap-4 rounded-[1.5rem] p-4 text-left"
+          className="tap glass-hero flex items-center gap-4 rounded-[1.5rem] p-4 text-left"
         >
           <span className="min-w-0 flex-1">
-            <span className="block text-[14.5px] font-bold text-tz-ink">Zikir &amp; Doa</span>
-            <span className="mt-0.5 block text-[11.5px] leading-relaxed text-tz-muted">
+            <span className="block text-[14.5px] font-bold text-white">Zikir &amp; Doa</span>
+            <span className="mt-0.5 block text-[11.5px] leading-relaxed text-white/75">
               Hitungan hari ini{" "}
-              <span className="tnum font-bold text-tz-ink">{zikirCount.toLocaleString("id-ID")}</span> dari target{" "}
+              <span className="tnum font-bold text-white">{zikirCount.toLocaleString("id-ID")}</span> dari target{" "}
               {zikirTarget.toLocaleString("id-ID")}
             </span>
           </span>
           {/* cincin progres mini */}
           <span aria-hidden className="relative flex h-14 w-14 shrink-0 items-center justify-center">
             <svg viewBox="0 0 56 56" className="absolute inset-0 h-full w-full -rotate-90">
-              <circle cx="28" cy="28" r="24" fill="none" strokeWidth="4" className="stroke-tz-track" />
+              <circle cx="28" cy="28" r="24" fill="none" strokeWidth="4" className="stroke-white/25" />
               <circle
                 cx="28"
                 cy="28"
@@ -87,12 +87,12 @@ export function JelajahiAktivitas({
                 fill="none"
                 strokeWidth="4"
                 strokeLinecap="round"
-                className="stroke-tz-violet"
+                className="stroke-white"
                 strokeDasharray={`${(zikirPct / 100) * 2 * Math.PI * 24} ${2 * Math.PI * 24}`}
                 style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.22, 1, 0.36, 1)" }}
               />
             </svg>
-            <span className="tnum text-[12px] font-bold text-tz-violet">{zikirCount > 999 ? "999+" : zikirCount}</span>
+            <span className="tnum text-[12px] font-bold text-white">{zikirCount > 999 ? "999+" : zikirCount}</span>
           </span>
         </button>
 

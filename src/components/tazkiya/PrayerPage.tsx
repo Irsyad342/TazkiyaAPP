@@ -85,12 +85,14 @@ function PrayerTimelineRow({
   detail,
   time,
   isLast,
+  isNext,
   onPress,
 }: {
   meta: PrayerMeta;
   detail: PrayerDetail;
   time?: string;
   isLast: boolean;
+  isNext?: boolean;
   onPress: () => void;
 }) {
   const isDone = detail.status === "done";
@@ -141,7 +143,16 @@ function PrayerTimelineRow({
 
         <span className="flex items-start justify-between gap-3">
           <span className="min-w-0">
-            <span className="block text-[15px] font-bold tracking-[-0.01em] text-tz-ink">{meta.label}</span>
+            <span className="flex items-center gap-2">
+              <span className={cn("block text-[15px] font-bold tracking-[-0.01em]", isNext && !isDone ? "text-tz-accent" : "text-tz-ink")}>
+                {meta.label}
+              </span>
+              {isNext && !isDone ? (
+                <span className="rounded-full bg-tz-violet px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-white">
+                  Berikutnya
+                </span>
+              ) : null}
+            </span>
             <span className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1">
               <span className="flex items-center gap-1.5 text-[11.5px] font-medium text-tz-muted">
                 <span aria-hidden className={cn("h-1.5 w-1.5 rounded-full", status.dot)} />
@@ -162,7 +173,7 @@ function PrayerTimelineRow({
           <span
             className={cn(
               "shrink-0 rounded-full px-3 py-1.5 text-[10.5px] font-bold",
-              isDone ? "bg-tz-panel-soft text-tz-muted" : "bg-tz-lavender text-tz-violet"
+              isDone ? "bg-tz-panel-strong text-tz-muted" : isNext ? "bg-tz-violet text-white" : "bg-tz-lavender text-tz-accent"
             )}
           >
             {isDone ? "Ubah" : "Catat"}
@@ -212,36 +223,36 @@ function TodayTab({
   return (
     <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
       <div className="space-y-8 lg:col-span-7">
-        {/* Featured: blok lavender lembut dengan countdown besar */}
-        <section aria-label="Ringkasan hari ini" className="animate-tz-fade-up rounded-[2rem] bg-tz-lavender p-5 sm:p-6">
+        {/* Featured: blok ORANGE dengan countdown besar */}
+        <section aria-label="Ringkasan hari ini" className="animate-tz-fade-up glass-hero rounded-[1.6rem] p-5 sm:p-6">
           <div className="flex items-center justify-between gap-3">
-            <p className="v5-overline">Sholat Berikutnya</p>
-            <span className="rounded-full bg-tz-lime px-3 py-1.5 text-[11.5px] font-bold text-tz-lime-ink">
+            <p className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-white/75">Sholat Berikutnya</p>
+            <span className="rounded-full bg-white/18 px-3 py-1.5 text-[11.5px] font-bold text-white backdrop-blur-sm">
               {formatCountdown(state.secondsLeft)} lagi
             </span>
           </div>
           <div className="mt-4 flex flex-wrap items-end gap-x-4 gap-y-2">
-            <p className="v5-display text-[48px] font-extrabold leading-[0.9] text-tz-ink sm:text-[56px]">{state.nextTime}</p>
+            <p className="v5-display text-[46px] font-extrabold leading-[0.9] text-white sm:text-[54px]">{state.nextTime}</p>
             <div className="pb-1">
-              <p className="text-[17px] font-bold tracking-[-0.01em] text-tz-ink">{nextMeta.label}</p>
-              <p className="mt-0.5 text-[11.5px] font-medium text-tz-muted">
+              <p className="text-[17px] font-bold tracking-[-0.01em] text-white">{nextMeta.label}</p>
+              <p className="mt-0.5 text-[11.5px] font-medium text-white/75">
                 {formatHijri(new Date()) || formatDayFullOf(today)}
               </p>
             </div>
           </div>
 
           {/* Status hari ini: angka + strip lima slot */}
-          <div className="mt-6 border-t border-tz-lav-deco pt-4">
+          <div className="mt-6 border-t border-white/20 pt-4">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[12.5px] font-medium text-tz-ink/90">
+              <p className="text-[12.5px] font-medium text-white/90">
                 Sudah dilaksanakan{" "}
                 <span className="tnum font-bold">
                   {doneCount}
-                  <span className="text-tz-muted">/5</span>
+                  <span className="text-white/60">/5</span>
                 </span>
-                {jamaah > 0 ? <span className="ml-2 text-[11.5px] font-semibold text-tz-teal">{jamaah} berjamaah</span> : null}
+                {jamaah > 0 ? <span className="ml-2 text-[11.5px] font-semibold text-white">{jamaah} berjamaah</span> : null}
               </p>
-              <span className="tnum text-[12.5px] font-bold text-tz-ink">{Math.round((doneCount / 5) * 100)}%</span>
+              <span className="tnum text-[12.5px] font-bold text-white">{Math.round((doneCount / 5) * 100)}%</span>
             </div>
             <div className="mt-2.5 flex items-center gap-1.5" role="img" aria-label={`${doneCount} dari 5 salat tercatat`}>
               {prayersToday.map((p) => {
@@ -252,7 +263,7 @@ function TodayTab({
                     aria-hidden
                     className={cn(
                       "h-1.5 flex-1 rounded-full transition-colors",
-                      st === "done" ? "bg-tz-violet" : st === "missed" ? "bg-tz-amber/70" : "bg-tz-lav-deco"
+                      st === "done" ? "bg-white" : st === "missed" ? "bg-[#FFD8A8]" : "bg-white/25"
                     )}
                   />
                 );
@@ -272,6 +283,7 @@ function TodayTab({
                 detail={detailOf(p.id)}
                 time={schedule[p.id]?.time}
                 isLast={i === prayersToday.length - 1}
+                isNext={p.id === state.next}
                 onPress={() => onRecord(p)}
               />
             ))}
@@ -657,9 +669,9 @@ function QadaTab({ today }: { today: string }) {
             <button
               type="button"
               onClick={submit}
-              className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn text-[14px] font-bold"
+              className="tap v5-ink-btn flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full text-[14px] font-bold"
             >
-              <Plus size={16} className="text-tz-lime" /> Tambah ke Daftar Qada
+              <Plus size={16} /> Tambah ke Daftar Qada
             </button>
           </GlassCard>
         </section>

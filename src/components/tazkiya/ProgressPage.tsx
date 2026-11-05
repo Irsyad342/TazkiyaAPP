@@ -554,7 +554,7 @@ export function ProgressPage() {
                 })}
               </div>
               <p className="mt-3 border-t border-tz-line pt-2.5 text-[10px] leading-relaxed text-tz-muted">
-                Titik menunjukkan cara salat terbanyak hari itu: lavender penuh = berjamaah, lavender muda = mandiri,
+                Titik menunjukkan cara salat terbanyak hari itu: orange penuh = berjamaah, orange redup = mandiri,
                 amber = ada yang tidak dilaksanakan.
               </p>
             </GlassCard>
@@ -640,7 +640,7 @@ export function ProgressPage() {
                       >
                         <span className="tnum leading-none">{cell.day}</span>
                         {cell.hasData && !cell.isFuture ? (
-                          <span aria-hidden className={cn("mt-1 h-[4px] w-[4px] rounded-full", cell.jamaah > 0 ? "bg-tz-lime" : "bg-tz-violet")} />
+                          <span aria-hidden className={cn("mt-1 h-[4px] w-[4px] rounded-full", cell.jamaah > 0 ? "bg-white" : "bg-tz-violet")} />
                         ) : (
                           <span aria-hidden className="mt-1 h-[4px] w-[4px] rounded-full bg-transparent" />
                         )}
@@ -696,7 +696,7 @@ export function ProgressPage() {
                   <span
                     className={cn(
                       "tnum flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10.5px] font-bold",
-                      idx === 0 ? "v5-ink-btn text-tz-lime" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
+                      idx === 0 ? "v5-ink-btn" : "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent"
                     )}
                   >
                     {idx + 1}
@@ -706,7 +706,7 @@ export function ProgressPage() {
                       <p className="truncate text-xs font-semibold text-tz-ink/90">{a.label}</p>
                       <p className="tnum text-[11px] font-bold text-tz-muted">{a.count}x</p>
                     </div>
-                    <ProgressBar value={(a.count / maxActivity) * 100} className="h-1.5" fillClass={idx === 0 ? "bg-tz-lime" : undefined} />
+                    <ProgressBar value={(a.count / maxActivity) * 100} className="h-1.5" />
                   </div>
                 </div>
               ))}

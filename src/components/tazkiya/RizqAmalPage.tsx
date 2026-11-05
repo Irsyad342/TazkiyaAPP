@@ -197,7 +197,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                         setGoalDraft("");
                         toast.success("Target pribadi ditambahkan");
                       }}
-                      className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full v5-ink-btn text-tz-lime"
+                      className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full v5-ink-btn"
                     >
                       <Plus size={16} />
                     </button>
@@ -227,7 +227,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                           kind === k.id ? "v5-ink-btn" : "bg-tz-panel-soft text-tz-muted hover:text-tz-ink"
                         )}
                       >
-                        <Icon size={13} className={kind === k.id ? "text-tz-lime" : "text-tz-violet"} />
+                        <Icon size={13} className={kind === k.id ? "text-white" : "text-tz-accent"} />
                         {k.label}
                       </button>
                     );
@@ -257,7 +257,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                 onClick={submit}
                 className="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full v5-ink-btn font-display text-[14px] font-bold"
               >
-                <Check size={16} strokeWidth={3} className="text-tz-lime" /> Simpan Catatan
+                <Check size={16} strokeWidth={3} /> Simpan Catatan
               </button>
               <p className="text-[10px] leading-relaxed text-tz-muted/80">
                 Tidak ada penilaian atas jumlah atau nilai — setiap kebaikan dicatat setara, untuk kesadaranmu sendiri.

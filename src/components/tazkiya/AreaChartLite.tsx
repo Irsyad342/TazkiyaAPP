@@ -90,10 +90,10 @@ export function AreaChartLite({
   const pw = Math.max(0, width - PAD.left - PAD.right);
   const ph = H - PAD.top - PAD.bottom;
   const n = data.length;
-  const lineColor = isLight ? "#16A34A" : "#4ADE80";
-  const dotFill = isLight ? "#A3D94A" : "#CFF05C";
-  const gridColor = isLight ? "rgba(41,35,49,0.08)" : "rgba(255,255,255,0.06)";
-  const axisColor = isLight ? "#706778" : "#A79BC6";
+  const lineColor = isLight ? "#E64A00" : "#FF6A1F";
+  const dotFill = isLight ? "#FF5A00" : "#FF8A50";
+  const gridColor = isLight ? "rgba(26,26,30,0.08)" : "rgba(255,255,255,0.07)";
+  const axisColor = isLight ? "#8E8E96" : "#8F8F8F";
 
   const xy: XY[] =
     n === 0 || pw === 0
@@ -179,7 +179,7 @@ export function AreaChartLite({
             strokeWidth={2.5}
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ filter: "drop-shadow(0 4px 10px rgba(108,92,231,0.45))" }}
+            style={{ filter: "drop-shadow(0 4px 10px rgba(255,90,0,0.35))" }}
           />
 
           {/* Titik data (mingguan) */}
@@ -204,11 +204,11 @@ export function AreaChartLite({
         <div
           className={cn(
             "pointer-events-none absolute z-10 rounded-xl border px-2.5 py-1.5 text-[11px] leading-snug shadow-lg",
-            isLight ? "border-[rgba(108,92,231,0.3)] bg-white/95 text-[#292331]" : "border-[rgba(108,92,231,0.35)] bg-[rgba(36,27,58,0.95)] text-white"
+            isLight ? "border-[rgba(255,90,0,0.3)] bg-white/95 text-[#1A1A1E]" : "border-[rgba(255,90,0,0.35)] bg-[rgba(30,30,30,0.95)] text-white"
           )}
           style={{ left: tipLeft, top: Math.max(-6, tipY - 58) }}
         >
-          <p className="font-semibold" style={{ color: isLight ? "#15803D" : "#CFF05C" }}>
+          <p className="font-semibold" style={{ color: isLight ? "#E64A00" : "#FF8A50" }}>
             {tip.label} · {tip.date.slice(-2)}/{tip.date.slice(5, 7)}
           </p>
           <p>{tip.pct}% Penyelesaian</p>

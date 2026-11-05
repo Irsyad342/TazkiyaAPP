@@ -92,7 +92,7 @@ export default function Page() {
   const animations = useWorshipStore((s) => s.settings.animations);
   const theme = useWorshipStore((s) => s.settings.theme);
   const liquidGlass = useWorshipStore((s) => s.settings.liquidGlass);
-  const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">("light");
+  const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">("dark");
 
   const readerRef = useRef<{ surah: number; ayah?: number } | null>(null);
   const tasbihRef = useRef(false);
@@ -117,7 +117,7 @@ export default function Page() {
       // Warna bilah status/URL browser mengikuti tema aktif.
       document
         .querySelector('meta[name="theme-color"]')
-        ?.setAttribute("content", resolved === "light" ? "#F8F9FC" : "#101014");
+        ?.setAttribute("content", resolved === "light" ? "#F6F6F7" : "#161616");
     };
     apply();
     if (theme === "system") {
@@ -203,12 +203,12 @@ export default function Page() {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-tz-stage" aria-label="Memuat Tazkiya">
         <div className="flex flex-col items-center gap-4">
-          <span className="animate-tz-pulse flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-tz-violet text-2xl font-bold text-white">
+          <span className="animate-tz-pulse flex h-14 w-14 items-center justify-center rounded-[1.1rem] bg-tz-violet text-2xl font-bold text-white">
             ت
           </span>
           <div className="text-center">
             <p className="text-[15px] font-bold tracking-[-0.01em] text-tz-ink">Tazkiya</p>
-            <p className="v5-overline mt-1.5">Better Daily Journey</p>
+            <p className="v5-overline mt-1.5">A Better Daily Journey</p>
           </div>
         </div>
       </main>
@@ -292,24 +292,24 @@ export default function Page() {
                   duration: 2600,
                   style: {
                     background: "#ffffff",
-                    border: "1px solid #EEF0F6",
-                    color: "#22212A",
+                    border: "1px solid #E9E9EC",
+                    color: "#1A1A1E",
                     borderRadius: "999px",
                     fontSize: "13px",
                     fontWeight: 600,
-                    boxShadow: "0 18px 48px -18px rgba(34,33,42,0.22)",
+                    boxShadow: "0 18px 48px -18px rgba(23,23,26,0.25)",
                   },
                 }
               : {
                   duration: 2600,
                   style: {
-                    background: "#1C1C24",
-                    border: "1px solid #33333E",
-                    color: "#F3F2F7",
+                    background: "#252525",
+                    border: "1px solid #383838",
+                    color: "#FFFFFF",
                     borderRadius: "999px",
                     fontSize: "13px",
                     fontWeight: 600,
-                    boxShadow: "0 18px 48px -18px rgba(0,0,0,0.6)",
+                    boxShadow: "0 18px 48px -18px rgba(0,0,0,0.7)",
                   },
                 }
           }

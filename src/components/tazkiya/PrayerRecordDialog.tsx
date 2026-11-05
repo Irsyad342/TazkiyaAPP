@@ -258,7 +258,7 @@ export function PrayerRecordDialog({
                 aria-hidden
                 className={cn(
                   "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border transition-all",
-                  addToQada ? "border-tz-ink v5-ink-btn text-tz-lime" : "border-tz-line-strong text-transparent"
+                  addToQada ? "border-tz-ink v5-ink-btn" : "border-tz-line-strong text-transparent"
                 )}
               >
                 <Check size={12} strokeWidth={3.4} />
@@ -286,8 +286,8 @@ export function PrayerRecordDialog({
             disabled={!canSave}
             onClick={save}
             className={cn(
-              "tap min-h-[44px] flex-1 rounded-full px-4 font-display text-sm font-bold text-white transition-all",
-              canSave ? "bg-tz-ink" : "cursor-not-allowed opacity-40"
+              "tap v5-ink-btn min-h-[44px] flex-1 rounded-full px-4 font-display text-sm font-bold transition-all",
+              !canSave && "cursor-not-allowed opacity-40"
             )}
           >
             Simpan

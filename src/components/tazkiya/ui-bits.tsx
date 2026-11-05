@@ -1,13 +1,12 @@
 "use client";
 
 /**
- * Tazkiya v5 — "Minimalist Premium" — kosakata visual dasar.
- * Prinsip: kartu putih FLAT tanpa bayangan; pemisah memakai hairline tipis;
- * lavender #8D7BE8 sebagai identitas; lime hanya aksen; angka besar memakai
- * Manrope tabular (.v5-display); label kecil uppercase (.v5-overline).
- * API komponen dipertahankan agar seluruh halaman tetap terhubung;
- * struktur visualnya baru. Komponen tambahan v5: StatBlock (statistik
- * tanpa kartu), GroupList/GroupRow (daftar pengaturan terkelompok).
+ * Tazkiya v6 — "Ember" — kosakata visual dasar.
+ * Prinsip: kartu arang #252525 dengan hairline halus; ORANGE #FF5A00
+ * hanya untuk aksi utama / status aktif / progres penting; angka besar
+ * memakai Manrope tabular (.v5-display); label kecil uppercase
+ * (.v5-overline). API komponen dipertahankan agar seluruh halaman tetap
+ * terhubung; struktur visualnya baru.
  */
 
 import { type ReactNode } from "react";
@@ -101,7 +100,7 @@ export function ConfirmButton({
           {children}
         </button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="glass-strong max-w-[320px]! rounded-[1.5rem]! border-tz-line p-5!">
+      <AlertDialogContent className="glass-strong max-w-[320px]! rounded-[1.4rem]! border-tz-line p-5!">
         <AlertDialogHeader className="gap-1.5!">
           <AlertDialogTitle className="text-[16px]! font-bold! text-tz-ink">{title}</AlertDialogTitle>
           <AlertDialogDescription className="text-[12px]! leading-relaxed! text-tz-muted">
@@ -249,7 +248,7 @@ export function IconBox({
 
 /* ---------------- ProgressRing ---------------- */
 
-/** Cincin progres flat: trek tipis, busur lavender — tanpa titik dekoratif. */
+/** Cincin progres flat: trek tipis, busur ORANGE — tanpa titik dekoratif. */
 export function ProgressRing({
   value,
   size = 104,
@@ -257,8 +256,8 @@ export function ProgressRing({
   children,
   className,
   trackClass = "stroke-tz-track",
-  from = "#8D7BE8",
-  to = "#D9F477",
+  from = "#FF5A00",
+  to = "#FF8A50",
 }: {
   value: number; // 0..100
   size?: number;
