@@ -909,3 +909,42 @@ salat terdekat sesuai jam berjalan. Satu ketukan pada blok langsung membuka shee
 tsc 0 · eslint bersih · build sukses · data-v="10". Browser: 5 blok zigzag terlihat serentak 360px &
 390px, gelap & terang, overflow-x 0px di semua kondisi; ketuk blok Zuhur → sheet "Catat Salat" terbuka;
 saklar Liquid Glass hilang dari setelan; 0 error konsol.
+
+## Task 46 — v11: garis hijau bawah Beranda dihapus + ornamen Islami Daily Barakah & Al-Qur'an
+
+Umpan balik pengguna: (1) area/garis hijau di paling bawah Beranda dihilangkan total dan
+disamakan dengan background aplikasi (termasuk safe area & navigasi sistem), (2) tipografi
+Daily Barakah dibuat lebih artistik dengan ornamen geometris Islami beraksen oranye,
+(3) tipografi halaman Al-Qur'an diperindah dengan ornamen halus tanpa mengganggu keterbacaan,
+(4) area kosong yang relevan diberi dekorasi tematik secukupnya — tanpa mengubah desain,
+layout, halaman, dan fitur lain sedikit pun.
+
+### Sumber hijau: manifest PWA, bukan elemen halaman
+`manifest.ts` masih membawa identitas hijau lama — `theme_color: "#16A34A"` dan
+`background_color: "#0B1512"`. Chrome/Android mencat area navigasi sistem BAWAH pada PWA
+standalone dari `theme_color` manifest (bilah status atas mengikuti meta theme-color dinamis
+yang sudah benar) — itulah strip hijau di bawah pil nav hitam. Keduanya diganti `#1B1B1E`
+(kanvas v7); meta theme-color dinamis terang/gelap di layout & page.tsx tidak diubah.
+Pemindaian DOM: 0 elemen berlatar hijau; html/body = rgb(27,27,30) sampai tepi bawah.
+
+### Sistem ornamen (berkas baru ornaments.tsx + utilitas CSS additive)
+`Star8` (khatam: bintang segi delapan silang dua persegi, poligon 16 titik r/R=0,46) dan
+`OrnamentDivider` (garis rambut — khatam — garis rambut). CSS baru `.tk-octagram` (clip-path
+bintang untuk chip nomor) dan `.tk-geo-pattern` (kisi khatam berulang via mask, dicat warna
+aksen 7% sehingga otomatis mengikuti tema terang/gelap). Tidak ada aturan lama yang diubah.
+
+### Penerapan
+- Daily Barakah: heading + aksen kaligrafi "بركة", chip nomor 01–04 khatam berlapis dua
+  (tepi rambut hangat, angka oranye), pola kisi samar di sudut, pembatas ornamen penutup.
+- Al-Qur'an: header + kaligrafi "القرآن الكريم" + pembatas ornamen; hero Lanjutkan Bacaan &
+  kartu Surah Favorit diberi pola kisi samar; statistik editorial (gambar rujukan pengguna)
+  mendapat aksen khatam kecil di samping tiap angka + pembatas di atas grafik 7 hari;
+  chip nomor surah & juz diganti khatam berlapis (Terakhir = solid oranye, teks putih);
+  nama Arab surah 19→20px. Konten, urutan, fungsi, dan pembaca ayat tidak diubah.
+- Sholat, Profil, navigasi, warna utama, layout: 0 diff (git diff hanya 4 berkas + 1 baru).
+
+### QA & Deploy
+tsc 0 · eslint bersih · build sukses. Browser produksi (390px, gelap+terang): Daily Barakah &
+daftar surah menampilkan khatam + pola; pembaca Al-Fatihah terbuka normal; beranda bawah
+bersih tanpa hijau; 0 error konsol. Deploy: push fe11b50 → Vercel; terverifikasi live —
+manifest.webmanifest menyajikan #1B1B1E dan CSS produksi memuat .tk-octagram/.tk-geo-pattern.
