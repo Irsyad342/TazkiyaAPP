@@ -1,15 +1,16 @@
 "use client";
 
 /**
- * Tazkiya v4 — Halaman Sholat sebagai habit tracker.
- * Komposisi baru: ringkasan angka-besar + deretan lima titik status, kartu
- * salat yang WAJAHNYA BERBEDA per status (selesai = aksen lavender + cek lime,
- * belum = garis putus, terlewat = tint amber), kalender pil ber-titik (bukan
- * sel bulat penuh), dan Qada pada kartu tinta premium. Semua logika catat,
- * Jumat/Zuhur alternatif, qada, dan dialog tidak berubah.
+ * Tazkiya v5 — Halaman Sholat "minimal prayer tracker".
+ * Komposisi baru: featured sholat berikutnya (blok lavender lembut dengan
+ * countdown besar), TIMELINE VERTIKAL lima waktu (garis + titik status,
+ * bukan kartu seragam) dengan status mudah dibaca (dilaksanakan / belum /
+ * terlewat + indikator berjamaah/mandiri), kalender bulanan minimalis,
+ * dan Qada pada blok lavender dengan daftar baris ringkas. Logika catat,
+ * Jumat/Zuhur alternatif, qada, dan dialog tidak berubah sama sekali.
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BookMarked,
   Check,
@@ -18,6 +19,7 @@ import {
   Clock,
   CloudSun,
   HandCoins,
+  Minus,
   Moon,
   MoonStar,
   Plus,
@@ -26,7 +28,6 @@ import {
   Sunrise,
   Sunset,
   Trash2,
-  User,
   Users,
   UtensilsCrossed,
 } from "lucide-react";
@@ -46,7 +47,7 @@ import {
 } from "@/lib/tazkiya/types";
 import { formatHijri, isFriday, monthCalendarDayKeys, todayKey } from "@/lib/tazkiya/dates";
 import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
-import { prayerTiming } from "@/lib/tazkiya/goals";
+import { formatCountdown, nextPrayerState, prayerTiming } from "@/lib/tazkiya/goals";
 import { HADITH_QADA } from "@/lib/tazkiya/hadith";
 import { Chip, ConfirmButton, GlassCard, SectionHeader, SegmentedTabs } from "./ui-bits";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
@@ -77,101 +78,96 @@ function formatDayFullOf(date: string): string {
   return new Date(y, (m ?? 1) - 1, d ?? 1).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" });
 }
 
-/* ================= Kartu satu salat — wajah berbeda per status ================= */
+/* ================= Timeline vertikal lima waktu ================= */
 
-function PrayerRow({
+function PrayerTimelineRow({
   meta,
   detail,
   time,
+  isLast,
   onPress,
 }: {
   meta: PrayerMeta;
   detail: PrayerDetail;
   time?: string;
+  isLast: boolean;
   onPress: () => void;
 }) {
-  const Icon = PRAYER_ICONS[meta.id];
   const isDone = detail.status === "done";
   const isMissed = detail.status === "missed";
   const timing = prayerTiming(detail, time, todayKey());
-  const KindIcon = detail.kind === "berjamaah" ? Users : User;
+  const JamaahIcon = Users;
 
-  const statusChips: { text: string; cls: string }[] = [];
-  if (isDone) {
-    statusChips.push(
-      timing === "ontime"
-        ? { text: "Tepat waktu", cls: "bg-tz-lime text-tz-lime-ink" }
-        : timing === "late"
-          ? { text: "Terlambat · dilaksanakan", cls: "bg-tz-amber-soft text-tz-amber" }
-          : { text: "Dilaksanakan", cls: "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent" }
-    );
-    if (detail.kind === "berjamaah") {
-      statusChips.push({ text: "Berjamaah", cls: "bg-tz-blue-soft text-[#3d63c2] dark:text-[#aebcff]" });
-    } else if (detail.kind === "mandiri") {
-      statusChips.push({ text: "Mandiri", cls: "bg-tz-lavender text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent" });
+  /** Satu kalimat status yang mudah dibaca + warna titiknya. */
+  const status = (() => {
+    if (isDone) {
+      if (timing === "late") return { text: "Dilaksanakan · terlambat", dot: "bg-tz-amber" };
+      if (timing === "ontime") return { text: "Dilaksanakan · tepat waktu", dot: "bg-tz-violet" };
+      return { text: "Dilaksanakan", dot: "bg-tz-violet" };
     }
-  } else if (isMissed) {
-    statusChips.push({ text: "Tidak dilaksanakan", cls: "bg-[#FBE4E6] text-[#B3424C] dark:bg-[#3A2226] dark:text-[#F09AA0]" });
-  } else {
-    statusChips.push({ text: "Belum dicatat", cls: "bg-tz-panel-soft text-tz-muted" });
-  }
+    if (isMissed) return { text: "Tidak dilaksanakan", dot: "bg-tz-amber" };
+    return { text: "Belum dicatat", dot: "bg-tz-line-strong" };
+  })();
 
   return (
     <button
       type="button"
       onClick={onPress}
-      aria-label={`Catat ${meta.label} — ${isDone ? "dilaksanakan" : isMissed ? "tidak dilaksanakan" : "belum dicatat"}`}
-      className={cn(
-        "tap relative flex w-full items-center gap-3.5 overflow-hidden rounded-[1.3rem] border p-3.5 text-left transition-all",
-        isDone
-          ? "border-tz-violet/35 bg-tz-panel shadow-[0_1px_2px_rgba(25,25,35,0.03),0_14px_34px_-26px_rgba(46,38,104,0.3)]"
-          : isMissed
-            ? "border-tz-amber/30 bg-tz-amber-soft/60"
-            : "border-tz-line bg-tz-panel hover:border-tz-violet/40"
-      )}
+      aria-label={`Catat ${meta.label} — ${status.text}`}
+      className="tap flex w-full items-stretch gap-0 text-left"
     >
-      {/* aksen kiri: strip status */}
-      <span
-        aria-hidden
-        className={cn(
-          "absolute inset-y-0 left-0 w-[3.5px]",
-          isDone ? "bg-tz-violet" : isMissed ? "bg-tz-amber" : "bg-tz-line-strong"
-        )}
-      />
-      <span
-        aria-hidden
-        className={cn(
-          "relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors",
-          isDone
-            ? "bg-tz-violet text-white"
-            : isMissed
-              ? "bg-tz-amber/15 text-tz-amber"
-              : "border border-dashed border-tz-line-strong text-tz-muted"
-        )}
-      >
-        {isDone ? <Check size={19} strokeWidth={2.6} /> : <Icon size={18} strokeWidth={1.9} />}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block font-display text-[14.5px] font-bold tracking-[-0.01em] text-tz-ink">{meta.label}</span>
-        <span className="mt-0.5 flex flex-wrap items-center gap-1.5">
-          {time ? (
-            <span className="tnum inline-flex items-center gap-1 text-[10.5px] font-medium text-tz-muted">
-              <Clock size={10} /> {time}
-            </span>
-          ) : null}
-          {isDone && detail.kind ? (
-            <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-tz-violet dark:text-tz-accent">
-              <KindIcon size={10} /> {detail.kind === "berjamaah" ? "Berjamaah" : "Mandiri"}
-            </span>
-          ) : null}
+      {/* Kolom jam */}
+      <span className="w-[52px] shrink-0 pb-6 pt-[13px] sm:w-[60px]">
+        <span className={cn("tnum block text-[13.5px] font-bold leading-none", isDone || isMissed ? "text-tz-muted" : "text-tz-ink")}>
+          {time ?? "—"}
         </span>
       </span>
-      <span className="flex max-w-[45%] shrink-0 flex-wrap justify-end gap-1">
-        {statusChips.map((c) => (
-          <span key={c.text} className={cn("rounded-full px-2 py-0.5 text-[9.5px] font-bold leading-tight", c.cls)}>
-            {c.text}
+
+      {/* Garis + titik + konten */}
+      <span className={cn("relative flex-1 border-l border-tz-line pb-6 pl-5 pt-[9px]", isLast && "border-l-transparent pb-1")}>
+        <span
+          aria-hidden
+          className={cn(
+            "absolute -left-[7px] top-[10px] flex h-[14px] w-[14px] items-center justify-center rounded-full",
+            isDone
+              ? "bg-tz-violet text-white"
+              : isMissed
+                ? "bg-tz-amber text-white"
+                : "border-[1.5px] border-tz-line-strong bg-tz-panel"
+          )}
+        >
+          {isDone ? <Check size={9} strokeWidth={3.5} /> : isMissed ? <Minus size={9} strokeWidth={3.5} /> : null}
+        </span>
+
+        <span className="flex items-start justify-between gap-3">
+          <span className="min-w-0">
+            <span className="block text-[15px] font-bold tracking-[-0.01em] text-tz-ink">{meta.label}</span>
+            <span className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1">
+              <span className="flex items-center gap-1.5 text-[11.5px] font-medium text-tz-muted">
+                <span aria-hidden className={cn("h-1.5 w-1.5 rounded-full", status.dot)} />
+                {status.text}
+              </span>
+              {isDone && detail.kind === "berjamaah" ? (
+                <span className="flex items-center gap-1 text-[11px] font-bold text-tz-teal">
+                  <JamaahIcon size={11} /> Berjamaah
+                </span>
+              ) : null}
+              {isDone && detail.kind === "mandiri" ? (
+                <span className="flex items-center gap-1 text-[11px] font-semibold text-tz-violet">
+                  <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-tz-violet/50" /> Mandiri
+                </span>
+              ) : null}
+            </span>
           </span>
-        ))}
+          <span
+            className={cn(
+              "shrink-0 rounded-full px-3 py-1.5 text-[10.5px] font-bold",
+              isDone ? "bg-tz-panel-soft text-tz-muted" : "bg-tz-lavender text-tz-violet"
+            )}
+          >
+            {isDone ? "Ubah" : "Catat"}
+          </span>
+        </span>
       </span>
     </button>
   );
@@ -200,72 +196,84 @@ function TodayTab({
 
   const detailOf = (id: PrayerId): PrayerDetail => selectPrayerDetail(prayerDetails, logs, today, id);
   const doneCount = prayersToday.filter((p) => detailOf(p.id).status === "done").length;
-  const pct = Math.round((doneCount / 5) * 100);
   const jamaah = prayersToday.filter((p) => detailOf(p.id).status === "done" && detailOf(p.id).kind === "berjamaah").length;
-  const ontime = prayersToday.filter((p) => prayerTiming(detailOf(p.id), schedule[p.id]?.time, today) === "ontime").length;
 
-  const nextEntry = (() => {
-    const now = new Date();
-    const nowMin = now.getHours() * 60 + now.getMinutes();
-    for (const p of PRAYER_ORDER) {
-      const [h, m] = (schedule[p.id]?.time ?? "00:00").split(":").map((v) => parseInt(v, 10) || 0);
-      if (nowMin < h * 60 + m) return p;
-    }
-    return null;
-  })();
+  /** Featured: salat berikutnya + countdown (sumber yang sama dengan Beranda). */
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const iv = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(iv);
+  }, []);
+  const state = nextPrayerState(schedule, now);
+  const nextMeta = prayersToday.find((p) => p.id === state.next) ?? prayersToday[0];
 
   const extrasList = EXTRAS.filter((e) => tracked.includes(e.id));
 
   return (
-    <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
-      <div className="space-y-5 lg:col-span-7">
-        {/* Ringkasan hari ini: angka besar + deretan titik status (flat) */}
-        <div className="rounded-[1.6rem] border border-tz-line bg-tz-panel p-5 shadow-[0_1px_2px_rgba(25,25,35,0.03),0_18px_44px_-30px_rgba(46,38,104,0.25)]">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-tz-muted">Salat hari ini</p>
-              <p className="tnum mt-1 font-display text-[46px] font-bold leading-none tracking-[-0.03em] text-tz-ink">
-                {doneCount}
-                <span className="text-[22px] font-bold text-tz-muted"> / 5</span>
-              </p>
-              <p className="mt-1.5 text-[11px] leading-snug text-tz-muted">
-                {nextEntry
-                  ? `Berikutnya: ${nextEntry.label} pukul ${schedule[nextEntry.id]?.time}`
-                  : "Kelima waktu telah berlalu — terima kasih telah menjaga hari ini"}
+    <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
+      <div className="space-y-8 lg:col-span-7">
+        {/* Featured: blok lavender lembut dengan countdown besar */}
+        <section aria-label="Ringkasan hari ini" className="animate-tz-fade-up rounded-[2rem] bg-tz-lavender p-5 sm:p-6">
+          <div className="flex items-center justify-between gap-3">
+            <p className="v5-overline">Sholat Berikutnya</p>
+            <span className="rounded-full bg-tz-lime px-3 py-1.5 text-[11.5px] font-bold text-tz-lime-ink">
+              {formatCountdown(state.secondsLeft)} lagi
+            </span>
+          </div>
+          <div className="mt-4 flex flex-wrap items-end gap-x-4 gap-y-2">
+            <p className="v5-display text-[48px] font-extrabold leading-[0.9] text-tz-ink sm:text-[56px]">{state.nextTime}</p>
+            <div className="pb-1">
+              <p className="text-[17px] font-bold tracking-[-0.01em] text-tz-ink">{nextMeta.label}</p>
+              <p className="mt-0.5 text-[11.5px] font-medium text-tz-muted">
+                {formatHijri(new Date()) || formatDayFullOf(today)}
               </p>
             </div>
-            <span className="rounded-full bg-tz-lime px-3 py-1.5 text-[12px] font-bold text-tz-lime-ink">{pct}%</span>
           </div>
 
-          {/* Deretan lima titik status */}
-          <div className="mt-4 flex items-center gap-2" role="img" aria-label={`${doneCount} dari 5 salat tercatat`}>
-            {prayersToday.map((p) => {
-              const st = detailOf(p.id).status;
-              return (
-                <span
-                  key={p.id}
-                  aria-hidden
-                  className={cn(
-                    "h-2.5 flex-1 rounded-full transition-colors",
-                    st === "done" ? "bg-tz-lime" : st === "missed" ? "bg-tz-amber/60" : "bg-tz-track"
-                  )}
-                />
-              );
-            })}
+          {/* Status hari ini: angka + strip lima slot */}
+          <div className="mt-6 border-t border-tz-lav-deco pt-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[12.5px] font-medium text-tz-ink/90">
+                Sudah dilaksanakan{" "}
+                <span className="tnum font-bold">
+                  {doneCount}
+                  <span className="text-tz-muted">/5</span>
+                </span>
+                {jamaah > 0 ? <span className="ml-2 text-[11.5px] font-semibold text-tz-teal">{jamaah} berjamaah</span> : null}
+              </p>
+              <span className="tnum text-[12.5px] font-bold text-tz-ink">{Math.round((doneCount / 5) * 100)}%</span>
+            </div>
+            <div className="mt-2.5 flex items-center gap-1.5" role="img" aria-label={`${doneCount} dari 5 salat tercatat`}>
+              {prayersToday.map((p) => {
+                const st = detailOf(p.id).status;
+                return (
+                  <span
+                    key={p.id}
+                    aria-hidden
+                    className={cn(
+                      "h-1.5 flex-1 rounded-full transition-colors",
+                      st === "done" ? "bg-tz-violet" : st === "missed" ? "bg-tz-amber/70" : "bg-tz-lav-deco"
+                    )}
+                  />
+                );
+              })}
+            </div>
           </div>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            <Chip className="border-tz-violet/25 bg-tz-lavender/60 text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent">Berjamaah {jamaah}</Chip>
-            {ontime > 0 ? <Chip className="border-tz-line">Tepat waktu {ontime}</Chip> : null}
-            <Chip className="border-tz-line">{formatHijri(new Date()) || formatDayFullOf(today)}</Chip>
-          </div>
-        </div>
+        </section>
 
-        {/* Lima waktu */}
+        {/* Timeline lima waktu — garis vertikal, bukan kartu */}
         <section aria-label="Daftar salat wajib hari ini">
-          <SectionHeader title="Lima Waktu Salat" caption="Ketuk kartu untuk mencatat status, cara, dan waktunya" />
-          <div className="space-y-2">
-            {prayersToday.map((p) => (
-              <PrayerRow key={p.id} meta={p} detail={detailOf(p.id)} time={schedule[p.id]?.time} onPress={() => onRecord(p)} />
+          <SectionHeader title="Lima Waktu" caption="Ketuk untuk mencatat status, cara, dan waktunya" />
+          <div className="tz-fade-in">
+            {prayersToday.map((p, i) => (
+              <PrayerTimelineRow
+                key={p.id}
+                meta={p}
+                detail={detailOf(p.id)}
+                time={schedule[p.id]?.time}
+                isLast={i === prayersToday.length - 1}
+                onPress={() => onRecord(p)}
+              />
             ))}
           </div>
           {friday ? (
@@ -278,15 +286,19 @@ function TodayTab({
         </section>
       </div>
 
-      {/* Ibadah sunah yang dilacak */}
+      {/* Ibadah sunah yang dilacak — daftar baris minimal */}
       {extrasList.length > 0 ? (
-        <section aria-label="Ibadah sunah" className="mt-5 lg:col-span-5 lg:mt-0">
+        <section aria-label="Ibadah sunah" className="mt-8 lg:col-span-5 lg:mt-0">
           <SectionHeader title="Ibadah Sunah" caption="Pelengkap hari ini — sedekah juga tersedia di Rizq & Amal" />
-          <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-1">
-            {extrasList.map(({ id, label, caption }) => {
+          <div className="glass overflow-hidden rounded-[1.5rem]">
+            {extrasList.map(({ id, label, caption }, i) => {
               const Icon = EXTRA_ICONS[id];
               const done = !!logs[today]?.extras?.[id];
-              return <SunnahChip key={id} id={id} label={label} caption={caption} icon={Icon} done={done} />;
+              return (
+                <div key={id} className={cn(i > 0 && "border-t border-tz-line-soft")}>
+                  <SunnahToggle id={id} label={label} caption={caption} icon={Icon} done={done} />
+                </div>
+              );
             })}
           </div>
         </section>
@@ -295,8 +307,8 @@ function TodayTab({
   );
 }
 
-/** Toggle ibadah sunah — perilaku sama dengan kartu extras lama. */
-function SunnahChip({
+/** Toggle ibadah sunah — baris hairline, perilaku sama dengan kartu extras lama. */
+function SunnahToggle({
   id,
   label,
   caption,
@@ -321,24 +333,22 @@ function SunnahChip({
         toggleExtra(today, id);
         toast[done ? "info" : "success"](done ? `${label} ditandai belum selesai` : `${label} tercatat selesai`);
       }}
-      className={cn(
-        "tap flex items-center gap-3 rounded-[1.3rem] border p-3.5 text-left transition-all",
-        done ? "border-tz-violet/40 bg-tz-lavender/50 dark:border-tz-violet/30 dark:bg-tz-accent/10" : "border-tz-line bg-tz-panel"
-      )}
+      className="tap flex w-full items-center gap-3.5 px-4 py-3.5 text-left"
     >
       <span
         aria-hidden
         className={cn(
-          "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
-          done ? "bg-tz-violet text-white" : "border border-dashed border-tz-line-strong text-tz-muted"
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+          done ? "bg-tz-violet text-white" : "border-[1.5px] border-tz-line-strong text-tz-muted"
         )}
       >
-        {done ? <Check size={16} strokeWidth={2.6} /> : <Icon size={16} />}
+        {done ? <Check size={14} strokeWidth={2.8} /> : <Icon size={15} strokeWidth={1.8} />}
       </span>
-      <span className="min-w-0">
-        <span className="block text-[12.5px] font-semibold text-tz-ink">{label}</span>
-        <span className="block truncate text-[10px] text-tz-muted">{caption}</span>
+      <span className="min-w-0 flex-1">
+        <span className={cn("block text-[13.5px]", done ? "font-semibold text-tz-ink" : "font-medium text-tz-ink/90")}>{label}</span>
+        <span className="block truncate text-[10.5px] text-tz-muted">{caption}</span>
       </span>
+      {done ? <Check size={15} className="shrink-0 text-tz-violet" strokeWidth={2.4} /> : null}
     </button>
   );
 }
@@ -350,7 +360,6 @@ const PRAYER_ORDER: { id: PrayerId; label: string }[] = PRAYERS.map((p) => ({ id
 function MonthTab({ today }: { today: string }) {
   const logs = useWorshipStore((s) => s.logs);
   const prayerDetails = useWorshipStore((s) => s.prayerDetails);
-  const fridayZuhurAlt = useWorshipStore((s) => s.fridayZuhurAlt);
   const [offset, setOffset] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -388,13 +397,13 @@ function MonthTab({ today }: { today: string }) {
             type="button"
             aria-label="Bulan sebelumnya"
             onClick={() => setOffset((o) => o - 1)}
-            className="tap flex h-9 w-9 items-center justify-center rounded-full border border-tz-line bg-tz-panel-soft text-tz-muted transition-colors hover:text-tz-ink"
+            className="tap flex h-9 w-9 items-center justify-center rounded-full bg-tz-panel-soft text-tz-muted transition-colors hover:text-tz-ink"
           >
             <ChevronLeft size={17} />
           </button>
           <div className="min-w-0 text-center">
-            <p className="truncate font-display text-[15px] font-bold text-tz-ink">{monthLabel}</p>
-            <p className="text-[10px] text-tz-muted">{daysWithAny} hari dengan salat tercatat</p>
+            <p className="truncate text-[15px] font-bold text-tz-ink">{monthLabel}</p>
+            <p className="text-[10.5px] text-tz-muted">{daysWithAny} hari dengan salat tercatat</p>
           </div>
           <button
             type="button"
@@ -402,7 +411,7 @@ function MonthTab({ today }: { today: string }) {
             disabled={!canGoNext}
             onClick={() => canGoNext && setOffset((o) => o + 1)}
             className={cn(
-              "tap flex h-9 w-9 items-center justify-center rounded-full border border-tz-line bg-tz-panel-soft text-tz-muted transition-colors hover:text-tz-ink",
+              "tap flex h-9 w-9 items-center justify-center rounded-full bg-tz-panel-soft text-tz-muted transition-colors hover:text-tz-ink",
               !canGoNext && "opacity-30"
             )}
           >
@@ -410,10 +419,10 @@ function MonthTab({ today }: { today: string }) {
           </button>
         </div>
 
-        {/* Kalender pil ber-titik */}
+        {/* Kalender minimalis: angka + lima titik mungil */}
         <div className="mt-4 grid grid-cols-7 gap-x-1 gap-y-2 text-center" key={offset}>
           {["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"].map((d) => (
-            <span key={d} className="pb-1 text-[10px] font-bold uppercase tracking-wide text-tz-muted/80">
+            <span key={d} className="v5-overline pb-1">
               {d}
             </span>
           ))}
@@ -428,14 +437,12 @@ function MonthTab({ today }: { today: string }) {
                 aria-label={`Rincian tanggal ${key}`}
                 onClick={() => setSelected(key)}
                 className={cn(
-                  "tap relative flex aspect-[3/4] flex-col items-center justify-center gap-1 rounded-[0.9rem] border text-[11px] font-semibold transition-colors",
-                  key === today
-                    ? "border-tz-violet bg-tz-lavender/50 text-tz-ink dark:bg-tz-accent/10"
-                    : "border-transparent bg-tz-panel-soft hover:border-tz-line-strong",
+                  "tap relative flex aspect-[3/4] flex-col items-center justify-center gap-1.5 rounded-xl text-[11.5px] transition-colors",
+                  key === today ? "bg-tz-lavender font-bold text-tz-ink" : "text-tz-ink/85 hover:bg-tz-panel-soft",
                   isFuture && "opacity-35"
                 )}
               >
-                <span className="tnum leading-none text-tz-ink/90">{parseInt(key.slice(-2), 10)}</span>
+                <span className="tnum leading-none">{parseInt(key.slice(-2), 10)}</span>
                 <span aria-hidden className="flex h-[5px] items-center gap-[3px]">
                   {Array.from({ length: 5 }, (_, n) => (
                     <span
@@ -458,7 +465,7 @@ function MonthTab({ today }: { today: string }) {
           })}
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 border-t border-tz-line pt-3 text-[10px] text-tz-muted">
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 border-t border-tz-line pt-3 text-[10.5px] text-tz-muted">
           <span className="flex items-center gap-1">
             <span aria-hidden className="h-2 w-2 rounded-full bg-tz-violet" /> Berjamaah
           </span>
@@ -520,56 +527,42 @@ function QadaTab({ today }: { today: string }) {
   const grouped = PRAYER_IDS.map((id) => ({ id, items: pending.filter((q) => q.prayer === id) })).filter((g) => g.items.length > 0);
 
   return (
-    <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
-      <div className="space-y-5 lg:col-span-7">
-        {/* Ringkasan lembut — kartu tinta premium (pengganti midnight lama) */}
-        <div className="tz-task-card" aria-label="Ringkasan qada">
-          <div className="tz-task-inner">
-            <div className="tz-task-panel">
-              <div className="tz-task-tab">
-                <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[color:var(--task-deco)]">
-                  Qada — salat yang ingin dimakbulkan
-                </span>
-                <span className="mt-0.5 truncate text-[11.5px] font-medium text-[color:var(--task-ink-55)]">
-                  Pelan-pelan, satu per satu — tanpa menghakimi diri
-                </span>
-              </div>
-              <p className="tnum font-display text-[44px] font-bold leading-none tracking-[-0.03em] text-white">
-                {pending.length} <span className="text-[16px] font-bold text-white/60">belum selesai</span>
-              </p>
-              <p className="mt-1.5 text-[11.5px] leading-relaxed text-[color:var(--task-ink-70)]">
-                {completedThisMonth > 0
-                  ? `Bulan ini kamu sudah mencatat ${completedThisMonth} qada selesai. Terus bertumbuh.`
-                  : "Tidak apa-apa, selalu ada kesempatan untuk memperbaiki diri."}
-              </p>
-              <div className="tz-beam mt-3.5 h-[6px]">
-                <div
-                  className="tz-beam-fill"
-                  style={{ width: `${Math.min(100, completedThisMonth * 12)}%` }}
-                />
-              </div>
-            </div>
+    <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
+      <div className="space-y-8 lg:col-span-7">
+        {/* Ringkasan — blok lavender lembut (pengganti kartu tinta gelap lama) */}
+        <section aria-label="Ringkasan qada" className="animate-tz-fade-up rounded-[2rem] bg-tz-lavender p-5 sm:p-6">
+          <p className="v5-overline">Qada — salat yang ingin dimakbulkan</p>
+          <p className="v5-display mt-4 text-[46px] font-extrabold leading-none text-tz-ink">
+            {pending.length} <span className="text-[15px] font-bold text-tz-muted">belum selesai</span>
+          </p>
+          <p className="mt-2.5 text-[12.5px] leading-relaxed text-tz-ink/85">
+            {completedThisMonth > 0
+              ? `Bulan ini kamu sudah menyelesaikan ${completedThisMonth} qada. Terus bertumbuh.`
+              : "Pelan-pelan, satu per satu — tanpa menghakimi diri."}
+          </p>
+          <div className="tz-beam mt-4 h-1.5">
+            <div className="tz-beam-fill" style={{ width: `${Math.min(100, completedThisMonth * 12)}%` }} />
           </div>
-        </div>
+        </section>
 
         {/* Daftar qada berjalan, dikelompokkan per waktu salat */}
         {grouped.length > 0 ? (
-          <section aria-label="Daftar qada berjalan" className="space-y-3">
+          <section aria-label="Daftar qada berjalan" className="space-y-5">
             {grouped.map(({ id, items }) => (
               <div key={id}>
-                <p className="mb-1.5 flex items-center gap-2 px-1 font-display text-[13px] font-bold text-tz-ink">
+                <p className="mb-1.5 flex items-center gap-2 px-0.5 text-[13px] font-bold text-tz-ink">
                   {prayerMetaFor(today, id, true).label}
-                  <Chip className="border-tz-line">{items.length}</Chip>
+                  <span className="tnum text-[11.5px] font-semibold text-tz-muted">{items.length}</span>
                 </p>
-                <div className="space-y-1.5">
-                  {items.map((q) => (
-                    <div key={q.id} className="flex items-center gap-2.5 rounded-[1.1rem] border border-tz-line bg-tz-panel px-3 py-2.5">
+                <div className="glass overflow-hidden rounded-[1.5rem]">
+                  {items.map((q, i) => (
+                    <div key={q.id} className={cn("flex items-center gap-3 px-4 py-3", i > 0 && "border-t border-tz-line-soft")}>
                       <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tz-amber-soft text-tz-amber">
                         <BookMarked size={14} />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[12px] font-semibold text-tz-ink">{formatDayFullOf(q.missedDate)}</span>
-                        {q.note ? <span className="block truncate text-[10px] text-tz-muted">{q.note}</span> : null}
+                        <span className="block text-[12.5px] font-semibold text-tz-ink">{formatDayFullOf(q.missedDate)}</span>
+                        {q.note ? <span className="block truncate text-[10.5px] text-tz-muted">{q.note}</span> : null}
                       </span>
                       <button
                         type="button"
@@ -584,7 +577,7 @@ function QadaTab({ today }: { today: string }) {
                       <ConfirmButton
                         label="Hapus catatan qada"
                         title="Hapus catatan qada ini?"
-                        description="Catatan akan dikeluarkan dari daftar qada. Bila kelak perlu, kamu bisa menambahkannya lagi lewat formulir di bawah."
+                        description="Catatan akan dikeluarkan dari daftar qada. Bila kelak perlu, kamu bisa menambahkannya lagi lewat formulir di samping."
                         onConfirm={() => {
                           deleteQada(q.id);
                           toast.info("Catatan qada dihapus");
@@ -600,23 +593,21 @@ function QadaTab({ today }: { today: string }) {
             ))}
           </section>
         ) : (
-          <p className="rounded-[1.4rem] border border-dashed border-tz-line-strong bg-tz-panel-soft px-4 py-6 text-center text-[12px] leading-relaxed text-tz-muted">
+          <p className="rounded-[1.5rem] bg-tz-panel-soft px-4 py-7 text-center text-[12.5px] leading-relaxed text-tz-muted">
             Daftar qada masih kosong. Bila ada salat yang terlewat, kamu bisa menandainya dari tab Hari Ini atau menambahkan
             manual di samping.
           </p>
         )}
       </div>
 
-      <div className="mt-5 space-y-5 lg:col-span-5 lg:mt-0">
-        {/* Pengingat hadis — sumber eksplisit */}
-        <GlassCard variant="violet" className="p-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-tz-violet dark:text-tz-accent">{HADITH_QADA.tag}</p>
-          <p className="quran-arabic mt-2.5 text-right text-[19px] leading-[1.9] text-tz-ink">{HADITH_QADA.arabic}</p>
-          <p className="mt-2 text-[12px] leading-relaxed text-tz-ink/90">&ldquo;{HADITH_QADA.text}&rdquo;</p>
-          <div className="mt-2.5">
-            <Chip className="border-tz-violet/25 bg-white/60 text-tz-violet dark:bg-white/10 dark:text-tz-accent">{HADITH_QADA.source}</Chip>
-          </div>
-        </GlassCard>
+      <div className="mt-8 space-y-8 lg:col-span-5 lg:mt-0">
+        {/* Pengingat hadis — blok editorial tanpa kartu */}
+        <section aria-label="Hadis tentang qada">
+          <p className="v5-overline">{HADITH_QADA.tag}</p>
+          <p className="quran-arabic mt-3.5 text-right text-[20px] leading-[1.95] text-tz-ink">{HADITH_QADA.arabic}</p>
+          <p className="mt-3 text-[13px] leading-relaxed text-tz-ink/90">&ldquo;{HADITH_QADA.text}&rdquo;</p>
+          <p className="mt-2.5 text-[11px] font-semibold text-tz-violet">{HADITH_QADA.source}</p>
+        </section>
 
         {/* Tambah manual */}
         <section aria-label="Tambah qada manual">
@@ -624,7 +615,7 @@ function QadaTab({ today }: { today: string }) {
           <GlassCard className="space-y-3 p-4">
             <div className="grid grid-cols-2 gap-2.5">
               <div>
-                <label htmlFor="qada-prayer" className="mb-1 block text-[10.5px] font-semibold uppercase tracking-wide text-tz-muted">
+                <label htmlFor="qada-prayer" className="v5-overline mb-1.5 block">
                   Waktu salat
                 </label>
                 <select
@@ -641,7 +632,7 @@ function QadaTab({ today }: { today: string }) {
                 </select>
               </div>
               <div>
-                <label htmlFor="qada-date" className="mb-1 block text-[10.5px] font-semibold uppercase tracking-wide text-tz-muted">
+                <label htmlFor="qada-date" className="v5-overline mb-1.5 block">
                   Tanggal salat
                 </label>
                 <input
@@ -666,7 +657,7 @@ function QadaTab({ today }: { today: string }) {
             <button
               type="button"
               onClick={submit}
-              className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink font-display text-[14px] font-bold text-white"
+              className="tap flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full bg-tz-ink text-[14px] font-bold text-white"
             >
               <Plus size={16} className="text-tz-lime" /> Tambah ke Daftar Qada
             </button>
@@ -680,15 +671,15 @@ function QadaTab({ today }: { today: string }) {
             <GlassCard className="thin-scrollbar max-h-80 overflow-y-auto">
               <ul className="divide-y divide-tz-line-soft">
                 {completed.slice(0, 40).map((q) => (
-                  <li key={q.id} className="flex items-center gap-3 px-4 py-2.5">
-                    <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tz-lime/50 text-tz-lime-ink dark:bg-tz-lime/15 dark:text-tz-lime">
-                      <Check size={14} strokeWidth={3} />
+                  <li key={q.id} className="flex items-center gap-3 px-4 py-3">
+                    <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tz-lavender text-tz-violet">
+                      <Check size={14} strokeWidth={2.8} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[12px] font-semibold text-tz-ink">
+                      <span className="block truncate text-[12.5px] font-semibold text-tz-ink">
                         {PRAYERS.find((p) => p.id === q.prayer)?.label ?? q.prayer} · {formatDayFullOf(q.missedDate)}
                       </span>
-                      <span className="block text-[10px] text-tz-muted">
+                      <span className="block text-[10.5px] text-tz-muted">
                         Diselesaikan {formatDayFullOf((q.completedAt ?? "").slice(0, 10))}
                       </span>
                     </span>
@@ -751,15 +742,12 @@ export function PrayerPage() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <header className="animate-tz-fade-up pt-1">
-        <h1 className="font-display text-[30px] font-bold tracking-[-0.025em] text-tz-ink">
-          Sholat<span className="text-tz-violet">.</span>
-        </h1>
+        <h1 className="text-[28px] font-extrabold tracking-[-0.03em] text-tz-ink">Sholat</h1>
         <p className="mt-1 text-[12.5px] text-tz-muted">Catat lima waktu salat dan kelola qada dengan tenang</p>
       </header>
 
-      {/* Tab garis editorial */}
       <SegmentedTabs
         ariaLabel="Bagian halaman sholat"
         items={[

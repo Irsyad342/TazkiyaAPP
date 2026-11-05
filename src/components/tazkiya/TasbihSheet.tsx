@@ -112,7 +112,7 @@ export function TasbihSheet({
       {/* ---------- Piringan hitung ---------- */}
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center gap-6 px-6">
         <p className="max-w-full truncate text-center font-display text-[17px] font-bold text-tz-violet dark:text-tz-accent">{tasbih.dhikr}</p>
-        <m.button
+        <button
           type="button"
           onClick={() => {
             tasbihAdd(1);
@@ -125,12 +125,9 @@ export function TasbihSheet({
             }
             if (tasbih.count + 1 === tasbih.target) toast.success("Target tasbih tercapai! Barakallah");
           }}
-          whileTap={{ scale: 0.94 }}
           aria-label={`Tambah hitungan, saat ini ${tasbih.count}`}
-          className={cn("relative flex h-[248px] w-[248px] items-center justify-center rounded-full sm:h-[260px] sm:w-[260px]", reached && "animate-tz-pulse")}
+          className={cn("tap relative flex h-[248px] w-[248px] items-center justify-center rounded-full sm:h-[260px] sm:w-[260px]", reached && "animate-tz-pulse")}
         >
-          {/* cincin luar tipis */}
-          <span aria-hidden className="absolute inset-0 rounded-full border border-tz-violet/25" />
           {/* cincin progres lavender + titik lime */}
           <svg aria-hidden viewBox="0 0 260 260" className="absolute inset-0 h-full w-full -rotate-90">
             <circle cx="130" cy="130" r={R} fill="none" strokeWidth="7" className="stroke-tz-track" />
@@ -150,7 +147,7 @@ export function TasbihSheet({
           {pct > 2 && pct < 100 ? (
             <span
               aria-hidden
-              className="absolute h-3 w-3 rounded-full bg-tz-lime shadow-[0_0_0_4px_rgba(213,247,106,0.3)]"
+              className="absolute h-3 w-3 rounded-full bg-tz-lime ring-4 ring-tz-lime/25"
               style={{
                 left: `calc(${(tipX / 260) * 100}% - 6px)`,
                 top: `calc(${(tipY / 260) * 100}% - 6px)`,
@@ -158,13 +155,9 @@ export function TasbihSheet({
             />
           ) : null}
           {/* piringan putih */}
-          <span
-            aria-hidden
-            className="tz-tasbih-disc absolute inset-[26px] rounded-full border border-tz-line"
-            style={{ boxShadow: "0 24px 60px -20px rgba(136,121,232,0.45)" }}
-          />
+          <span aria-hidden className="tz-tasbih-disc absolute inset-[26px] rounded-full border border-tz-line" />
           <span className="relative flex flex-col items-center">
-            <span className="tnum font-display text-[64px] font-bold leading-none tracking-[-0.03em] text-tz-ink">
+            <span className="v5-display text-[64px] font-extrabold leading-none text-tz-ink">
               {tasbih.count.toLocaleString("id-ID")}
             </span>
             <span className="mt-1.5 text-xs font-medium text-tz-muted">
@@ -179,7 +172,7 @@ export function TasbihSheet({
               {reached ? "Target tercapai" : `${pct}%`}
             </span>
           </span>
-        </m.button>
+        </button>
 
         <div className="flex items-center gap-3">
           <button

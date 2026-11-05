@@ -1,30 +1,31 @@
 "use client";
 
 /**
- * Tazkiya v4 — Mood Check-in (Beranda): tujuh mood berilustrasi besar dan
- * interaktif — lingkaran ilustrasi 64px dengan cincin pilihan lavender,
- * latar soft-purple saat aktif, label tegas; BUKAN daftar tombol kecil.
- * Disimpan SATU catatan per tanggal — menekan berkali-kali hanya memperbarui
- * pilihan hari itu. Pilihan lama hari ini otomatis tampil terpilih.
- * Bukan alat diagnosis psikologis.
+ * Tazkiya v5 — Mood Check-in (Beranda) — tanpa kartu, komposisi editorial.
+ * Tujuh ekspresi SVG bergaya garis konsisten (stroke membulat sama, satu
+ * keluarga wajah) dalam lingkaran lembut; pilihan aktif: lingkaran lavender
+ * muda + ring lavender + pop animasi spring. Disimpan SATU catatan per
+ * tanggal — menekan berkali-kali hanya memperbarui pilihan hari itu.
+ * Pilihan lama hari ini otomatis tampil terpilih. Bukan alat diagnosis.
  */
 
 import { BookHeart, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import { m } from "framer-motion";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { MOODS, moodLabel, type MoodId } from "@/lib/tazkiya/types";
 import type { SubPageId } from "./BottomNav";
 import { cn } from "@/lib/utils";
 
-/** Aksen warna per karakter mood — lavender Tazkiya tetap identitas utama. */
+/** Aksen warna per karakter mood — lembut, satu keluarga pastel. */
 const TONE: Record<MoodId, { face: string; activeBg: string }> = {
-  bahagia: { face: "text-amber-500 dark:text-amber-300", activeBg: "bg-amber-100 dark:bg-amber-400/15" },
-  tenang: { face: "text-[#5b8def]", activeBg: "bg-[#5b8def]/12 dark:bg-[#5b8def]/20" },
-  bersyukur: { face: "text-tz-rose dark:text-pink-300", activeBg: "bg-pink-100 dark:bg-pink-400/15" },
-  lelah: { face: "text-slate-500 dark:text-slate-300", activeBg: "bg-slate-200/70 dark:bg-slate-400/15" },
-  sedih: { face: "text-sky-600 dark:text-sky-300", activeBg: "bg-sky-100 dark:bg-sky-400/15" },
-  cemas: { face: "text-indigo-500 dark:text-indigo-300", activeBg: "bg-indigo-100 dark:bg-indigo-400/15" },
-  "campur-aduk": { face: "text-tz-violet dark:text-tz-accent", activeBg: "bg-tz-lavender dark:bg-tz-accent/20" },
+  bahagia: { face: "text-[#e8a23d]", activeBg: "bg-[#fbf3e4]" },
+  tenang: { face: "text-[#5b8def]", activeBg: "bg-[#edf3fe]" },
+  bersyukur: { face: "text-[#e8698d]", activeBg: "bg-[#fdeef2]" },
+  lelah: { face: "text-[#888795]", activeBg: "bg-[#f4f5f9]" },
+  sedih: { face: "text-[#6a89c9]", activeBg: "bg-[#eef2fa]" },
+  cemas: { face: "text-[#8a79d9]", activeBg: "bg-[#f0edff]" },
+  "campur-aduk": { face: "text-[#8d7be8]", activeBg: "bg-[#e6e0ff]" },
 };
 
 /** Kalimat pendamping singkat — dukungan, bukan kesimpulan kondisi mental. */
@@ -127,85 +128,68 @@ export function MoodSection({
   };
 
   return (
-    <section
-      aria-label="Mood check-in"
-      className="animate-tz-fade-up flex h-full flex-col rounded-[1.6rem] border border-tz-line bg-tz-panel p-5 shadow-[0_1px_2px_rgba(25,25,35,0.03),0_18px_44px_-30px_rgba(46,38,104,0.25)]"
-    >
+    <section aria-label="Mood check-in" className="animate-tz-fade-up flex h-full flex-col">
       <div className="mb-4">
-        <h2 className="font-display text-[17px] font-bold tracking-[-0.01em] text-tz-ink">
-          Bagaimana perasaanmu hari ini?
-        </h2>
-        <p className="mt-0.5 text-[11.5px] text-tz-muted">Luangkan waktu sejenak untuk memahami dirimu.</p>
+        <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tz-ink">Bagaimana perasaanmu hari ini?</h2>
+        <p className="mt-1 text-[12px] text-tz-muted">Luangkan waktu sejenak untuk memahami dirimu.</p>
       </div>
 
       <div
         role="radiogroup"
         aria-label="Pilih mood hari ini"
-        className="no-scrollbar -mx-1.5 flex snap-x gap-2 overflow-x-auto px-1.5 pb-1 sm:grid sm:grid-cols-4 sm:gap-2 sm:overflow-visible"
+        className="no-scrollbar -mx-1.5 flex w-full min-w-0 snap-x gap-1.5 overflow-x-auto px-1.5 pb-1 sm:grid sm:grid-cols-4 sm:gap-2 sm:overflow-visible"
       >
-        {MOODS.map((m) => {
-          const tone = TONE[m.id];
-          const active = moodToday === m.id;
+        {MOODS.map((mo) => {
+          const tone = TONE[mo.id];
+          const active = moodToday === mo.id;
           return (
             <button
-              key={m.id}
+              key={mo.id}
               type="button"
               role="radio"
               aria-checked={active}
-              aria-label={`Mood ${m.label}`}
-              onClick={() => select(m.id, m.label)}
-              className={cn(
-                "tap flex w-[84px] shrink-0 snap-start flex-col items-center gap-2 rounded-[1.4rem] px-2 py-3.5 transition-all duration-200 sm:w-auto",
-                active ? tone.activeBg : "bg-tz-panel-soft hover:bg-tz-lavender/50 dark:hover:bg-tz-accent/10"
-              )}
+              aria-label={`Mood ${mo.label}`}
+              onClick={() => select(mo.id, mo.label)}
+              className="tap flex w-[76px] shrink-0 snap-start flex-col items-center gap-2 rounded-2xl px-1.5 py-2.5 sm:w-auto"
             >
-              <span
+              <m.span
                 aria-hidden
+                animate={{ scale: active ? 1.07 : 1 }}
+                transition={{ type: "spring", stiffness: 420, damping: 22 }}
                 className={cn(
-                  "relative flex h-[68px] w-[68px] items-center justify-center rounded-full transition-all duration-200",
-                  active
-                    ? "bg-tz-panel ring-[2.5px] ring-tz-violet shadow-[0_10px_24px_-10px_rgba(136,121,232,0.5)]"
-                    : "bg-tz-panel/60"
+                  "flex h-[58px] w-[58px] items-center justify-center rounded-full transition-colors duration-200",
+                  active ? cn(tone.activeBg, "ring-2 ring-tz-violet") : "bg-tz-panel-soft"
                 )}
               >
-                <MoodFace
-                  id={m.id}
-                  className={cn("h-[54px] w-[54px] transition-transform duration-200", tone.face, active && "scale-[1.06]")}
-                />
-                {active ? (
-                  <span aria-hidden className="absolute -bottom-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-tz-lime" />
-                ) : null}
-              </span>
-              <span className={cn("text-[11px] font-bold leading-none", active ? "text-tz-ink" : "text-tz-muted")}>
-                {m.label}
+                <MoodFace id={mo.id} className={cn("h-[44px] w-[44px]", tone.face)} />
+              </m.span>
+              <span className={cn("text-[10.5px] leading-none", active ? "font-bold text-tz-ink" : "font-medium text-tz-muted")}>
+                {mo.label}
               </span>
             </button>
           );
         })}
       </div>
 
-      <div className="mt-auto min-h-[86px] pt-3">
+      <div className="mt-auto min-h-[74px] pt-4">
         {moodToday ? (
-          <div className="tz-fade-in rounded-2xl bg-tz-panel-soft p-3.5">
-            <p className="text-[12.5px] leading-relaxed text-tz-ink/95">
+          <div className="tz-fade-in rounded-[1.25rem] bg-tz-panel-soft p-4">
+            <p className="text-[13px] leading-relaxed text-tz-ink/95">
               <span className="font-bold">{moodLabel(moodToday)}</span>
               <span className="text-tz-muted"> — {REFLEKSI[moodToday]}</span>
-            </p>
-            <p className="mt-0.5 text-[10px] text-tz-muted/85">
-              Kamu sudah check-in hari ini. Ketuk mood lain bila perasaanmu berubah.
             </p>
             <button
               type="button"
               onClick={() => onOpenSubpage("jurnal")}
-              className="tap mt-2.5 flex h-10 w-full items-center justify-center gap-1.5 rounded-full bg-tz-ink text-[12px] font-bold text-white transition-all hover:bg-tz-ink/90"
+              className="tap mt-2 flex items-center gap-1 text-[12px] font-bold text-tz-violet"
             >
-              <BookHeart size={15} className="text-tz-lime" />
+              <BookHeart size={14} />
               Lanjut ke Jurnal Syukur
               <ChevronRight size={14} />
             </button>
           </div>
         ) : (
-          <p className="rounded-2xl border border-dashed border-tz-line-strong px-3.5 py-3 text-[11px] leading-relaxed text-tz-muted/80">
+          <p className="text-[11.5px] leading-relaxed text-tz-muted/80">
             Pilih yang paling mendekati — boleh diganti kapan saja. Satu catatan per hari.
           </p>
         )}

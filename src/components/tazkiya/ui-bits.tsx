@@ -1,15 +1,18 @@
 "use client";
 
 /**
- * Tazkiya v4 — Komponen visual dasar "A Better Daily Journey".
- * Bahasa desain: kartu putih bersih + border hairline + soft shadow,
- * lavender terarah, lime sebagai aksen kecil, tanpa gradien dan tanpa
- * glassmorphism sebagai gaya dasar. API komponen dipertahankan agar
- * seluruh halaman tetap terhubung; struktur visualnya baru.
+ * Tazkiya v5 — "Minimalist Premium" — kosakata visual dasar.
+ * Prinsip: kartu putih FLAT tanpa bayangan; pemisah memakai hairline tipis;
+ * lavender #8D7BE8 sebagai identitas; lime hanya aksen; angka besar memakai
+ * Manrope tabular (.v5-display); label kecil uppercase (.v5-overline).
+ * API komponen dipertahankan agar seluruh halaman tetap terhubung;
+ * struktur visualnya baru. Komponen tambahan v5: StatBlock (statistik
+ * tanpa kartu), GroupList/GroupRow (daftar pengaturan terkelompok).
  */
 
 import { type ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,7 +52,7 @@ export function GlassCard({
             ? "glass-strong"
             : "glass";
   const cls = cn(
-    "relative overflow-hidden rounded-[1.6rem]",
+    "relative overflow-hidden rounded-[1.75rem]",
     variantClass,
     onClick && "cursor-pointer tap active:scale-[0.985]",
     className
@@ -100,7 +103,7 @@ export function ConfirmButton({
       </AlertDialogTrigger>
       <AlertDialogContent className="glass-strong max-w-[320px]! rounded-[1.5rem]! border-tz-line p-5!">
         <AlertDialogHeader className="gap-1.5!">
-          <AlertDialogTitle className="font-display text-[16px]! font-bold! text-tz-ink">{title}</AlertDialogTitle>
+          <AlertDialogTitle className="text-[16px]! font-bold! text-tz-ink">{title}</AlertDialogTitle>
           <AlertDialogDescription className="text-[12px]! leading-relaxed! text-tz-muted">
             {description}
           </AlertDialogDescription>
@@ -123,7 +126,11 @@ export function ConfirmButton({
 
 /* ---------------- SectionHeader ---------------- */
 
-/** Judul section editorial: titik aksen lime + judul tegas + hairline. */
+/**
+ * Kepala section editorial v5: judul tegas 16-17px + keterangan abu —
+ * tanpa titik dekoratif; pemisah antar section memakai white space,
+ * bukan kartu.
+ */
 export function SectionHeader({
   title,
   caption,
@@ -136,13 +143,10 @@ export function SectionHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("mb-3 flex items-end justify-between gap-3 px-0.5", className)}>
+    <div className={cn("mb-3.5 flex items-end justify-between gap-3 px-0.5", className)}>
       <div className="min-w-0">
-        <div className="flex items-center gap-2">
-          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-tz-lime" />
-          <h2 className="font-display text-[17px] font-bold tracking-[-0.01em] text-tz-ink">{title}</h2>
-        </div>
-        {caption ? <p className="mt-0.5 pl-3.5 text-[11.5px] leading-snug text-tz-muted">{caption}</p> : null}
+        <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tz-ink">{title}</h2>
+        {caption ? <p className="mt-1 text-[12px] leading-snug text-tz-muted">{caption}</p> : null}
       </div>
       {action ? <div className="flex shrink-0 items-center whitespace-nowrap">{action}</div> : null}
     </div>
@@ -152,9 +156,8 @@ export function SectionHeader({
 /* ---------------- SegmentedTabs ---------------- */
 
 /**
- * Tab editorial garis-bawah (Hari Ini / Bulanan / Qada, Zikir / Doa, dst.) —
- * label tegas, garis aktif lavender dengan titik lime; pengganti gaya pil
- * bertumpuk dari versi lama.
+ * Tab garis-bawah minimalis (Hari Ini / Bulanan / Qada, Zikir / Doa, dst.) —
+ * label tegas, garis aktif lavender 2px tanpa ornamen tambahan.
  */
 export function SegmentedTabs<T extends string>({
   items,
@@ -185,8 +188,8 @@ export function SegmentedTabs<T extends string>({
             aria-selected={active}
             onClick={() => onChange(id)}
             className={cn(
-              "tap relative flex min-h-[44px] flex-1 items-center justify-center gap-1.5 px-3 text-[13px] font-semibold transition-colors sm:flex-none sm:min-w-[120px]",
-              active ? "text-tz-ink" : "text-tz-muted hover:text-tz-ink/80"
+              "tap relative flex min-h-[46px] flex-1 items-center justify-center gap-1.5 px-3 text-[13.5px] transition-colors sm:flex-none sm:min-w-[120px]",
+              active ? "font-bold text-tz-ink" : "font-medium text-tz-muted hover:text-tz-ink/80"
             )}
           >
             {Icon ? <Icon size={15} className={active ? "text-tz-violet" : ""} /> : null}
@@ -194,12 +197,10 @@ export function SegmentedTabs<T extends string>({
             <span
               aria-hidden
               className={cn(
-                "absolute inset-x-2 bottom-0 h-[2.5px] rounded-full transition-all duration-200",
+                "absolute inset-x-3 bottom-0 h-[2px] rounded-full transition-all duration-200",
                 active ? "bg-tz-violet" : "bg-transparent"
               )}
-            >
-              {active ? <span className="absolute right-0 top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-tz-lime" /> : null}
-            </span>
+            />
           </button>
         );
       })}
@@ -230,14 +231,14 @@ export function IconBox({
             ? "h-9 w-9 rounded-xl [&>svg]:h-4 [&>svg]:w-4"
             : size === "lg"
               ? "h-12 w-12 rounded-2xl [&>svg]:h-[22px] [&>svg]:w-[22px]"
-              : "h-10 w-10 rounded-[0.85rem] [&>svg]:h-[18px] [&>svg]:w-[18px]",
+              : "h-10 w-10 rounded-[0.95rem] [&>svg]:h-[18px] [&>svg]:w-[18px]",
         tone === "solid"
           ? "bg-tz-violet text-white"
           : tone === "ghost"
-            ? "border border-tz-line bg-tz-panel-soft text-tz-muted"
+            ? "bg-tz-panel-soft text-tz-muted"
             : tone === "lavender"
-              ? "bg-tz-lavender text-tz-violet dark:text-[#c9c2f5]"
-              : "bg-tz-lavender/60 text-tz-violet dark:bg-tz-accent/15 dark:text-tz-accent",
+              ? "bg-tz-lav-deco text-tz-violet"
+              : "bg-tz-lavender text-tz-violet",
         className
       )}
     >
@@ -248,16 +249,16 @@ export function IconBox({
 
 /* ---------------- ProgressRing ---------------- */
 
-/** Cincin progres flat: trek hairline, busur lavender solid, ujung lime. */
+/** Cincin progres flat: trek tipis, busur lavender — tanpa titik dekoratif. */
 export function ProgressRing({
   value,
   size = 104,
-  stroke = 9,
+  stroke = 8,
   children,
   className,
   trackClass = "stroke-tz-track",
-  from = "#8879E8",
-  to = "#D5F76A",
+  from = "#8D7BE8",
+  to = "#D9F477",
 }: {
   value: number; // 0..100
   size?: number;
@@ -272,11 +273,6 @@ export function ProgressRing({
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const dash = (clamped / 100) * c;
-  // Ujung kecil lime di perbatasan busur (aksen, bukan dekorasi lebay):
-  // sudut busur = -90° + clamped% dari 360°.
-  const angle = (-90 + (clamped / 100) * 360) * (Math.PI / 180);
-  const tipX = size / 2 + r * Math.cos(angle);
-  const tipY = size / 2 + r * Math.sin(angle);
   return (
     <div className={cn("relative inline-flex items-center justify-center", className)} style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
@@ -294,9 +290,6 @@ export function ProgressRing({
             transition: "stroke-dasharray 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
           }}
         />
-        {clamped > 4 && clamped < 100 ? (
-          <circle cx={tipX} cy={tipY} r={stroke * 0.72} fill={to} className="rotate-90" style={{ transformOrigin: `${tipX}px ${tipY}px` }} />
-        ) : null}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">{children}</div>
     </div>
@@ -308,7 +301,7 @@ export function ProgressRing({
 export function ProgressBar({ value, className, fillClass }: { value: number; className?: string; fillClass?: string }) {
   const clamped = Math.max(0, Math.min(100, value));
   return (
-    <div className={cn("h-2 w-full overflow-hidden rounded-full bg-tz-track", className)}>
+    <div className={cn("h-1.5 w-full overflow-hidden rounded-full bg-tz-track", className)}>
       <div
         className={cn("h-full rounded-full bg-tz-violet", fillClass)}
         style={{
@@ -320,13 +313,107 @@ export function ProgressBar({ value, className, fillClass }: { value: number; cl
   );
 }
 
+/* ---------------- StatBlock — statistik TANPA kartu ---------------- */
+
+/** Angka besar Manrope + label kecil; pemisah antar statistik: divider tipis. */
+export function StatBlock({
+  value,
+  label,
+  className,
+  align = "left",
+}: {
+  value: ReactNode;
+  label: string;
+  className?: string;
+  align?: "left" | "center";
+}) {
+  return (
+    <div className={cn("min-w-0", align === "center" ? "text-center" : "text-left", className)}>
+      <p className="v5-display truncate text-[26px] font-extrabold leading-none text-tz-ink sm:text-[30px]">{value}</p>
+      <p className="mt-1.5 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-tz-muted">{label}</p>
+    </div>
+  );
+}
+
+/* ---------------- GroupList / GroupRow — daftar pengaturan minimalis ---------------- */
+
+/** Kelompok baris pengaturan: satu permukaan putih, pemisah hairline tipis. */
+export function GroupList({
+  children,
+  className,
+  ariaLabel,
+}: {
+  children: ReactNode;
+  className?: string;
+  ariaLabel?: string;
+}) {
+  return (
+    <div
+      role="group"
+      aria-label={ariaLabel}
+      className={cn("glass divide-y divide-tz-line-soft overflow-hidden rounded-[1.5rem]", className)}
+    >
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Satu baris pengaturan: ikon sederhana 18px + judul + keterangan abu +
+ * nilai/aksi di kanan. Ikon sengaja TANPA kotak berwarna — minimalis.
+ */
+export function GroupRow({
+  icon: Icon,
+  title,
+  caption,
+  value,
+  onClick,
+  children,
+  className,
+  control,
+}: {
+  icon?: LucideIcon;
+  title: ReactNode;
+  caption?: ReactNode;
+  value?: ReactNode;
+  onClick?: () => void;
+  children?: ReactNode;
+  className?: string;
+  /** Kontrol langsung di kanan (Switch, segmen) — mematikan chevron. */
+  control?: boolean;
+}) {
+  const inner = (
+    <>
+      {Icon ? <Icon size={18} strokeWidth={1.8} className="shrink-0 text-tz-muted" /> : null}
+      <span className="min-w-0 flex-1 py-3.5">
+        <span className="block truncate text-[14px] font-medium text-tz-ink">{title}</span>
+        {caption ? <span className="mt-0.5 block truncate text-[11.5px] leading-snug text-tz-muted">{caption}</span> : null}
+        {children}
+      </span>
+      {value !== undefined ? (
+        <span className="shrink-0 text-[12.5px] font-medium text-tz-muted">{value}</span>
+      ) : null}
+      {onClick && !control ? <ChevronRight size={16} className="shrink-0 text-tz-muted/60" /> : null}
+    </>
+  );
+  const base = cn("flex w-full items-center gap-3.5 px-4 text-left", className);
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} aria-label={typeof title === "string" ? title : undefined} className={cn(base, "tap")}>
+        {inner}
+      </button>
+    );
+  }
+  return <div className={base}>{inner}</div>;
+}
+
 /* ---------------- Pill / Chip ---------------- */
 
 export function Chip({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border border-tz-line bg-tz-panel-soft px-2.5 py-1 text-[11px] font-semibold text-tz-muted",
+        "inline-flex items-center gap-1 rounded-full bg-tz-panel-soft px-2.5 py-1 text-[11px] font-semibold text-tz-muted",
         className
       )}
     >
@@ -339,11 +426,11 @@ export function Chip({ children, className }: { children: ReactNode; className?:
 
 export function EmptyState({ icon, title, caption }: { icon: ReactNode; title: string; caption?: string }) {
   return (
-    <div className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[1.5rem] border border-dashed border-tz-line-strong bg-tz-panel-soft px-4 py-8 text-center">
-      <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-tz-lavender text-tz-violet dark:text-[#c9c2f5]">
+    <div className="relative flex flex-col items-center gap-2.5 rounded-[1.5rem] bg-tz-panel-soft px-4 py-9 text-center">
+      <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-tz-lavender text-tz-violet">
         {icon}
       </div>
-      <p className="font-display text-sm font-bold text-tz-ink/90">{title}</p>
+      <p className="text-sm font-bold text-tz-ink/90">{title}</p>
       {caption ? <p className="max-w-[270px] text-xs leading-relaxed text-tz-muted">{caption}</p> : null}
     </div>
   );
@@ -352,7 +439,7 @@ export function EmptyState({ icon, title, caption }: { icon: ReactNode; title: s
 /* ---------------- Orb dekoratif ---------------- */
 
 export function GlowOrb({ className }: { className?: string }) {
-  // v4: ornamen blur/glow dihapus dari bahasa desain. API dipertahankan
+  // v5: ornamen blur/glow dihapus dari bahasa desain. API dipertahankan
   // agar pemanggil lama tidak perlu diubah.
   void className;
   return null;

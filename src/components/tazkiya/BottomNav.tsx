@@ -1,11 +1,12 @@
 "use client";
 
 /**
- * Tazkiya v4 — Navigasi ganda sesuai perangkat:
- * - BottomNav  : kapsul putih mengambang (mobile) — item aktif lingkaran
- *                lavender + titik lime; ikon konsisten, label jelas.
- * - SidebarNav : sidebar proporsional (desktop lg+) — brand, menu utama,
- *                grup refleksi, dashboard lebar di sebelah kanan.
+ * Tazkiya v5 — Navigasi ganda sesuai perangkat:
+ * - BottomNav  : capsule putih minimalis mengambang (mobile) — ikon outline
+ *                abu, item aktif berupa pil lavender lembut dengan ikon &
+ *                label lavender pekat; satu-satunya permukaan berbayang.
+ * - SidebarNav : sidebar putih minimal (desktop lg+) — teks + hairline,
+ *                tanpa kotak ikon, aktif = pil lavender lembut.
  */
 
 import { BookOpen, ChartColumn, CircleUserRound, House, MoonStar, NotebookPen, HandCoins, Sparkles } from "lucide-react";
@@ -32,11 +33,11 @@ const REFLEKSI: { id: SubPageId; label: string; icon: typeof NotebookPen }[] = [
 
 function Brand() {
   return (
-    <div className="flex items-center gap-3 px-2">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[0.95rem] bg-tz-violet font-display text-xl font-bold text-white shadow-[0_12px_28px_-12px_rgba(136,121,232,0.7)]">ت</span>
+    <div className="flex items-center gap-2.5 px-2">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[0.85rem] bg-tz-violet text-base font-bold text-white">ت</span>
       <span>
-        <span className="block font-display text-lg font-bold leading-tight tracking-[-0.01em] text-tz-ink">Tazkiya</span>
-        <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-tz-muted">Better Daily Journey</span>
+        <span className="block text-[16px] font-bold leading-tight tracking-[-0.01em] text-tz-ink">Tazkiya</span>
+        <span className="block text-[8.5px] font-bold uppercase tracking-[0.22em] text-tz-muted">Better Daily Journey</span>
       </span>
     </div>
   );
@@ -52,9 +53,9 @@ export function BottomNav({
   return (
     <nav
       aria-label="Navigasi utama"
-      className="pointer-events-auto fixed inset-x-0 bottom-0 z-30 px-4 pb-[max(0.9rem,env(safe-area-inset-bottom))] lg:hidden"
+      className="pointer-events-auto fixed inset-x-0 bottom-0 z-30 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] lg:hidden"
     >
-      <div className="glass-strong mx-auto flex max-w-md items-center justify-between gap-1 rounded-full px-2.5 py-2">
+      <div className="mx-auto flex max-w-md items-stretch justify-between gap-1 rounded-[1.65rem] border border-tz-line bg-tz-panel px-2 py-1.5 shadow-[0_18px_48px_-18px_rgba(34,33,42,0.22)]">
         {TABS.map(({ id, label, icon: Icon }) => {
           const isActive = active === id;
           return (
@@ -64,22 +65,20 @@ export function BottomNav({
               aria-current={isActive ? "page" : undefined}
               aria-label={`Buka menu ${label}`}
               onClick={() => onChange(id)}
-              className="tap relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 rounded-full px-1"
+              className={cn(
+                "tap relative flex min-h-[54px] flex-1 flex-col items-center justify-center gap-1 rounded-[1.25rem] px-1 transition-colors duration-200",
+                isActive ? "bg-tz-lavender" : "bg-transparent"
+              )}
             >
-              <span
-                aria-hidden
-                className={cn(
-                  "relative flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200",
-                  isActive ? "bg-tz-violet text-white shadow-[0_8px_18px_-6px_rgba(136,121,232,0.6)]" : "bg-transparent text-tz-muted"
-                )}
-              >
-                <Icon size={19} strokeWidth={isActive ? 2.2 : 1.9} />
-                {isActive ? <span aria-hidden className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-tz-lime ring-2 ring-white dark:ring-[#26252F]" /> : null}
-              </span>
+              <Icon
+                size={20}
+                strokeWidth={isActive ? 2.1 : 1.7}
+                className={cn("transition-colors duration-200", isActive ? "text-tz-violet" : "text-tz-muted")}
+              />
               <span
                 className={cn(
                   "text-[9.5px] font-semibold leading-none transition-colors duration-200",
-                  isActive ? "font-bold text-tz-ink" : "text-tz-muted"
+                  isActive ? "font-bold text-tz-violet" : "text-tz-muted"
                 )}
               >
                 {label}
@@ -110,8 +109,8 @@ export function SidebarNav({
     >
       <Brand />
 
-      <p className="mb-2 mt-9 px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-tz-muted">Menu</p>
-      <nav className="flex flex-col gap-1" aria-label="Menu utama">
+      <p className="v5-overline mb-2 mt-9 px-2">Menu</p>
+      <nav className="flex flex-col gap-0.5" aria-label="Menu utama">
         {TABS.map(({ id, label, icon: Icon }) => {
           const isActive = subpage === null && active === id;
           return (
@@ -121,20 +120,19 @@ export function SidebarNav({
               aria-current={isActive ? "page" : undefined}
               onClick={() => onChange(id)}
               className={cn(
-                "tap flex min-h-[46px] items-center gap-3 rounded-2xl px-3.5 text-[14.5px] font-semibold transition-colors",
-                isActive ? "bg-tz-lavender text-tz-violet dark:text-[#c9c2f5]" : "text-tz-muted hover:bg-tz-panel-soft"
+                "tap flex min-h-[44px] items-center gap-3 rounded-2xl px-3.5 text-[14px] transition-colors",
+                isActive ? "bg-tz-lavender font-bold text-tz-violet" : "font-medium text-tz-muted hover:bg-tz-panel-soft hover:text-tz-ink"
               )}
             >
-              <Icon size={19} strokeWidth={isActive ? 2.2 : 1.9} />
+              <Icon size={18} strokeWidth={isActive ? 2.1 : 1.7} />
               {label}
-              {isActive ? <span aria-hidden className="ml-auto h-1.5 w-1.5 rounded-full bg-tz-lime" /> : null}
             </button>
           );
         })}
       </nav>
 
-      <p className="mb-2 mt-7 px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-tz-muted">Refleksi</p>
-      <nav className="flex flex-col gap-1" aria-label="Refleksi">
+      <p className="v5-overline mb-2 mt-7 px-2">Refleksi</p>
+      <nav className="flex flex-col gap-0.5" aria-label="Refleksi">
         {REFLEKSI.map(({ id, label, icon: Icon }) => {
           const isActive = subpage === id;
           return (
@@ -144,21 +142,20 @@ export function SidebarNav({
               aria-current={isActive ? "page" : undefined}
               onClick={() => onOpenSubpage(id)}
               className={cn(
-                "tap flex min-h-[46px] items-center gap-3 rounded-2xl px-3.5 text-[14.5px] font-semibold transition-colors",
-                isActive ? "bg-tz-lavender text-tz-violet dark:text-[#c9c2f5]" : "text-tz-muted hover:bg-tz-panel-soft"
+                "tap flex min-h-[44px] items-center gap-3 rounded-2xl px-3.5 text-[14px] transition-colors",
+                isActive ? "bg-tz-lavender font-bold text-tz-violet" : "font-medium text-tz-muted hover:bg-tz-panel-soft hover:text-tz-ink"
               )}
             >
-              <Icon size={19} strokeWidth={isActive ? 2.2 : 1.9} />
+              <Icon size={18} strokeWidth={isActive ? 2.1 : 1.7} />
               {label}
             </button>
           );
         })}
       </nav>
 
-      <div className="mt-auto rounded-3xl border border-tz-line bg-tz-panel-soft p-4">
-        <p className="font-display text-[13px] font-bold text-tz-ink">Tazkiya v4</p>
-        <p className="mt-1 text-[11.5px] leading-relaxed text-tz-muted">Satu langkah kecil setiap hari menjaga istiqamah.</p>
-      </div>
+      <p className="mt-auto px-2 text-[11px] leading-relaxed text-tz-muted/80">
+        Satu langkah kecil setiap hari menjaga istiqamah.
+      </p>
     </aside>
   );
 }

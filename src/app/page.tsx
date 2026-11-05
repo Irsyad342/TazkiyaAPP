@@ -117,7 +117,7 @@ export default function Page() {
       // Warna bilah status/URL browser mengikuti tema aktif.
       document
         .querySelector('meta[name="theme-color"]')
-        ?.setAttribute("content", resolved === "light" ? "#F7F9FC" : "#14131A");
+        ?.setAttribute("content", resolved === "light" ? "#F8F9FC" : "#101014");
     };
     apply();
     if (theme === "system") {
@@ -202,13 +202,13 @@ export default function Page() {
   if (!hydrated) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-tz-stage" aria-label="Memuat Tazkiya">
-        <div className="flex flex-col items-center gap-5">
-          <div className="animate-tz-pulse relative flex h-16 w-16 items-center justify-center rounded-[1.4rem] bg-tz-violet font-display text-3xl font-bold text-white shadow-[0_20px_44px_-18px_rgba(136,121,232,0.65)]">
+        <div className="flex flex-col items-center gap-4">
+          <span className="animate-tz-pulse flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-tz-violet text-2xl font-bold text-white">
             ت
-          </div>
+          </span>
           <div className="text-center">
-            <p className="font-display text-base font-bold tracking-[0.02em] text-tz-ink">Tazkiya</p>
-            <p className="mt-1 text-[11px] font-medium tracking-[0.2em] text-tz-muted uppercase">A Better Daily Journey</p>
+            <p className="text-[15px] font-bold tracking-[-0.01em] text-tz-ink">Tazkiya</p>
+            <p className="v5-overline mt-1.5">Better Daily Journey</p>
           </div>
         </div>
       </main>
@@ -222,11 +222,10 @@ export default function Page() {
           {/* Sidebar desktop — navigasi vertikal proporsional (lg+) */}
           <SidebarNav active={tab} onChange={(t) => { setSubpage(null); setTab(t); }} subpage={subpage} onOpenSubpage={setSubpage} />
 
-          {/* Kanvas konten: mobile penuh, desktop dashboard lebar */}
-          <div className="relative min-h-dvh flex-1">
-            {/* Pola titik samar di tepi atas kanvas (dekorasi flat) */}
-            <div aria-hidden className="tz-aurora pointer-events-none absolute inset-x-0 top-0 h-40" />
-
+          {/* Kanvas konten: mobile penuh, desktop dashboard lebar.
+              min-w-0: hentikan penyebaran min-content dari scroller horizontal
+              (baris mood) agar tidak memaksa lebar dokumen melebihi viewport. */}
+          <div className="relative min-h-dvh min-w-0 flex-1">
             <div
               id="konten-tazkiya"
               className="no-scrollbar relative z-10 mx-auto w-full max-w-[1120px] px-4 pb-40 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-6 lg:px-10 lg:pb-14 lg:pt-10"
@@ -293,24 +292,24 @@ export default function Page() {
                   duration: 2600,
                   style: {
                     background: "#ffffff",
-                    border: "1px solid #ECECF3",
-                    color: "#191923",
+                    border: "1px solid #EEF0F6",
+                    color: "#22212A",
                     borderRadius: "999px",
                     fontSize: "13px",
                     fontWeight: 600,
-                    boxShadow: "0 16px 44px -18px rgba(46,38,104,0.28)",
+                    boxShadow: "0 18px 48px -18px rgba(34,33,42,0.22)",
                   },
                 }
               : {
                   duration: 2600,
                   style: {
-                    background: "#26252F",
-                    border: "1px solid #3A3946",
-                    color: "#F1F0F6",
+                    background: "#1C1C24",
+                    border: "1px solid #33333E",
+                    color: "#F3F2F7",
                     borderRadius: "999px",
                     fontSize: "13px",
                     fontWeight: 600,
-                    boxShadow: "0 16px 44px -18px rgba(0,0,0,0.6)",
+                    boxShadow: "0 18px 48px -18px rgba(0,0,0,0.6)",
                   },
                 }
           }
