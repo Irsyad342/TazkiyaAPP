@@ -1,29 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 30 30" style="enable-background:new 0 0 30 30;" xml:space="preserve">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
 <defs>
-  <style type="text/css">
-    .st194{fill:#2D2D2D;stroke:#FFFFFF;stroke-width:0.6317;stroke-miterlimit:10;}
-    .st23{fill:#FFFFFF;}
-
-    .z-breathe {
-      animation: breathe 2.5s ease-in-out infinite;
-    }
-
-    @keyframes breathe {
-      0%, 100% { opacity: 0.7; }
-      50% { opacity: 1; }
-    }
-  </style>
+  <linearGradient id="cres" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#FF9A62"/><stop offset="1" stop-color="#FA5200"/>
+  </linearGradient>
+  <radialGradient id="glow" cx="0.38" cy="0.34" r="0.62">
+    <stop offset="0" stop-color="#FA5200" stop-opacity="0.34"/>
+    <stop offset="1" stop-color="#FA5200" stop-opacity="0"/>
+  </radialGradient>
 </defs>
-
+<rect width="512" height="512" rx="116" fill="#17171A"/>
+<rect width="512" height="512" rx="116" fill="url(#glow)"/>
 <g>
-  <path class="st194" d="M24.51,28.51H5.49c-2.21,0-4-1.79-4-4V5.49c0-2.21,1.79-4,4-4h19.03c2.21,0,4,1.79,4,4v19.03
-    C28.51,26.72,26.72,28.51,24.51,28.51z"/>
-  <g class="z-breathe">
-    <path class="st23" d="M15.47,7.1l-1.3,1.85c-0.2,0.29-0.54,0.47-0.9,0.47h-7.1V7.09C6.16,7.1,15.47,7.1,15.47,7.1z"/>
-    <polygon class="st23" points="24.3,7.1 13.14,22.91 5.7,22.91 16.86,7.1"/>
-    <path class="st23" d="M14.53,22.91l1.31-1.86c0.2-0.29,0.54-0.47,0.9-0.47h7.09v2.33H14.53z"/>
-  </g>
+<path d="M250.1 95.1 A118 118 0 1 0 334.5 273.9 A100 100 0 0 1 250.1 95.1 Z" fill="url(#cres)"/>
+<path d="M368 118 C372 136 380 144 398 148 C380 152 372 160 368 178 C364 160 356 152 338 148 C356 144 364 136 368 118 Z" fill="#FFD9BF"/>
+
+<g transform="translate(0 6)">
+  <path d="M256 350 C224 330 176 326 148 336 L148 412 C176 402 224 406 256 426 Z" fill="#C94100"/>
+  <path d="M256 350 C288 330 336 326 364 336 L364 412 C336 402 288 406 256 426 Z" fill="#C94100"/>
+  <path d="M256 356 C226 338 182 334 156 342 L156 406 C182 398 226 402 256 420 Z" fill="#F7F1EA"/>
+  <path d="M256 356 C286 338 330 334 356 342 L356 406 C330 398 286 402 256 420 Z" fill="#FFFDF9"/>
+  <path d="M226 360 C210 358 194 358 180 361 L180 370 C194 367 210 367 226 369 Z" fill="#E5D5C4"/>
+  <path d="M226 380 C210 378 194 378 180 381 L180 390 C194 387 210 387 226 389 Z" fill="#E5D5C4"/>
+  <path d="M286 360 C302 358 318 358 332 361 L332 370 C318 367 302 367 286 369 Z" fill="#EAD9C8"/>
+  <path d="M286 380 C302 378 318 378 332 381 L332 390 C318 387 302 387 286 389 Z" fill="#EAD9C8"/>
+  <path d="M256 352 L256 424" stroke="#C94100" stroke-width="5" stroke-linecap="round"/>
+</g>
+
 </g>
 </svg>

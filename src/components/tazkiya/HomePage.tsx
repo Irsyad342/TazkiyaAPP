@@ -637,60 +637,96 @@ function KebaikanCard({
     {
       label: "Al-Qur'an",
       value: `${quran}/${settings.quranDailyTarget} hlm`,
+      caption: `Target ${settings.quranDailyTarget} halaman setiap hari`,
       done: quran >= settings.quranDailyTarget && settings.quranDailyTarget > 0,
       go: () => onNavigate("quran"),
     },
     {
       label: "Zikir & Doa",
       value: zikir.toLocaleString("id-ID"),
+      caption: `Zikir harian — target ${settings.zikirTarget.toLocaleString("id-ID")} hitungan`,
       done: zikir >= settings.zikirTarget && settings.zikirTarget > 0,
       go: () => onOpenSubpage("zikir-doa"),
     },
     {
       label: "Amal",
       value: `${amal} amal`,
+      caption: "Sedekah, bantu sesama, kebaikan kecil",
       done: amal > 0,
       go: () => onOpenSubpage("rizq-amal"),
     },
     {
       label: "Jurnal",
       value: jurnal > 0 ? `${jurnal} syukur` : "kosong",
+      caption: "Tuliskan rasa syukur dan renungan hari ini",
       done: jurnal > 0,
       go: () => onOpenSubpage("jurnal"),
     },
   ];
 
+  const doneCount = rows.filter((r) => r.done).length;
+  const insight =
+    doneCount === rows.length
+      ? "Semua ibadah pendukung tercatat — luar biasa hari ini."
+      : doneCount === 0
+        ? "Mulai dari yang paling ringan — satu kebaikan pun berharga."
+        : `${doneCount} dari ${rows.length} sudah tercatat — lanjutkan yang lain.`;
+
   return (
     <section aria-label="Ibadah pendukung hari ini" className="glass-hero flex h-full flex-col rounded-[1.4rem] p-4">
-      <p className="text-[13.5px] font-bold tracking-[-0.01em] text-white">Kebaikan Hari Ini</p>
-      <ul className="mt-2.5 flex-1 space-y-2" role="group">
-        {rows.map(({ label, value, done, go }) => (
+      <div className="flex items-center justify-between gap-2">
+        <p className="whitespace-nowrap text-[12.5px] font-bold tracking-[-0.01em] text-white">Kebaikan Hari Ini</p>
+        <span className="tnum shrink-0 rounded-full bg-white/18 px-2 py-0.5 text-[9px] font-bold text-white">
+          {doneCount}/{rows.length}
+        </span>
+      </div>
+      <ul className="mt-1 flex-1 divide-y divide-white/12" role="group">
+        {rows.map(({ label, value, caption, done, go }) => (
           <li key={label}>
             <button
               type="button"
               onClick={go}
-              aria-label={`${label}: ${value} — buka`}
-              className="tap flex w-full items-center gap-2 text-left"
+              aria-label={`${label}: ${value} — ${caption}. Ketuk untuk mencatat.`}
+              className="tap flex w-full items-center gap-2.5 py-2.5 text-left"
             >
               <span
                 aria-hidden
                 className={cn(
-                  "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-white/45",
+                  "flex h-[19px] w-[19px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-white/45",
                   done && "border-white bg-white"
                 )}
               >
                 {done ? <Check size={10} strokeWidth={3.2} className="text-tk-violet" /> : null}
               </span>
-              <span className="min-w-0 flex-1 truncate text-[11.5px] font-medium text-white/95">{label}</span>
-              <span className="tnum shrink-0 whitespace-nowrap text-[9.5px] font-bold text-white/85">{value}</span>
+              <span className="min-w-0 flex-1">
+                <span className="flex items-baseline justify-between gap-2">
+                  <span className="truncate text-[12.5px] font-bold text-white">{label}</span>
+                  <span className="tnum shrink-0 whitespace-nowrap text-[10px] font-bold text-white/90">{value}</span>
+                </span>
+                <span className="mt-px block truncate text-[10px] leading-snug text-white/70">{caption}</span>
+              </span>
+              <ChevronRight size={14} className="shrink-0 text-white/55" aria-hidden />
             </button>
           </li>
         ))}
       </ul>
-      <p className="mt-2.5 flex items-center gap-1 border-t border-white/20 pt-2.5 text-[10.5px] font-medium text-white/80">
-        <Sparkles size={10} className="shrink-0" />
-        Ketuk untuk mencatat
-      </p>
+      <div className="mt-1 border-t border-white/20 pt-2.5">
+        <p className="flex items-center gap-1.5 text-[10.5px] font-medium leading-snug text-white/90">
+          <Sparkles size={11} className="shrink-0" aria-hidden />
+          {insight}
+        </p>
+        <div className="mt-2 flex justify-end">
+          <button
+            type="button"
+            onClick={() => onNavigate("progress")}
+            aria-label="Lihat perkembangan ibadah di halaman Progress"
+            className="tap flex shrink-0 items-center gap-0.5 rounded-full bg-white/16 px-2.5 py-1 text-[10px] font-bold text-white transition-colors hover:bg-white/25"
+          >
+            Lihat perkembangan
+            <ChevronRight size={11} aria-hidden />
+          </button>
+        </div>
+      </div>
     </section>
   );
 }

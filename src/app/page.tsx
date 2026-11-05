@@ -223,6 +223,8 @@ export default function Page() {
       <main className="relative min-h-dvh w-full bg-[#101013] light:bg-[#e8e8ec]" aria-label="Aplikasi Tazkiya">
         {/* Kolom aplikasi — selalu selebar HP, di tengah, semua viewport. */}
         <div className="relative mx-auto min-h-dvh w-full max-w-[430px] bg-tk-stage desktop:shadow-[0_0_0_1px_var(--color-tk-line),0_40px_90px_-40px_rgba(0,0,0,0.6)]">
+          {/* Cahaya ambien di belakang konten — dasar efek Liquid Glass. */}
+          <div aria-hidden className="tk-ambience" />
           <div
             id="konten-tazkiya"
             className="no-scrollbar relative z-10 mx-auto w-full px-4 pb-44 pt-[max(1.25rem,env(safe-area-inset-top))]"

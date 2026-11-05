@@ -33,6 +33,7 @@ export function BottomNav({
   return (
     <nav
       aria-label="Navigasi utama"
+      data-tk-nav=""
       className="pointer-events-auto fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[430px] px-5 pb-[max(1.1rem,env(safe-area-inset-bottom))]"
     >
       {/* Bar hitam pekat kapsul — seperti bottom bar referensi */}
