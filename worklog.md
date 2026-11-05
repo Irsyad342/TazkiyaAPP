@@ -885,3 +885,27 @@ tsc 0 · eslint bersih · build sukses. Browser 360/390: daftar salat 5 baris ta
 ruang kosong, glass terlihat jelas (teks tembus di pil nav & kartu), tema terang/gelap konsisten,
 0 error konsol. Kendala QA: proses worker next-server yatim sempat menyajikan build lama — dihentikan
 paksa, diverifikasi ulang dari build segar.
+
+## Task 45 — v10: liquid glass dihapus total + Sholat zigzag vertikal
+
+Umpan balik pengguna: (1) fitur Liquid Glass hapus saja, (2) halaman Sholat kembali ke desain kalender/
+sumbu waktu yang lama tetapi TIDAK digeser menyamping — cukup dibuat zigzag.
+
+### Liquid Glass dihapus bersih
+Saklar "Mode Liquid Glass" di Profil, state `liquidGlass` (types + default store), inisialisasi
+`data-glass` di layout, seluruh CSS `html[data-glass="liquid"]` (blur/backdrop/ambience/reduced-
+transparency), dan lapisan cahaya ambien `.tk-ambience` beserta keyframes-nya dihapus dari lima berkas.
+Permukaan desain standar (.glass, .glass-strong, .glass-hero, .tk-card-white) TETAP — itu sistem kartu
+v7, bukan bagian fitur liquid. Terverifikasi grep: 0 sisa.
+
+### Sholat — timeline zigzag vertikal (gaya kalender, tanpa geser samping)
+`PrayerList` v9 diganti `PrayerZigzag`: bahasa visual sumbu waktu v8 diputar 90° — garis putus-putus
+turun di tengah panel, blok salat berselang kiri–kanan (Subuh kanan, Zuhur kiri, …), label jam di sisi
+berlawanan, bar status kiri (oranye=terlaksana, amber=terlewat), titik status di sumbu, badge
+"Berikutnya", dan penanda waktu berjalan (pil oranye jam sekarang) yang diinterpolasi di antara dua
+salat terdekat sesuai jam berjalan. Satu ketukan pada blok langsung membuka sheet pencatatan.
+
+### QA
+tsc 0 · eslint bersih · build sukses · data-v="10". Browser: 5 blok zigzag terlihat serentak 360px &
+390px, gelap & terang, overflow-x 0px di semua kondisi; ketuk blok Zuhur → sheet "Catat Salat" terbuka;
+saklar Liquid Glass hilang dari setelan; 0 error konsol.

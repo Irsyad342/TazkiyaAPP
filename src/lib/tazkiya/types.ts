@@ -223,7 +223,6 @@ export interface Settings {
   vibration: boolean;
   showArabic: boolean;
   theme: ThemeMode;
-  liquidGlass: boolean;
   readerArabicSize: number; // px 20..46
   readerTransSize: number; // px 11..20
   readerLineHeight: number; // 1.7 | 1.9 | 2.2
@@ -419,7 +418,6 @@ export function createDefaultSettings(): Settings {
     vibration: true,
     showArabic: true,
     theme: "dark",
-    liquidGlass: false,
     readerArabicSize: 28,
     readerTransSize: 13,
     readerLineHeight: 1.9,
