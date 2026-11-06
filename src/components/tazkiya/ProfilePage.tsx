@@ -1081,18 +1081,25 @@ export function ProfilePage({
       <section aria-label="Tentang aplikasi" className="animate-tk-fade-up pb-2">
         <SectionHeader title="Tentang" />
         <GroupList ariaLabel="Tentang aplikasi">
-          <div className="flex items-center gap-3.5 px-4 py-4">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center"><SuioMark size={40} /></span>
-            <div className="flex-1">
-              <p className="text-[14px] font-bold text-tk-ink">SUIO: Pelacak Ibadah Harian</p>
-              <p className="text-[11px] text-tk-muted">Versi 5.0.0 (prototipe web) · Data lokal</p>
+          <div className="px-4 py-4">
+            <div className="flex items-center gap-3.5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center"><SuioMark size={40} /></span>
+              <div className="flex-1">
+                <p className="text-[14px] font-bold text-tk-ink">SUIO</p>
+                <p className="text-[11px] text-tk-muted">Sujud in Order</p>
+              </div>
             </div>
-            <Chip className="bg-tk-lavender text-tk-violet">v5.0.0</Chip>
+            <p className="mt-3 text-[11.5px] leading-relaxed text-tk-muted">
+              SUIO adalah aplikasi pendamping ibadah harian yang membantu Muslim mengatur, memantau, dan menjaga
+              konsistensi dalam menjalankan ibadah. Mulai dari pengingat waktu salat, membaca Al-Qur&apos;an, zikir,
+              amal kebaikan, hingga jurnal syukur, semuanya dirancang untuk membantu membangun kebiasaan ibadah yang
+              lebih teratur dan berkelanjutan.
+            </p>
           </div>
         </GroupList>
-        <p className="mt-3 flex items-center gap-1.5 text-[11.5px] leading-relaxed text-tk-muted">
-          <Check size={13} className="shrink-0 text-tk-violet" aria-hidden />
-          Terus bertumbuh dalam istiqamah, satu langkah kecil setiap hari.
+        <p className="mt-3 flex items-center gap-1.5 text-[11.5px] font-semibold leading-relaxed text-tk-violet dark:text-tk-accent">
+          <Check size={13} className="shrink-0" aria-hidden />
+          Setiap Langkah Kecil, Menuju Istiqamah.
         </p>
       </section>
 

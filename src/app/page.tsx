@@ -269,7 +269,7 @@ export default function Page() {
         <div className="relative mx-auto min-h-dvh w-full max-w-[430px] bg-tk-stage desktop:shadow-[0_0_0_1px_var(--color-tk-line),0_40px_90px_-40px_rgba(0,0,0,0.6)]">
           <div
             id="konten-tazkiya"
-            className="no-scrollbar relative z-10 mx-auto w-full px-4 pb-44 pt-[max(1.25rem,env(safe-area-inset-top))]"
+            className="no-scrollbar relative z-10 mx-auto w-full px-4 pb-[var(--tk-nav-reserve)] pt-[max(1.25rem,env(safe-area-inset-top))]"
           >
             <AnimatePresence mode="wait" initial={false}>
               {/*

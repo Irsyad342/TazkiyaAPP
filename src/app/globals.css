@@ -123,6 +123,11 @@
 
 :root {
   --radius: 1.25rem;
+  /* Ruang cadangan bawah konten aplikasi di atas navigasi kapsul mengambang.
+     Komposisi: tinggi kapsul nav (tombol 46px + padding vertikal 8px = 62px)
+     + padding bawah nav max(1.1rem, jaman aman perangkat) + jarak napas 28px
+     (target jarak konten terakhir ke nav: 24–32px). Tema-tidak tergantung. */
+  --tk-nav-reserve: calc(62px + max(1.1rem, env(safe-area-inset-bottom)) + 28px);
   /* ---------- LIGHT — pasangan setara dari identitas v7 ---------- */
   --background: #f2f2f4;
   --foreground: #17171b;

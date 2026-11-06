@@ -217,7 +217,7 @@ export function QuranReader({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 60 * (animated ? 1 : 0) }}
       transition={{ duration: 0.24 * (animated ? 1 : 0), ease: "easeOut" }}
-      className="absolute inset-0 z-40 flex flex-col bg-tk-stage"
+      className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-tk-stage"
       role="dialog"
       aria-label={`Pembaca surah ${meta?.latin ?? ""}`}
     >
@@ -367,7 +367,7 @@ export function QuranReader({
       </header>
 
       {/* ---------- Isi ayat: kolom baca terpusat ---------- */}
-      <div ref={scrollRef} className="thin-scrollbar relative z-10 flex-1 overflow-y-auto px-4 pb-36 pt-5 sm:px-6">
+      <div ref={scrollRef} className="thin-scrollbar relative z-10 flex-1 overflow-y-auto px-4 pb-8 pt-5 sm:px-6">
         <div className="mx-auto max-w-[720px]">
           {loading ? (
             <div className="flex flex-col items-center gap-3 pt-24 text-center">
