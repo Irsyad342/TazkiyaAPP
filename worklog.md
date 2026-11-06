@@ -1487,3 +1487,20 @@ PrayerTickets. Hapus <p> petunjuk di PrayerPage.tsx (paragraf kondisional
 Jumat & sisanya dipertahankan), build lulus, push → Vercel live; verifikasi
 produksi: unduh 16 chunk JS beranda (mencakup view Sholat — "Salat Hari Ini"
 ada), string "Ketuk kartu salat"/"menyala oranye"/"berjamaah/mandiri" = 0.
+
+## Task 61 — Mood Tracker: animasi tekan premium + glow orange (2026-11-06)
+MoodSection.tsx saja (MoodFace/struktur grid 4+3/ukuran/ekspresi/mekanisme
+setMood tak disentuh). Tekan: whileTap 0.88 → pop spring keyframes scale
+[0.86,1.15,0.97,1.08] + rotate [-2.5,2,-0.8,0] (0.55s, times .38/.66);
+deselect spring mulus 1.08→1 (terukur 0.992 overshoot). Glow aktif: ring-2
+tk-accent + offset (transisi box-shadow 300ms) + ambient light
+rgba(255,90,0,.45/.22) dark rgba(217,75,10,.55)+rgba(255,154,82,.5) +
+InnerGlow overlay (inset peach #FFE0CC + orange, beda per tema) + ripple halo
+sekali-jalan (key remount per tekan, scale .92→1.38 fade). Label emphasis
+spring 1.06 + bold + transition-colors. Entrance staggered + settle rotate
+-3→0; whileHover 1.05/-2. Reduced-motion/settings.animations off: tanpa
+pop/halo/hover, ring+glow instan (teruji via saklar Profil). Build lulus;
+push → Vercel live; verifikasi produksi (login qa.mood.suio.20261106@gmail.
+com): bundle memuat keyframes (.86) & key halo-, pop terukur 1.086→1.05→
+1.072→1.08 dengan halo=3 children, light (Bahagia) & dark (Lelah) visual ok,
+tepat 1 radio terpilih, toast & refleksi utuh.
