@@ -178,44 +178,51 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
         <section aria-label="Mood check-in" className="animate-tk-fade-up mt-6 lg:col-span-5 lg:mt-0">
           <SectionHeader title="Mood Check-in" caption="Pilihanmu sepenuhnya milikmu" />
           <GlassCard className="p-4">
-            <div className="grid grid-cols-4 gap-2">
-              {MOODS.map((mo, i) => {
-                const active = activeMood === mo.id;
-                return (
-                  <m.button
-                    key={mo.id}
-                    type="button"
-                    aria-pressed={active}
-                    aria-label={`Mood ${mo.label}`}
-                    onClick={() => {
-                      setMoodSel(mo.id);
-                      setMood(today, mo.id);
-                    }}
-                    initial={motionOK ? { opacity: 0, scale: 0.6, y: 8 } : false}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ type: "spring", stiffness: 420, damping: 24, delay: motionOK ? i * 0.05 : 0 }}
-                    whileTap={motionOK ? { scale: 0.9 } : undefined}
-                    className="tap flex flex-col items-center gap-2 rounded-[1.2rem] px-1 py-3 transition-all"
-                  >
-                    <m.span
-                      aria-hidden
-                      animate={{ scale: motionOK && active ? 1.08 : 1 }}
-                      transition={{ type: "spring", stiffness: 420, damping: 20 }}
-                      className={cn(
-                        "flex rounded-[25%] transition-[box-shadow] duration-300",
-                        active
-                          ? "ring-2 ring-tk-accent light:shadow-[0_10px_20px_-8px_rgba(255,90,0,0.45)] dark:shadow-[0_10px_22px_-10px_rgba(255,90,0,0.4)]"
-                          : "light:shadow-[0_5px_12px_-6px_rgba(119,113,109,0.42)] light:ring-1 light:ring-[#2a2320]/[0.06] dark:shadow-[0_6px_14px_-8px_rgba(0,0,0,0.5)] dark:ring-1 dark:ring-white/[0.05]"
-                      )}
-                    >
-                      <MoodFace id={mo.id} className="h-[52px] w-[52px]" />
-                    </m.span>
-                    <span className={cn("text-[10px] font-bold leading-tight", active ? "text-tk-ink" : "text-tk-muted")}>
-                      {mo.label}
-                    </span>
-                  </m.button>
-                );
-              })}
+            <div role="radiogroup" aria-label="Pilih mood hari ini" className="flex flex-col gap-2.5">
+              {/* Baris 4 + 3 simetris di tengah — selaras dengan mood check-in Beranda; item 70px agar pas di kartu */}
+              {[MOODS.slice(0, 4), MOODS.slice(4)].map((row, r) => (
+                <div key={r} className="flex items-start justify-center gap-1">
+                  {row.map((mo, i) => {
+                    const active = activeMood === mo.id;
+                    const order = r * 4 + i;
+                    return (
+                      <m.button
+                        key={mo.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        aria-label={`Mood ${mo.label}`}
+                        onClick={() => {
+                          setMoodSel(mo.id);
+                          setMood(today, mo.id);
+                        }}
+                        initial={motionOK ? { opacity: 0, scale: 0.55, y: 8 } : false}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        transition={{ type: "spring", stiffness: 420, damping: 24, delay: motionOK ? order * 0.05 : 0 }}
+                        whileTap={motionOK ? { scale: 0.88 } : undefined}
+                        className="tap flex w-[70px] shrink-0 flex-col items-center gap-2 rounded-2xl px-1 py-2"
+                      >
+                        <m.span
+                          aria-hidden
+                          animate={{ scale: motionOK && active ? 1.08 : 1 }}
+                          transition={{ type: "spring", stiffness: 420, damping: 20 }}
+                          className={cn(
+                            "flex rounded-[25%] transition-[box-shadow] duration-300",
+                            active
+                              ? "ring-2 ring-tk-accent ring-offset-2 ring-offset-tk-panel light:shadow-[0_10px_22px_-8px_rgba(255,90,0,0.45)] dark:shadow-[0_10px_24px_-10px_rgba(255,90,0,0.4)]"
+                              : "light:shadow-[0_6px_14px_-6px_rgba(119,113,109,0.42)] light:ring-1 light:ring-[#2a2320]/[0.06] dark:shadow-[0_8px_18px_-10px_rgba(0,0,0,0.55)] dark:ring-1 dark:ring-white/[0.05]"
+                          )}
+                        >
+                          <MoodFace id={mo.id} className="h-14 w-14" />
+                        </m.span>
+                        <span className={cn("whitespace-nowrap text-[10.5px] leading-none", active ? "font-bold text-tk-ink" : "font-medium text-tk-muted")}>
+                          {mo.label}
+                        </span>
+                      </m.button>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
             <p className="mt-3 border-t border-tk-line pt-2.5 text-[10px] leading-relaxed text-tk-muted/80">
               Mood membantu memilih pengingat yang sesuai, bukan penilaian atau diagnosis psikologis.
