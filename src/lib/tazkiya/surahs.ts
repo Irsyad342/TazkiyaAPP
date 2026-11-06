@@ -138,5 +138,5 @@ export function getSurah(n: number): SurahMeta | undefined {
 export function surahLabel(n: number, showArabic: boolean = false): string {
   const s = getSurah(n);
   if (!s) return `Surah ${n}`;
-  return showArabic ? `${s.arabic} — ${s.latin}` : s.latin;
+  return showArabic ? `${s.arabic}, ${s.latin}` : s.latin;
 }

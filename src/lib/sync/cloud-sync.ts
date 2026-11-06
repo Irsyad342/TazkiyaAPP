@@ -67,7 +67,7 @@ export async function pushNow(): Promise<void> {
     useAuthStore.getState().setSyncError(null);
   } catch (err) {
     console.warn("[tazkiya-sync] dorongan tertunda:", err);
-    useAuthStore.getState().setSyncError("Sinkronisasi tertunda — akan dicoba ulang otomatis saat online.");
+    useAuthStore.getState().setSyncError("Sinkronisasi tertunda, akan dicoba ulang otomatis saat online.");
   }
 }
 
@@ -202,7 +202,7 @@ export async function startSync(uid: string): Promise<void> {
     }
   } catch (err) {
     console.warn("[tazkiya-sync] inisialisasi gagal:", err);
-    useAuthStore.getState().setSyncError("Tidak dapat menghubungi server — data tetap tersimpan di perangkat.");
+    useAuthStore.getState().setSyncError("Tidak dapat menghubungi server, data tetap tersimpan di perangkat.");
     setPhase("error");
   }
 
@@ -230,7 +230,7 @@ export async function resolveMigration(choice: "migrate" | "fresh" | "merge" | "
       } else {
         // "Mulai kosong": data lokal tidak dihapus — tersimpan di cadangan pra-login.
         useWorshipStore.getState().clearWorshipData();
-        toast.info("Akun dimulai dari kosong — salinan data lama tetap tersimpan di perangkat");
+        toast.info("Akun dimulai dari kosong, salinan data lama tetap tersimpan di perangkat");
       }
     } else {
       const cloud = await fetchCloudDoc(uid);
@@ -244,7 +244,7 @@ export async function resolveMigration(choice: "migrate" | "fresh" | "merge" | "
         toast.success("Data perangkat & akun digabungkan tanpa duplikat");
       } else if (choice === "cloud" && cloud) {
         applyCloud(cloud);
-        toast.info("Data akun dimuat — data perangkat tetap tersimpan sebagai cadangan");
+        toast.info("Data akun dimuat, data perangkat tetap tersimpan sebagai cadangan");
       }
     }
     setMigratedFlag(uid);
@@ -252,7 +252,7 @@ export async function resolveMigration(choice: "migrate" | "fresh" | "merge" | "
     setPhase("active");
   } catch (err) {
     console.warn("[tazkiya-sync] resolusi migrasi gagal:", err);
-    useAuthStore.getState().setSyncError("Gagal menyimpan ke akun — coba lagi.");
+    useAuthStore.getState().setSyncError("Gagal menyimpan ke akun, coba lagi.");
     setPhase("error");
   }
 }

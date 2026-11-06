@@ -67,7 +67,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
     }
     saveJournal(today, items, activeMood);
     setSavedAt(new Date().toISOString());
-    toast.success("Jurnal syukur tersimpan — terima kasih sudah merenung hari ini");
+    toast.success("Jurnal syukur tersimpan, terima kasih sudah merenung hari ini");
   };
 
   const historyDates = useMemo(
@@ -77,7 +77,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="space-y-6">
-      <SubPageHeader title="Jurnal Syukur" caption="Refleksi harian — tiga hal kecil yang layak disyukuri" onBack={onBack} />
+      <SubPageHeader title="Jurnal Syukur" caption="Refleksi harian, tiga hal kecil yang layak disyukuri" onBack={onBack} />
 
       <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
         {/* ---------- A. Refleksi hari ini ---------- */}
@@ -113,7 +113,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                       next[i] = e.target.value;
                       setItems(next);
                     }}
-                    placeholder={i === 0 ? "Hal pertama yang saya syukuri…" : i === 1 ? "Hal kedua yang saya syukuri…" : "Hal ketiga — yang kecil pun boleh…"}
+                    placeholder={i === 0 ? "Hal pertama yang saya syukuri…" : i === 1 ? "Hal kedua yang saya syukuri…" : "Hal ketiga, yang kecil pun boleh…"}
                     aria-label={`Hal ${i + 1} yang disyukuri`}
                     className="tk-field flex-1 resize-none py-3 leading-relaxed"
                   />
@@ -134,7 +134,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
             </button>
             <p className="mt-2.5 flex items-center justify-center gap-1.5 text-[10px] text-tk-muted/80">
               <Lock size={10} />
-              {savedAt ? "Tersimpan hari ini — kamu bisa mengeditnya kapan saja." : "Privat — hanya kamu yang bisa membacanya."}
+              {savedAt ? "Tersimpan hari ini, kamu bisa mengeditnya kapan saja." : "Privat, hanya kamu yang bisa membacanya."}
             </p>
           </GlassCard>
         </section>
@@ -175,7 +175,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
               })}
             </div>
             <p className="mt-3 border-t border-tk-line pt-2.5 text-[10px] leading-relaxed text-tk-muted/80">
-              Mood membantu memilih pengingat yang sesuai — bukan penilaian atau diagnosis psikologis.
+              Mood membantu memilih pengingat yang sesuai, bukan penilaian atau diagnosis psikologis.
             </p>
           </GlassCard>
         </section>
@@ -201,7 +201,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
             <div className="relative mt-4 flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() => void shareQuote(`"${hadith.text}"\n— ${hadith.source}`)}
+                onClick={() => void shareQuote(`"${hadith.text}"\n(${hadith.source})`)}
                 className="tap flex min-h-[40px] items-center gap-1.5 rounded-full gs-ink-btn px-4 text-[12px] font-bold"
               >
                 <Share2 size={14} /> Simpan / Bagikan
@@ -253,7 +253,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                               setItems(e.items);
                               setMoodSel(e.mood);
                               setSavedAt(e.savedAt);
-                              toast.info("Jurnal dimuat ke atas — ubah lalu simpan kembali");
+                              toast.info("Jurnal dimuat ke atas, ubah lalu simpan kembali");
                               // Konten aplikasi bergulir di dalam kontainer utama, bukan di window.
                               document.getElementById("konten-tazkiya")?.scrollTo({ top: 0, behavior: "smooth" });
                             }}
@@ -294,7 +294,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
 
       <p className="flex items-center justify-center gap-1.5 pb-1 text-center text-[10px] leading-relaxed text-tk-muted/60">
         <Lock size={10} />
-        Jurnal tersimpan di perangkat &amp; akunmu — tidak dikirim ke layanan analisis mana pun.
+        Jurnal tersimpan di perangkat &amp; akunmu, tidak dikirim ke layanan analisis mana pun.
       </p>
     </div>
   );

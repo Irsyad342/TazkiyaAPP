@@ -29,18 +29,18 @@ const NIAT_BAIK: string[] = [
 ];
 
 const SETELAH_SUBUH: string[] = [
-  "Duduk sejenak berdzikir setelah Subuh — keutamaannya besar (HR. Tirmidzi no. 586).",
+  "Duduk sejenak berdzikir setelah Subuh, keutamaannya besar (HR. Tirmidzi no. 586).",
   "Baca Ayat Kursi dan tiga surah perlindungan setelah Subuh sebagai pemelihara harimu.",
   "Tulis satu rencana terbaik untuk hari ini sebelum kesibukan dimulai.",
-  "Sempatkan sarat dan minum yang cukup — tubuh yang sehat membantu ibadah.",
-  "Salamkan orang tua atau keluargamu di pagi hari — awali hari dengan silaturahmi.",
+  "Sempatkan sarat dan minum yang cukup, tubuh yang sehat membantu ibadah.",
+  "Salamkan orang tua atau keluargamu di pagi hari, awali hari dengan silaturahmi.",
   "Istighfar tiga kali sebelum memulai aktivitas pagi.",
 ];
 
 const MOTIVASI: string[] = [
   "Amalan yang paling dicintai Allah adalah yang paling berkesinambungan, meskipun sedikit. (HR. Bukhari & Muslim)",
   "Sedikit yang konsisten jauh lebih berharga daripada banyak yang hanya sesekali.",
-  "Langkah kecil hari ini tetap berarti — pelan-pelan asal terus berjalan.",
+  "Langkah kecil hari ini tetap berarti, pelan-pelan asal terus berjalan.",
   "Setiap ayat yang kamu baca hari ini adalah cahaya untuk esokmu.",
   "Jantung yang tenang diraih melalui zikir yang terjaga.",
   "Jangan menunggu sempurna untuk memulai; mulailah agar menjadi semakin baik.",
@@ -49,7 +49,7 @@ const MOTIVASI: string[] = [
 
 const TARGET_KECIL: string[] = [
   "Baca satu halaman Al-Qur'an hari ini.",
-  "Sedekahkan satu tindakan baik — walau sederhana.",
+  "Sedekahkan satu tindakan baik, walau sederhana.",
   "Istighfar 10 kali sebelum tidur nanti.",
   "Sampaikan satu apresiasi tulus kepada orang di sekitarmu.",
   "Tunaikan satu salat di masjid atau berjamaah hari ini.",

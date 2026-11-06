@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Tazkiya",
-    short_name: "Tazkiya",
-    description: "Pelacak Ibadah Harian",
+    name: "SUIO: Sujud in Order",
+    short_name: "SUIO",
+    description: "Sujud in Order, pelacak ibadah harian",
     start_url: "/",
     display: "standalone",
     /* Identitas v7 (kanvas #1B1B1E) — bukan hijau lama. Chrome/Android

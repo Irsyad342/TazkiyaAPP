@@ -24,6 +24,7 @@ import { isOnboarded, markOnboarded, subscribeOnboarding, getOnboardedSnapshot, 
 import { useAuthStore } from "@/lib/auth/auth-store";
 import { initSyncBridge } from "@/lib/sync/cloud-sync";
 import { BottomNav, type SubPageId, type TabId } from "@/components/tazkiya/BottomNav";
+import { SuioMark } from "@/components/tazkiya/brand";
 import { AuthGate } from "@/components/tazkiya/AuthGate";
 import { HomePage } from "@/components/tazkiya/HomePage";
 import { QuranPage } from "@/components/tazkiya/QuranPage";
@@ -59,17 +60,17 @@ const ProgressPage = dynamic(() => import("@/components/tazkiya/ProgressPage").t
 });
 
 const TAB_TITLES: Record<TabId, string> = {
-  beranda: "Tazkiya — Beranda",
-  quran: "Tazkiya — Al-Qur'an",
-  sholat: "Tazkiya — Sholat",
-  progress: "Tazkiya — Progress",
-  profil: "Tazkiya — Profil",
+  beranda: "SUIO: Beranda",
+  quran: "SUIO: Al-Qur'an",
+  sholat: "SUIO: Sholat",
+  progress: "SUIO: Progress",
+  profil: "SUIO: Profil",
 };
 
 const SUBPAGE_TITLES: Record<SubPageId, string> = {
-  jurnal: "Tazkiya — Jurnal Syukur",
-  "zikir-doa": "Tazkiya — Zikir & Doa",
-  "rizq-amal": "Tazkiya — Rizq & Amal",
+  jurnal: "SUIO: Jurnal Syukur",
+  "zikir-doa": "SUIO: Zikir & Doa",
+  "rizq-amal": "SUIO: Rizq & Amal",
 };
 
 /* Deteksi runtime Capacitor (APK) tanpa dependensi langsung. */
@@ -170,6 +171,19 @@ export default function Page() {
     document.title = subpage ? SUBPAGE_TITLES[subpage] : TAB_TITLES[tab];
   }, [tab, subpage]);
 
+  /*
+   * Perbaikan v13: posisi gulir SELALU kembali ke atas saat berpindah tab
+   * atau membuka/menutup sub-halaman fitur (Rizq & Amal, Zikir & Doa,
+   * Jurnal Syukur). Tanpa ini, konten baru tampil pada posisi gulir lama
+   * sehingga halaman terasa "muncul dari bawah". Efek ini sengaja HANYA
+   * bergantung pada [tab, subpage] agar membuka sheet/dialog kecil
+   * (tasbih, target, pembaca) tidak mengganggu posisi gulir.
+   */
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    document.getElementById("konten-tazkiya")?.scrollTo({ top: 0, behavior: "instant" });
+  }, [tab, subpage]);
+
   // Tombol kembali perangkat (khusus APK/Capacitor).
   useEffect(() => {
     if (!capacitorNative()) return;
@@ -229,14 +243,12 @@ export default function Page() {
 
   if (!hydrated || !onboarded) {
     return (
-      <main className="flex min-h-dvh items-center justify-center bg-[#101013] light:bg-[#e8e8ec]" aria-label="Memuat Tazkiya">
+      <main className="flex min-h-dvh items-center justify-center bg-[#101013] light:bg-[#e8e8ec]" aria-label="Memuat SUIO">
         <div className="flex flex-col items-center gap-4">
-          <span className="animate-tk-pulse flex h-14 w-14 items-center justify-center rounded-[1.1rem] bg-tk-violet text-2xl font-bold text-white">
-            ت
-          </span>
+          <SuioMark size={56} glow className="animate-tk-pulse" />
           <div className="text-center">
-            <p className="text-[15px] font-bold tracking-[-0.01em] text-white light:text-[#17171b]">Tazkiya</p>
-            <p className="gs-overline mt-1.5">A Better Daily Journey</p>
+            <p className="text-[15px] font-bold tracking-[0.06em] text-white light:text-[#17171b]">SUIO</p>
+            <p className="gs-overline mt-1.5">Sujud in Order</p>
           </div>
         </div>
       </main>
@@ -247,20 +259,32 @@ export default function Page() {
     <LazyMotion features={domAnimation} strict>
       {/* Panggung luar (terlihat hanya di layar lebar): rona lebih pekat dari
           kanvas aplikasi agar kolom HP terbingkai jelas, bukan tampak salah. */}
-      <main className="relative min-h-dvh w-full bg-[#101013] light:bg-[#e8e8ec]" aria-label="Aplikasi Tazkiya">
-        {/* Kolom aplikasi — selalu selebar HP, di tengah, semua viewport. */}
+      <main className="relative min-h-dvh w-full bg-[#101013] light:bg-[#e8e8ec]" aria-label="Aplikasi SUIO">
+        {/* Kolom aplikasi, selalu selebar HP, di tengah, semua viewport. */}
         <div className="relative mx-auto min-h-dvh w-full max-w-[430px] bg-tk-stage desktop:shadow-[0_0_0_1px_var(--color-tk-line),0_40px_90px_-40px_rgba(0,0,0,0.6)]">
           <div
             id="konten-tazkiya"
             className="no-scrollbar relative z-10 mx-auto w-full px-4 pb-44 pt-[max(1.25rem,env(safe-area-inset-top))]"
           >
             <AnimatePresence mode="wait" initial={false}>
+              {/*
+                Transisi masuk halaman v13 (Bottom to Top Page Entrance):
+                konten halaman/tab baru dimulai SEDIKIT DI BAWAH posisi
+                akhirnya lalu naik halus ke posisi normal, dikombinasikan
+                dengan opacity. Ini transisi TAMPILAN HALAMAN (translateY
+                pada pembungkus), bukan memaksa konten menggulir dari bawah.
+                Saklar "Animasi transisi" nonaktif → tanpa gerakan (y: 0).
+              */}
               <m.div
                 key={subpage ?? tab}
-                initial={{ opacity: 0, y: 14 * (animations ? 1 : 0) }}
+                initial={{ opacity: 0, y: 56 * (animations ? 1 : 0) }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: animations ? -10 : 0 }}
-                transition={{ duration: 0.22 * (animations ? 1 : 0), ease: [0.22, 1, 0.36, 1] }}
+                exit={{ opacity: 0, y: animations ? -14 : 0 }}
+                transition={
+                  animations
+                    ? { duration: 0.34, ease: [0.22, 1, 0.36, 1] }
+                    : { duration: 0 }
+                }
               >
                 {subpage === null && tab === "beranda" && (
                   <HomePage
@@ -297,7 +321,7 @@ export default function Page() {
         {/* Gerbang akun: inisialisasi sesi + dialog keputusan data (migrasi/gabung). */}
         <AuthGate />
 
-        {/* Navigasi kapsul mengambang — satu-satunya navigasi, semua perangkat. */}
+        {/* Navigasi kapsul mengambang, satu-satunya navigasi, semua perangkat. */}
         <BottomNav
           active={tab}
           onChange={(t) => {

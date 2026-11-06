@@ -15,7 +15,7 @@ export const MOTIVATIONS: MotivationQuote[] = [
     source: "HR. Bukhari & Muslim",
   },
   { text: "Sedikit yang konsisten jauh lebih berharga daripada banyak yang hanya sesekali." },
-  { text: "Mulailah dari yang kecil hari ini — langkah kecil yang istiqamah membawa perubahan besar." },
+  { text: "Mulailah dari yang kecil hari ini, langkah kecil yang istiqamah membawa perubahan besar." },
   { text: "Jaga Subuh-mu, insya Allah Allah menjaga harimu." },
   { text: "Setiap ayat yang kamu baca hari ini adalah cahaya untuk esokmu." },
   { text: "Jantung yang tenang diraih melalui zikir yang terjaga." },

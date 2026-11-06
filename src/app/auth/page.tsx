@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/lib/auth/auth-store";
 import { initSyncBridge } from "@/lib/sync/cloud-sync";
+import { SuioMark } from "@/components/tazkiya/brand";
 import { cn } from "@/lib/utils";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -73,7 +74,7 @@ function AuthForm() {
     const fe: Record<string, string> = {};
     if (mode === "register" && name.trim().length < 2) fe.name = "Nama minimal 2 huruf.";
     if (!email.trim()) fe.email = "Email wajib diisi.";
-    else if (!EMAIL_RE.test(email.trim())) fe.email = "Format email tidak valid — contoh: nama@email.com";
+    else if (!EMAIL_RE.test(email.trim())) fe.email = "Format email tidak valid, contoh: nama@email.com";
     if (!resetMode || mode === "register") {
       if (!password) fe.password = "Kata sandi wajib diisi.";
       else if (password.length < 8) fe.password = "Kata sandi minimal 8 karakter.";
@@ -132,7 +133,7 @@ function AuthForm() {
     setError(null);
     setInfo(null);
     if (!EMAIL_RE.test(email.trim())) {
-      setFieldErrors({ email: "Format email tidak valid — contoh: nama@email.com" });
+      setFieldErrors({ email: "Format email tidak valid, contoh: nama@email.com" });
       return;
     }
     setFieldErrors({});
@@ -163,7 +164,7 @@ function AuthForm() {
   const subtitle = resetMode
     ? "Buat kata sandi baru untuk akunmu"
     : forgotOpen
-      ? "Masukkan email akunmu — tautan atur ulang akan dikirim"
+      ? "Masukkan email akunmu, tautan atur ulang akan dikirim"
       : mode === "login"
         ? "Masuk untuk melanjutkan perjalanan ibadahmu"
         : "Catat ibadah dengan akun yang aman milikmu sendiri";
@@ -179,15 +180,13 @@ function AuthForm() {
           Kembali ke aplikasi
         </Link>
 
-        {/* Kartu putih bersih — satu-satunya permukaan berbayang di halaman */}
+        {/* Kartu putih bersih, satu-satunya permukaan berbayang di halaman */}
         <div className="glass rounded-[1.75rem] p-6 shadow-[0_24px_64px_-24px_rgba(34,33,42,0.16)]">
           {/* Logo */}
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] bg-tk-violet text-2xl font-bold text-white">
-              ت
-            </div>
-            <h1 className="mt-3 text-[22px] font-extrabold tracking-[-0.02em] text-tk-ink">Tazkiya</h1>
-            <p className="gs-overline mt-1">A Better Daily Journey</p>
+            <SuioMark size={56} glow />
+            <h1 className="mt-3 font-display text-[22px] font-extrabold tracking-[0.06em] text-tk-ink">SUIO</h1>
+            <p className="gs-overline mt-1">Sujud in Order</p>
           </div>
 
           <div className="mt-6 border-t border-tk-line pt-5">
@@ -454,7 +453,7 @@ function AuthForm() {
         </div>
 
         <p className="mt-5 text-center text-[10.5px] leading-relaxed text-tk-muted/85">
-          Data ibadah tersimpan terpisah untuk setiap akun — hanya kamu yang dapat membacanya. Kata sandi tidak pernah
+          Data ibadah tersimpan terpisah untuk setiap akun, hanya kamu yang dapat membacanya. Kata sandi tidak pernah
           disimpan dalam bentuk teks biasa.
         </p>
       </div>

@@ -78,6 +78,7 @@ import { recordedDateList, reviewActivityDays } from "@/lib/tazkiya/stats";
 import { formatGregorian, isFriday, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
 import { Chip, GroupList, GroupRow, SectionHeader } from "./ui-bits";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
+import { SuioMark } from "./brand";
 import { cn } from "@/lib/utils";
 
 const THEME_OPTIONS: { id: ThemeMode; label: string; hint: string; bg: string; dot: string }[] = [
@@ -259,7 +260,7 @@ export function ProfilePage({
     toast.success(
       next.label
         ? firstTime
-          ? `Lokasi otomatis aktif — ${next.label}`
+          ? `Lokasi otomatis aktif, ${next.label}`
           : `Lokasi diperbarui: ${next.label}`
         : firstTime
           ? "Lokasi otomatis aktif"
@@ -270,7 +271,7 @@ export function ProfilePage({
 
   /** Pembaruan posisi otomatis saat berpindah: berjalan selama halaman ini terlihat (hemat baterai). */
   useEffect(() => {
-    if (!geoActive) return; // belum ada izin/posisi — tunggu tombol lokasi ditekan
+    if (!geoActive) return; // belum ada izin/posisi, tunggu tombol lokasi ditekan
     let stopWatch: (() => void) | null = null;
     const start = () => {
       if (stopWatch) return;
@@ -376,7 +377,7 @@ export function ProfilePage({
             ) : (
               <div className="flex items-center gap-1.5">
                 <p className="truncate text-[24px] font-extrabold tracking-[-0.025em] text-tk-ink">{settings.name}</p>
-                <BadgeCheck size={17} className="shrink-0 text-tk-violet" aria-label="Anggota Tazkiya" />
+                <BadgeCheck size={17} className="shrink-0 text-tk-violet" aria-label="Anggota SUIO" />
                 <button
                   type="button"
                   aria-label="Ubah nama"
@@ -400,7 +401,7 @@ export function ProfilePage({
         </div>
       </section>
 
-      {/* ---------- Statistik personal — TANPA kartu ---------- */}
+      {/* ---------- Statistik personal, TANPA kartu ---------- */}
       <section aria-label="Statistik personal" className="animate-tk-fade-up">
         <div className="grid grid-cols-3">
           {[
@@ -465,13 +466,13 @@ export function ProfilePage({
                   {d.label}
                 </span>
                 <span className="sr-only">
-                  {d.label} — {d.status === "done" ? "terlaksana" : d.status === "missed" ? "terlewat" : "belum dicatat"}
+                  {d.label}, {d.status === "done" ? "terlaksana" : d.status === "missed" ? "terlewat" : "belum dicatat"}
                 </span>
               </div>
             ))}
           </div>
 
-          {/* Progress bar — terisi kiri ke kanan sesuai jumlah salat terlaksana */}
+          {/* Progress bar, terisi kiri ke kanan sesuai jumlah salat terlaksana */}
           <div
             className="tk-beam mt-4 h-1.5"
             role="img"
@@ -483,7 +484,7 @@ export function ProfilePage({
           {focusMissed > 0 ? (
             <p className="mt-2.5 flex items-center gap-1.5 text-[11px] leading-snug text-tk-muted">
               <Minus size={12} className="shrink-0 text-tk-amber" aria-hidden />
-              {focusMissed} salat terlewat hari ini — tidak apa-apa, besok kesempatan baru.
+              {focusMissed} salat terlewat hari ini, tidak apa-apa, besok kesempatan baru.
             </p>
           ) : null}
 
@@ -552,7 +553,7 @@ export function ProfilePage({
                 {syncPhase === "error" ? (
                   <p className="mt-3 flex items-start gap-1.5 rounded-xl bg-tk-amber-soft px-3 py-2 text-[11px] leading-relaxed text-tk-amber">
                     <Info size={13} className="mt-0.5 shrink-0" />
-                    {syncError ?? "Gangguan sinkronisasi — data tetap tersimpan di perangkat dan akan dicoba ulang."}
+                    {syncError ?? "Gangguan sinkronisasi, data tetap tersimpan di perangkat dan akan dicoba ulang."}
                   </p>
                 ) : null}
               </div>
@@ -580,7 +581,7 @@ export function ProfilePage({
                     <AlertDialogAction
                       onClick={() => {
                         void signOut();
-                        toast.info("Kamu telah keluar — data akunmu tersimpan aman.");
+                        toast.info("Kamu telah keluar, data akunmu tersimpan aman.");
                       }}
                     >
                       Ya, keluar
@@ -601,7 +602,7 @@ export function ProfilePage({
                       perangkat lain.
                     </p>
                     <p className="mt-2 text-[10.5px] leading-relaxed text-tk-muted/80">
-                      Punya catatan lama di perangkat ini? Setelah masuk, kamu akan ditawari memindahkannya ke akun —
+                      Punya catatan lama di perangkat ini? Setelah masuk, kamu akan ditawari memindahkannya ke akun,
                       tidak ada data yang hilang.
                     </p>
                   </div>
@@ -657,7 +658,7 @@ export function ProfilePage({
           <GroupRow
             icon={Bell}
             title="Pengingat Salat"
-            caption={settings.remindersEnabled ? "Aktif — preferensi waktu tersimpan" : "Nonaktif"}
+            caption={settings.remindersEnabled ? "Aktif, preferensi waktu tersimpan" : "Nonaktif"}
             onClick={() => togglePanel("pengingat")}
             control
           >
@@ -669,7 +670,7 @@ export function ProfilePage({
           <GroupRow
             icon={LocateFixed}
             title="Lokasi & Jadwal"
-            caption={settings.geo ? (settings.geo.label ?? "Koordinat perangkat") : "Otomatis dari GPS — belum aktif"}
+            caption={settings.geo ? (settings.geo.label ?? "Koordinat perangkat") : "Otomatis dari GPS, belum aktif"}
             onClick={() => togglePanel("lokasi")}
             control
           >
@@ -752,12 +753,12 @@ export function ProfilePage({
                               const statusText =
                                 d.status === "done"
                                   ? d.kind === "berjamaah"
-                                    ? "Dilaksanakan — berjamaah"
+                                    ? "Dilaksanakan, berjamaah"
                                     : d.kind === "mandiri"
-                                      ? "Dilaksanakan — mandiri"
+                                      ? "Dilaksanakan, mandiri"
                                       : "Dilaksanakan"
                                   : d.status === "missed"
-                                    ? `Tidak dilaksanakan${d.reason ? ` — ${missReasonLabel(d.reason)}` : ""}${
+                                    ? `Tidak dilaksanakan${d.reason ? `, ${missReasonLabel(d.reason)}` : ""}${
                                         d.reason === "lainnya" && d.reasonText ? `: ${d.reasonText}` : ""
                                       }`
                                     : "Belum dicatat";
@@ -816,7 +817,7 @@ export function ProfilePage({
                 {autoTimes ? (
                   <p className="flex items-start gap-1.5 rounded-xl bg-tk-lavender px-3 py-2 text-[11px] leading-relaxed text-tk-violet">
                     <CalendarClock size={13} className="mt-0.5 shrink-0" />
-                    Waktu di bawah otomatis dari GPS ({autoMethod?.label}) — pengingat mengikuti jadwal daerahmu.
+                    Waktu di bawah otomatis dari GPS ({autoMethod?.label}), pengingat mengikuti jadwal daerahmu.
                   </p>
                 ) : null}
                 {PRAYERS.map((p) => {
@@ -873,7 +874,7 @@ export function ProfilePage({
                   <div className="min-w-0">
                     <p className="text-[13.5px] font-medium text-tk-ink">Lokasi otomatis (GPS)</p>
                     <p className="truncate text-[11px] leading-snug text-tk-muted">
-                      {settings.geo ? (settings.geo.label ?? "Koordinat perangkat") : "Belum aktif — butuh izin lokasi"}
+                      {settings.geo ? (settings.geo.label ?? "Koordinat perangkat") : "Belum aktif, butuh izin lokasi"}
                     </p>
                   </div>
                 </div>
@@ -902,7 +903,7 @@ export function ProfilePage({
                   <div className="min-w-0">
                     <p className="text-[13px] font-medium text-tk-ink">Pembaruan saat berpindah</p>
                     <p className="text-[10.5px] leading-snug text-tk-muted">
-                      Posisi mengikuti kamu otomatis — hanya saat aplikasi terlihat, hemat baterai
+                      Posisi mengikuti kamu otomatis, hanya saat aplikasi terlihat, hemat baterai
                     </p>
                   </div>
                   <AutoBadge />
@@ -961,14 +962,14 @@ export function ProfilePage({
                 </div>
               ) : (
                 <p className="mt-2.5 rounded-xl bg-tk-lavender px-3 py-2 text-[11px] leading-relaxed text-tk-violet">
-                  Aktifkan lokasi dengan tombol di atas — jadwal salat, pengingat, dan Beranda langsung menyesuaikan daerahmu.
+                  Aktifkan lokasi dengan tombol di atas, jadwal salat, pengingat, dan Beranda langsung menyesuaikan daerahmu.
                 </p>
               )}
 
               <p className="mt-2.5 flex items-start gap-1.5 text-[10.5px] leading-relaxed text-tk-muted/85">
                 <Info size={12} className="mt-0.5 shrink-0" />
                 Izin lokasi hanya diminta saat tombol lokasi pertama kali dipakai. Koordinat disimpan di perangkat dan
-                hanya dipakai untuk nama kota serta perhitungan jadwal salat — tidak dikirim ke server Tazkiya.
+                hanya dipakai untuk nama kota serta perhitungan jadwal salat, tidak dikirim ke server SUIO.
               </p>
             </div>
           ) : null}
@@ -979,7 +980,7 @@ export function ProfilePage({
       <section id="tazkiya-preferensi" aria-label="Preferensi aplikasi" className="animate-tk-fade-up">
         <SectionHeader title="Preferensi" caption="Sesuaikan tampilan dan interaksi" />
         <GroupList ariaLabel="Preferensi tampilan">
-          {/* Tema — pilihan inline dalam satu baris */}
+          {/* Tema, pilihan inline dalam satu baris */}
           <div className="px-4 py-4">
             <div className="flex items-center gap-3.5">
               <Droplets size={18} strokeWidth={1.8} className="shrink-0 text-tk-muted" />
@@ -1070,9 +1071,9 @@ export function ProfilePage({
         <SectionHeader title="Tentang" />
         <GroupList ariaLabel="Tentang aplikasi">
           <div className="flex items-center gap-3.5 px-4 py-4">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.85rem] bg-tk-violet text-base font-bold text-white">ت</span>
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center"><SuioMark size={40} /></span>
             <div className="flex-1">
-              <p className="text-[14px] font-bold text-tk-ink">Tazkiya — Pelacak Ibadah Harian</p>
+              <p className="text-[14px] font-bold text-tk-ink">SUIO: Pelacak Ibadah Harian</p>
               <p className="text-[11px] text-tk-muted">Versi 5.0.0 (prototipe web) · Data lokal</p>
             </div>
             <Chip className="bg-tk-lavender text-tk-violet">v5.0.0</Chip>
@@ -1080,7 +1081,7 @@ export function ProfilePage({
         </GroupList>
         <p className="mt-3 flex items-center gap-1.5 text-[11.5px] leading-relaxed text-tk-muted">
           <Check size={13} className="shrink-0 text-tk-violet" aria-hidden />
-          Terus bertumbuh dalam istiqamah — satu langkah kecil setiap hari.
+          Terus bertumbuh dalam istiqamah, satu langkah kecil setiap hari.
         </p>
       </section>
 
@@ -1100,8 +1101,8 @@ export function ProfilePage({
             if (!editingPrayer) return;
             setPrayerRecord(editingPrayer.date, editingPrayer.meta.id, detail);
             const label = editingPrayer.meta.fullName ?? `Salat ${editingPrayer.meta.label}`;
-            if (detail?.status === "done") toast.success(`${label} diperbarui — tercatat dilaksanakan`);
-            else if (detail?.status === "missed") toast.info(`${label} diperbarui — dicatat tidak dilaksanakan`);
+            if (detail?.status === "done") toast.success(`${label} diperbarui, tercatat dilaksanakan`);
+            else if (detail?.status === "missed") toast.info(`${label} diperbarui, dicatat tidak dilaksanakan`);
             else toast.info(`Catatan ${label} dihapus`);
           }}
         />

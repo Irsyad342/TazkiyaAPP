@@ -144,9 +144,9 @@ export function QuranReader({
    */
   const finishSession = useCallback(() => {
     if (recordedRef.current) return;
-    if (Date.now() - sessionStartAt.current < 1200) return; // buka-tutup kilat — abaikan
+    if (Date.now() - sessionStartAt.current < 1200) return; // buka-tutup kilat, abaikan
     const d = dataRef.current;
-    if (!d) return; // teks tak termuat (error/offline) — jangan mengarang progres
+    if (!d) return; // teks tak termuat (error/offline), jangan mengarang progres
     recordedRef.current = true;
     commitLastRead();
     const from = Math.max(1, Math.min(sessionStart, minSeenRef.current));
@@ -169,7 +169,7 @@ export function QuranReader({
       auto: true,
     });
     toast.success(
-      `Tercatat otomatis: ${meta?.latin ?? "Surah"} ${from}${to > from ? `–${to}` : ""} · ${verses} ayat${pages > 1 ? ` · ${pages} halaman` : ""}`
+      `Tercatat otomatis: ${meta?.latin ?? "Surah"} ${from}${to > from ? `-${to}` : ""} · ${verses} ayat${pages > 1 ? ` · ${pages} halaman` : ""}`
     );
   }, [surah, sessionStart, commitLastRead, saveBookmark, addQuranProgress, meta?.latin]);
 
@@ -359,7 +359,7 @@ export function QuranReader({
               </button>
             </div>
             <p className="text-[10.5px] leading-relaxed text-tk-muted">
-              Bacaan dicatat otomatis saat pembaca ditutup — dari ayat awal sampai ayat terakhir yang kamu baca — lalu
+              Bacaan dicatat otomatis saat pembaca ditutup, dari ayat awal sampai ayat terakhir yang kamu baca, lalu
               penanda ikut berpindah. Semua pengaturan juga tersimpan otomatis di perangkat Anda.
             </p>
           </div>
@@ -463,7 +463,7 @@ export function QuranReader({
                 );
               })}
               <p className="pb-2 pt-3 text-center text-[10.5px] text-tk-muted">
-                Sumber: AlQuran Cloud — teks Uthmani (Tanzil) &amp; terjemahan Kemenag RI
+                Sumber: AlQuran Cloud, teks Uthmani (Tanzil) &amp; terjemahan Kemenag RI
               </p>
             </>
           ) : null}
@@ -474,7 +474,7 @@ export function QuranReader({
       <div className="glass-strong relative z-20 rounded-none border-0 border-t border-tk-line px-4 pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2">
         <div className="mx-auto flex max-w-[760px] items-center justify-between gap-3">
           <p className="tnum text-[11px] font-semibold text-tk-muted">
-            Ayat <span className="font-bold text-tk-ink">{currentAyah}</span> dari {meta?.verses ?? "—"}
+            Ayat <span className="font-bold text-tk-ink">{currentAyah}</span> dari {meta?.verses ?? "0"}
           </p>
           <p className="truncate text-[10px] text-tk-muted/80">Progres bacaan tercatat otomatis saat ditutup</p>
         </div>

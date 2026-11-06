@@ -218,7 +218,7 @@ export function TasbihSheet({
             type="button"
             onClick={() => {
               const n = commitZikirToDay(todayKey(), slot);
-              if (n === 0) toast.error("Hitungan masih 0 — berzikir dulu ya");
+              if (n === 0) toast.error("Hitungan masih 0, berzikir dulu ya");
               else toast.success(`${n.toLocaleString("id-ID")} zikir ditambahkan ke catatan harian`);
             }}
             className="tap flex h-12 items-center justify-center gap-2 rounded-full gs-ink-btn px-5 font-display text-sm font-bold"

@@ -119,7 +119,7 @@ function TodayTab({
   return (
     <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
       <div className="space-y-7 lg:col-span-7">
-        {/* Judul tanggal besar — gaya "Manage Task" */}
+        {/* Judul tanggal besar, gaya "Manage Task" */}
         <header className="animate-tk-fade-up">
           <p className="flex items-center gap-1.5 text-[24px] font-bold tracking-[-0.02em] text-tk-ink">
             {dateLabel}
@@ -141,7 +141,7 @@ function TodayTab({
           </p>
         </header>
 
-        {/* Daftar salat — ketuk baris untuk mencatat */}
+        {/* Daftar salat, ketuk baris untuk mencatat */}
         <section aria-label="Salat hari ini" className="animate-tk-fade-up">
           <div className="mb-2.5 flex items-end justify-between gap-3 px-0.5">
             <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Salat Hari Ini</h2>
@@ -158,7 +158,7 @@ function TodayTab({
             onRecord={onRecord}
           />
           <p className="mt-2 px-1 text-[10.5px] leading-relaxed text-tk-muted">
-            Ketuk blok salat pada timeline zigzag untuk mencatat status, cara (berjamaah/mandiri), dan waktunya — lima
+            Ketuk blok salat pada timeline zigzag untuk mencatat status, cara (berjamaah/mandiri), dan waktunya, lima
             waktu terlihat serentak tanpa menggulir menyamping.
           </p>
           {friday ? (
@@ -171,10 +171,10 @@ function TodayTab({
         </section>
       </div>
 
-      {/* Ibadah sunah yang dilacak — daftar baris minimal */}
+      {/* Ibadah sunah yang dilacak, daftar baris minimal */}
       {extrasList.length > 0 ? (
         <section aria-label="Ibadah sunah" className="mt-8 lg:col-span-5 lg:mt-0">
-          <SectionHeader title="Ibadah Sunah" caption="Pelengkap hari ini — sedekah juga tersedia di Rizq & Amal" />
+          <SectionHeader title="Ibadah Sunah" caption="Pelengkap hari ini, sedekah juga tersedia di Rizq & Amal" />
           <div className="glass overflow-hidden rounded-[1.5rem]">
             {extrasList.map(({ id, label, caption }, i) => {
               const Icon = EXTRA_ICONS[id];
@@ -297,7 +297,7 @@ function PrayerZigzag({
       {/* Sumbu vertikal putus-putus di tengah panel */}
       <span aria-hidden className="absolute left-1/2 top-4 bottom-4 -translate-x-1/2 border-l border-dashed border-tk-line" />
 
-      {/* Penanda waktu berjalan — bergerak di antara dua salat sesuai jam sekarang */}
+      {/* Penanda waktu berjalan, bergerak di antara dua salat sesuai jam sekarang */}
       {nowOffset !== null ? (
         <div aria-hidden className="absolute left-1/2 z-20 -translate-x-1/2 -translate-y-1/2" style={{ top: `calc(6px + ${nowOffset.toFixed(1)}px)` }}>
           <span className="absolute left-1/2 top-1/2 h-[2px] w-9 -translate-x-1/2 -translate-y-1/2 rounded-full bg-tk-violet/45" />
@@ -362,14 +362,14 @@ function PrayerZigzag({
             <button
               type="button"
               onClick={() => onRecord(p)}
-              aria-label={`Catat ${p.label} pukul ${time} — ${statusShort}`}
+              aria-label={`Catat ${p.label} pukul ${time}, ${statusShort}`}
               className={cn(
                 "tap flex w-full items-stretch overflow-hidden rounded-xl text-left transition-colors",
                 isDone ? "bg-tk-panel-strong" : isMissed ? "bg-tk-panel-strong/80" : "border border-tk-line bg-tk-panel/70",
                 isNext && !isDone && "border-tk-violet/70"
               )}
             >
-              {/* Bar status kiri — ORANGE bila dilaksanakan */}
+              {/* Bar status kiri, ORANGE bila dilaksanakan */}
               <span aria-hidden className={cn("w-[3px] shrink-0", isDone ? "bg-tk-violet" : isMissed ? "bg-tk-amber" : "bg-tk-line-strong")} />
               <span className="flex min-w-0 flex-1 items-center gap-2 px-2 py-2.5">
                 <span
@@ -548,7 +548,7 @@ function MonthTab({ today }: { today: string }) {
       </GlassCard>
 
       <p className="px-1 text-[10.5px] leading-relaxed text-tk-muted">
-        Tanggal tanpa catatan tidak dihitung sebagai salat yang terlewat — ia hanya belum mempunyai catatan. Ketuk tanggal
+        Tanggal tanpa catatan tidak dihitung sebagai salat yang terlewat, ia hanya belum mempunyai catatan. Ketuk tanggal
         untuk melihat detailnya.
       </p>
 
@@ -587,7 +587,7 @@ function QadaTab({ today }: { today: string }) {
       return;
     }
     setFormNote("");
-    toast.success("Ditambahkan ke daftar qada — pelan-pelan, satu per satu");
+    toast.success("Ditambahkan ke daftar qada, pelan-pelan, satu per satu");
   };
 
   const grouped = PRAYER_IDS.map((id) => ({ id, items: pending.filter((q) => q.prayer === id) })).filter((g) => g.items.length > 0);
@@ -595,16 +595,16 @@ function QadaTab({ today }: { today: string }) {
   return (
     <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
       <div className="space-y-8 lg:col-span-7">
-        {/* Ringkasan — kartu ORANGE (gaya kartu oranye referensi) */}
+        {/* Ringkasan, kartu ORANGE (gaya kartu oranye referensi) */}
         <section aria-label="Ringkasan qada" className="animate-tk-fade-up glass-hero rounded-[1.4rem] p-5 sm:p-6">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/75">Qada — salat yang ingin dimakbulkan</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/75">Qada, salat yang ingin dimakbulkan</p>
           <p className="gs-display mt-3.5 text-[44px] font-bold leading-none text-white">
             {pending.length} <span className="text-[14px] font-bold text-white/80">belum selesai</span>
           </p>
           <p className="mt-2.5 text-[12.5px] leading-relaxed text-white/90">
             {completedThisMonth > 0
               ? `Bulan ini kamu sudah menyelesaikan ${completedThisMonth} qada. Terus bertumbuh.`
-              : "Pelan-pelan, satu per satu — tanpa menghakimi diri."}
+              : "Pelan-pelan, satu per satu, tanpa menghakimi diri."}
           </p>
           <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-white/25">
             <div className="h-full rounded-full bg-white transition-all" style={{ width: `${Math.min(100, completedThisMonth * 12)}%` }} />
@@ -667,7 +667,7 @@ function QadaTab({ today }: { today: string }) {
       </div>
 
       <div className="mt-8 space-y-8 lg:col-span-5 lg:mt-0">
-        {/* Pengingat hadis — blok editorial tanpa kartu */}
+        {/* Pengingat hadis, blok editorial tanpa kartu */}
         <section aria-label="Hadis tentang qada">
           <p className="gs-overline">{HADITH_QADA.tag}</p>
           <p className="quran-arabic mt-3.5 text-right text-[20px] leading-[1.95] text-tk-ink">{HADITH_QADA.arabic}</p>
@@ -675,7 +675,7 @@ function QadaTab({ today }: { today: string }) {
           <p className="mt-2.5 text-[11px] font-semibold text-tk-accent">{HADITH_QADA.source}</p>
         </section>
 
-        {/* Tambah manual — formulir gaya referensi kanan: label tegas + input gelap */}
+        {/* Tambah manual, formulir gaya referensi kanan: label tegas + input gelap */}
         <section aria-label="Tambah qada manual">
           <SectionHeader title="Tambah Catatan Qada" caption="Isi manual salat yang ingin kamu qada" />
           <GlassCard className="space-y-3.5 p-4">
@@ -804,7 +804,7 @@ export function PrayerPage() {
       if (opts?.addToQada) {
         const rec = addQada(meta.id, today);
         setMotivation({ variant: "missed", prayer: fullName });
-        if (!rec) toast.info("Catatan qada untuk salat ini sudah ada — tidak diduplikasi");
+        if (!rec) toast.info("Catatan qada untuk salat ini sudah ada, tidak diduplikasi");
       } else {
         setMotivation({ variant: "missed", prayer: fullName });
       }

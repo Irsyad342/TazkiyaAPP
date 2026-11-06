@@ -20,7 +20,7 @@
 import type { PrayerCalcMethod, PrayerId, Settings } from "./types";
 
 export const PRAYER_METHOD_OPTIONS: { id: PrayerCalcMethod; label: string; note: string }[] = [
-  { id: "kemenag", label: "Kemenag RI", note: "20°/18° — standar Indonesia" },
+  { id: "kemenag", label: "Kemenag RI", note: "20°/18°, standar Indonesia" },
   { id: "mwl", label: "Liga Muslim Dunia", note: "18°/17°" },
   { id: "egypt", label: "Otoritas Mesir", note: "19,5°/17,5°" },
   { id: "isna", label: "ISNA (Amerika Utara)", note: "15°/15°" },

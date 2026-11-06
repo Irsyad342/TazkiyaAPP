@@ -48,7 +48,7 @@ export const HADITHS: Hadith[] = [
     tag: "Untuk hari yang melelahkan",
     arabic:
       "الْمُؤْمِنُ الْقَوِيُّ خَيْرٌ وَأَحَبُّ إِلَى اللَّهِ مِنَ الْمُؤْمِنِ الضَّعِيفِ، وَفِي كُلٍّ خَيْرٌ، احْرِصْ عَلَى مَا يَنْفَعُكَ، وَاسْتَعِنْ بِاللَّهِ وَلَا تَعْجِزْ",
-    text: "Mukmin yang kuat lebih baik dan lebih dicintai Allah daripada mukmin yang lemah. Pada setiap hal ada kebaikan — bersemangatlah untuk hal yang bermanfaat bagimu, mohonlah pertolongan kepada Allah, dan jangan engkau lemah.",
+    text: "Mukmin yang kuat lebih baik dan lebih dicintai Allah daripada mukmin yang lemah. Pada setiap hal ada kebaikan, bersemangatlah untuk hal yang bermanfaat bagimu, mohonlah pertolongan kepada Allah, dan jangan engkau lemah.",
     source: "HR. Muslim no. 2664",
     moods: ["lelah", "campur-aduk"],
   },

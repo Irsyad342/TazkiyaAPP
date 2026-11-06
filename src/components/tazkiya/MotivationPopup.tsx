@@ -36,7 +36,7 @@ const MESSAGES: Record<MotivationVariant, { title: string; body: string[]; butto
     body: [
       "Satu kewajiban sudah kamu jaga. Yuk, lanjutkan ikhtiar menjaga sholat berikutnya.",
       "Alhamdulillah, salat mandiri ini tetap bernilai di sisi Allah. Semoga hatimu semakin dekat dengan masjid.",
-      "Syukur, satu salat tercatat hari ini. Pelan-pelan asal konsisten — itulah inti istiqamah.",
+      "Syukur, satu salat tercatat hari ini. Pelan-pelan asal konsisten, itulah inti istiqamah.",
     ],
     button: "Alhamdulillah",
   },

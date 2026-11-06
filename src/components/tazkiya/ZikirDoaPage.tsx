@@ -91,7 +91,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
         ) : null}
       </div>
 
-      {/* Lingkaran hitung besar — ketuk untuk menambah */}
+      {/* Lingkaran hitung besar, ketuk untuk menambah */}
       <m.button
         type="button"
         onClick={count}
@@ -114,7 +114,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
             style={{ transition: "stroke-dasharray 0.5s cubic-bezier(0.22, 1, 0.36, 1)" }}
           />
         </svg>
-        {/* titik lime di ujung busur — aksen tunggal */}
+        {/* titik lime di ujung busur, aksen tunggal */}
         {pct > 2 && pct < 100 ? (
           <span
             aria-hidden
@@ -170,7 +170,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
           type="button"
           onClick={() => {
             const n = commitZikirToDay(todayKey(), "harian");
-            if (n === 0) toast.error("Hitungan masih 0 — berzikir dulu ya");
+            if (n === 0) toast.error("Hitungan masih 0, berzikir dulu ya");
             else toast.success(`${n.toLocaleString("id-ID")} zikir ditambahkan ke catatan harian`);
           }}
           className="tap flex h-12 items-center justify-center gap-2 rounded-full gs-ink-btn px-5 text-[13.5px] font-bold"
@@ -250,7 +250,7 @@ function ZikirSetCard({ set, onOpenTasbih }: { set: ZikirSet; onOpenTasbih: (slo
               onClick={() => onOpenTasbih(set.slot)}
               className="tap flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-tk-lavender text-[13px] font-bold text-tk-violet"
             >
-              <CircleDot size={15} /> Buka tasbih — {set.title.toLowerCase()}
+              <CircleDot size={15} /> Buka tasbih, {set.title.toLowerCase()}
             </button>
             <p className="mt-1.5 text-center text-[9.5px] text-tk-muted/80">
               Hitungan yang disimpan akan tercatat sebagai {SLOT_LABEL[set.slot].toLowerCase()}.
@@ -311,7 +311,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
 
   return (
     <div className="space-y-6">
-      <SubPageHeader title="Zikir & Doa" caption="Pengingat hati — pagi, petang, dan sepanjang hari" onBack={onBack} />
+      <SubPageHeader title="Zikir & Doa" caption="Pengingat hati, pagi, petang, dan sepanjang hari" onBack={onBack} />
 
       <SegmentedTabs
         ariaLabel="Bagian zikir dan doa"
@@ -326,7 +326,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
       {tab === "zikir" ? (
         <div key="zikir" className="tk-fade-in lg:grid lg:grid-cols-12 lg:gap-x-8">
           <div className="space-y-9 lg:col-span-5">
-            {/* Penghitung — fokus visual */}
+            {/* Penghitung, fokus visual */}
             <TasbihCounter onOpenFull={() => onOpenTasbih("harian")} />
 
             {/* Riwayat zikir */}
@@ -336,7 +336,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
                 <EmptyState
                   icon={<History size={18} />}
                   title="Belum ada sesi zikir"
-                  caption="Berzikir lewat penghitung di atas, lalu tekan Simpan Harian — sesi akan tercatat di sini."
+                  caption="Berzikir lewat penghitung di atas, lalu tekan Simpan Harian, sesi akan tercatat di sini."
                 />
               ) : (
                 <div className="glass thin-scrollbar max-h-80 overflow-y-auto rounded-[1.5rem]">
@@ -364,7 +364,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
 
           {/* Set zikir */}
           <section aria-label="Set zikir" className="mt-9 space-y-3 lg:col-span-7 lg:mt-0">
-            <SectionHeader title="Set Zikir" caption="Bacaan masyhur dengan sumber — dilipat agar ringan di layar" />
+            <SectionHeader title="Set Zikir" caption="Bacaan masyhur dengan sumber, dilipat agar ringan di layar" />
             {ZIKIR_SETS.map((set) => (
               <ZikirSetCard key={set.id} set={set} onOpenTasbih={(slot) => onOpenTasbih(slot)} />
             ))}
@@ -372,7 +372,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
         </div>
       ) : (
         <div key="doa" className="tk-fade-in lg:grid lg:grid-cols-12 lg:gap-x-8">
-          {/* Doa Hari Ini — blok editorial lavender */}
+          {/* Doa Hari Ini, blok editorial lavender */}
           <div className="lg:col-span-5">
             <SectionHeader title="Doa Hari Ini" caption={dua.title} />
             <div className="rounded-[1.75rem] bg-tk-lavender p-5">
@@ -414,7 +414,7 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
             </div>
 
             <p className="mt-4 pb-1 text-center text-[10px] leading-relaxed text-tk-muted/60">
-              Bacaan dikurasi dari Al-Qur&apos;an dan riwayat masyhur dengan sumber tertulis — tanpa teks karangan.
+              Bacaan dikurasi dari Al-Qur&apos;an dan riwayat masyhur dengan sumber tertulis, tanpa teks karangan.
             </p>
           </div>
         </div>

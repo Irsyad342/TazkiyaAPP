@@ -50,7 +50,7 @@ const PLACE_FILTERS: { id: PlaceFilter; label: string }[] = [
 
 const SORT_MODES: { id: SortMode; label: string }[] = [
   { id: "nomor", label: "Nomor" },
-  { id: "nama", label: "A–Z" },
+  { id: "nama", label: "A-Z" },
   { id: "ayat", label: "Ayat" },
 ];
 
@@ -74,7 +74,7 @@ function SurahRow({
         type="button"
         onClick={onOpen}
         className="tap group flex w-full items-center gap-3.5 rounded-2xl px-2.5 py-3 text-left transition-colors hover:bg-tk-panel-soft"
-        aria-label={`Buka ${surah.latin} — surah ke-${surah.number}`}
+        aria-label={`Buka ${surah.latin}, surah ke-${surah.number}`}
       >
         {/* Chip nomor khatam: bintang segi delapan berlapis, tepi rambut hangat */}
         <span aria-hidden className="relative flex h-10 w-10 shrink-0 items-center justify-center">
@@ -143,7 +143,7 @@ function JuzRow({ juz, onOpen }: { juz: (typeof JUZ_RANGES)[number]; onOpen: () 
         <span className="min-w-0 flex-1">
           <span className="block truncate font-display text-[14.5px] font-bold text-tk-ink">Juz {juz.juz}</span>
           <span className="block truncate text-[10.5px] text-tk-muted">
-            {start?.latin} {juz.startAyah} — {end?.latin} {juz.endAyah} · {juz.surahs.length} surah
+            {start?.latin} {juz.startAyah}, {end?.latin} {juz.endAyah} · {juz.surahs.length} surah
           </span>
         </span>
         <ChevronRight size={16} className="shrink-0 text-tk-muted/60" />
@@ -313,7 +313,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
       markBookmark: true,
     });
     toast.success(
-      `Bacaan disimpan: ${p.meta.latin} ${p.from}${p.to > p.from ? `–${p.to}` : ""} · ${p.to - p.from + 1} ayat · penanda di ayat ${p.to}`
+      `Bacaan disimpan: ${p.meta.latin} ${p.from}${p.to > p.from ? `-${p.to}` : ""} · ${p.to - p.from + 1} ayat · penanda di ayat ${p.to}`
     );
     setCatSurah("");
     setCatAyat("");
@@ -446,7 +446,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
             ))}
           </div>
 
-          {/* Batang 7 hari — kronologis kiri ke kanan, tanpa kartu */}
+          {/* Batang 7 hari, kronologis kiri ke kanan, tanpa kartu */}
           <OrnamentDivider className="mt-7" />
           <div className="mt-5 flex items-end justify-between gap-1.5" aria-hidden>
             {lastNDays(7, today).map((k) => {
@@ -469,7 +469,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
           </div>
           <p className="mt-3 text-[10.5px] leading-relaxed text-tk-muted">
             Minggu ini: {weekPages.toLocaleString("id-ID")} halaman · {weekVerses.toLocaleString("id-ID")} ayat. Hari tanpa
-            catatan bukan hari gagal — tinggal lanjutkan besok.
+            catatan bukan hari gagal, tinggal lanjutkan besok.
           </p>
         </section>
 
@@ -486,7 +486,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                 )
               }
               className="tap block w-full text-left"
-              aria-label={`Buka ${topMeta.latin} — dibaca ${topEntry[1].count} kali`}
+              aria-label={`Buka ${topMeta.latin}, dibaca ${topEntry[1].count} kali`}
             >
               <div className="relative h-full overflow-hidden rounded-[1.75rem] bg-tk-lavender p-5">
                 {/* Ornamen latar: kisi khatam samar di sudut kanan atas */}
@@ -536,7 +536,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
         {/* ---------- Penanda ayat ---------- */}
         {ayahBookmarks.length > 0 ? (
           <section aria-label="Ayat yang ditandai" className="animate-tk-fade-up mt-6 lg:col-span-7">
-            <SectionHeader title="Ayat Ditandai" caption={`${ayahBookmarks.length} ayat — ketuk untuk membuka`} />
+            <SectionHeader title="Ayat Ditandai" caption={`${ayahBookmarks.length} ayat, ketuk untuk membuka`} />
             <GlassCard className="thin-scrollbar max-h-64 overflow-y-auto">
               <ul className="divide-y divide-tk-line-soft">
                 {ayahBookmarks.slice(0, 20).map((b) => {
@@ -672,14 +672,14 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                 </ul>
                 {filtered.length === 0 ? (
                   <p className="mt-3 rounded-2xl border border-tk-line bg-tk-panel-soft px-3 py-4 text-center text-sm text-tk-muted">
-                    Tidak ada surah yang cocok — coba kata kunci atau filter lain.
+                    Tidak ada surah yang cocok, coba kata kunci atau filter lain.
                   </p>
                 ) : null}
               </>
             ) : (
               <>
                 <p className="mt-4 text-[10.5px] text-tk-muted">
-                  {juzFiltered.length} dari {JUZ_RANGES.length} juz — sentuh untuk membuka dari awal juz.
+                  {juzFiltered.length} dari {JUZ_RANGES.length} juz, sentuh untuk membuka dari awal juz.
                 </p>
                 <ul className="tk-list-cv mt-2 divide-y divide-tk-line-soft sm:grid sm:grid-cols-2 sm:gap-x-4 sm:divide-y-0 lg:grid-cols-3">
                   {juzFiltered.map((j) => (
@@ -688,7 +688,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                 </ul>
                 {juzFiltered.length === 0 ? (
                   <p className="mt-3 rounded-2xl border border-tk-line bg-tk-panel-soft px-3 py-4 text-center text-sm text-tk-muted">
-                    Juz tidak ditemukan — coba nomor juz atau nama surah di dalamnya.
+                    Juz tidak ditemukan, coba nomor juz atau nama surah di dalamnya.
                   </p>
                 ) : null}
               </>
@@ -710,7 +710,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block font-display text-[14.5px] font-bold text-tk-ink">Catat Bacaan</span>
-                <span className="block text-[11px] text-tk-muted">Cukup surah &amp; ayat — rentang dan penanda diisi otomatis</span>
+                <span className="block text-[11px] text-tk-muted">Cukup surah &amp; ayat, rentang dan penanda diisi otomatis</span>
               </span>
               <ChevronRight size={16} className={cn("shrink-0 text-tk-muted/70 transition-transform", formOpen && "rotate-90")} />
             </button>
@@ -725,7 +725,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                         Surah
                       </label>
                       <select id="cat-surah" value={catSurah} onChange={(e) => setCatSurah(e.target.value)} className={inputCls}>
-                        <option value="">— Pilih —</option>
+                        <option value="">Pilih</option>
                         {SURAH_LIST.map((s) => (
                           <option key={s.number} value={s.number}>
                             {s.number}. {s.latin}
@@ -755,18 +755,18 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                       <span>
                         {catPreview.exceeds ? (
                           <>
-                            {catPreview.meta.latin} hanya {catPreview.meta.verses} ayat —{" "}
+                            {catPreview.meta.latin} hanya {catPreview.meta.verses} ayat,{" "}
                           </>
                         ) : null}
                         Tercatat: {catPreview.meta.latin} {catPreview.from}
-                        {catPreview.to > catPreview.from ? `–${catPreview.to}` : ""} · {catPreview.to - catPreview.from + 1} ayat ·
+                        {catPreview.to > catPreview.from ? ` sampai ${catPreview.to}` : ""} · {catPreview.to - catPreview.from + 1} ayat ·
                         penanda pindah ke ayat {catPreview.to}
                         {catPreview.continuing ? " (lanjutan dari posisi terakhir)" : ""}
                       </span>
                     </p>
                   ) : (
                     <p className="mt-2 text-[11px] leading-relaxed text-tk-muted">
-                      Pilih surah &amp; ayat terakhir — rentang bacaan dihitung otomatis dari posisi terakhirmu.
+                      Pilih surah &amp; ayat terakhir, rentang bacaan dihitung otomatis dari posisi terakhirmu.
                     </p>
                   )}
                   <button
@@ -811,7 +811,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                           {e.pages > 0 ? `${e.pages.toLocaleString("id-ID")} halaman` : ""}
                           {e.pages > 0 && e.verses > 0 ? " · " : ""}
                           {e.verses > 0 ? `${e.verses.toLocaleString("id-ID")} ayat` : ""}
-                          {s ? ` — ${s.latin}${e.ayahFrom ? ` : ${e.ayahFrom}-${e.ayahTo ?? e.ayahFrom}` : ""}` : ""}
+                          {s ? `, ${s.latin}${e.ayahFrom ? ` : ${e.ayahFrom}-${e.ayahTo ?? e.ayahFrom}` : ""}` : ""}
                         </p>
                         <p className="flex items-center gap-1.5 text-[11px] text-tk-muted">
                           {relativeDayLabel(e.date, today)}

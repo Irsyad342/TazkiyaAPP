@@ -76,7 +76,7 @@ export function AuthGate() {
               </button>
             </div>
             <p className="mt-3 text-[10.5px] leading-relaxed text-tk-muted/80">
-              Memilih mulai kosong tidak menghapus apa pun — salinan data lama tetap tersimpan aman di perangkat ini.
+              Memilih mulai kosong tidak menghapus apa pun, salinan data lama tetap tersimpan aman di perangkat ini.
             </p>
           </>
         ) : (

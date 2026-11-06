@@ -76,7 +76,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
     addAmalEntry(today, kind, title, note);
     setTitle("");
     setNote("");
-    toast.success("Amal tercatat — sekecil apa pun, itu berarti");
+    toast.success("Amal tercatat, sekecil apa pun, itu berarti");
   };
 
   return (
@@ -102,7 +102,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                 </div>
               </div>
 
-              {/* Bar 7 hari — lavender, hari ini violet */}
+              {/* Bar 7 hari, lavender, hari ini violet */}
               <div className="mt-5 flex items-end justify-between gap-2 border-t border-tk-line pt-4" aria-hidden>
                 {weekCounts.map((c, i) => (
                   <div key={week[i]} className="flex flex-1 flex-col items-center gap-1.5">
@@ -126,7 +126,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
           <section aria-label="Target kebaikan harian" className="animate-tk-fade-up">
             <SectionHeader
               title="Target Kebaikan"
-              caption="Pilih salah satu untuk dicatat cepat — bisa diatur sesuai preferensimu"
+              caption="Pilih salah satu untuk dicatat cepat, bisa diatur sesuai preferensimu"
               action={
                 <button
                   type="button"
@@ -209,7 +209,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
 
           {/* ---------- Catat amal ---------- */}
           <section aria-label="Catat amal kebaikan" className="animate-tk-fade-up">
-            <SectionHeader title="Catat Amal Hari Ini" caption="Sedekah, bantuan, silaturahmi — semua sama berharganya" />
+            <SectionHeader title="Catat Amal Hari Ini" caption="Sedekah, bantuan, silaturahmi, semua sama berharganya" />
             <GlassCard className="space-y-3 p-4 sm:p-5">
               <div>
                 <p className="gs-overline mb-1.5 block">Jenis kebaikan</p>
@@ -260,7 +260,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                 <Check size={16} strokeWidth={3} /> Simpan Catatan
               </button>
               <p className="text-[10px] leading-relaxed text-tk-muted/80">
-                Tidak ada penilaian atas jumlah atau nilai — setiap kebaikan dicatat setara, untuk kesadaranmu sendiri.
+                Tidak ada penilaian atas jumlah atau nilai, setiap kebaikan dicatat setara, untuk kesadaranmu sendiri.
               </p>
             </GlassCard>
           </section>
@@ -272,7 +272,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
               <EmptyState
                 icon={<HandCoins size={18} />}
                 title="Belum ada catatan hari ini"
-                caption="Satu kebaikan kecil — menyapa, membantu, sedekah — sudah layak dicatat."
+                caption="Satu kebaikan kecil, menyapa, membantu, sedekah, sudah layak dicatat."
               />
             ) : (
               <div className="space-y-2">
@@ -350,7 +350,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
             </GlassCard>
           )}
           <p className="mt-4 text-center text-[10px] leading-relaxed text-tk-muted/60">
-            Rizq &amp; Amal membantu membangun kebiasaan — bukan kompetisi, bukan pengukuran keimanan. {formatDayFull(today)}.
+            Rizq &amp; Amal membantu membangun kebiasaan, bukan kompetisi, bukan pengukuran keimanan. {formatDayFull(today)}.
           </p>
         </section>
       </div>

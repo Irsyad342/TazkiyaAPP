@@ -20,18 +20,18 @@ export interface ExtraMeta {
 }
 
 export const PRAYERS: PrayerMeta[] = [
-  { id: "subuh", label: "Subuh", caption: "2 rakaat — awal pagi" },
-  { id: "zuhur", label: "Zuhur", caption: "4 rakaat — tengah hari" },
-  { id: "asar", label: "Asar", caption: "4 rakaat — sore hari" },
-  { id: "magrib", label: "Magrib", caption: "3 rakaat — matahari terbenam" },
-  { id: "isya", label: "Isya", caption: "4 rakaat — malam hari" },
+  { id: "subuh", label: "Subuh", caption: "2 rakaat, awal pagi" },
+  { id: "zuhur", label: "Zuhur", caption: "4 rakaat, tengah hari" },
+  { id: "asar", label: "Asar", caption: "4 rakaat, sore hari" },
+  { id: "magrib", label: "Magrib", caption: "3 rakaat, matahari terbenam" },
+  { id: "isya", label: "Isya", caption: "4 rakaat, malam hari" },
 ];
 
 /** Pengganti slot Zuhur pada hari Jumat — wajib berjamaah di masjid. */
 export const SALAT_JUMAT: PrayerMeta = {
   id: "zuhur",
   label: "Salat Jumat",
-  caption: "Wajib — berjamaah di masjid",
+  caption: "Wajib, berjamaah di masjid",
   fullName: "Salat Jumat",
 };
 
@@ -172,7 +172,7 @@ export interface DeviceGeo {
   lng: number;
   accuracy?: number; // meter
   label?: string; // nama kota/wilayah hasil reverse geocoding
-  updatedAt: string; // ISO — terakhir kali posisi valid diterima
+  updatedAt: string; // ISO, terakhir kali posisi valid diterima
 }
 
 export interface ReadingEntry {
@@ -207,7 +207,7 @@ export interface Settings {
   prayerTimesAuto?: boolean;
   quranTargetType: QuranTargetType;
   quranDailyTarget: number;
-  quranTargetSurah: number; // 1..114 — dipakai bila quranTargetType = "surah"
+  quranTargetSurah: number; // 1..114, dipakai bila quranTargetType = "surah"
   zikirTarget: number;
   /** Aktivitas tambahan yang dilacak (memengaruhi tampilan Beranda & skor). */
   trackedExtras: ExtraId[];
@@ -227,7 +227,7 @@ export interface Settings {
   readerTransSize: number; // px 11..20
   readerLineHeight: number; // 1.7 | 1.9 | 2.2
   readerShowTranslation: boolean;
-  createdAt: string; // ISO — pertama kali memakai aplikasi
+  createdAt: string; // ISO, pertama kali memakai aplikasi
 }
 
 export interface TasbihState {
@@ -303,7 +303,7 @@ export interface JournalEntry {
   items: [string, string, string];
   mood?: MoodId;
   savedAt: string; // ISO
-  updatedAt?: string; // ISO — terisi setelah edit
+  updatedAt?: string; // ISO, terisi setelah edit
 }
 
 /* ---------- Rizq & Amal ---------- */
@@ -358,12 +358,12 @@ export interface DailyGoal {
   /** Bila terisi, keberselesaian diturunkan dari data nyata; selain itu manual. */
   auto?: DailyGoalAuto;
   enabled: boolean;
-  custom?: boolean; // target buatan pengguna — boleh dihapus
+  custom?: boolean; // target buatan pengguna, boleh dihapus
 }
 
 export const DEFAULT_DAILY_GOALS: DailyGoal[] = [
   { id: "g-subuh", label: "Salat Subuh tepat waktu", auto: "subuh-ontime", enabled: true },
-  { id: "g-quran", label: "Baca Al-Qur'an — 1 lembar", auto: "quran-lembar", enabled: true },
+  { id: "g-quran", label: "Baca Al-Qur'an, 1 lembar", auto: "quran-lembar", enabled: true },
   { id: "g-zikir-pagi", label: "Zikir pagi", auto: "zikir-pagi", enabled: true },
   { id: "g-zikir-petang", label: "Zikir petang", auto: "zikir-petang", enabled: true },
   { id: "g-amal", label: "Satu aktivitas kebaikan", auto: "amal-hari-ini", enabled: true },
@@ -396,7 +396,7 @@ export function createEmptyLog(date: string): DailyLog {
 
 export function createDefaultSettings(): Settings {
   return {
-    name: "Sahabat Tazkiya",
+    name: "Sahabat SUIO",
     quranTargetType: "halaman",
     quranDailyTarget: 5,
     quranTargetSurah: 1,

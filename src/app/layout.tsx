@@ -4,7 +4,7 @@ import { Amiri_Quran } from "next/font/google";
 import "./globals.css";
 
 /*
- * Tazkiya v7 — tipografi baru, diganti total dari v6:
+ * SUIO v13 — rebranding dari Tazkiya. Tipografi tidak berubah:
  * General Sans (Fontshare, ITF Free Font License) menjadi SATU-SATUNYA
  * keluarga latin aplikasi — body, judul, dan angka display. Font inilah
  * yang dipakai desain task-planner premium pada referensi: bentuk huruf
@@ -36,10 +36,10 @@ const amiriQuran = Amiri_Quran({
 });
 
 export const metadata: Metadata = {
-  title: "Tazkiya — Pelacak Ibadah Harian",
+  title: "SUIO: Sujud in Order, Pelacak Ibadah Harian",
   description:
-    "Tazkiya membantu Anda mencatat, memantau, dan meningkatkan konsistensi ibadah harian: salat wajib, Al-Qur'an, zikir, dan aktivitas lainnya.",
-  keywords: ["Tazkiya", "pelacak ibadah", "salat", "Al-Qur'an", "zikir", "tasbih"],
+    "SUIO (Sujud in Order) membantu Anda mencatat, memantau, dan meningkatkan konsistensi ibadah harian: salat wajib, Al-Qur'an, zikir, dan aktivitas lainnya.",
+  keywords: ["SUIO", "Sujud in Order", "pelacak ibadah", "salat", "Al-Qur'an", "zikir", "tasbih"],
   icons: {
     icon: [
       { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },

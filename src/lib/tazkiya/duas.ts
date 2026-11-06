@@ -41,7 +41,7 @@ export const DAILY_DUAS: DailyDua[] = [
     arabic: "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي",
     transliteration: "Rabbisyrach lii sadrii wa yassir lii amrii",
     meaning: "Ya Tuhanku, lapangkanlah dadaku dan mudahkanlah urusanku.",
-    source: "QS Thaha: 25–26 (doa Nabi Musa)",
+    source: "QS Thaha: 25-26 (doa Nabi Musa)",
   },
   {
     id: "ketenangan-hati",
@@ -101,7 +101,7 @@ export const DAILY_DUAS: DailyDua[] = [
   },
   {
     id: "sayyidul-istighfar",
-    title: "Sayyidul Istighfar — pemohon ampunan utama",
+    title: "Sayyidul Istighfar, pemohon ampunan utama",
     arabic:
       "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي، فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ",
     transliteration:

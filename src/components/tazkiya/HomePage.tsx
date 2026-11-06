@@ -112,7 +112,7 @@ function CircleDateStrip({ today }: { today: string }) {
             key={key}
             type="button"
             disabled={isFuture}
-            aria-label={`${isToday ? "Hari ini" : "Tanggal"} ${key}${count > 0 ? ` — ${count} salat tercatat` : ""}`}
+            aria-label={`${isToday ? "Hari ini" : "Tanggal"} ${key}${count > 0 ? `, ${count} salat tercatat` : ""}`}
             aria-pressed={isToday}
             onClick={() => !isFuture && setSelected(key)}
             className={cn(
@@ -470,7 +470,7 @@ function MonthSheet({
               key={key}
               type="button"
               disabled={isFuture}
-              aria-label={`Tanggal ${key}${recorded ? " — ada catatan" : ""}`}
+              aria-label={`Tanggal ${key}${recorded ? ", ada catatan" : ""}`}
               onClick={() => {
                 onClose();
                 onPickDay(key);
@@ -513,7 +513,7 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
     <button
       type="button"
       onClick={() => onNavigate("sholat")}
-      aria-label="Salat lima waktu — buka halaman Sholat"
+      aria-label="Salat lima waktu, buka halaman Sholat"
       className="tap tk-card-white block w-full rounded-[1.4rem] p-4 text-left"
     >
       <p className="text-[13.5px] font-bold tracking-[-0.01em] text-[#17171B]">Salat Lima Waktu</p>
@@ -579,7 +579,7 @@ function RingCard({ today, onNavigate }: { today: string; onNavigate: (tab: TabI
     <button
       type="button"
       onClick={() => onNavigate("progress")}
-      aria-label={`Target harian ${done} dari ${statuses.length} selesai — buka analitik`}
+      aria-label={`Target harian ${done} dari ${statuses.length} selesai, buka analitik`}
       className="tap glass block w-full rounded-[1.4rem] p-4 text-left"
     >
       <div className="flex items-center gap-3.5">
@@ -645,7 +645,7 @@ function KebaikanCard({
     {
       label: "Zikir & Doa",
       value: zikir.toLocaleString("id-ID"),
-      caption: `Zikir harian — target ${settings.zikirTarget.toLocaleString("id-ID")} hitungan`,
+      caption: `Zikir harian, target ${settings.zikirTarget.toLocaleString("id-ID")} hitungan`,
       done: zikir >= settings.zikirTarget && settings.zikirTarget > 0,
       go: () => onOpenSubpage("zikir-doa"),
     },
@@ -668,10 +668,10 @@ function KebaikanCard({
   const doneCount = rows.filter((r) => r.done).length;
   const insight =
     doneCount === rows.length
-      ? "Semua ibadah pendukung tercatat — luar biasa hari ini."
+      ? "Semua ibadah pendukung tercatat, luar biasa hari ini."
       : doneCount === 0
-        ? "Mulai dari yang paling ringan — satu kebaikan pun berharga."
-        : `${doneCount} dari ${rows.length} sudah tercatat — lanjutkan yang lain.`;
+        ? "Mulai dari yang paling ringan, satu kebaikan pun berharga."
+        : `${doneCount} dari ${rows.length} sudah tercatat, lanjutkan yang lain.`;
 
   return (
     <section aria-label="Ibadah pendukung hari ini" className="glass-hero flex h-full flex-col rounded-[1.4rem] p-4">
@@ -687,7 +687,7 @@ function KebaikanCard({
             <button
               type="button"
               onClick={go}
-              aria-label={`${label}: ${value} — ${caption}. Ketuk untuk mencatat.`}
+              aria-label={`${label}: ${value}, ${caption}. Ketuk untuk mencatat.`}
               className="tap flex w-full items-center gap-2.5 py-2.5 text-left"
             >
               <span
@@ -793,7 +793,7 @@ function TodayTasks({ today }: { today: string }) {
               type="button"
               role="checkbox"
               aria-checked={done}
-              aria-label={`Tugas: ${goal.label} — ${done ? "tercapai" : "belum tercapai"}`}
+              aria-label={`Tugas: ${goal.label}, ${done ? "tercapai" : "belum tercapai"}`}
               onClick={() => {
                 // Target otomatis yang sudah tercapai dari catatan nyata tidak
                 // bisa "dibatalkan" lewat ketukan — beri penjelasan, jangan
@@ -826,7 +826,7 @@ function TodayTasks({ today }: { today: string }) {
         ))}
       </ul>
 
-      {/* Editor target — logika utuh dari v6 */}
+      {/* Editor target, logika utuh dari v6 */}
       {editing ? (
         <div className="tk-fade-in mt-3 space-y-2.5 rounded-[1.25rem] border border-tk-line bg-tk-panel-soft p-3.5">
           <p className="gs-overline">Atur tugas harian</p>
@@ -902,8 +902,8 @@ function TodayTasks({ today }: { today: string }) {
       <div className="mt-3 flex items-center justify-between gap-3">
         <p className="text-[10.5px] leading-relaxed text-tk-deep">
           {doneCount === statuses.length && statuses.length > 0
-            ? "MasyaAllah, semua tugas hari ini tercapai — syukur itu dari Allah."
-            : `Progress hari ini ${doneCount}/${statuses.length} — satu langkah kecil sudah berarti.`}
+            ? "MasyaAllah, semua tugas hari ini tercapai, syukur itu dari Allah."
+            : `Progress hari ini ${doneCount}/${statuses.length}, satu langkah kecil sudah berarti.`}
         </p>
         <button
           type="button"
@@ -1028,7 +1028,7 @@ export function HomePage({
               Assalamu&apos;alaikum, {greeting.toLowerCase()}
             </p>
             <h1 className="truncate text-[19px] font-bold leading-tight tracking-[-0.02em] text-tk-ink">
-              {settings.name || "Sahabat Tazkiya"}
+              {settings.name || "Sahabat SUIO"}
             </h1>
           </div>
           <button

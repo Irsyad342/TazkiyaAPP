@@ -69,12 +69,12 @@ export function DayDetailSheet({ date, onClose }: { date: string; onClose: () =>
                 const statusText =
                   d.status === "done"
                     ? d.kind === "berjamaah"
-                      ? "Dilaksanakan — berjamaah"
+                      ? "Dilaksanakan, berjamaah"
                       : d.kind === "mandiri"
-                        ? "Dilaksanakan — mandiri"
+                        ? "Dilaksanakan, mandiri"
                         : "Dilaksanakan"
                     : d.status === "missed"
-                      ? `Tidak dilaksanakan${d.reason ? ` — ${missReasonLabel(d.reason)}` : ""}${
+                      ? `Tidak dilaksanakan${d.reason ? `, ${missReasonLabel(d.reason)}` : ""}${
                           d.reason === "lainnya" && d.reasonText ? `: ${d.reasonText}` : ""
                         }`
                       : "Belum dicatat";

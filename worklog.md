@@ -1019,3 +1019,63 @@ tsc 0 · eslint 0 · build sukses. Browser: 7 img /mood/*.png termuat; klik Bers
 aria-checked + ring #ff6b26 (varian gelap) + skala 1.08 + toast "Tercatat"; persist
 setelah reload; Jurnal 7 emoji; .tk-geo-pattern=0 di Beranda, =1 di Al-Qur'an (utuh);
 0 overflow 360px; 0 error konsol; tema gelap & terang diverifikasi visual.
+
+## Task 49 — v13: rebranding SUIO, onboarding premium floating-interface, transisi fitur bottom-to-top
+
+Permintaan: (1) rebranding Tazkiya → SUIO "Sujud in Order" di seluruh UI + PWA tanpa
+menyentuh identifier teknis; (2) onboarding baru 4 slide + layar akhir konsep
+"premium animated mobile onboarding with floating interface illustrations" sesuai
+referensi; (3) sistem animasi lengkap; (4) dark & light mode onboarding; (5) transisi
+halaman fitur bottom-to-top + perbaikan posisi scroll; (6) hapus em/en dash sebagai
+pemisah kalimat; (7) scope ketat, halaman lain tidak berubah.
+
+### Rebranding
+- Mark baru `brand.tsx` (SuioMark/SuioLockup): kubah sujud + kepala + garis tanah +
+  kilau, tile gradasi oranye #FF7A38→#FA5200, murni SVG. Mengganti glyph ت di splash,
+  auth, header onboarding, dan baris Tentang Profil.
+- Ikon PWA diregenerasi (scripts/make_suio_icons.mjs, sharp): icon-192/512,
+  maskable-192/512, favicon src/app/icon.svg. Manifest: name "SUIO: Sujud in Order".
+- Metadata layout: title, description, keywords SUIO. Judul dokumen per tab/sub-halaman
+  memakai format "SUIO: X". Splash, header onboarding, auth, profil (Anggota SUIO,
+  server SUIO), greeting "Sahabat SUIO", fallback auth-store/types/supabase.
+
+### Onboarding baru (OnboardingFlow + onboarding-art ditulis ulang)
+- 5 layar sesuai spesifikasi: Welcome (Lebih Teratur, Lebih Bermakna), Ibadah (Jaga
+  Ibadah Setiap Hari), Quran & Dhikr (Dekatkan Diri dengan Kebaikan), Daily Barakah
+  (Setiap Kebaikan Berarti), Final (Mulai Perjalananmu Bersama SUIO; CTA register +
+  link Masuk). Semua headline/deskripsi persis dari brief.
+- Ilustrasi: kartu komponen ASLI aplikasi sebagai floating cards berotasi (jadwal
+  salat, cincin progres 4/5, kalender aktivitas, tracker target, mushaf QS Al-Insyirah
+  6 dengan Amiri, tasbih 33×, Daily Barakah "Niat Hari Ini", Rizq & Amal, Jurnal
+  Syukur, chip mood /mood/*.png). Tanpa fitur palsu.
+- Animasi: entrance bertahap branding→ilustrasi→judul per kata→deskripsi→CTA; float
+  infinite per kartu dengan durasi/rotasi beda; parallax latar 3 lapis + offset
+  ilustrasi nonaktif; trek geser spring antar slide; whileTap CTA; indikator pil
+  beranimasi; swipe pointer + panah keyboard; MotionConfig reducedMotion="user";
+  dekorasi CSS ikut guard data-anim/prefers-reduced-motion.
+- Tema: kanvas #131217 (dark) / #F4F2F7 (warm-white light), kartu lebih terang dari
+  latar, aksen lavender + oranye, varian light:/dark:. onboarding/page.tsx resolusi
+  tema dari pengaturan tersimpan atau preferensi sistem + sinkron meta theme-color.
+
+### Navigasi fitur (page.tsx)
+- Scroll reset: efek [tab, subpage] → window/konten scrollTo top; sheet kecil (tasbih,
+  target, reader) tidak memicu (tidak mengubah tab/subpage).
+- Transisi bottom-to-top: wrapper AnimatePresence kini masuk dari y=56→0 (0.34s,
+  ease [0.22,1,0.36,1]) + opacity, keluar y=-14; tetap transisi tampilan halaman,
+  bukan scroll konten; saklar Animasi nonaktif → tanpa gerakan.
+
+### Tipografi
+- scripts/dash_sweep.py: 169 baris string UI " — " → ", ", plus kurasi manual
+  (attribution hadis → tanda kurung, "ayat,{\" \"}", fallback "—", rentang ayat – → -,
+  "— Pilih —" → "Pilih", "A-Z"). Komentar kode dan sintaks tidak disentuh. Verifikasi:
+  innerText Beranda/Rizq/Jurnal/auth bebas — dan –, bebas "Tazkiya".
+
+### QA
+tsc 0 · eslint 0 · build sukses. Browser: gerbang kunjungan-pertama → /onboarding;
+5 slide + indikator + swipe (pointer event) + Lanjut/Lewati; CTA akhir → /auth?mode=
+register, flag onboarding ter-set; auth SUIO + tagline; splash & tab title benar;
+buka Rizq & Amal saat scroll 1899px → scrollY 0; tab Sholat dari scroll 2200px → 0;
+sampler rAF membuktikan entrance: halaman baru y=56→0 ~340ms, lama keluar ke -14px;
+dark onboarding terverifikasi visual (meta #131217), light terverifikasi visual;
+0 overflow horizontal; console bersih; manifest "SUIO: Sujud in Order"; icon.svg mark
+baru; Beranda mood 7 emoji & halaman lain tak berubah.

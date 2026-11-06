@@ -38,7 +38,7 @@ export function JelajahiAktivitas({
       </div>
 
       <div className="flex flex-1 flex-col gap-5">
-        {/* 1. Jurnal Syukur — baris editorial tanpa kartu */}
+        {/* 1. Jurnal Syukur, baris editorial tanpa kartu */}
         <button
           type="button"
           onClick={() => onOpen("jurnal")}
@@ -52,7 +52,7 @@ export function JelajahiAktivitas({
             <span className="min-w-0 flex-1">
               <span className="block text-[15.5px] font-bold tracking-[-0.01em] text-tk-ink">Jurnal Syukur</span>
               <span className="mt-0.5 block text-[12px] leading-relaxed text-tk-muted">
-                {sudahMenulis ? "Sudah kamu tulis hari ini — terima kasih sudah berhenti sejenak." : "Tiga hal kecil yang kamu syukuri hari ini — butuh 2 menit saja."}
+                {sudahMenulis ? "Sudah kamu tulis hari ini, terima kasih sudah berhenti sejenak." : "Tiga hal kecil yang kamu syukuri hari ini, butuh 2 menit saja."}
               </span>
               <span className="mt-2 inline-flex items-center gap-1 text-[12px] font-bold text-tk-violet">
                 {sudahMenulis ? "Buka kembali" : "Mulai menulis"} <ChevronRight size={14} />
@@ -61,7 +61,7 @@ export function JelajahiAktivitas({
           </span>
         </button>
 
-        {/* 2. Zikir & Doa — kartu ORANGE pekat + widget cincin */}
+        {/* 2. Zikir & Doa, kartu ORANGE pekat + widget cincin */}
         <button
           type="button"
           onClick={() => onOpen("zikir-doa")}
@@ -96,7 +96,7 @@ export function JelajahiAktivitas({
           </span>
         </button>
 
-        {/* 3. Rizq & Amal — blok statistik: angka besar + aksen lime */}
+        {/* 3. Rizq & Amal, blok statistik: angka besar + aksen lime */}
         <button
           type="button"
           onClick={() => onOpen("rizq-amal")}

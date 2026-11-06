@@ -87,7 +87,7 @@ export function authErrorMessage(err: unknown): string {
   if (code === "over_request_rate_limit" || code === "over_email_send_rate_limit" || msg.includes("rate limit"))
     return "Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi.";
   if (code === "user_banned" || msg.includes("banned"))
-    return "Akun ini dinonaktifkan. Hubungi dukungan Tazkiya.";
+    return "Akun ini dinonaktifkan. Hubungi dukungan SUIO.";
   if (code === "weak_password" || msg.includes("password"))
     return "Kata sandi terlalu lemah. Gunakan minimal 8 karakter.";
   if (code === "signup_disabled" || msg.includes("signups not allowed"))

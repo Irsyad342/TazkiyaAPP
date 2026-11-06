@@ -172,7 +172,7 @@ export function ProgressPage() {
   const [patternDay, setPatternDay] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState(today);
   /* Sheet rincian hari: HANYA terbuka lewat ketukan sengaja (batang grafik /
-     strip mingguan) — dipisah dari selectedDate agar tidak auto-muncul saat
+     strip mingguan), dipisah dari selectedDate agar tidak auto-muncul saat
      berganti tab periode. */
   const [sheetDate, setSheetDate] = useState<string | null>(null);
   const [barsIn, setBarsIn] = useState(false);
@@ -270,7 +270,7 @@ export function ProgressPage() {
       {/* ---------- Judul ---------- */}
       <header className="animate-tk-fade-up pt-1">
         <h1 className="text-[28px] font-extrabold tracking-[-0.03em] text-tk-ink">Progress</h1>
-        <p className="mt-1 text-[12.5px] text-tk-muted">Perjalanan ibadahmu — satu langkah kecil setiap hari</p>
+        <p className="mt-1 text-[12.5px] text-tk-muted">Perjalanan ibadahmu, satu langkah kecil setiap hari</p>
       </header>
 
       {/* Tab garis periode (indikator menggeser) */}
@@ -315,7 +315,7 @@ export function ProgressPage() {
               </div>
             </div>
             <p className="mt-4 text-[10.5px] leading-tight text-tk-muted">
-              Terus bertumbuh dalam istiqamah — setiap catatan hari ini berarti.
+              Terus bertumbuh dalam istiqamah, setiap catatan hari ini berarti.
             </p>
           </GlassCard>
 
@@ -384,7 +384,7 @@ export function ProgressPage() {
 
             <StatCard icon={BookHeart} tone="blue" label="Jurnal Syukur">
               <p className={cn("gs-display text-[26px] font-bold leading-none", journal[today] ? "text-tk-ink" : "text-tk-deep")}>
-                {journal[today] ? "✓" : "–"}
+                {journal[today] ? "✓" : "·"}
               </p>
               <p className="mt-2 text-[10px] leading-tight text-tk-muted">
                 {journal[today]
@@ -401,7 +401,7 @@ export function ProgressPage() {
         <div key="mingguan" className="tk-stagger space-y-4">
           {/* Kartu grafik pola salat 7 hari */}
           <section aria-label="Pola salat minggu ini">
-            <SectionHeader title="Perjalanan Salat Minggu Ini" caption="Senin sampai Minggu — kronologis kiri ke kanan" />
+            <SectionHeader title="Perjalanan Salat Minggu Ini" caption="Senin sampai Minggu, kronologis kiri ke kanan" />
             <GlassCard className="p-4">
               <div className="relative flex h-36 items-end justify-between gap-1.5">
                 {pattern.days.map((d, idx) => {
@@ -417,7 +417,7 @@ export function ProgressPage() {
                       key={d.date}
                       type="button"
                       onClick={() => !isFuture && setPatternDay(d.date)}
-                      aria-label={`Rincian ${isToday ? "hari ini" : relativeDayLabel(d.date, today)} — ${d.done} salat terlaksana`}
+                      aria-label={`Rincian ${isToday ? "hari ini" : relativeDayLabel(d.date, today)}, ${d.done} salat terlaksana`}
                       className={cn("flex h-full flex-1 cursor-pointer flex-col items-center gap-1.5", isFuture && "opacity-45")}
                     >
                       <span className={cn("tnum text-[9.5px] font-bold", isToday ? "text-tk-ink" : "text-tk-muted/80")}>
@@ -553,7 +553,7 @@ export function ProgressPage() {
               ))}
             </GlassCard>
             <p className="mt-2 px-1 text-[10px] leading-relaxed text-tk-muted/80">
-              Hari tanpa catatan tidak dihitung sebagai hari gagal — ia hanya hari yang belum mempunyai catatan.
+              Hari tanpa catatan tidak dihitung sebagai hari gagal, ia hanya hari yang belum mempunyai catatan.
             </p>
           </section>
         </div>
@@ -580,7 +580,7 @@ export function ProgressPage() {
           <section aria-label="Kalender aktivitas bulanan">
             <SectionHeader
               title="Kalender Aktivitas"
-              caption={`${monthLabel(today, monthOffset)} — ketuk tanggal untuk membuka rinciannya`}
+              caption={`${monthLabel(today, monthOffset)}, ketuk tanggal untuk membuka rinciannya`}
               action={
                 <div className="flex items-center gap-1">
                   <button
@@ -652,7 +652,7 @@ export function ProgressPage() {
               <div key={selectedDate} className="tk-fade-in mt-4 rounded-2xl bg-tk-panel-soft p-3.5">
                 {selFuture ? (
                   <p className="text-center text-[11.5px] leading-relaxed text-tk-muted">
-                    Tanggal ini belum berjalan — belum ada catatan, bukan hari gagal.
+                    Tanggal ini belum berjalan, belum ada catatan, bukan hari gagal.
                   </p>
                 ) : selStatus.hasData || (selLog && ((selLog.quranPages ?? 0) > 0 || (selLog.quranVerses ?? 0) > 0 || (selLog.zikirCount ?? 0) > 0)) ? (
                   <>
@@ -679,7 +679,7 @@ export function ProgressPage() {
                   </>
                 ) : (
                   <p className="text-center text-[11.5px] leading-relaxed text-tk-muted">
-                    {relativeDayLabel(selectedDate, today)} — belum ada catatan ibadah (bukan hari gagal).
+                    {relativeDayLabel(selectedDate, today)}, belum ada catatan ibadah (bukan hari gagal).
                   </p>
                 )}
               </div>
@@ -716,7 +716,7 @@ export function ProgressPage() {
 
       <p className="flex items-center justify-center gap-1.5 pb-1 pt-1 text-center text-[10px] text-tk-muted/60">
         <CalendarDays size={11} />
-        Progress dihitung langsung dari catatan ibadah Anda — bukan perkiraan.
+        Progress dihitung langsung dari catatan ibadah Anda, bukan perkiraan.
       </p>
 
       {patternDay || sheetDate ? (

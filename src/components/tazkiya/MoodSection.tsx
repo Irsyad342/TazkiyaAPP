@@ -24,7 +24,7 @@ const REFLEKSI: Record<MoodId, string> = {
   tenang: "Semoga ketenangan ini bertahan sepanjang hari.",
   bersyukur: "Hatimu sedang penuh syukur.",
   lelah: "Istirahat juga bagian dari ikhtiar.",
-  sedih: "Tidak apa-apa — perasaanmu sah.",
+  sedih: "Tidak apa-apa, perasaanmu sah.",
   cemas: "Tarik napas, jalani satu demi satu.",
   "campur-aduk": "Bercampur itu wajar, tidak harus memilih satu.",
 };
@@ -52,7 +52,7 @@ export function MoodSection({
       </div>
 
       <div role="radiogroup" aria-label="Pilih mood hari ini" className="flex flex-col gap-2.5">
-        {/* Baris 4 + 3 simetris — semua ekspresi terlihat tanpa menggulir */}
+        {/* Baris 4 + 3 simetris, semua ekspresi terlihat tanpa menggulir */}
         {[MOODS.slice(0, 4), MOODS.slice(4)].map((row, r) => (
           <div key={r} className="flex items-start justify-center gap-1">
             {row.map((mo, i) => {
@@ -99,7 +99,7 @@ export function MoodSection({
           <div className="tk-fade-in rounded-[1.25rem] bg-tk-panel-soft p-4">
             <p className="text-[13px] leading-relaxed text-tk-ink/95">
               <span className="font-bold">{moodLabel(moodToday)}</span>
-              <span className="text-tk-muted"> — {REFLEKSI[moodToday]}</span>
+              <span className="text-tk-muted">, {REFLEKSI[moodToday]}</span>
             </p>
             <button
               type="button"
@@ -113,13 +113,13 @@ export function MoodSection({
           </div>
         ) : (
           <p className="text-[11.5px] leading-relaxed text-tk-muted/80">
-            Pilih yang paling mendekati — boleh diganti kapan saja. Satu catatan per hari.
+            Pilih yang paling mendekati, boleh diganti kapan saja. Satu catatan per hari.
           </p>
         )}
       </div>
 
       <p className="mt-2.5 text-[9.5px] leading-relaxed text-tk-muted/60">
-        Mood membantu refleksi diri — bukan alat diagnosis psikologis.
+        Mood membantu refleksi diri, bukan alat diagnosis psikologis.
       </p>
     </section>
   );

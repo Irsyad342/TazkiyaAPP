@@ -68,7 +68,7 @@ function userFromSession(session: Session | null): AuthUser | null {
   if (!u) return null;
   const meta = (u.user_metadata ?? {}) as { display_name?: string; full_name?: string; name?: string };
   const email = u.email ?? "";
-  const name = meta.display_name ?? meta.full_name ?? meta.name ?? (email ? email.split("@")[0] : "Sahabat Tazkiya");
+  const name = meta.display_name ?? meta.full_name ?? meta.name ?? (email ? email.split("@")[0] : "Sahabat SUIO");
   return { id: u.id, email, name };
 }
 

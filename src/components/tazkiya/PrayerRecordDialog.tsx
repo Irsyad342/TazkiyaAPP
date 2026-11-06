@@ -80,7 +80,7 @@ export function PrayerRecordDialog({
         { addToQada }
       );
     } else {
-      onSave(null); // belum dicatat — hapus detail
+      onSave(null); // belum dicatat, hapus detail
     }
     onClose();
   };
@@ -207,7 +207,7 @@ export function PrayerRecordDialog({
           <div className="rounded-[1.1rem] border border-tk-line bg-tk-panel-soft p-3">
             <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-tk-muted">Alasan</p>
             <p className="mb-2.5 text-[10.5px] leading-relaxed text-tk-muted">
-              Catatan ini hanya untuk introspeksi dan evaluasi kebiasaan — bukan untuk menyalahkan diri sendiri.
+              Catatan ini hanya untuk introspeksi dan evaluasi kebiasaan, bukan untuk menyalahkan diri sendiri.
             </p>
             <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Alasan tidak melaksanakan salat">
               {MISS_REASONS.map((r) => {
@@ -243,7 +243,7 @@ export function PrayerRecordDialog({
               />
             ) : null}
 
-            {/* Tawaran lembut memasukkan salat ini ke daftar qada — murni pilihan pengguna. */}
+            {/* Tawaran lembut memasukkan salat ini ke daftar qada, murni pilihan pengguna. */}
             <button
               type="button"
               role="checkbox"

@@ -36,7 +36,7 @@ export function BottomNav({
       data-tk-nav=""
       className="pointer-events-auto fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[430px] px-5 pb-[max(1.1rem,env(safe-area-inset-bottom))]"
     >
-      {/* Bar hitam pekat kapsul — seperti bottom bar referensi */}
+      {/* Bar hitam pekat kapsul, seperti bottom bar referensi */}
       <div className="flex items-center justify-between gap-1 rounded-full border border-white/5 bg-[#0A0A0B] p-2 shadow-[0_18px_44px_-14px_rgba(0,0,0,0.8)]">
         {TABS.map(({ id, label, icon: Icon }) => {
           const isActive = active === id;

@@ -75,7 +75,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
       setQuranTargetSurah(surahDraft);
       updateSettings({ quranTargetType: "surah" });
       const meta = SURAHS.find((s) => s.number === surahDraft);
-      toast.success(`Target bacaan: 1 surah per hari — ${meta?.latin ?? ""}`);
+      toast.success(`Target bacaan: 1 surah per hari, ${meta?.latin ?? ""}`);
       return;
     }
     const n = parseInt(quranDraft, 10);
@@ -148,7 +148,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
       {/* ---------- Konten ---------- */}
       <div className="thin-scrollbar relative z-10 flex-1 space-y-3.5 overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2">
         {/* A. Salat Wajib */}
-        <SectionCard icon={<MoonStar size={17} />} title="Salat Wajib" caption="Target tetap — tidak perlu diatur">
+        <SectionCard icon={<MoonStar size={17} />} title="Salat Wajib" caption="Target tetap, tidak perlu diatur">
           <p className="font-display text-[19px] font-bold text-tk-ink">5 waktu salat per hari</p>
           <div className="mt-2.5 flex flex-wrap gap-1.5">
             {["Subuh", fridayLabel(), "Asar", "Magrib", "Isya"].map((label) => (
@@ -202,13 +202,13 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
               >
                 {SURAHS.map((s) => (
                   <option key={s.number} value={s.number}>
-                    {s.number}. {s.latin} — {s.verses} ayat
+                    {s.number}. {s.latin}, {s.verses} ayat
                   </option>
                 ))}
               </select>
               <p className="mt-2 text-[11px] leading-relaxed text-tk-muted">
-                Target: 1 surah pilihan per hari. Progres dihitung dari jumlah ayat yang benar-benar tercatat dibaca —
-                membuka surah saja belum dihitung selesai.
+                Target: 1 surah pilihan per hari. Progres dihitung dari jumlah ayat yang benar-benar tercatat dibaca.
+                Membuka surah saja belum dihitung selesai.
               </p>
             </div>
           ) : (
@@ -281,12 +281,12 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
             </button>
           </div>
           <p className="mt-1.5 text-[10.5px] leading-relaxed text-tk-muted">
-            Hitungan tasbih yang sudah disimpan ke catatan harian otomatis direset — tidak dihitung dua kali.
+            Hitungan tasbih yang sudah disimpan ke catatan harian otomatis direset, tidak dihitung dua kali.
           </p>
         </SectionCard>
 
         {/* D. Ibadah Tambahan */}
-        <SectionCard icon={<Target size={17} />} title="Ibadah Tambahan" caption="Opsional — pilih yang ingin dilacak">
+        <SectionCard icon={<Target size={17} />} title="Ibadah Tambahan" caption="Opsional, pilih yang ingin dilacak">
           <div className="space-y-1">
             {EXTRAS.map((e) => {
               const active = (settings.trackedExtras ?? []).includes(e.id);
