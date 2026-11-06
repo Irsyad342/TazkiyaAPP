@@ -1504,3 +1504,29 @@ push → Vercel live; verifikasi produksi (login qa.mood.suio.20261106@gmail.
 com): bundle memuat keyframes (.86) & key halo-, pop terukur 1.086→1.05→
 1.072→1.08 dengan halo=3 children, light (Bahagia) & dark (Lelah) visual ok,
 tepat 1 radio terpilih, toast & refleksi utuh.
+
+## Task 62 — SUIO V2: redesign total onboarding (2026-11-06)
+3 file saja (cakupan ketat): onboarding-art.tsx + OnboardingFlow.tsx dibangun
+ulang, app/onboarding/page.tsx di-patch. 7 layar: 5 slide fitur (salinan
+headline/deskripsi persis dari brief) → pemilihan tema (Terang/Gelap/Sistem,
+pratinjau mini 3 mode, persist via updateSettings, "system" disimpan mentah,
+ikuti prefers-color-scheme live) → layar final (entrance logo resmi SuioMark
++ halo cincin, tagline "Setiap Langkah Kecil, Menuju Istiqamah.", CTA
+"Mulai Sekarang"→/auth?mode=register, "Sudah punya akun? Masuk"→/auth).
+Komponen: PhoneMockup (bezel + dynamic island + status bar 9:41) berisi
+pratinjau UI asli dibangun ulang mini (Beranda/Sholat tiket aktif oranye/
+Al-Qur'an + Arab dari data aplikasi saja/Profil statistik count-up),
+FitStage (box 340-340×430-500, scale via ResizeObserver, min .66) mencegah
+clipping semua tinggi layar; kartu melayang berposisi + float CSS compositor
+(pause via section[data-live=false]); parallax 3 lapis; teks word-rise
+per kata dengan aksen oranye; count-up rAF gated (reduced-motion/data-anim
+= nilai final instan); desktop ≥900px grid 2 kolom (teks kiri, visual
+kanan). Palet brief v15 (#F7F5F2/#171717/#FF5A00/#FFE0CC/#EFC4A8), dark
+bukan inversi (#24211F/#302925). Teks ayat TIDAK dikarang (konsisten
+kebijakan aplikasi — hanya nama surah/kaligrafi/frasa zikir dari data).
+Build lulus; QA lokal: 7 slide light+dark, swipe 0→1→0, Kembali/Lanjut,
+3 tema + persist, 360/390/430/1280 tanpa overflow (fix overlap 360),
+reduced-motion instan. Deploy Vercel live; verifikasi produksi: HTML baru,
+slide1 light/dark, Gelap→#171717, Mulai Sekarang→/auth?mode=register,
+login qa.mood.suio.20261106@gmail.com → Beranda, logout Profil → kembali
+/onboarding dengan theme tersimpan "dark" (tidak direset) ✓.
