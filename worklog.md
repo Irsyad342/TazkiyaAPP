@@ -1391,3 +1391,22 @@ Perubahan:
   endGap 32px + progress berjalan, 2 tema diverifikasi screenshot, konsol
   tanpa error; deployment Vercel production terverifikasi via pengukuran
   langsung di tazkiyaapp.vercel.app.
+
+## Task 57 — Tata Letak Emosi Mood Check-in Jurnal = Beranda
+- JurnalPage: grid grid-cols-4 (baris kedua 3 ikon menempel kiri, sel 68px
+  melebar penuh kolom, ring aktif tanpa offset, label text-[10px]) diganti
+  pola MoodSection Beranda: dua baris simetris 4+3 di tengah
+  (flex items-start justify-center gap-1), item w-[70px] shrink-0 (pas di
+  kartu 294px; 4×70+3×4=292), ikon h-14 w-14 (proporsi 56/70 = 64/80
+  Beranda), ring aktif ring-offset-tk-panel (permukaan kartu, bukan stage),
+  bayangan soft sama dengan Beranda, label text-[10.5px] leading-none
+  whitespace-nowrap (Campur aduk tetap 1 baris di kartu sempit), a11y
+  radiogroup + role=radio aria-checked, animasi spring entrance berurutan
+  (order × 0.05s) + whileTap 0.88.
+- HANYA blok ikon emosi yang berubah; logika Jurnal utuh (moodSel + setMood
+  langsung, simpan manual lewat tombol Simpan Jurnal, tanpa toast), header,
+  disclaimer, hadis, dan riwayat tidak disentuh.
+- Guard: tsc 0, eslint bersih, build sukses; QA lokal + produksi 360px:
+  2 baris 4+3, centerDelta 0 kedua baris persis sejajar tengah, item 70px,
+  ikon 56px, label 11px (1 baris), overflow-x 0; fungsi pilih emosi lulus
+  (aria-checked + caption hadis berganti); 2 tema diverifikasi screenshot.
