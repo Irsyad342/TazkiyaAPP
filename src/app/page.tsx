@@ -33,10 +33,8 @@ import { JurnalPage } from "@/components/tazkiya/JurnalPage";
 import { ZikirDoaPage } from "@/components/tazkiya/ZikirDoaPage";
 import { RizqAmalPage } from "@/components/tazkiya/RizqAmalPage";
 import { ProfilePage } from "@/components/tazkiya/ProfilePage";
-import { TasbihSheet } from "@/components/tazkiya/TasbihSheet";
 import { TasbihFullscreen } from "@/components/tazkiya/TasbihFullscreen";
 import { TargetSheet } from "@/components/tazkiya/TargetSheet";
-import type { ZikirSlot } from "@/lib/tazkiya/types";
 
 /*
  * Pembaca Al-Qur'an dimuat terpisah (lazy) — hanya diunduh saat pengguna
@@ -93,8 +91,6 @@ export default function Page() {
 
   const [tab, setTab] = useState<TabId>("beranda");
   const [subpage, setSubpage] = useState<SubPageId | null>(null);
-  const [tasbihOpen, setTasbihOpen] = useState(false);
-  const [tasbihSlot, setTasbihSlot] = useState<ZikirSlot>("harian");
   const [tasbihFullOpen, setTasbihFullOpen] = useState(false);
   const [targetOpen, setTargetOpen] = useState(false);
   const [reader, setReader] = useState<{ surah: number; ayah?: number } | null>(null);
@@ -107,8 +103,8 @@ export default function Page() {
   const tasbihRef = useRef(false);
   useEffect(() => {
     readerRef.current = reader;
-    tasbihRef.current = tasbihOpen;
-  }, [reader, tasbihOpen]);
+    tasbihRef.current = tasbihFullOpen;
+  }, [reader, tasbihFullOpen]);
 
   // Hidrasi manual setelah mount (localStorage).
   useEffect(() => {
@@ -210,7 +206,7 @@ export default function Page() {
         if (App?.addListener) {
           const handle = App.addListener("backButton", () => {
             if (readerRef.current) setReader(null);
-            else if (tasbihRef.current) setTasbihOpen(false);
+            else if (tasbihRef.current) setTasbihFullOpen(false);
             else (App as unknown as { exitApp?: () => void }).exitApp?.();
           });
           cleanup = () => {
@@ -243,10 +239,6 @@ export default function Page() {
 
   const openReader = useCallback((surah: number, ayah?: number) => setReader({ surah, ayah }), []);
   const closeReader = useCallback(() => setReader(null), []);
-  const openTasbih = useCallback((slot?: ZikirSlot) => {
-    setTasbihSlot(slot ?? "harian");
-    setTasbihOpen(true);
-  }, []);
   const openTargets = useCallback(() => setTargetOpen(true), []);
   /** "Lanjutkan Tracker" (Fokus Ibadah, halaman Profil) → halaman Sholat. */
   const goTracker = useCallback(() => {
@@ -315,7 +307,7 @@ export default function Page() {
 
                 {subpage === "jurnal" && <JurnalPage onBack={() => setSubpage(null)} />}
                 {subpage === "zikir-doa" && (
-                  <ZikirDoaPage onBack={() => setSubpage(null)} onOpenTasbih={openTasbih} onOpenTasbihFull={() => setTasbihFullOpen(true)} />
+                  <ZikirDoaPage onBack={() => setSubpage(null)} onOpenTasbihFull={() => setTasbihFullOpen(true)} />
                 )}
                 {subpage === "rizq-amal" && <RizqAmalPage onBack={() => setSubpage(null)} />}
               </m.div>
@@ -328,8 +320,6 @@ export default function Page() {
             <QuranReader key={`${reader.surah}-${reader.ayah ?? 0}`} surah={reader.surah} startAyah={reader.ayah} onClose={closeReader} />
           )}
         </AnimatePresence>
-
-        <AnimatePresence>{tasbihOpen && <TasbihSheet open={tasbihOpen} onClose={() => setTasbihOpen(false)} slot={tasbihSlot} />}</AnimatePresence>
 
         <AnimatePresence>{tasbihFullOpen && <TasbihFullscreen open={tasbihFullOpen} onClose={() => setTasbihFullOpen(false)} slot="harian" />}</AnimatePresence>
 

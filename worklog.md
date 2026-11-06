@@ -1336,3 +1336,30 @@ berkonfirmasi; target ring+statistik+4 kartu+detail+simpan target (150→kembali
 regresi Beranda/Salat (5 kartu tiket utuh)/Qur'an/Profil OK; konsol bersih.
 Catatan: Fullscreen API tak tersedia di headless (fallback overlay yang
 diverifikasi); getaran disembunyikan otomatis di headless (perancangan).
+
+## Task 54 — Koreksi halaman Zikir (arah pengguna)
+
+Umpan balik: Pilih Zikir jangan kartu besar ber-grid — kembalikan ke bubble
+pill kecil seperti gaya sebelumnya; dan di bagian Dzikir Pagi / Zikir Setelah
+Sholat / Dzikir Petang jangan ada opsi/tombol "Buka tasbih" — set zikir cukup
+menampilkan dzikir-dzikirnya saja.
+
+Perubahan:
+- `ZikirPresetPicker` ditulis ulang: grid 2 kolom kartu besar (Arab + arti +
+  chip) diganti baris bubble pill ringkas (px-3.5 py-1.5, teks 11.5px, gaya
+  identik dengan chip kategori doa & chip target). Aktif = oranye gs-ink-btn.
+  Arab/arti zikir aktif tetap tampil di penghitung. Chip "Hari ini Nx" pada
+  kartu dihapus (bukan bagian bubble).
+- `ZikirSetCard`: footer tombol "Buka tasbih, …" + keterangan slot dihapus —
+  set zikir kini murni daftar bacaan (Arab, latin, arti, jumlah, sumber).
+- Rantai yang mati ikut dibersihkan: prop `onOpenTasbih` pada ZikirDoaPage,
+  state tasbihOpen/tasbihSlot + callback openTasbih + render TasbihSheet di
+  page.tsx, import TasbihSheet/ZikirSlot; komponen `TasbihSheet.tsx` dihapus
+  (tanpa referensi; masih ada di riwayat git). Tombol kembali Android
+  (Capacitor) kini menutup TasbihFullscreen (satu-satunya permukaan tasbih
+  modal yang tersisa) — penghitung + fullscreen TETAP ADA sebagai fitur
+  Tasbih Digital di halaman itu; hanya jalur dari set zikir yang dilepas.
+- Guard: tsc 0, eslint bersih, build sukses; QA browser: bubble 6 preset
+  (±29px tinggi, tanpa grid), ketuk bubble → penghitung berganti zikir,
+  fullscreen membuka zikir yang sama, hitungan 8 tetap, keluar tertutup;
+  section Set Zikir diverifikasi 0 tombol ber-kata "tasbih"; konsol bersih.
