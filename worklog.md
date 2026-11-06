@@ -1079,3 +1079,97 @@ sampler rAF membuktikan entrance: halaman baru y=56→0 ~340ms, lama keluar ke -
 dark onboarding terverifikasi visual (meta #131217), light terverifikasi visual;
 0 overflow horizontal; console bersih; manifest "SUIO: Sujud in Order"; icon.svg mark
 baru; Beranda mood 7 emoji & halaman lain tak berubah.
+
+## Task 50 — v14: alur onboarding → theme selection → login/logout + palet mood SUIO
+
+Permintaan: (1) alur baru — pengguna baru: onboarding → theme selection → login/
+register → Beranda; pengguna berseksi → langsung Beranda; logout → KEMBALI ke awal
+onboarding (bukan /auth); sesi benar-benar terhapus; Beranda tak bisa diakses tanpa
+autentikasi; anti redirect-loop; status onboarding & autentikasi terpisah; tema
+tersimpan tetap utuh saat logout. (2) Halaman Theme Selection di dalam onboarding.
+(3-6) Emoji mood: recolor palet SUIO tanpa mengubah bentuk/ekspresi/susunan 4+3,
+varian dark menyatu charcoal tanpa outline putih, light bersih dengan soft shadow,
+animasi stagger + spring, hormati reduced motion. (7) Strict design preservation.
+(8) Implementasi + 12 pengujian + deploy.
+
+### Aset mood (scripts/recolor_mood.py)
+- Pendekatan: remap warna per-piksel, GEOMETRI UTUH — 14 klaster asli per PNG
+  dipetakan eksplisit ke target light/dark; piksel antar-klaster (anti-alias,
+  gradasi tile) = rata-rata tertimbang 3 tetangga terdekat; alpha dipertahankan.
+- Perbaikan kualitas yang terbukti perlu: (a) tangga warna konsisten tile→fitur
+  untuk klaster anti-alias (menghilangkan bintik); (b) anchor sampel tile nyata
+  (6-8 titik tepi per emoji) agar gradasi tile tak tercemar target aksen
+  (kasus bersyukur); (c) cincin tepi siluet 2px (light) / 6px (dark) diwarnai
+  ulang dari interior terdekat — matte putih + "sticker stroke" artwork asli
+  tidak menyisakan outline di latar gelap.
+- Set light (public/mood/*.png): bahagia orange cerah #FF9A52; tenang soft orange
+  #FFB27A; bersyukur ivory #FFE0CC + hati burnt #D94B0A + blush soft orange;
+  lelah burnt #DC5A10; sedih warm gray #8F8781 + air mata warm ivory #FFF1E6;
+  cemas clay muted #BE8A62; campur-aduk peach #FFD9B8. Fitur charcoal #202020,
+  glint ivory. Audit hue: 100% piksel saturat dalam keluarga oranye hangat
+  (sedih sengaja netral); 0 biru/pink/hijau/kuning.
+- Set dark (public/mood/dark/*.png): tile charcoal #272220 (menyatu dgn bg
+  #131217), fitur warm ivory #FFE4D0 / #F7D0B0, air mata #FFE9D8, glint membalik
+  gelap #2A2521, aksen orange; tanpa outline putih, tanpa area menyilaukan.
+- Original 7 PNG dicadangkan scripts/mood_originals/ (masuk git agar skrip
+  re-runnable).
+
+### Komponen mood
+- MoodFace: kini span + 2 img (light:/dark: custom variant) — varian mengikuti
+  data-theme murni via CSS, tanpa state. Ukuran dari pemanggil tak berubah.
+- MoodSection (Beranda): tile non-aktif diberi soft shadow (light: warm gray
+  rgba(119,113,109,.42) + hairline ring; dark: shadow dalam + ring white/5);
+  aktif: ring-2 oranye + shadow orange lebih kuat (persis permintaan).
+  Entrance stagger + spring pop sudah ada, kini di-guard motionOK =
+  settings.animations && !useReducedMotion (initial=false, whileTap off).
+- JurnalPage picker: dinaikkan ke m.button — stagger masuk per index, spring
+  scale 1.08 saat aktif + kembali saat batal, whileTap, shadow per mode sama
+  dengan Beranda. Struktur grid-cols-4, ukuran, label TIDAK berubah.
+- onboarding-art: chip mood memakai MoodFace (ikut tema).
+
+### Alur autentikasi
+- lib/tazkiya/onboarding.ts: + clearOnboarded() (hapus flag + notify); komentar
+  diperbarui: flag onboarding & status auth dikelola terpisah.
+- page.tsx gerbang v14: signedIn → Beranda (+markOnboarded bila perlu);
+  signedOut → clearOnboarded + /onboarding (BAPAK alur logout); unconfigured +
+  sudah onboarding → mode lokal tetap; loading → tunggu (3 dtk → /onboarding).
+  Beranda tak lagi bisa diakses tanpa sesi.
+- ProfilePage logout: await signOut() (sesi Supabase dihapus via sb.auth.signOut,
+  pembersihan data lokal tetap oleh cloud-sync) → clearOnboarded() → router.
+  replace('/onboarding'); toast tetap. Tema TIDAK disentuh.
+- onboarding/page.tsx: bounce rules baru — signedIn → markOnboarded + "/";
+  isOnboarded() tanpa sesi → "/auth". initialTheme=resolveStoredTheme()
+  diteruskan ke Flow. Anti-loop: /onboarding tak pernah melempar ke /auth
+  selama flag kosong; /auth hanya melempar saat signedIn.
+- OnboardingFlow: + initialTheme; + state tema & pickTheme() — flip
+  documentElement.dataset.theme + meta theme-color + persist ke pengaturan
+  existing (useWorshipStore.updateSettings({theme})) — mekanisme yang SAMA
+  dengan halaman pengaturan tema Profil (tak diubah). Kanvas + teks utama
+  diberi transition-colors 500ms sehingga pergantian tema beranimasi halus.
+  SLIDES +1: "Choose Your Experience" (judul/deskripsi persis brief) — CTA
+  Continue → onDone('/auth?mode=register'); baris "Sudah punya akun? Masuk"
+  pindah ke slide ini; Lewati kini → '/auth'; slide 5 CTA menjadi 'Lanjut';
+  trek w-[600%], x/6, w-1/6.
+
+### Theme selection page (onboarding-art ThemePreviewArt)
+- Dua mini preview BERDAMPINGAN yang benar2 menggambarkan aplikasi: header
+  branding SUIO, kartu Shalat (Subuh/Zuhur/Asar + chip Selesai + progress 4/5),
+  kartu mood MoodFace, pill CTA — masing-masing memakai palet temanya sendiri
+  (warm white/putih/charcoal-oranye vs deep charcoal/dark gray/orange/ivory).
+- Selected state: outline oranye 2.5px + offset, badge check oranye beranimasi
+  scale, label oranye; m.button whileTap + spring scale. Pilihan tersimpan
+  seketika; kanvas seluruh onboarding bertransisi mengikuti.
+
+### QA (lokal, semua lulus)
+tsc 0 · eslint 0 · build sukses. Browser: fresh → /onboarding 6 slide; slide 6
+radios + Continue + Masuk; pilih dark → dataset.theme/meta/store berubah &
+kanvan bertransisi (screenshot dark+light); pilih light → kembali; Continue →
+/auth?mode=register + flag done; register akun uji → sesi langsung → Beranda;
+mood dark: varian dark tampil (light none), pilih Bahagia → tersimpan + ring;
+flip data-theme → varian light tampil (screenshot keduanya); Jurnal picker 7
+tile + seleksi sinkron; logout → /onboarding slide 1, flag null, sb-* kosong,
+theme dark PRESERVED; Masuk dari slide tema → /auth → login → Beranda + mood
+akun kembali; signedIn: /onboarding & /auth memantul ke "/", "/" langsung
+Beranda — tanpa loop; mood berganti tenang tersimpan; tanpa overflow
+horizontal; console bersih; Al-Qur'an/Profil normal; pengaturan tema Profil
+(Terang/Gelap/Sistem) utuh.

@@ -27,7 +27,8 @@ import { LazyMotion, MotionConfig, domAnimation, m } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { SuioMark } from "@/components/tazkiya/brand";
 import { Star8 } from "@/components/tazkiya/ornaments";
-import { WelcomeArt, IbadahArt, QuranArt, BarakahArt, FinalArt } from "@/components/tazkiya/onboarding-art";
+import { WelcomeArt, IbadahArt, QuranArt, BarakahArt, FinalArt, ThemePreviewArt } from "@/components/tazkiya/onboarding-art";
+import { useWorshipStore } from "@/lib/tazkiya/store";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -60,7 +61,15 @@ const SLIDES = [
     description: "Langkah kecil yang dilakukan dengan konsisten dapat menjadi perjalanan yang berarti.",
     Art: FinalArt,
   },
-];
+  {
+    headline: "Choose Your Experience",
+    description: "Sesuaikan tampilan SUIO dengan kenyamananmu. Pilih tampilan terang atau gelap sesuai preferensimu.",
+    Art: null, // slide pemilihan tema — digambar ThemePreviewArt
+  },
+] as const;
+
+/** Warna kanvas per tema (sinkron dengan CANVAS di app/onboarding/page.tsx). */
+const CANVAS = { dark: "#131217", light: "#f4f2f7" } as const;
 
 /* Varian animasi teks: stagger per elemen, judul naik dari balik topeng. */
 const textContainer = {
@@ -76,15 +85,34 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
 };
 
-export function OnboardingFlow({ onDone }: { onDone: (target: string) => void }) {
+export function OnboardingFlow({
+  initialTheme,
+  onDone,
+}: {
+  /** Tema awal (dari pengaturan tersimpan atau preferensi sistem). */
+  initialTheme: "dark" | "light";
+  onDone: (target: string) => void;
+}) {
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState(1);
   const [entered, setEntered] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">(initialTheme);
 
   /* Entrance sekali di awal: header → ilustrasi → teks → footer. */
   useEffect(() => {
     const t = window.setTimeout(() => setEntered(true), 60);
     return () => window.clearTimeout(t);
+  }, []);
+
+  /* Pilih tema: flip data-theme seluruh halaman (kanvas bertransisi
+     lewat CSS), simpan ke mekanisme pengaturan yang sudah ada, dan
+     sinkronkan warna bilah status. Preferensi ini bertahan meski
+     pengguna logout. */
+  const pickTheme = useCallback((t: "dark" | "light") => {
+    setTheme(t);
+    document.documentElement.dataset.theme = t;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", CANVAS[t]);
+    useWorshipStore.getState().updateSettings({ theme: t });
   }, []);
 
   const go = useCallback(
@@ -141,17 +169,16 @@ export function OnboardingFlow({ onDone }: { onDone: (target: string) => void })
     horizontal.current = null;
   };
 
-  const slide = SLIDES[index];
   const last = index === SLIDES.length - 1;
 
   return (
     <MotionConfig reducedMotion="user">
       <LazyMotion features={domAnimation} strict>
         <main
-          className="relative h-dvh w-full overflow-hidden bg-[#131217] light:bg-[#f4f2f7]"
+          className="relative h-dvh w-full overflow-hidden bg-[#131217] transition-colors duration-500 light:bg-[#f4f2f7]"
           aria-label="Perkenalan SUIO"
         >
-          <div className="relative mx-auto flex h-full w-full max-w-[430px] flex-col overflow-hidden bg-[#131217] light:bg-[#f4f2f7] desktop:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_40px_90px_-40px_rgba(0,0,0,0.55)] desktop:light:shadow-[0_0_0_1px_rgba(23,20,40,0.06),0_40px_90px_-40px_rgba(40,30,80,0.25)]">
+          <div className="relative mx-auto flex h-full w-full max-w-[430px] flex-col overflow-hidden bg-[#131217] transition-colors duration-500 light:bg-[#f4f2f7] desktop:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_40px_90px_-40px_rgba(0,0,0,0.55)] desktop:light:shadow-[0_0_0_1px_rgba(23,20,40,0.06),0_40px_90px_-40px_rgba(40,30,80,0.25)]">
 
             {/* ---------- Latar: blob lavender + oranye, parallax antar slide ---------- */}
             <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
@@ -193,7 +220,7 @@ export function OnboardingFlow({ onDone }: { onDone: (target: string) => void })
               <div className="flex items-center gap-2.5">
                 <SuioMark size={36} />
                 <div>
-                  <p className="font-display text-[15px] font-extrabold leading-none tracking-[0.06em] text-white light:text-[#17171b]">
+                  <p className="font-display text-[15px] font-extrabold leading-none tracking-[0.06em] text-white transition-colors duration-500 light:text-[#17171b]">
                     SUIO
                   </p>
                   <p className="mt-[5px] text-[8px] font-semibold uppercase leading-none tracking-[0.2em] text-[#a5a1b3] light:text-[#9a96a5]">
@@ -203,8 +230,8 @@ export function OnboardingFlow({ onDone }: { onDone: (target: string) => void })
               </div>
               <button
                 type="button"
-                onClick={() => onDone("/")}
-                className="tap rounded-full border px-3.5 py-2 text-[11.5px] font-bold text-[#a5a1b3] light:border-[#e4e0ee] light:bg-white/70 light:text-[#7a7686] dark:border-white/[0.09] dark:bg-white/[0.04] transition-colors hover:text-white light:hover:text-[#17171b]"
+                onClick={() => onDone("/auth")}
+                className="tap rounded-full border px-3.5 py-2 text-[11.5px] font-bold text-[#a5a1b3] transition-colors light:border-[#e4e0ee] light:bg-white/70 light:text-[#7a7686] dark:border-white/[0.09] dark:bg-white/[0.04] hover:text-white light:hover:text-[#17171b]"
               >
                 Lewati
               </button>
@@ -220,8 +247,8 @@ export function OnboardingFlow({ onDone }: { onDone: (target: string) => void })
               onPointerCancel={onPointerUp}
             >
               <m.div
-                className="flex h-full w-[500%]"
-                animate={{ x: `${(-index * 100) / 5}%` }}
+                className="flex h-full w-[600%]"
+                animate={{ x: `${(-index * 100) / 6}%` }}
                 transition={{ type: "spring", stiffness: 300, damping: 33, mass: 0.9 }}
               >
                 {SLIDES.map((s, i) => {
@@ -230,7 +257,7 @@ export function OnboardingFlow({ onDone }: { onDone: (target: string) => void })
                     <section
                       key={s.headline}
                       aria-hidden={!active}
-                      className="flex h-full w-1/5 flex-col items-center justify-center px-7"
+                      className="flex h-full w-1/6 flex-col items-center justify-center px-7"
                     >
                       {/* Ilustrasi: fade + scale + geser melawan arah (parallax) */}
                       <m.div
@@ -243,7 +270,7 @@ export function OnboardingFlow({ onDone }: { onDone: (target: string) => void })
                         transition={{ duration: 0.6, ease: EASE }}
                         className="flex h-[clamp(200px,32dvh,258px)] w-full items-center justify-center"
                       >
-                        <s.Art />
+                        {s.Art ? <s.Art /> : <ThemePreviewArt selected={theme} onSelect={pickTheme} />}
                       </m.div>
 
                       {/* Teks: stagger per kata saat slide aktif */}
@@ -253,7 +280,7 @@ export function OnboardingFlow({ onDone }: { onDone: (target: string) => void })
                         animate={active ? "show" : "hidden"}
                         className="mt-6 flex w-full flex-col items-center text-center"
                       >
-                        <h1 className="text-[27px] font-extrabold leading-[1.16] tracking-[-0.025em] text-white light:text-[#1b1922]">
+                        <h1 className="text-[27px] font-extrabold leading-[1.16] tracking-[-0.025em] text-white transition-colors duration-500 light:text-[#1b1922]">
                           {s.headline.split(" ").map((w, wi) => (
                             <span key={wi} className="inline-block overflow-hidden pb-[0.08em] align-bottom">
                               <m.span variants={wordRise} className="inline-block">
@@ -265,7 +292,7 @@ export function OnboardingFlow({ onDone }: { onDone: (target: string) => void })
                         </h1>
                         <m.p
                           variants={fadeUp}
-                          className="mt-3.5 max-w-[300px] text-[13px] leading-[1.75] text-[#aba7b6] light:text-[#5f5b6b]"
+                          className="mt-3.5 max-w-[300px] text-[13px] leading-[1.75] text-[#aba7b6] transition-colors duration-500 light:text-[#5f5b6b]"
                         >
                           {s.description}
                         </m.p>
@@ -311,18 +338,18 @@ export function OnboardingFlow({ onDone }: { onDone: (target: string) => void })
                 className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#FA5200] font-display text-[14.5px] font-bold text-white"
                 style={{ boxShadow: "0 18px 40px -16px rgba(250,82,0,0.55)" }}
               >
-                {last ? null : <ArrowRight size={17} />}
-                {last ? "Mulai Sekarang" : "Lanjut"}
+                <ArrowRight size={17} />
+                {last ? "Continue" : "Lanjut"}
               </m.button>
 
-              {/* Baris masuk, hanya di layar akhir; tinggi dicadangkan agar tidak lompat */}
+              {/* Baris masuk, hanya di layar pemilihan tema; tinggi dicadangkan agar tidak lompat */}
               <div className="mt-3 flex h-5 items-center justify-center">
                 {last && (
                   <m.p
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, ease: EASE }}
-                    className="text-[12px] text-[#a5a1b3] light:text-[#7a7686]"
+                    className="text-[12px] text-[#a5a1b3] transition-colors duration-500 light:text-[#7a7686]"
                   >
                     Sudah punya akun?{" "}
                     <button type="button" onClick={() => onDone("/auth")} className="tap font-bold text-[#ff6b26] light:text-[#e04a00]">

@@ -16,9 +16,10 @@
  */
 
 import { m } from "framer-motion";
-import { BookOpen, Heart, MoonStar, Sparkles } from "lucide-react";
+import { BookOpen, Check, Heart, MoonStar, Sparkles } from "lucide-react";
 import { Star8 } from "@/components/tazkiya/ornaments";
 import { SuioMark } from "@/components/tazkiya/brand";
+import { MoodFace } from "@/components/tazkiya/MoodFace";
 
 /* ---------- Kelas permukaan kartu (tema-aware) ---------- */
 const CARD =
@@ -169,7 +170,7 @@ export function WelcomeArt() {
       {/* Chip aktivitas harian (mood) kanan-atas */}
       <TiltCard rot={3} className="absolute right-[6px] top-0">
         <div className={`flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3 ${CARD}`}>
-          <img src="/mood/tenang.png" alt="" className="h-6 w-6 rounded-lg" />
+          <MoodFace id="tenang" className="h-6 w-6" />
           <span className="text-[8.5px] font-bold leading-none">Aktivitas harian</span>
         </div>
       </TiltCard>
@@ -387,11 +388,185 @@ export function FinalArt() {
       </TiltCard>
       <TiltCard rot={-4} className="absolute bottom-[30px] right-[2px]">
         <div className={`flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3 ${CARD}`}>
-          <img src="/mood/bersyukur.png" alt="" className="h-6 w-6 rounded-lg" />
+          <MoodFace id="bersyukur" className="h-6 w-6" />
           <span className="text-[8px] font-bold leading-none">Bersyukur</span>
         </div>
       </TiltCard>
       <Star8 size={13} className="tk-ob-float tk-ob-float-delay absolute right-[44px] top-[8px] text-[#FA5200]/40" />
+    </div>
+  );
+}
+
+/* ---------- v14: Pemilih tema — dua mini preview antarmuka SUIO ---------- */
+
+type ThemeChoice = "dark" | "light";
+
+/** Kartu mini yang MENGgambarkan tampilan aplikasi pada temanya sendiri:
+    header branding, kartu jadwal salat, dan pill CTA — diperkaya aksen
+    oranye/lavender khas SUIO. Setiap preview selalu memakai warna tema
+    tujuannya (bukan tema aktif), sehingga perbandingannya jujur. */
+function MiniPreview({ kind }: { kind: ThemeChoice }) {
+  const light = kind === "light";
+  return (
+    <div
+      className="flex h-full w-full flex-col rounded-[22px] p-3"
+      style={{
+        background: light ? "#F4F2F7" : "#131217",
+        boxShadow: light
+          ? "inset 0 0 0 1px rgba(23,20,40,0.06)"
+          : "inset 0 0 0 1px rgba(255,255,255,0.07)",
+      }}
+    >
+      {/* Header branding */}
+      <div className="flex items-center gap-1.5">
+        <span
+          className="flex h-[18px] w-[18px] items-center justify-center rounded-md"
+          style={{ background: `linear-gradient(135deg, #FF7A38, ${ORANGE})` }}
+        >
+          <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" aria-hidden>
+            <path d="M5 16.5c0-4 3.2-7.2 7-7.2s7 3.2 7 7.2" stroke="#fff" strokeWidth="2.1" strokeLinecap="round" />
+            <circle cx="12" cy="6.6" r="1.7" fill="#fff" />
+            <path d="M4.5 18.6h15" stroke="#fff" strokeWidth="2.1" strokeLinecap="round" />
+          </svg>
+        </span>
+        <span
+          className="font-display text-[9px] font-extrabold tracking-[0.06em]"
+          style={{ color: light ? "#17171b" : "#ffffff" }}
+        >
+          SUIO
+        </span>
+      </div>
+
+      {/* Kartu jadwal salat mini */}
+      <div
+        className="mt-2.5 rounded-2xl p-2.5"
+        style={{
+          background: light ? "#ffffff" : "#211f26",
+          boxShadow: light ? "0 10px 22px -12px rgba(60,45,110,0.28)" : "0 12px 26px -14px rgba(0,0,0,0.85)",
+        }}
+      >
+        <div className="flex items-center justify-between">
+          <span className="text-[7px] font-extrabold uppercase tracking-[0.14em]" style={{ color: light ? "#9a96a5" : "#77737f" }}>
+            Shalat
+          </span>
+          <span
+            className="rounded-full px-1.5 py-[2px] text-[6.5px] font-bold"
+            style={{ background: light ? "#ffe9de" : "rgba(250,82,0,0.16)", color: light ? "#e04a00" : "#ff8a4d" }}
+          >
+            Selesai
+          </span>
+        </div>
+        {[
+          ["Subuh", "04:32"],
+          ["Zuhur", "11:58"],
+          ["Asar", "15:19"],
+        ].map(([nm, tm], i) => (
+          <div key={nm} className="mt-1.5 flex items-center gap-1.5">
+            <span
+              className="h-[7px] w-[7px] rounded-full"
+              style={{ background: i === 0 ? ORANGE : light ? "#e4e0ee" : "#37333f" }}
+            />
+            <span className="flex-1 text-[8px] font-bold leading-none" style={{ color: light ? "#17171b" : "#f0eef6" }}>
+              {nm}
+            </span>
+            <span className="text-[7.5px] font-semibold leading-none" style={{ color: light ? "#6f6b7a" : "#a5a1b3" }}>
+              {tm}
+            </span>
+          </div>
+        ))}
+        {/* Progress bar 4/5 */}
+        <div className="mt-2.5 flex items-center gap-1.5">
+          <div className="h-[5px] flex-1 overflow-hidden rounded-full" style={{ background: light ? "#efecf4" : "#2e2a36" }}>
+            <div className="h-full w-[80%] rounded-full" style={{ background: `linear-gradient(90deg, #FF9A52, ${ORANGE})` }} />
+          </div>
+          <span className="text-[7px] font-extrabold" style={{ color: ORANGE }}>
+            4/5
+          </span>
+        </div>
+      </div>
+
+      {/* Kartu mood mini */}
+      <div
+        className="mt-2 flex items-center gap-2 rounded-2xl p-2"
+        style={{ background: light ? "#ffffff" : "#211f26" }}
+      >
+        <MoodFace id={light ? "bahagia" : "tenang"} className="h-6 w-6" />
+        <div className="min-w-0">
+          <p className="truncate text-[7.5px] font-bold leading-none" style={{ color: light ? "#17171b" : "#f0eef6" }}>
+            Aktivitas harian
+          </p>
+          <p className="mt-[3px] text-[6.5px] leading-none" style={{ color: light ? "#9a96a5" : "#77737f" }}>
+            Mood tercatat hari ini
+          </p>
+        </div>
+      </div>
+
+      {/* Pill CTA */}
+      <div
+        className="mt-auto flex items-center justify-center gap-1 rounded-full py-[7px]"
+        style={{ background: ORANGE, boxShadow: "0 8px 18px -8px rgba(250,82,0,0.55)" }}
+      >
+        <span className="text-[8px] font-bold text-white">Lanjut</span>
+      </div>
+    </div>
+  );
+}
+
+/** Dua pilihan berdampingan dengan selected state oranye + check. */
+export function ThemePreviewArt({
+  selected,
+  onSelect,
+}: {
+  selected: ThemeChoice;
+  onSelect: (t: ThemeChoice) => void;
+}) {
+  const items: { id: ThemeChoice; label: string }[] = [
+    { id: "light", label: "Light Mode" },
+    { id: "dark", label: "Dark Mode" },
+  ];
+  return (
+    <div className="flex w-full items-stretch justify-center gap-3.5">
+      {items.map((it) => {
+        const active = selected === it.id;
+        return (
+          <m.button
+            key={it.id}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            aria-label={`Pilih ${it.label}`}
+            onClick={() => onSelect(it.id)}
+            whileTap={{ scale: 0.97 }}
+            animate={{ scale: active ? 1.015 : 1 }}
+            transition={{ type: "spring", stiffness: 380, damping: 24 }}
+            className="relative w-[46%] max-w-[172px] rounded-[24px]"
+            style={{
+              outline: active ? `2.5px solid ${ORANGE}` : "2.5px solid transparent",
+              outlineOffset: 4,
+              transition: "outline-color 0.3s ease, outline-offset 0.3s ease",
+            }}
+          >
+            <MiniPreview kind={it.id} />
+            <span
+              className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-300"
+              style={{
+                background: ORANGE,
+                transform: active ? "scale(1)" : "scale(0)",
+                boxShadow: "0 6px 14px -4px rgba(250,82,0,0.6)",
+              }}
+            >
+              <Check size={13} strokeWidth={3} className="text-white" />
+            </span>
+            <span
+              className={`mt-2.5 block text-center text-[10.5px] font-bold transition-colors duration-300 ${
+                active ? "text-[#FA5200]" : "text-[#aba7b6] light:text-[#5f5b6b] opacity-70"
+              }`}
+            >
+              {it.label}
+            </span>
+          </m.button>
+        );
+      })}
     </div>
   );
 }

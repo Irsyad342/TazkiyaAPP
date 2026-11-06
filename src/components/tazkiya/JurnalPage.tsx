@@ -13,6 +13,7 @@
 import { useMemo, useState } from "react";
 import { Check, Heart, Lock, BookHeart, Share2, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { m, useReducedMotion } from "framer-motion";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { MOODS, moodLabel, type MoodId } from "@/lib/tazkiya/types";
 import { hadithForMood } from "@/lib/tazkiya/hadith";
@@ -57,6 +58,9 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
 
   const activeMood = moodSel ?? moods[today]?.mood;
   const hadith = useMemo(() => hadithForMood(activeMood, today, hadithOffset), [activeMood, today, hadithOffset]);
+  const animationsOn = useWorshipStore((s) => s.settings.animations);
+  const reduceMotion = useReducedMotion();
+  const motionOK = animationsOn && !reduceMotion;
 
   const canSave = items.some((it) => it.trim().length > 0);
 
@@ -144,10 +148,10 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
           <SectionHeader title="Mood Check-in" caption="Pilihanmu sepenuhnya milikmu" />
           <GlassCard className="p-4">
             <div className="grid grid-cols-4 gap-2">
-              {MOODS.map((mo) => {
+              {MOODS.map((mo, i) => {
                 const active = activeMood === mo.id;
                 return (
-                  <button
+                  <m.button
                     key={mo.id}
                     type="button"
                     aria-pressed={active}
@@ -156,21 +160,29 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                       setMoodSel(mo.id);
                       setMood(today, mo.id);
                     }}
+                    initial={motionOK ? { opacity: 0, scale: 0.6, y: 8 } : false}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ type: "spring", stiffness: 420, damping: 24, delay: motionOK ? i * 0.05 : 0 }}
+                    whileTap={motionOK ? { scale: 0.9 } : undefined}
                     className="tap flex flex-col items-center gap-2 rounded-[1.2rem] px-1 py-3 transition-all"
                   >
-                    <span
+                    <m.span
                       aria-hidden
+                      animate={{ scale: motionOK && active ? 1.08 : 1 }}
+                      transition={{ type: "spring", stiffness: 420, damping: 20 }}
                       className={cn(
-                        "flex rounded-[25%] transition-all",
-                        active && "shadow-[0_8px_18px_-8px_rgba(250,82,0,0.5)] ring-2 ring-tk-accent"
+                        "flex rounded-[25%] transition-[box-shadow] duration-300",
+                        active
+                          ? "ring-2 ring-tk-accent light:shadow-[0_10px_20px_-8px_rgba(255,90,0,0.45)] dark:shadow-[0_10px_22px_-10px_rgba(255,90,0,0.4)]"
+                          : "light:shadow-[0_5px_12px_-6px_rgba(119,113,109,0.42)] light:ring-1 light:ring-[#2a2320]/[0.06] dark:shadow-[0_6px_14px_-8px_rgba(0,0,0,0.5)] dark:ring-1 dark:ring-white/[0.05]"
                       )}
                     >
                       <MoodFace id={mo.id} className="h-[52px] w-[52px]" />
-                    </span>
+                    </m.span>
                     <span className={cn("text-[10px] font-bold leading-tight", active ? "text-tk-ink" : "text-tk-muted")}>
                       {mo.label}
                     </span>
-                  </button>
+                  </m.button>
                 );
               })}
             </div>

@@ -1,14 +1,15 @@
 "use client";
 
 /**
- * SUIO v13 — Rute onboarding.
+ * SUIO v14 — Rute onboarding.
  *
- * Kunjungan pertama per perangkat diarahkan ke sini oleh gerbang di
- * src/app/page.tsx. Halaman ini pembungkus tipis: memantul ke Beranda
- * bila onboarding pernah diselesaikan ATAU pengguna sudah login,
- * mengatur judul dokumen + warna bilah status sesuai TEMA aktif
- * (pengaturan tersimpan, atau preferensi sistem untuk pengunjung baru),
- * lalu menyerahkan semuanya ke OnboardingFlow.
+ * Alur: onboarding → pemilihan tema → login/registrasi → Beranda.
+ * Halaman ini pembungkus tipis: memantul ke Beranda bila pengguna sudah
+ * login, atau ke /auth bila onboarding pernah diselesaikan tanpa sesi
+ * (Beranda tidak boleh diakses tanpa autentikasi). Setelah logout flag
+ * onboarding dihapus, sehingga halaman ini tampil lagi dari awal.
+ * Judul dokumen + warna bilah status mengikuti TEMA aktif (pengaturan
+ * tersimpan, atau preferensi sistem untuk pengunjung baru).
  */
 
 import { useEffect } from "react";
@@ -42,11 +43,13 @@ export default function OnboardingPage() {
     void useAuthStore.getState().initAuth();
   }, []);
 
-  // Sudah pernah onboarding / sudah login → tidak perlu sambutan lagi.
+  // Sudah login → langsung Beranda; sudah onboarding tanpa sesi → login.
   useEffect(() => {
-    if (isOnboarded() || status === "signedIn") {
+    if (status === "signedIn") {
       markOnboarded();
       router.replace("/");
+    } else if (isOnboarded()) {
+      router.replace("/auth");
     }
   }, [status, router]);
 
@@ -64,5 +67,13 @@ export default function OnboardingPage() {
     };
   }, []);
 
-  return <OnboardingFlow onDone={(target) => { markOnboarded(); router.replace(target); }} />;
+  return (
+    <OnboardingFlow
+      initialTheme={resolveStoredTheme()}
+      onDone={(target) => {
+        markOnboarded();
+        router.replace(target);
+      }}
+    />
+  );
 }

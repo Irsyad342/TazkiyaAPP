@@ -19,6 +19,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   BadgeCheck,
   Bell,
@@ -61,6 +62,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { useAuthStore } from "@/lib/auth/auth-store";
+import { clearOnboarded } from "@/lib/tazkiya/onboarding";
 import {
   PRAYERS,
   SALAT_JUMAT,
@@ -129,6 +131,7 @@ export function ProfilePage({
   const syncPhase = useAuthStore((s) => s.syncPhase);
   const syncError = useAuthStore((s) => s.syncError);
   const signOut = useAuthStore((s) => s.signOut);
+  const router = useRouter();
 
   const fileRef = useRef<HTMLInputElement>(null);
   const [editingName, setEditingName] = useState(false);
@@ -580,7 +583,15 @@ export function ProfilePage({
                     <AlertDialogCancel>Batal</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => {
-                        void signOut();
+                        void (async () => {
+                          await signOut();
+                          // v14: logout selalu kembali ke awal onboarding
+                          // (onboarding → pilih tema → login), bukan ke
+                          // halaman login. Sesi Supabase sudah dihapus
+                          // oleh signOut; preferensi tema tidak disentuh.
+                          clearOnboarded();
+                          router.replace("/onboarding");
+                        })();
                         toast.info("Kamu telah keluar, data akunmu tersimpan aman.");
                       }}
                     >

@@ -11,7 +11,7 @@
 
 import { BookHeart, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
-import { m } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { MOODS, moodLabel, type MoodId } from "@/lib/tazkiya/types";
 import { MoodFace } from "./MoodFace";
@@ -38,6 +38,9 @@ export function MoodSection({
 }) {
   const moodToday = useWorshipStore((s) => s.moods[today]?.mood);
   const setMood = useWorshipStore((s) => s.setMood);
+  const animationsOn = useWorshipStore((s) => s.settings.animations);
+  const reduceMotion = useReducedMotion();
+  const motionOK = animationsOn && !reduceMotion;
 
   const select = (id: MoodId, label: string) => {
     setMood(today, id);
@@ -66,20 +69,21 @@ export function MoodSection({
                   aria-checked={active}
                   aria-label={`Mood ${mo.label}`}
                   onClick={() => select(mo.id, mo.label)}
-                  initial={{ opacity: 0, scale: 0.55, y: 8 }}
+                  initial={motionOK ? { opacity: 0, scale: 0.55, y: 8 } : false}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ type: "spring", stiffness: 420, damping: 24, delay: 0.05 + order * 0.05 }}
-                  whileTap={{ scale: 0.88 }}
+                  transition={{ type: "spring", stiffness: 420, damping: 24, delay: motionOK ? 0.05 + order * 0.05 : 0 }}
+                  whileTap={motionOK ? { scale: 0.88 } : undefined}
                   className="tap flex w-[80px] shrink-0 flex-col items-center gap-2 rounded-2xl px-1 py-2"
                 >
                   <m.span
                     aria-hidden
-                    animate={{ scale: active ? 1.08 : 1 }}
+                    animate={{ scale: motionOK && active ? 1.08 : 1 }}
                     transition={{ type: "spring", stiffness: 420, damping: 20 }}
                     className={cn(
                       "flex rounded-[25%] transition-[box-shadow] duration-300",
-                      active &&
-                        "shadow-[0_10px_22px_-10px_rgba(250,82,0,0.55)] ring-2 ring-tk-accent ring-offset-2 ring-offset-tk-stage"
+                      active
+                        ? "ring-2 ring-tk-accent ring-offset-2 ring-offset-tk-stage light:shadow-[0_10px_22px_-8px_rgba(255,90,0,0.45)] dark:shadow-[0_10px_24px_-10px_rgba(255,90,0,0.4)]"
+                        : "light:shadow-[0_6px_14px_-6px_rgba(119,113,109,0.42)] light:ring-1 light:ring-[#2a2320]/[0.06] dark:shadow-[0_8px_18px_-10px_rgba(0,0,0,0.55)] dark:ring-1 dark:ring-white/[0.05]"
                     )}
                   >
                     <MoodFace id={mo.id} className="h-16 w-16" />

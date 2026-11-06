@@ -20,7 +20,7 @@ import { AnimatePresence, LazyMotion, domAnimation, m } from "framer-motion";
 import { LoaderCircle } from "lucide-react";
 import { Toaster } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
-import { isOnboarded, markOnboarded, subscribeOnboarding, getOnboardedSnapshot, getOnboardedServerSnapshot } from "@/lib/tazkiya/onboarding";
+import { isOnboarded, markOnboarded, clearOnboarded, subscribeOnboarding, getOnboardedSnapshot, getOnboardedServerSnapshot } from "@/lib/tazkiya/onboarding";
 import { useAuthStore } from "@/lib/auth/auth-store";
 import { initSyncBridge } from "@/lib/sync/cloud-sync";
 import { BottomNav, type SubPageId, type TabId } from "@/components/tazkiya/BottomNav";
@@ -113,10 +113,14 @@ export default function Page() {
     useWorshipStore.persist.rehydrate();
   }, []);
 
-  // Gerbang onboarding (v12): hanya kunjungan pertama per perangkat yang
-  // diarahkan ke /onboarding. Pengguna yang sudah login langsung masuk
-  // Beranda dan ditandai selesai; sesi yang tak kunjung pasti (jaringan
-  // lambat) diperlakukan seperti pengguna baru setelah batas 3 detik.
+  // Gerbang alur (v14): status onboarding dan autentikasi dikelola
+  // TERPISAH. Sesi valid → langsung Beranda; kunjungan pertama tanpa
+  // sesi → /onboarding; logout/sesi berakhir → flag onboarding dihapus
+  // dan pengguna kembali ke /onboarding (bukan /auth). Mode
+  // unconfigured (deployment tanpa Supabase) tetap boleh memakai
+  // aplikasi secara lokal seperti sebelumnya. Sesi yang tak kunjung
+  // pasti (jaringan lambat) diperlakukan seperti pengguna baru setelah
+  // batas 3 detik.
   const router = useRouter();
   const authStatus = useAuthStore((s) => s.status);
   const onboarded = useSyncExternalStore(subscribeOnboarding, getOnboardedSnapshot, getOnboardedServerSnapshot);
@@ -132,12 +136,19 @@ export default function Page() {
   }, [onboarded, router]);
 
   useEffect(() => {
-    if (onboarded) return;
+    if (authStatus === "loading") return;
     if (authStatus === "signedIn") {
-      markOnboarded(); // memberi tahu pelanggan → snapshot berubah
-    } else if (authStatus === "signedOut" || authStatus === "unconfigured") {
+      // Pengguna berseksi valid selalu masuk Beranda, apa pun flag-nya.
+      if (!onboarded) markOnboarded(); // memberi tahu pelanggan → snapshot berubah
+      return;
+    }
+    if (!onboarded || authStatus === "signedOut") {
+      // Logout: hapus flag onboarding agar alur berikutnya adalah
+      // onboarding → pilih tema → login, bukan langsung /auth.
+      if (authStatus === "signedOut" && onboarded) clearOnboarded();
       router.replace("/onboarding");
     }
+    // unconfigured + sudah onboarding → mode lokal, tetap di aplikasi.
   }, [authStatus, onboarded, router]);
 
   // Tema: data-theme pada <html>; "system" mengikuti preferensi perangkat.

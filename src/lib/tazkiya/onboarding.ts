@@ -1,9 +1,10 @@
 /**
- * Tazkiya — Status penyelesaian onboarding (per perangkat, bukan per akun).
+ * SUIO — status penyelesaian onboarding (per perangkat, bukan per akun).
  *
- * Flag sengaja disimpan terpisah dari store ibadah (tazkiya-store-v1):
- * pembersihan data lokal saat logout tidak boleh membuat pengguna melihat
- * onboarding ulang. Mekanisme sama dengan tema: localStorage langsung.
+ * Flag sengaja disimpan terpisah dari store ibadah (tazkiya-store-v1)
+ * dan dari status autentikasi: keduanya dikelola mandiri. v14: logout
+ * menghapus flag ini agar pengguna kembali ke awal onboarding, sementara
+ * preferensi tema (settings.theme di store) tetap tersimpan.
  */
 export const ONBOARDING_KEY = "tazkiya-onboarding-v1";
 
@@ -20,6 +21,10 @@ export function isOnboarded(): boolean {
 type Listener = () => void;
 const listeners = new Set<Listener>();
 let snapshot: boolean | null = null;
+
+function notify(): void {
+  listeners.forEach((l) => l());
+}
 
 export function subscribeOnboarding(cb: Listener): () => void {
   listeners.add(cb);
@@ -45,5 +50,17 @@ export function markOnboarded(): void {
     /* penyimpanan diblokir/penuh — onboarding boleh tampil lagi */
   }
   snapshot = true;
-  listeners.forEach((l) => l());
+  notify();
+}
+
+/** Hapus status onboarding (dipanggil saat logout) sehingga gerbang
+    menampilkan onboarding lagi dari awal pada kunjungan berikutnya. */
+export function clearOnboarded(): void {
+  try {
+    localStorage.removeItem(ONBOARDING_KEY);
+  } catch {
+    /* penyimpanan diblokir — biarkan snapshot saja yang berubah */
+  }
+  snapshot = false;
+  notify();
 }
