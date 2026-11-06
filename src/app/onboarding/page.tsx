@@ -19,8 +19,8 @@ import { useAuthStore } from "@/lib/auth/auth-store";
 import { initSyncBridge } from "@/lib/sync/cloud-sync";
 import { isOnboarded, markOnboarded } from "@/lib/tazkiya/onboarding";
 
-/** Kanvas onboarding per tema — harus sinkron dengan bg OnboardingFlow. */
-const CANVAS = { dark: "#131217", light: "#f4f2f7" } as const;
+/** Kanvas onboarding per tema — harus sinkron dengan bg OnboardingFlow (v15). */
+const CANVAS = { dark: "#171717", light: "#F7F5F2" } as const;
 
 function resolveStoredTheme(): "dark" | "light" {
   try {
@@ -31,6 +31,17 @@ function resolveStoredTheme(): "dark" | "light" {
     return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
   } catch {
     return "dark";
+  }
+}
+
+/** Mode tema mentah pengaturan ("system" tidak dipecah) untuk opsi pemilih tema. */
+function resolveStoredThemeMode(): "dark" | "light" | "system" {
+  try {
+    const raw = localStorage.getItem("tazkiya-store-v1");
+    const theme = raw ? (JSON.parse(raw)?.state?.settings?.theme ?? "system") : "system";
+    return theme === "dark" || theme === "light" ? theme : "system";
+  } catch {
+    return "system";
   }
 }
 
@@ -69,7 +80,7 @@ export default function OnboardingPage() {
 
   return (
     <OnboardingFlow
-      initialTheme={resolveStoredTheme()}
+      initialThemeMode={resolveStoredThemeMode()}
       onDone={(target) => {
         markOnboarded();
         router.replace(target);
