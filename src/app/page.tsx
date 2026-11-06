@@ -8,15 +8,21 @@
  * tata letak desktop/sidebar dihapus total (v7 ke bawah).
  * Gerbang hidrasi, tema (gelap/terang/sistem), transisi
  * antartab, lima menu utama + sub-halaman, pembaca Al-Qur'an, dan Tasbih
- * Digital tetap di satu kerangka ini.
+ * Digital tetap di satu kerangka ini. Gerbang onboarding v12 menambahkan
+ * satu keputusan sebelum kerangka dirender: kunjungan pertama per perangkat
+ * diarahkan ke /onboarding (lihat efek "Gerbang onboarding" di bawah).
  */
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, LazyMotion, domAnimation, m } from "framer-motion";
 import { LoaderCircle } from "lucide-react";
 import { Toaster } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
+import { isOnboarded, markOnboarded, subscribeOnboarding, getOnboardedSnapshot, getOnboardedServerSnapshot } from "@/lib/tazkiya/onboarding";
+import { useAuthStore } from "@/lib/auth/auth-store";
+import { initSyncBridge } from "@/lib/sync/cloud-sync";
 import { BottomNav, type SubPageId, type TabId } from "@/components/tazkiya/BottomNav";
 import { AuthGate } from "@/components/tazkiya/AuthGate";
 import { HomePage } from "@/components/tazkiya/HomePage";
@@ -106,6 +112,33 @@ export default function Page() {
     useWorshipStore.persist.rehydrate();
   }, []);
 
+  // Gerbang onboarding (v12): hanya kunjungan pertama per perangkat yang
+  // diarahkan ke /onboarding. Pengguna yang sudah login langsung masuk
+  // Beranda dan ditandai selesai; sesi yang tak kunjung pasti (jaringan
+  // lambat) diperlakukan seperti pengguna baru setelah batas 3 detik.
+  const router = useRouter();
+  const authStatus = useAuthStore((s) => s.status);
+  const onboarded = useSyncExternalStore(subscribeOnboarding, getOnboardedSnapshot, getOnboardedServerSnapshot);
+
+  useEffect(() => {
+    if (onboarded) return;
+    initSyncBridge();
+    void useAuthStore.getState().initAuth();
+    const t = window.setTimeout(() => {
+      if (!isOnboarded() && useAuthStore.getState().status === "loading") router.replace("/onboarding");
+    }, 3000);
+    return () => window.clearTimeout(t);
+  }, [onboarded, router]);
+
+  useEffect(() => {
+    if (onboarded) return;
+    if (authStatus === "signedIn") {
+      markOnboarded(); // memberi tahu pelanggan → snapshot berubah
+    } else if (authStatus === "signedOut" || authStatus === "unconfigured") {
+      router.replace("/onboarding");
+    }
+  }, [authStatus, onboarded, router]);
+
   // Tema: data-theme pada <html>; "system" mengikuti preferensi perangkat.
   useEffect(() => {
     const html = document.documentElement;
@@ -194,7 +227,7 @@ export default function Page() {
     setTab("sholat");
   }, []);
 
-  if (!hydrated) {
+  if (!hydrated || !onboarded) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-[#101013] light:bg-[#e8e8ec]" aria-label="Memuat Tazkiya">
         <div className="flex flex-col items-center gap-4">

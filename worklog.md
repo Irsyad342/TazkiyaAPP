@@ -948,3 +948,40 @@ tsc 0 · eslint bersih · build sukses. Browser produksi (390px, gelap+terang): 
 daftar surah menampilkan khatam + pola; pembaca Al-Fatihah terbuka normal; beranda bawah
 bersih tanpa hijau; 0 error konsol. Deploy: push fe11b50 → Vercel; terverifikasi live —
 manifest.webmanifest menyajikan #1B1B1E dan CSS produksi memuat .tk-octagram/.tk-geo-pattern.
+
+## Task 47 — v12: Onboarding / Welcome Screen 3 layar (fitur baru, tanpa redesign)
+
+Permintaan: tambahkan onboarding premium 3 layar sebelum alur autentikasi — tanpa mengubah
+desain halaman lain sedikit pun. Lingkup diff: 4 berkas baru + gerbang kecil di page.tsx +
+blok CSS aditif; Beranda/Qur'an/Sholat/Profil/Barakah/nav/Login tidak tersentuh (QA tab normal).
+
+### Arsitektur
+- Rute baru `/onboarding` (static) → `OnboardingFlow` (komponen) + `onboarding-art.tsx`
+  (ilustrasi SVG/CSS murni: lintasan perjalanan→logo, miniatur kartu Jadwal Salat + ring 4/5 +
+  strip kalender, mushaf + chip Daily Barakah + bilah target). Identitas tetap v7: kanvas
+  off-white #F2F2F4 (permintaan desain: onboarding selalu identitas terang), oranye #FA5200,
+  General Sans, pil tombol bulat, khatam dari ornaments.tsx. Tanpa dependensi baru
+  (framer-motion LazyMotion domAnimation + MotionConfig reducedMotion="user").
+- Status per perangkat: kunci localStorage terpisah `tazkiya-onboarding-v1` (bukan di
+  tazkiya-store-v1 agar pembersihan data saat logout tidak memunculkan onboarding ulang),
+  di-port sebagai store mini + useSyncExternalStore (menghindari setState-in-effect,
+  aturan React Compiler).
+- Gerbang di `page.tsx`: flag ada → aplikasi langsung; tidak ada + signedIn → tandai selesai,
+  masuk Beranda; tidak ada + signedOut/unconfigured → router.replace("/onboarding");
+  pengaman sesi menggantung 3 detik. `/onboarding` memantul ke `/` bila flag ada ATAU
+  signedIn. Judul dokumen + meta theme-color sementara terang selama di onboarding.
+
+### Alur & animasi
+First Visit → Onboarding → (Mulai Sekarang → /auth?mode=register | Masuk → /auth | Lewati
+→ /) → aplikasi existing. Entrance stagger (judul per kata masked-rise, deskripsi menyusul,
+ilustrasi fade+scale), latar khatam mengambang + cincin putar pelan, transisi trek spring
+dengan re-stagger teks per slide & parallax ilustrasi, swipe pointer (intent horizontal,
+ambang 48px) + panah keyboard + klik indikator, whileTap pada CTA, pil indikator beranimasi.
+prefers-reduced-motion & data-anim="off" mematikan keyframes CSS; framer menyetel sendiri.
+
+### QA
+tsc 0 · eslint 0 · build sukses (route /onboarding static). Browser produksi lokal:
+redirect kunjungan pertama ✓, swipe ✓, Next/Lewati ✓, Mulai Sekarang→Daftar ✓, Masuk→Masuk ✓,
+kunjungan ulang langsung aplikasi ✓, pantulan /onboarding (flag & signedIn tersimulasi
+sesi fabrikasi) ✓, 0 overflow di 360/390/430/768/1280 + 360×640 ✓, reduced-motion animasi
+dekoratif mati ✓, 0 error halaman, tab Beranda/Qur'an/Sholat normal.
