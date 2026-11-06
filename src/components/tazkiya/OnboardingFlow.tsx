@@ -15,7 +15,9 @@
  * - Slide: trek geser horizontal (spring) + parallax latar berlapis +
  *   ilustrasi nonaktif bergeser melawan arah (kedalaman).
  * - Float: kartu ilustrasi naik-turun dan berotasi ringan, tempo antar
- *   kartu berbeda (lihat TiltCard/Float di onboarding-art).
+ *   kartu berbeda — via animasi CSS compositor (hemat main-thread di
+ *   ponsel) dan hanya berjalan pada slide aktif (lihat Float di
+ *   onboarding-art).
  * - Interaksi: whileTap CTA, indikator pil beranimasi, swipe/pointer,
  *   panah keyboard, tombol Lewati.
  * - prefers-reduced-motion dihormati via MotionConfig reducedMotion="user";
@@ -180,25 +182,32 @@ export function OnboardingFlow({
         >
           <div className="relative mx-auto flex h-full w-full max-w-[430px] flex-col overflow-hidden bg-[#131217] transition-colors duration-500 light:bg-[#f4f2f7] desktop:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_40px_90px_-40px_rgba(0,0,0,0.55)] desktop:light:shadow-[0_0_0_1px_rgba(23,20,40,0.06),0_40px_90px_-40px_rgba(40,30,80,0.25)]">
 
-            {/* ---------- Latar: blob lavender + oranye, parallax antar slide ---------- */}
+            {/* ---------- Latar: blob lavender + oranye, parallax antar slide ----------
+                Div biasa + transition CSS (compositor) — tanpa node framer-motion. */}
             <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-              <m.div
-                className="absolute -right-[88px] -top-[88px] h-[290px] w-[290px] rounded-full"
-                style={{ background: "radial-gradient(circle, rgba(139,124,248,0.2), transparent 66%)" }}
-                animate={{ x: -index * 26, y: index * 12 }}
-                transition={{ duration: 0.7, ease: EASE }}
+              <div
+                className="absolute -right-[88px] -top-[88px] h-[290px] w-[290px] rounded-full will-change-transform"
+                style={{
+                  background: "radial-gradient(circle, rgba(139,124,248,0.2), transparent 66%)",
+                  transform: `translate(${-index * 26}px, ${index * 12}px)`,
+                  transition: "transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)",
+                }}
               />
-              <m.div
-                className="absolute -bottom-[84px] -left-[92px] h-[260px] w-[260px] rounded-full"
-                style={{ background: "radial-gradient(circle, rgba(250,82,0,0.14), transparent 66%)" }}
-                animate={{ x: index * 22 }}
-                transition={{ duration: 0.7, ease: EASE }}
+              <div
+                className="absolute -bottom-[84px] -left-[92px] h-[260px] w-[260px] rounded-full will-change-transform"
+                style={{
+                  background: "radial-gradient(circle, rgba(250,82,0,0.14), transparent 66%)",
+                  transform: `translateX(${index * 22}px)`,
+                  transition: "transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)",
+                }}
               />
-              <m.div
-                className="absolute left-[16%] top-[30%] h-[170px] w-[170px] rounded-full"
-                style={{ background: "radial-gradient(circle, rgba(139,124,248,0.1), transparent 64%)" }}
-                animate={{ y: -index * 18 }}
-                transition={{ duration: 0.8, ease: EASE }}
+              <div
+                className="absolute left-[16%] top-[30%] h-[170px] w-[170px] rounded-full will-change-transform"
+                style={{
+                  background: "radial-gradient(circle, rgba(139,124,248,0.1), transparent 64%)",
+                  transform: `translateY(${-index * 18}px)`,
+                  transition: "transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)",
+                }}
               />
               <div className="tk-ob-pattern absolute inset-x-0 top-0 h-[220px] light:opacity-[0.035] dark:opacity-[0.05]" />
               <Star8
@@ -257,6 +266,7 @@ export function OnboardingFlow({
                     <section
                       key={s.headline}
                       aria-hidden={!active}
+                      data-live={active}
                       className="flex h-full w-1/6 flex-col items-center justify-center px-7"
                     >
                       {/* Ilustrasi: fade + scale + geser melawan arah (parallax) */}
@@ -270,7 +280,7 @@ export function OnboardingFlow({
                         transition={{ duration: 0.6, ease: EASE }}
                         className="flex h-[clamp(200px,32dvh,258px)] w-full items-center justify-center"
                       >
-                        {s.Art ? <s.Art /> : <ThemePreviewArt selected={theme} onSelect={pickTheme} />}
+                        {s.Art ? <s.Art live={active} /> : <ThemePreviewArt selected={theme} onSelect={pickTheme} />}
                       </m.div>
 
                       {/* Teks: stagger per kata saat slide aktif */}

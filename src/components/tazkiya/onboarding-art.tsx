@@ -10,9 +10,11 @@
  * agar terasa punya kedalaman. Semua warna memakai varian light:/dark:
  * sehingga mengikuti data-theme yang sama dengan aplikasi.
  *
- * Preferensi gerak: float via framer-motion di bawah MotionConfig
- * reducedMotion="user"; dekorasi CSS memakai kelas tk-ob-* yang sudah
- * dinonaktifkan untuk prefers-reduced-motion dan data-anim="off".
+ * Preferensi gerak: float kartu via animasi CSS .tk-ob-card-float (compositor,
+ * hanya slide aktif — see Float) yang dimatikan untuk prefers-reduced-motion
+ * dan data-anim="off" di globals.css; entrance/interaksi via framer-motion di
+ * bawah MotionConfig reducedMotion="user"; dekorasi CSS memakai kelas tk-ob-*
+ * yang juga dinonaktifkan untuk prefers-reduced-motion dan data-anim="off".
  */
 
 import { m } from "framer-motion";
@@ -31,44 +33,55 @@ const ORANGE = "#FA5200";
 const LAV = "light:bg-[#f3f0fa] dark:bg-[#2e2a3a]";
 const CAL_FILLED = new Set([0, 1, 2, 4, 5, 8, 9, 12, 15, 16, 17, 19, 22, 23]);
 
-/* ---------- Pembungkus float: naik-turun kecil, tiap kartu beda tempo ---------- */
+/* ---------- Pembungkus float: naik-turun kecil, tiap kartu beda tempo ----------
+   v14b: pindah dari framer-motion (repeat: Infinity di main thread — berat di
+   ponsel saat banyak slide ter-mount) ke animasi CSS compositor .tk-ob-card-
+   float. `live` hanya true pada slide aktif, sehingga slide lain tidak
+   menganimasi apa pun; guard reduced-motion/animasi-off ada di globals.css. */
 function Float({
   y = 7,
   dur = 6,
   delay = 0,
+  live = true,
   className,
   children,
 }: {
   y?: number;
   dur?: number;
   delay?: number;
+  live?: boolean;
   className?: string;
   children: React.ReactNode;
 }) {
   return (
-    <m.div
-      className={className}
-      animate={{ y: [0, -y, 0] }}
-      transition={{ duration: dur, repeat: Infinity, ease: "easeInOut", delay }}
+    <div
+      className={`${className ?? ""}${live ? " tk-ob-card-float" : ""}`}
+      style={
+        live
+          ? ({ "--ob-float-y": `${y}px`, "--ob-float-dur": `${dur}s`, "--ob-float-delay": `${delay}s` } as React.CSSProperties)
+          : undefined
+      }
     >
       {children}
-    </m.div>
+    </div>
   );
 }
 
 /* Kartu berotasi + float: rotasi statik di pembungkus, float di dalam. */
 function TiltCard({
   rot = 0,
+  live = true,
   className = "",
   children,
 }: {
   rot?: number;
+  live?: boolean;
   className?: string;
   children: React.ReactNode;
 }) {
   return (
     <div aria-hidden style={{ transform: `rotate(${rot}deg)` }} className={className}>
-      <Float>{children}</Float>
+      <Float live={live}>{children}</Float>
     </div>
   );
 }
@@ -135,11 +148,11 @@ function Ring({ pct, label, value }: { pct: number; label: string; value: string
 /* ================================================================
    SLIDE 1, Welcome to SUIO: logo elegan + kartu identitas melayang
    ================================================================ */
-export function WelcomeArt() {
+export function WelcomeArt({ live = true }: { live?: boolean }) {
   return (
     <div aria-hidden className="relative h-[236px] w-[286px]">
       {/* Kartu logo pusat */}
-      <TiltCard rot={-2.5} className="absolute left-1/2 top-[26px] -translate-x-1/2">
+      <TiltCard live={live} rot={-2.5} className="absolute left-1/2 top-[26px] -translate-x-1/2">
         <div className={`flex items-center gap-3 rounded-[1.4rem] px-5 py-4 ${CARD}`}>
           <SuioMark size={46} glow />
           <div>
@@ -152,7 +165,7 @@ export function WelcomeArt() {
       </TiltCard>
 
       {/* Kartu jadwal salat kiri-bawah */}
-      <TiltCard rot={4} className="absolute bottom-[6px] left-0">
+      <TiltCard live={live} rot={4} className="absolute bottom-[6px] left-0">
         <div className={`w-[150px] rounded-[1.2rem] p-3.5 ${CARD}`}>
           <p className={`gs-overline text-[7px]`}>Jadwal Salat</p>
           <div className="mt-2 space-y-[7px]">
@@ -163,12 +176,12 @@ export function WelcomeArt() {
       </TiltCard>
 
       {/* Kartu progres ibadah kanan-bawah */}
-      <TiltCard rot={-5} className="absolute bottom-[16px] right-0">
+      <TiltCard live={live} rot={-5} className="absolute bottom-[16px] right-0">
         <Ring pct={80} value="4/5" label="Ibadah hari ini" />
       </TiltCard>
 
       {/* Chip aktivitas harian (mood) kanan-atas */}
-      <TiltCard rot={3} className="absolute right-[6px] top-0">
+      <TiltCard live={live} rot={3} className="absolute right-[6px] top-0">
         <div className={`flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3 ${CARD}`}>
           <MoodFace id="tenang" className="h-6 w-6" />
           <span className="text-[8.5px] font-bold leading-none">Aktivitas harian</span>
@@ -185,11 +198,11 @@ export function WelcomeArt() {
 /* ================================================================
    SLIDE 2, Worship journey: jadwal 5 waktu + kalender + tracker
    ================================================================ */
-export function IbadahArt() {
+export function IbadahArt({ live = true }: { live?: boolean }) {
   return (
     <div aria-hidden className="relative h-[236px] w-[286px]">
       {/* Kartu utama: jadwal lima waktu */}
-      <TiltCard rot={-1.5} className="absolute left-[10px] top-[4px]">
+      <TiltCard live={live} rot={-1.5} className="absolute left-[10px] top-[4px]">
         <div className={`w-[186px] rounded-[1.3rem] p-4 ${CARD}`}>
           <p className="gs-overline text-[7px]">Jadwal Salat</p>
           <div className="mt-2 space-y-[7px]">
@@ -203,7 +216,7 @@ export function IbadahArt() {
       </TiltCard>
 
       {/* Kalender aktivitas kanan-atas (bertumpuk di atas kartu utama) */}
-      <TiltCard rot={4} className="absolute right-0 top-[14px]">
+      <TiltCard live={live} rot={4} className="absolute right-0 top-[14px]">
         <div className={`w-[112px] rounded-[1.1rem] p-3 ${CARD}`}>
           <p className="text-[7.5px] font-bold leading-none">Kalender</p>
           <p className={`mt-[3px] text-[6.5px] font-semibold leading-none ${SUB}`}>aktivitas</p>
@@ -220,12 +233,12 @@ export function IbadahArt() {
       </TiltCard>
 
       {/* Cincin progres tengah */}
-      <TiltCard rot={5} className="absolute left-0 top-[120px]">
+      <TiltCard live={live} rot={5} className="absolute left-0 top-[120px]">
         <Ring pct={80} value="4/5" label="Ibadah hari ini" />
       </TiltCard>
 
       {/* Progress tracker kanan-bawah */}
-      <TiltCard rot={-3} className="absolute bottom-[8px] right-[2px]">
+      <TiltCard live={live} rot={-3} className="absolute bottom-[8px] right-[2px]">
         <div className={`w-[132px] rounded-[1.1rem] p-3 ${CARD}`}>
           <div className="flex items-center justify-between">
             <p className="text-[7.5px] font-bold leading-none">Target harian</p>
@@ -248,11 +261,11 @@ export function IbadahArt() {
 /* ================================================================
    SLIDE 3, Quran & dhikr: mushaf, progres baca, kartu zikir
    ================================================================ */
-export function QuranArt() {
+export function QuranArt({ live = true }: { live?: boolean }) {
   return (
     <div aria-hidden className="relative h-[236px] w-[286px]">
       {/* Kartu mushaf utama dengan ayat Arab asli */}
-      <TiltCard rot={1.5} className="absolute left-[26px] top-[6px]">
+      <TiltCard live={live} rot={1.5} className="absolute left-[26px] top-[6px]">
         <div className={`w-[208px] rounded-[1.3rem] p-4 ${CARD}`}>
           <div className="flex items-center gap-2">
             <span className={`flex h-6 w-6 items-center justify-center rounded-lg ${LAV}`} style={{ color: ORANGE }}>
@@ -275,7 +288,7 @@ export function QuranArt() {
       </TiltCard>
 
       {/* Kartu zikir kanan-bawah */}
-      <TiltCard rot={-4} className="absolute bottom-[10px] right-0">
+      <TiltCard live={live} rot={-4} className="absolute bottom-[10px] right-0">
         <div className={`flex items-center gap-2.5 rounded-[1.1rem] p-3 pr-4 ${CARD}`}>
           <span className={`flex h-8 w-8 items-center justify-center rounded-xl ${LAV}`} style={{ color: ORANGE }}>
             <MoonStar size={14} />
@@ -288,7 +301,7 @@ export function QuranArt() {
       </TiltCard>
 
       {/* Chip progres membaca kiri-atas */}
-      <TiltCard rot={-3} className="absolute left-0 top-[2px]">
+      <TiltCard live={live} rot={-3} className="absolute left-0 top-[2px]">
         <div className={`flex items-center gap-1.5 rounded-full py-1.5 pl-2.5 pr-3 ${CARD}`}>
           <Sparkles size={10} style={{ color: ORANGE }} />
           <span className="text-[8px] font-bold leading-none">Al-Kahf, 2 halaman</span>
@@ -305,11 +318,11 @@ export function QuranArt() {
 /* ================================================================
    SLIDE 4, Daily Barakah: amal, rizki, jurnal syukur, barakah
    ================================================================ */
-export function BarakahArt() {
+export function BarakahArt({ live = true }: { live?: boolean }) {
   return (
     <div aria-hidden className="relative h-[236px] w-[286px]">
       {/* Kartu utama: Daily Barakah */}
-      <TiltCard rot={-1.5} className="absolute right-[8px] top-[10px]">
+      <TiltCard live={live} rot={-1.5} className="absolute right-[8px] top-[10px]">
         <div className={`w-[196px] rounded-[1.3rem] p-4 ${CARD}`}>
           <div className="flex items-center gap-2.5">
             <span
@@ -329,7 +342,7 @@ export function BarakahArt() {
       </TiltCard>
 
       {/* Kartu Rizq & Amal kiri-bawah */}
-      <TiltCard rot={4} className="absolute bottom-[14px] left-0">
+      <TiltCard live={live} rot={4} className="absolute bottom-[14px] left-0">
         <div className={`w-[150px] rounded-[1.2rem] p-3.5 ${CARD}`}>
           <div className="flex items-center gap-2">
             <span className={`flex h-6 w-6 items-center justify-center rounded-lg ${LAV}`} style={{ color: ORANGE }}>
@@ -345,7 +358,7 @@ export function BarakahArt() {
       </TiltCard>
 
       {/* Kartu Jurnal Syukur kanan-bawah */}
-      <TiltCard rot={-5} className="absolute bottom-[2px] right-[4px]">
+      <TiltCard live={live} rot={-5} className="absolute bottom-[2px] right-[4px]">
         <div className={`w-[124px] rounded-[1.1rem] p-3 ${CARD}`}>
           <span className="gs-display block text-[20px] font-extrabold leading-[0.6]" style={{ color: ORANGE }}>
             &ldquo;
@@ -364,7 +377,7 @@ export function BarakahArt() {
 /* ================================================================
    FINAL, Mulai perjalananmu: logo besar dengan glow lembut
    ================================================================ */
-export function FinalArt() {
+export function FinalArt({ live = true }: { live?: boolean }) {
   return (
     <div aria-hidden className="relative flex h-[236px] w-[286px] items-center justify-center">
       <span
@@ -376,17 +389,17 @@ export function FinalArt() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       >
-        <Float y={8} dur={5.5}>
+        <Float y={8} dur={5.5} live={live}>
           <SuioMark size={88} radius={24} glow />
         </Float>
       </m.div>
-      <TiltCard rot={4} className="absolute left-[6px] top-[26px]">
+      <TiltCard live={live} rot={4} className="absolute left-[6px] top-[26px]">
         <div className={`flex items-center gap-1.5 rounded-full py-1.5 pl-2.5 pr-3 ${CARD}`}>
           <span className="h-[7px] w-[7px] rounded-full" style={{ background: ORANGE }} />
           <span className="text-[8px] font-bold leading-none">Subuh, 04:32</span>
         </div>
       </TiltCard>
-      <TiltCard rot={-4} className="absolute bottom-[30px] right-[2px]">
+      <TiltCard live={live} rot={-4} className="absolute bottom-[30px] right-[2px]">
         <div className={`flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3 ${CARD}`}>
           <MoodFace id="bersyukur" className="h-6 w-6" />
           <span className="text-[8px] font-bold leading-none">Bersyukur</span>

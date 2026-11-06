@@ -1173,3 +1173,36 @@ akun kembali; signedIn: /onboarding & /auth memantul ke "/", "/" langsung
 Beranda — tanpa loop; mood berganti tenang tersimpan; tanpa overflow
 horizontal; console bersih; Al-Qur'an/Profil normal; pengaturan tema Profil
 (Terang/Gelap/Sistem) utuh.
+
+## Task 51 — v14b: optimasi performa onboarding di ponsel
+
+Keluhan: onboarding masih terasa lag di HP. Akar masalah (audit kode): semua 6
+slide ter-mount sekaligus dan setiap kartu ilustrasi menjalankan animasi float
+framer-motion `repeat: Infinity` — ±15 loop JS di main thread berjalan terus
+walaupun slidanya tak terlihat, menambah beban pada ponsel kelas bawah (di
+sandbox lock 60fps sehingga tidak terasa, tapi strukturnya nyata).
+
+Perubahan:
+- Float kartu (Float/TiltCard di onboarding-art) pindah dari framer-motion ke
+  animasi CSS compositor `tk-ob-card-float` (keyframes translateY dengan
+  variabel --ob-float-y/-dur/-delay; guard prefers-reduced-motion +
+  data-anim="off" sama seperti dekorasi tk-ob-* lain). Hasil visual identik,
+  nol kerja animasi di main thread.
+- Float hanya dipasang pada slide aktif: komponen art menerima prop `live`
+  (OnboardingFlow kirim `live={active}`); slide nonaktif dirender statis.
+- Dekorasi CSS tk-ob-float pada slide nonaktif dipause via
+  `section[data-live="false"] .tk-ob-float { animation-play-state: paused }`.
+- 3 blob latar parallax pindah dari m.div framer ke div biasa dengan
+  `transition: transform` CSS + will-change-transform (nilai transform sama
+  persis dengan animate framer sebelumnya).
+- Efek samping positif: setelan Animasi = off (data-anim="off") kini juga
+  membekukan float kartu (sebelumnya tetap berjalan via framer).
+
+Verifikasi: tsc 0, eslint bersih, build sukses. Browser lokal: hanya 1 slide
+live; kelas float hanya pada kartu slide aktif (4 di slide 1 & 2, ikut pindah
+saat navigasi); dekorasi slide nonaktif paused; blob bertransformasi persis
+sesuai nilai desain saat ganti slide; track spring jalan; slide tema masih
+berfungsi (pilih light tersimpan + kanvas bertransisi); screenshot slide 1 &
+6 light identik dengan desain. Catatan pengukuran: sandbox desktop lock 60fps
+(avg 16.7ms, 0 longtask sebelum & sesudah) — perbaikan dinilai dari struktur
+(loop main-thread 15 → 0; animasi aktif hanya slide tampil, via compositor).

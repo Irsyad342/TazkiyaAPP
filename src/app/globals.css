@@ -728,6 +728,21 @@ html[data-anim="off"] .animate-tk-bell-swing {
 .tk-ob-spin {
   animation: tk-ob-spin 40s linear infinite;
 }
+/* Float kartu ilustrasi via compositor (v14b): translateY murni dengan
+   tempo & amplitudo per kartu lewat variabel — tanpa kerja main-thread.
+   Hanya dipasang pada slide aktif; slide nonaktif dipause selektor di bawah. */
+@keyframes tk-ob-card-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(-1 * var(--ob-float-y, 7px)));
+  }
+}
+.tk-ob-card-float {
+  animation: tk-ob-card-float var(--ob-float-dur, 6s) ease-in-out var(--ob-float-delay, 0s) infinite;
+}
 /* Pola khatam berulang dengan warna tetap — pasangan .tk-geo-pattern
    yang tidak mengikuti variabel tema. */
 .tk-ob-pattern {
@@ -743,11 +758,19 @@ html[data-anim="off"] .animate-tk-bell-swing {
 }
 @media (prefers-reduced-motion: reduce) {
   .tk-ob-float,
-  .tk-ob-spin {
+  .tk-ob-spin,
+  .tk-ob-card-float {
     animation: none !important;
   }
 }
 html[data-anim="off"] .tk-ob-float,
-html[data-anim="off"] .tk-ob-spin {
+html[data-anim="off"] .tk-ob-spin,
+html[data-anim="off"] .tk-ob-card-float {
   animation: none !important;
+}
+/* Slide onboarding nonaktif: seluruh dekorasi mengambang berhenti agar
+   animasi tak menumpuk di main thread saat banyak slide ter-mount. */
+section[data-live="false"] .tk-ob-float,
+section[data-live="false"] .tk-ob-card-float {
+  animation-play-state: paused !important;
 }
