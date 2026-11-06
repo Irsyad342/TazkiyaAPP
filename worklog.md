@@ -1460,3 +1460,23 @@ Perubahan:
   desktop, accordion buka-tutup halus, Arab terrender, header chip hidup
   (catat Subuh berjamaah → 1/5 & 1 BERJAMAAH + beam 66px + popup), mood
   pilih → aria-checked & hadis sinkron, Jurnal utuh, light byte-identical.
+
+## Task 59 — Identitas logo baru SUIO + app icon (2026-11-06)
+Logo baru "sujud di bawah cahaya" direplikasi 1:1 dari 2 aset referensi upload
+(dark ref diukur piksel: tile rx≈138/512, dome apex 230,233 + arch 194–294,
+kepala 397,338 r39, bar y398 x63–448 w22 round, bintang 357,170 R58 Q k=0.25R,
+warna #FF7B01 / tile #0D0D0D / figur #1C1B1B–putih; star diverifikasi numerik
+≤3% vs referensi). SuioMark (brand.tsx) ditulis ulang theme-aware via kelas
+light:/dark: tanpa defs → dipakai ulang di auth (56 glow), splash, header
+onboarding (36 + animasi masuk spring fade+scale−8°→0 gate `entered`,
+reduced-motion aman), kartu mockup onboarding-art (46/88), Profil "Tentang"
+(40). App icon = versi LIGHT permanen: icon-192/512 (any, sudut transparan),
+maskable 192/512 (putih full-bleed, figur 78% safe-zone), apple-touch-icon.png
+180 BARU + metadata.icons.apple, favicon src/app/icon.svg, public/logo.svg —
+semua digenerate scripts/suio_assets.py dari scripts/suio_logo.py. Sweep: tak
+ada sisa logo lama (crescent/gradien lama hilang). Build lulus; deploy Vercel
+fe6b9ab; verifikasi produksi: aset byte-match md5, manifest ok, head link
+icon+apple ok, onboarding/auth/Profil 2 tema sesuai matriks (Profil dark:
+rectFill rgb(13,13,13) figFill putih terukur), animasi terukur (opacity
+0→1, scale .59→1), smoke test Beranda/Sholat/Al-Qur'an utuh. Akun uji signup
+qa.logo.suio.20261106@gmail.com (throttle verifikasi email Supabase off).
