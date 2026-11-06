@@ -774,3 +774,334 @@ section[data-live="false"] .tk-ob-float,
 section[data-live="false"] .tk-ob-card-float {
   animation-play-state: paused !important;
 }
+
+/* ============================================================
+   SALAT V15 — Prayer Schedule Ticket Cards (halaman Salat saja)
+   Kartu tiket bertumpuk: kiri nama+jam mulai, tengah garis + pil
+   durasi, kanan batas akhir; perforasi ber-notch; kartu aktif
+   ORANGE (identitas SUIO). Semua warna memakai token tema existing.
+   ============================================================ */
+.tk-tkt-stack {
+  display: flex;
+  flex-direction: column;
+}
+/* Susunan bertingkat: kartu berikutnya menelungkup 11px di bawah kartu
+   di atasnya — hanya zona padding yang tersembunyi, isi tak tertutup. */
+.tk-tkt-slot {
+  position: relative;
+  animation: tk-tkt-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+.tk-tkt-slot + .tk-tkt-slot {
+  margin-top: -11px;
+}
+@keyframes tk-tkt-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.tk-tkt {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 14px 18px 0;
+  border-radius: 22px;
+  background: var(--color-tk-panel);
+  box-shadow: 0 16px 32px -20px rgba(23, 23, 26, 0.32);
+  text-align: left;
+  transition:
+    transform 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 340ms,
+    background-color 340ms;
+}
+/* Accent line di tepi kiri tiket — mengikuti status pelaksanaan. */
+.tk-tkt::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 18px;
+  bottom: 18px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--color-tk-line-strong);
+}
+.tk-tkt--done::before {
+  background: var(--color-tk-violet);
+}
+.tk-tkt--missed::before {
+  background: var(--color-tk-amber);
+}
+.tk-tkt--next::before {
+  background: var(--color-tk-accent);
+}
+.tk-tkt--active {
+  background: var(--color-tk-violet);
+  transform: scale(1.016);
+  box-shadow: 0 22px 44px -18px rgba(250, 82, 0, 0.55);
+}
+.tk-tkt--active::before {
+  background: rgba(255, 255, 255, 0.9);
+}
+/* Baris utama: mulai — garis & durasi — batas akhir */
+.tk-tkt-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 13px;
+}
+.tk-tkt-side {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.tk-tkt-side--l {
+  flex-shrink: 0;
+}
+.tk-tkt-side--r {
+  flex-shrink: 0;
+  align-items: flex-end;
+  text-align: right;
+}
+.tk-tkt-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-tk-ink);
+  white-space: nowrap;
+}
+.tk-tkt-name--end {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-tk-muted);
+}
+.tk-tkt-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  width: 22px;
+  border-radius: 7px;
+  background: var(--color-tk-lavender);
+  color: var(--color-tk-accent);
+}
+.tk-tkt--done .tk-tkt-ic {
+  background: var(--color-tk-violet);
+  color: #ffffff;
+}
+.tk-tkt--missed .tk-tkt-ic {
+  background: var(--color-tk-amber-soft);
+  color: var(--color-tk-amber);
+}
+.tk-tkt--active .tk-tkt-ic {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+.tk-tkt-time {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: var(--color-tk-ink);
+}
+.tk-tkt-time--end {
+  font-size: 13px;
+  color: var(--color-tk-muted);
+}
+.tk-tkt--active .tk-tkt-name,
+.tk-tkt--active .tk-tkt-time {
+  color: #ffffff;
+}
+.tk-tkt--active .tk-tkt-name--end {
+  color: rgba(255, 255, 255, 0.75);
+}
+.tk-tkt--active .tk-tkt-time--end {
+  color: rgba(255, 255, 255, 0.95);
+}
+/* Tengah: garis putus-putus + pil durasi */
+.tk-tkt-mid {
+  position: relative;
+  flex: 1;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tk-tkt-dash {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  border-top: 2px dashed var(--color-tk-line-strong);
+}
+.tk-tkt--active .tk-tkt-dash {
+  border-top-color: rgba(255, 255, 255, 0.45);
+}
+.tk-tkt-dur {
+  position: relative;
+  z-index: 1;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-tk-lavender);
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--color-tk-accent);
+}
+.tk-tkt--active .tk-tkt-dur {
+  background: #ffffff;
+  color: var(--color-tk-violet);
+}
+/* Perforasi + notch tiket (setengah lingkaran di kedua sisi) */
+.tk-tkt-perf {
+  position: relative;
+  display: block;
+  border-top: 2px dashed var(--color-tk-line-soft);
+  margin: 0 -18px;
+}
+html[data-theme="dark"] .tk-tkt-perf {
+  border-top-color: var(--color-tk-line);
+}
+.tk-tkt--active .tk-tkt-perf {
+  border-top-color: rgba(255, 255, 255, 0.35);
+}
+.tk-tkt-perf::before,
+.tk-tkt-perf::after {
+  content: "";
+  position: absolute;
+  top: -9px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  /* Isi = warna kanvas halaman → ilusi potongan tiket sejati. */
+  background: var(--color-tk-stage);
+}
+.tk-tkt-perf::before {
+  left: -9px;
+}
+.tk-tkt-perf::after {
+  right: -9px;
+}
+/* Sisi status: pencatatan (kiri) + penanda waktu (kanan) */
+.tk-tkt-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0 13px;
+}
+.tk-tkt-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-tk-muted);
+  white-space: nowrap;
+}
+.tk-tkt-dot {
+  flex-shrink: 0;
+  height: 6px;
+  width: 6px;
+  border-radius: 50%;
+  background: var(--color-tk-line-strong);
+}
+.tk-tkt-status--done {
+  color: var(--color-tk-ink);
+}
+.tk-tkt-status--done .tk-tkt-dot {
+  background: var(--color-tk-violet);
+}
+.tk-tkt-status--missed {
+  color: var(--color-tk-amber);
+}
+.tk-tkt-status--missed .tk-tkt-dot {
+  background: var(--color-tk-amber);
+}
+.tk-tkt--active .tk-tkt-status {
+  color: rgba(255, 255, 255, 0.9);
+}
+.tk-tkt--active .tk-tkt-status .tk-tkt-dot {
+  background: rgba(255, 255, 255, 0.85);
+}
+.tk-tkt-badge {
+  flex-shrink: 0;
+  padding: 3.5px 9px;
+  border-radius: 999px;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--color-tk-panel-soft);
+  color: var(--color-tk-muted);
+}
+.tk-tkt-badge--next {
+  background: var(--color-tk-lavender);
+  color: var(--color-tk-accent);
+}
+.tk-tkt-badge--live {
+  background: #ffffff;
+  color: var(--color-tk-violet);
+}
+/* Kartu aktif: countdown + progress dari waktu perangkat vs jadwal */
+.tk-tkt-live {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding-bottom: 13px;
+}
+.tk-tkt-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+}
+.tk-tkt-bar {
+  display: block;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  overflow: hidden;
+}
+.tk-tkt-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #ffffff;
+  transition: width 1.3s linear;
+}
+/* Keterangan batas akhir (mis. metode Isya) */
+.tk-tkt-note {
+  display: block;
+  padding-bottom: 13px;
+  font-size: 9.5px;
+  line-height: 1.55;
+  color: var(--color-tk-muted);
+}
+.tk-tkt-note--onbrand {
+  color: rgba(255, 255, 255, 0.85);
+}
+/* Hormati setelan animasi & preferensi sistem */
+html[data-anim="off"] .tk-tkt-slot {
+  animation: none !important;
+}
+html[data-anim="off"] .tk-tkt,
+html[data-anim="off"] .tk-tkt-bar-fill {
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html .tk-tkt-slot {
+    animation: none !important;
+  }
+  html .tk-tkt,
+  html .tk-tkt-bar-fill {
+    transition: none !important;
+  }
+}

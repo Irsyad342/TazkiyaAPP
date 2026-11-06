@@ -1206,3 +1206,51 @@ berfungsi (pilih light tersimpan + kanvas bertransisi); screenshot slide 1 &
 6 light identik dengan desain. Catatan pengukuran: sandbox desktop lock 60fps
 (avg 16.7ms, 0 longtask sebelum & sesudah) — perbaikan dinilai dari struktur
 (loop main-thread 15 → 0; animasi aktif hanya slide tampil, via compositor).
+
+## Task 52 — v15: halaman Salat jadi Prayer Schedule Ticket Cards
+
+Permintaan: ganti timeline zigzag halaman Salat dengan kartu tiket bertumpuk ala
+aplikasi travel booking (referensi lampiran), tanpa menyentuh halaman lain.
+
+Implementasi:
+- `lib/tazkiya/prayerTimes.ts`: `computePrayerTimes` kini juga menghasilkan
+  `terbit` (matahari terbit, tanpa ihtiyat — mengikuti publikasi jadwal).
+- `lib/tazkiya/prayerWindows.ts` (baru): jendela tiap slot — batas antar slot =
+  waktu masuk salat berikutnya pada jadwal efektif; batas akhir Subuh = terbit
+  (bila koordinat tersedia, else null — tidak pernah mengarang); batas akhir
+  Isya mengikuti metode terpilih: Kemenag/MWL/Mesir/ISNA → Subuh esok (fajar
+  shadiq, standar SIHAT Kemenag), Ummul Qura → tengah malam (tengah Magrib–
+  Subuh esok). Durasi otomatis, termasuk lintas tengah malam (+24 jam).
+- `PrayerPage.tsx`: PrayerZigzag diganti PrayerTickets — kartu tiket dengan
+  sisi kiri (nama + jam mulai), tengah (garis putus-putus + pil durasi), kanan
+  (label + jam batas akhir), perforasi ber-notch setengah lingkaran, accent
+  line status kiri. Kartu aktif: oranye penuh + "Sedang Berlangsung" +
+  "Berakhir dalam X jam Y menit" + progress bar (progress dihitung dari waktu
+  perangkat vs jadwal, tick 30 dtk, transisi lebar CSS). Penanda waktu:
+  "Berikutnya" / "Waktu Selesai" — sepenuhnya terpisah dari status pelaksanaan
+  (tetap dari catatan: Berjamaah/Tepat waktu/Terlambat/Tidak dilaksanakan/
+  Belum dicatat). Tap kartu tetap membuka PrayerRecordDialog existing.
+- Stack animation: entrance bertahap (slide-up + scale, 70 ms/kartu, via CSS
+  keyframes compositor), tumpukan -11 px dengan z-index bertingkat, kartu aktif
+  scale 1.016 + shadow oranye; guard prefers-reduced-motion + data-anim=off.
+- Header: tanggal Masehi, ringkasan (x/5 · berjamaah), Hijriah, chip
+  "Berikutnya · <nama> <jam>" dipertahankan dan dirapikan.
+- CSS baru scoped `tk-tkt-*` di globals.css (semua warna dari token existing —
+  oranye #FA5200, kanvas #1B1B1E/#F2F2F4, kartu #242429/putih, peach
+  tk-lavender). Halaman lain & design system global tidak diubah.
+
+Bug yang ditemukan & diperbaiki saat QA: (1) geseran +24 jam windowClock tadinya
+diterapkan ke semua jendela → slot masa depan terbaca "Waktu Selesai"; kini
+hanya untuk jendela lintas tengah malam. (2) Jendela tanpa batas akhir (jadwal
+manual tanpa koordinat) membuat dua kartu aktif; kini fase mengikuti urutan
+slot yang sudah masuk waktu. (3) Server dev sandbox menyajikan build lama
+(standalone bun) — direstart sebelum QA.
+
+Verifikasi: tsc 0, eslint bersih, build sukses; unit check jendela (TZ=Asia/
+Jakarta): Subuh 04.07→Terbit 05.26, Jumat 11.38→Asar 14.56, Isya 19.01→Subuh
+esok 04.07 (9j6m), Ummul Qura tengah malam 23.01, manual-tanpa-geo → batas
+null. Browser: satu kartu aktif, countdown "Berakhir dalam 2 jam 10 menit" +
+progress 33% sesuai perhitungan, pencatatan Berjamaah tersimpan (header 1/5 ·
+1 berjamaah), Bulanan & Qada & Beranda tak berubah, 360/390/430/desktop tanpa
+overflow-x, konsol bersih, 0 longtask. Geolokasi headless tidak tersedia →
+mode GPS diverifikasi via unit check, bukan UI.

@@ -1,17 +1,20 @@
 "use client";
 
 /**
- * Tazkiya v10 — Halaman Sholat. Tab "Hari Ini" memakai TIMELINE ZIGZAG
- * VERTIKAL: bahasa visual sumbu waktu (garis putus-putus, penanda waktu
- * berjalan, blok acara berbar status ORANGE bila dilaksanakan / amber bila
- * terlewat) diputar menghadap ke bawah — sumbu di tengah panel, blok salat
- * berselang kiri–kanan, sehingga seluruh rangkaian terlihat dalam satu layar
- * tanpa menggulir menyamping; satu ketukan membuka pencatatan.
- * Tab Bulanan (kalender lima titik) dan Qada (formulir + CTA orange)
- * dipertahankan dengan logika utuh.
+ * Tazkiya v15 — Halaman Sholat. Tab "Hari Ini" memakai PRAYER SCHEDULE TICKET
+ * CARDS: setiap salat adalah kartu tiket bertumpuk ala aplikasi travel booking —
+ * sisi kiri berisi nama salat & jam mulai, tengah garis penghubung dengan pil
+ * durasi, sisi kanan batas akhir & jam berakhir, disambung garis perforasi ber-notch.
+ * Kartu yang sedang berlangsung berubah ORANGE (identitas SUIO) dengan countdown
+ * dan progress bar yang dihitung dari waktu perangkat vs jadwal; kartu berikutnya
+ * diberi penanda "Berikutnya"; kartu yang telah lewat diberi "Waktu Selesai" —
+ * tanpa menyalaksan status pelaksanaan yang tetap mengikuti catatan pengguna.
+ * Batas akhir Subuh = terbit; batas akhir Isya mengikuti metode perhitungan
+ * (lihat lib/tazkiya/prayerWindows). Tab Bulanan (kalender lima titik) dan Qada
+ * (formulir + CTA orange) dipertahankan dengan logika utuh.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   BookMarked,
   Check,
@@ -47,6 +50,7 @@ import {
 import { formatHijri, isFriday, monthCalendarDayKeys, todayKey } from "@/lib/tazkiya/dates";
 import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { nextPrayerState, prayerTiming } from "@/lib/tazkiya/goals";
+import { nowTotalMinutes, resolvePrayerWindows, windowClock, type PrayerWindows } from "@/lib/tazkiya/prayerWindows";
 import { HADITH_QADA } from "@/lib/tazkiya/hadith";
 import { ConfirmButton, GlassCard, SectionHeader, SegmentedTabs } from "./ui-bits";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
@@ -97,6 +101,7 @@ function TodayTab({
   const prayersToday: PrayerMeta[] = friday
     ? PRAYERS.map((p) => (p.id === "zuhur" ? (fridayZuhurAlt ? ZUHUR_ALTERNATIF : SALAT_JUMAT) : p))
     : PRAYERS;
+  const windows = useMemo(() => resolvePrayerWindows(settings, today, prayersToday), [settings, today, prayersToday]);
 
   const detailOf = (id: PrayerId): PrayerDetail => selectPrayerDetail(prayerDetails, logs, today, id);
   const doneCount = prayersToday.filter((p) => detailOf(p.id).status === "done").length;
@@ -141,25 +146,25 @@ function TodayTab({
           </p>
         </header>
 
-        {/* Daftar salat, ketuk baris untuk mencatat */}
+        {/* Daftar salat — kartu tiket bertumpuk, ketuk untuk mencatat */}
         <section aria-label="Salat hari ini" className="animate-tk-fade-up">
-          <div className="mb-2.5 flex items-end justify-between gap-3 px-0.5">
+          <div className="mb-3 flex items-end justify-between gap-3 px-0.5">
             <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Salat Hari Ini</h2>
-            <p className="text-[11px] text-tk-muted">
-              Berikutnya · <span className="font-bold text-tk-accent">{nextMeta.label} {state.nextTime}</span>
-            </p>
+            <span className="flex items-center gap-1 rounded-full bg-tk-lavender px-2.5 py-1.5 text-[10.5px] font-semibold text-tk-ink">
+              Berikutnya ·&nbsp;<span className="tnum font-bold text-tk-accent">{nextMeta.label} {state.nextTime}</span>
+            </span>
           </div>
-          <PrayerZigzag
+          <PrayerTickets
             today={today}
             prayers={prayersToday}
-            schedule={schedule}
+            windows={windows}
             detailOf={detailOf}
-            nextState={{ next: state.next, current: state.current }}
+            now={now}
             onRecord={onRecord}
           />
-          <p className="mt-2 px-1 text-[10.5px] leading-relaxed text-tk-muted">
-            Ketuk blok salat pada timeline zigzag untuk mencatat status, cara (berjamaah/mandiri), dan waktunya, lima
-            waktu terlihat serentak tanpa menggulir menyamping.
+          <p className="mt-2.5 px-1 text-[10.5px] leading-relaxed text-tk-muted">
+            Ketuk kartu salat untuk mencatat status, cara (berjamaah/mandiri), dan waktunya. Setiap kartu memperlihatkan
+            waktu mulai, batas akhir, dan durasinya — kartu yang sedang berlangsung menyala oranye dengan posisi waktunya.
           </p>
           {friday ? (
             <p className="mt-1.5 px-1 text-[10.5px] leading-relaxed text-tk-muted">
@@ -239,185 +244,204 @@ function SunnahToggle({
 }
 
 /**
- * Timeline zigzag vertikal — bahasa visual sumbu waktu lama (garis putus-putus,
- * penanda waktu berjalan, blok berbar status, ketuk untuk mencatat) tetapi
- * sumbunya turun ke bawah di tengah panel dan blok salat berselang kiri–kanan.
- * Semua lima waktu terlihat sekaligus tanpa menggulir ke samping.
+ * Prayer Schedule Ticket Cards — kartu tiket bertumpuk ala aplikasi travel
+ * booking. Sisi kiri: nama salat + jam mulai. Tengah: garis putus-putus dengan
+ * pil durasi. Sisi kanan: label batas akhir + jam berakhir. Garis perforasi
+ * ber-notch memisahkan "badan tiket" dari sisi status. Kartu yang sedang
+ * berlangsung menyala ORANGE dengan countdown + progress bar waktu nyata;
+ * "Berikutnya" dan "Waktu Selesai" adalah penanda WAKTU — status pelaksanaan
+ * tetap sepenuhnya mengikuti catatan pengguna (tidak pernah dianggap otomatis).
+ * Seluruh kartu bisa diketuk dan membuka dialog pencatatan yang sama.
  */
-const ROW_H = 70;
 
-function minutesOf(time: string): number {
-  const [h, m] = time.split(":").map((v) => parseInt(v, 10) || 0);
-  return h * 60 + m;
+function formatDurCompact(min: number): string {
+  const h = Math.floor(min / 60);
+  const m = Math.round(min % 60);
+  if (h > 0 && m > 0) return `${h} j ${m} m`;
+  if (h > 0) return `${h} j`;
+  return `${m} m`;
 }
 
-function PrayerZigzag({
+function formatDurFull(min: number): string {
+  const h = Math.floor(min / 60);
+  const m = Math.round(min % 60);
+  if (h > 0 && m > 0) return `${h} jam ${m} menit`;
+  if (h > 0) return `${h} jam`;
+  return `${m} menit`;
+}
+
+function PrayerTickets({
   today,
   prayers,
-  schedule,
+  windows,
   detailOf,
-  nextState,
+  now,
   onRecord,
 }: {
   today: string;
   prayers: PrayerMeta[];
-  schedule: Record<PrayerId, { time: string; enabled: boolean }>;
+  windows: PrayerWindows;
   detailOf: (id: PrayerId) => PrayerDetail;
-  nextState: { next: PrayerId | null; current: PrayerId | null };
+  now: Date;
   onRecord: (meta: PrayerMeta) => void;
 }) {
-  const isToday = today === todayKey();
-  const times = prayers.map((p) => schedule[p.id]?.time ?? "00:00");
-  const totalH = prayers.length * ROW_H;
-
-  /** Posisi vertikal penanda "sekarang" — diinterpolasi di antara dua salat terdekat. */
-  const nowOffset = (() => {
-    if (!isToday) return null;
-    const now = new Date();
-    const m = now.getHours() * 60 + now.getMinutes();
-    const mins = times.map(minutesOf);
-    if (m <= mins[0]) return 14;
-    if (m >= mins[mins.length - 1]) return totalH - 14;
-    for (let i = 0; i < mins.length - 1; i++) {
-      if (m >= mins[i] && m <= mins[i + 1]) {
-        const f = (m - mins[i]) / Math.max(1, mins[i + 1] - mins[i]);
-        return i * ROW_H + ROW_H / 2 + f * ROW_H;
-      }
+  /** Slot pertama yang belum masuk waktunya — penerima penanda "Berikutnya". */
+  const nowTotal = nowTotalMinutes(now);
+  const nextIdx = (() => {
+    for (let i = 0; i < prayers.length; i++) {
+      const w = windows[prayers[i].id];
+      if (!w) continue;
+      const [h, m] = w.start.split(":").map((v) => parseInt(v, 10) || 0);
+      if (h * 60 + m > nowTotal) return i;
     }
-    return null;
+    return -1;
   })();
-  const nowLabel = (() => {
-    if (nowOffset === null) return null;
-    const now = new Date();
-    return `${String(now.getHours()).padStart(2, "0")}.${String(now.getMinutes()).padStart(2, "0")}`;
+
+  /** Slot terakhir yang sudah masuk waktunya — rujukan fase untuk jendela
+      tanpa batas akhir (jadwal manual tanpa koordinat terbit/subuh esok). */
+  const lastStarted = (() => {
+    let idx = -1;
+    for (let i = 0; i < prayers.length; i++) {
+      const w = windows[prayers[i].id];
+      if (!w) continue;
+      const [h, m] = w.start.split(":").map((v) => parseInt(v, 10) || 0);
+      if (h * 60 + m <= nowTotal) idx = i;
+    }
+    return idx;
   })();
 
   return (
-    <div className="relative overflow-hidden rounded-[1.4rem] border border-tk-line-soft bg-tk-panel-soft px-2 py-1.5">
-      {/* Sumbu vertikal putus-putus di tengah panel */}
-      <span aria-hidden className="absolute left-1/2 top-4 bottom-4 -translate-x-1/2 border-l border-dashed border-tk-line" />
+    <ul className="tk-tkt-stack" aria-label="Kartu jadwal salat">
+      {prayers.map((p, i) => {
+        const w = windows[p.id];
+        if (!w) return null;
+        const time = w.start;
+        const detail = detailOf(p.id);
+        const isDone = detail.status === "done";
+        const isMissed = detail.status === "missed";
+        const timing = prayerTiming(detail, time, today);
+        const clock = windowClock(w, now);
+        /** Fase final: jendela tanpa batas akhir mengikuti urutan slot — aktif
+            hanya bila ia slot terakhir yang sudah masuk waktunya. */
+        const [sh, sm] = w.start.split(":").map((v) => parseInt(v, 10) || 0);
+        const phase: "active" | "past" | "future" = !w.end
+          ? nowTotal < sh * 60 + sm
+            ? "future"
+            : i === lastStarted
+              ? "active"
+              : "past"
+          : clock.phase;
+        const isActive = phase === "active";
+        const isNext = i === nextIdx && !isActive;
+        const Icon = p.label === "Salat Jumat" ? Users : PRAYER_ICONS[p.id] ?? Sun;
 
-      {/* Penanda waktu berjalan, bergerak di antara dua salat sesuai jam sekarang */}
-      {nowOffset !== null ? (
-        <div aria-hidden className="absolute left-1/2 z-20 -translate-x-1/2 -translate-y-1/2" style={{ top: `calc(6px + ${nowOffset.toFixed(1)}px)` }}>
-          <span className="absolute left-1/2 top-1/2 h-[2px] w-9 -translate-x-1/2 -translate-y-1/2 rounded-full bg-tk-violet/45" />
-          <span className="tnum relative block rounded-full bg-tk-violet px-1.5 py-[3px] text-[8.5px] font-bold leading-none text-white shadow-[0_0_0_3px_rgba(250,82,0,0.18)]">
-            {nowLabel}
-          </span>
-        </div>
-      ) : null}
+        const recText = isDone
+          ? detail.kind === "berjamaah"
+            ? "Berjamaah"
+            : timing === "late"
+              ? "Terlambat"
+              : timing === "ontime"
+                ? "Tepat waktu"
+                : "Dilaksanakan"
+          : isMissed
+            ? "Tidak dilaksanakan"
+            : phase === "future"
+              ? "Akan datang"
+              : "Belum dicatat";
 
-      <div className="relative">
-        {prayers.map((p, i) => {
-          const time = times[i];
-          const detail = detailOf(p.id);
-          const isDone = detail.status === "done";
-          const isMissed = detail.status === "missed";
-          const isNext = nextState.next === p.id;
-          const timing = prayerTiming(detail, time, today);
-          const Icon = PRAYER_ICONS[p.id] ?? Sun;
+        const showNote = !w.end || isActive || w.endNote?.startsWith("Batas akhir Isya");
 
-          const statusShort = isDone
-            ? detail.kind === "berjamaah"
-              ? "Berjamaah"
-              : timing === "late"
-                ? "Terlambat"
-                : timing === "ontime"
-                  ? "Tepat waktu"
-                  : "Dilaksanakan"
-            : isMissed
-              ? "Tidak dilaksanakan"
-              : nowLabel && time > nowLabel.replace(".", ":")
-                ? "Akan datang"
-                : "Belum dicatat";
-
-          const dot = (
-            <span aria-hidden className="col-start-2 flex items-center">
-              <span
-                className={cn(
-                  "mx-auto h-3.5 w-3.5 rounded-full",
-                  isDone
-                    ? "bg-tk-violet"
-                    : isMissed
-                      ? "bg-tk-amber"
-                      : isNext
-                        ? "bg-tk-violet ring-4 ring-tk-violet/20"
-                        : "border-2 border-tk-line-strong bg-tk-panel-soft"
-                )}
-              />
-            </span>
-          );
-          const timeLabel = (
-            <span
-              className={cn(
-                "tnum flex items-center text-[11px] font-bold",
-                i % 2 === 0 ? "col-start-1 justify-end pr-1.5" : "col-start-3 justify-start pl-1.5",
-                isDone ? "text-tk-ink" : isMissed ? "text-tk-amber" : "text-tk-muted"
-              )}
-            >
-              {time.replace(":", ".")}
-            </span>
-          );
-          const card = (
+        return (
+          <li
+            key={p.id}
+            className="tk-tkt-slot"
+            style={{ zIndex: isActive ? 30 : 20 - i, "--i": i } as CSSProperties}
+          >
             <button
               type="button"
               onClick={() => onRecord(p)}
-              aria-label={`Catat ${p.label} pukul ${time}, ${statusShort}`}
+              aria-label={`Catat ${p.label}, mulai ${time.replace(":", ".")}, batas akhir ${w.endLabel} ${w.end ? w.end.replace(":", ".") : "tidak tersedia"}`}
               className={cn(
-                "tap flex w-full items-stretch overflow-hidden rounded-xl text-left transition-colors",
-                isDone ? "bg-tk-panel-strong" : isMissed ? "bg-tk-panel-strong/80" : "border border-tk-line bg-tk-panel/70",
-                isNext && !isDone && "border-tk-violet/70"
+                "tk-tkt",
+                isActive && "tk-tkt--active",
+                isDone && "tk-tkt--done",
+                isMissed && "tk-tkt--missed",
+                isNext && "tk-tkt--next"
               )}
             >
-              {/* Bar status kiri, ORANGE bila dilaksanakan */}
-              <span aria-hidden className={cn("w-[3px] shrink-0", isDone ? "bg-tk-violet" : isMissed ? "bg-tk-amber" : "bg-tk-line-strong")} />
-              <span className="flex min-w-0 flex-1 items-center gap-2 px-2 py-2.5">
-                <span
-                  aria-hidden
-                  className={cn(
-                    "flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
-                    isDone ? "bg-tk-violet text-white" : isMissed ? "bg-tk-amber/25 text-tk-amber" : "bg-tk-panel-strong text-tk-muted"
-                  )}
-                >
-                  <Icon size={13} strokeWidth={2} />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-1">
-                    <span className={cn("block truncate text-[12px] font-bold leading-tight", isNext && !isDone ? "text-tk-accent" : "text-tk-ink")}>
-                      {p.label}
+              {/* Baris utama tiket: mulai — durasi — batas akhir */}
+              <span className="tk-tkt-row">
+                <span className="tk-tkt-side tk-tkt-side--l">
+                  <span className="tk-tkt-name">
+                    <span className="tk-tkt-ic" aria-hidden>
+                      <Icon size={12} strokeWidth={2.1} />
                     </span>
-                    {isNext && !isDone ? (
-                      <span className="shrink-0 rounded-full bg-tk-violet px-1.5 py-px text-[7.5px] font-bold uppercase tracking-wide text-white">
-                        Berikutnya
-                      </span>
-                    ) : null}
+                    {p.label}
                   </span>
-                  <span className="mt-0.5 block truncate text-[9.5px] font-medium text-tk-muted">{statusShort}</span>
+                  <span className="tk-tkt-time tnum">{time.replace(":", ".")}</span>
+                </span>
+                <span className="tk-tkt-mid" aria-hidden>
+                  <span className="tk-tkt-dash" />
+                  {w.durationMin !== null ? (
+                    <span className="tk-tkt-dur tnum">{formatDurCompact(w.durationMin)}</span>
+                  ) : null}
+                </span>
+                <span className="tk-tkt-side tk-tkt-side--r">
+                  <span className="tk-tkt-name tk-tkt-name--end">{w.endLabel}</span>
+                  <span className="tk-tkt-time tk-tkt-time--end tnum">
+                    {w.end ? w.end.replace(":", ".") : "—"}
+                  </span>
                 </span>
               </span>
-            </button>
-          );
 
-          return (
-            <div key={p.id} className="grid h-[70px] grid-cols-[1fr_36px_1fr] items-stretch">
-              {i % 2 === 0 ? (
-                <>
-                  {timeLabel}
-                  {dot}
-                  <span className="col-start-3 flex items-center">{card}</span>
-                </>
-              ) : (
-                <>
-                  <span className="col-start-1 flex items-center">{card}</span>
-                  {dot}
-                  {timeLabel}
-                </>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
+              {/* Perforasi ber-notch + sisi status tiket */}
+              <span className="tk-tkt-perf" aria-hidden />
+              <span className="tk-tkt-foot">
+                <span
+                  className={cn(
+                    "tk-tkt-status",
+                    isDone && "tk-tkt-status--done",
+                    isMissed && "tk-tkt-status--missed"
+                  )}
+                >
+                  <span className="tk-tkt-dot" aria-hidden />
+                  {recText}
+                </span>
+                {isActive ? (
+                  <span className="tk-tkt-badge tk-tkt-badge--live">Sedang Berlangsung</span>
+                ) : isNext ? (
+                  <span className="tk-tkt-badge tk-tkt-badge--next">Berikutnya</span>
+                ) : phase === "past" ? (
+                  <span className="tk-tkt-badge tk-tkt-badge--past">Waktu Selesai</span>
+                ) : null}
+              </span>
+
+              {/* Countdown + progress — dihitung dari waktu perangkat vs jadwal */}
+              {isActive && clock.secondsLeft > 0 ? (
+                <span className="tk-tkt-live">
+                  <span className="tk-tkt-count">
+                    Berakhir dalam {formatDurFull(clock.secondsLeft / 60)}
+                  </span>
+                  <span className="tk-tkt-bar">
+                    <span
+                      className="tk-tkt-bar-fill"
+                      style={{ width: `${Math.round(clock.progress * 100)}%` }}
+                    />
+                  </span>
+                </span>
+              ) : null}
+
+              {/* Keterangan batas akhir — wajib untuk Isya (metode) & data kosong */}
+              {showNote && w.endNote ? (
+                <span className={cn("tk-tkt-note", isActive && "tk-tkt-note--onbrand")}>
+                  {w.endNote}
+                </span>
+              ) : null}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 

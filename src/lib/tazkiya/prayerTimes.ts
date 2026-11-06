@@ -93,6 +93,8 @@ function toHHMM(hours: number): string {
 
 export interface ComputedPrayerTimes {
   subuh: string;
+  /** Terbit matahari (batas akhir waktu Subuh) — tanpa ihtiyat, mengikuti publikasi jadwal. */
+  terbit: string;
   zuhur: string;
   asar: string;
   magrib: string;
@@ -147,6 +149,7 @@ export function computePrayerTimes(lat: number, lng: number, date: Date, method:
 
   return {
     subuh: toHHMM(fixHour(plusIhtiyat(subuh))),
+    terbit: toHHMM(fixHour(base - hourAngleFor(lat, declination, SUNRISE_ALT) / 15)),
     zuhur: toHHMM(fixHour(plusIhtiyat(zuhur))),
     asar: toHHMM(fixHour(plusIhtiyat(asarSafe))),
     magrib: toHHMM(fixHour(plusIhtiyat(magribSafe))),
