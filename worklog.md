@@ -1480,3 +1480,10 @@ icon+apple ok, onboarding/auth/Profil 2 tema sesuai matriks (Profil dark:
 rectFill rgb(13,13,13) figFill putih terukur), animasi terukur (opacity
 0→1, scale .59→1), smoke test Beranda/Sholat/Al-Qur'an utuh. Akun uji signup
 qa.logo.suio.20261106@gmail.com (throttle verifikasi email Supabase off).
+
+## Task 60 — Hapus paragraf petunjuk halaman Sholat (2026-11-06)
+Minta user: buang teks "Ketuk kartu salat untuk mencatat status..." di bawah
+PrayerTickets. Hapus <p> petunjuk di PrayerPage.tsx (paragraf kondisional
+Jumat & sisanya dipertahankan), build lulus, push → Vercel live; verifikasi
+produksi: unduh 16 chunk JS beranda (mencakup view Sholat — "Salat Hari Ini"
+ada), string "Ketuk kartu salat"/"menyala oranye"/"berjamaah/mandiri" = 0.
