@@ -1363,3 +1363,31 @@ Perubahan:
   (±29px tinggi, tanpa grid), ketuk bubble → penghitung berganti zikir,
   fullscreen membuka zikir yang sama, hitungan 8 tetap, keluar tertutup;
   section Set Zikir diverifikasi 0 tombol ber-kata "tasbih"; konsol bersih.
+
+## Task 56 — Spacing Global & Identitas Tentang (v15b)
+- Root cause jarak bawah: wrapper konten global #konten-tazkiya memakai
+  padding-bottom 176px (pb-44) untuk menghindari nav, sedangkan kapsul nav
+  hanya menempati ±80px → ±96px ruang kosong di SEMUA halaman. Diganti var
+  global --tk-nav-reserve = calc(62px kapsul + max(1.1rem, safe-area) + 28px
+  jarak) → jarak konten terakhir ke nav 26px terukur (target 24–32px),
+  tema terang/gelap sama, min-h-dvh & fixed nav DIPERTAHANKAN.
+- Root cause halaman Al-Qur'an: overlay Pembaca memakai absolute inset-0 →
+  tingginya mengikuti halaman daftar surah di belakangnya (±11.000px) sehingga
+  konten ayat berakhir ±9.500px sebelum footer (ruang kosong raksasa), scroll
+  internal flex-1 tidak pernah aktif, pelacak ayat IntersectionObserver
+  (root=scrollRef) mati → progres bacaan mentok "Ayat 1". Diperbaiki ke
+  fixed inset-0 overflow-hidden (pola TasbihFullscreen): scroll internal hidup
+  (±1.100px), footer menempel viewport, jarak akhir baca 32px, "Ayat N dari M"
+  berjalan saat digulir.
+- pb-36 → pb-8 pada kolom baca (footer reader bukan overlay, bukan double pad).
+- Tentang (Profil): identitas resmi SUIO — judul SUIO + subjudul Sujud in
+  Order + deskripsi pendamping ibadah harian + tagline "Setiap Langkah
+  Kecil, Menuju Istiqamah." (aksen oranye); keterangan teknis "Versi 5.0.0
+  (prototipe web) · Data lokal" + chip v5.0.0 dihapus.
+- Tidak ada margin per halaman yang diubah manual; desain halaman, nav,
+  tipografi, TargetSheet (sudah 24px+safe) tidak disentuh.
+- Guard: tsc 0, eslint bersih, build sukses; QA agent-browser lokal 360/1280
+  + produksi 360: 5 tab + 3 subpage gap 26px & overflow-x 0, reader fixed +
+  endGap 32px + progress berjalan, 2 tema diverifikasi screenshot, konsol
+  tanpa error; deployment Vercel production terverifikasi via pengukuran
+  langsung di tazkiyaapp.vercel.app.
