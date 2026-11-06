@@ -290,10 +290,6 @@ function TodayTab({
             now={now}
             onRecord={onRecord}
           />
-          <p className="mt-2.5 px-1 text-[10.5px] leading-relaxed text-tk-muted">
-            Ketuk kartu salat untuk mencatat status, cara (berjamaah/mandiri), dan waktunya. Setiap kartu memperlihatkan
-            waktu mulai, batas akhir, dan durasinya — kartu yang sedang berlangsung menyala oranye dengan posisi waktunya.
-          </p>
           {friday ? (
             <p className="mt-1.5 px-1 text-[10.5px] leading-relaxed text-tk-muted">
               {fridayZuhurAlt
