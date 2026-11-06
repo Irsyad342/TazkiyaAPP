@@ -1410,3 +1410,53 @@ Perubahan:
   2 baris 4+3, centerDelta 0 kedua baris persis sejajar tengah, item 70px,
   ikon 56px, label 11px (1 baris), overflow-x 0; fungsi pilih emosi lulus
   (aria-checked + caption hadis berganti); 2 tema diverifikasi screenshot.
+
+## Task 58 — Dark Mode Hangat, Target Ibadah, Statistik Profil, Header Salat & Panduan Sunnah
+- DARK MODE v18: token gelap diremap ke palet hangat pengguna — kanvas Deep
+  Charcoal #1C1A1A, kartu Charcoal #272321, input/pil Warm Dark Gray #352B27,
+  blok brand Muted Brown (#3B2B20/#4D3522), brand fill Primary Orange #FF5A00,
+  aksen teks Soft Orange #FF9A52, teks Warm Ivory (#F6EEE3). Dua blok token
+  (@theme + html[data-theme=dark]) disinkronkan; light tidak disentuh sama
+  sekali. Kedalaman: .glass/.glass-strong/.glass-violet diberi gradasi vertikal
+  halus khusus dark, .glass-hero mengalir #FF5A00→#D94B0A; popover #2E2825,
+  border/input/bar grid chart/muted semuanya dihangatkan; BottomNav kapsul
+  #151110; Toaster & meta theme-color mengikuti; swatch tema Profil diperbarui.
+- EMOJI DARK: public/mood/dark/* diregenerasi scripts/recolor_mood_dark_v2.py
+  (hanya menulis dark; light byte-identical). Tile hangat bervariasi per emosi:
+  bahagia soft orange+peach, tenang amber muted, bersyukur burnt orange+hati
+  peach, lelah orange hangat+fitur cokelat tua, sedih brown muted+air mata
+  ivory, cemas warm gray+tetes soft orange, campur aduk peach+muted orange.
+  Geometri tak disentuh (pemetaan klaster + anchor tile + band tepi 6px).
+  Ring aktif ring-offset tetap; bayangan inactive dark dihangatkan (rgba hitam
+  hangat) + ring hairline ivory 7%.
+- TARGET IBADAH: root cause "terbuka dari bawah" — sheet absolute inset-0 di
+  dalam <main relative> yang tingginya setinggi dokumen; diganti FIXED inset-0
+  + mx-auto max-w-[430px] (pola reader/tasbih), ref scrollTop=0 sekali saat
+  mount (interaksi dalam halaman tidak direset), caption header diperjelas,
+  ring 108→96px, label "Sisa"→"Berjalan", gap antar section 3.5→3, padding
+  bawah 28px+safe-area (jarak konten terakhir 28px), komposisi v16
+  (header→ringkasan ring % + 3 stat→daftar kartu) dipertahankan.
+- STATISTIK PROFIL: grid-cols-3 kolom sama lebar, angka & label CENTER
+  (sebelumnya kiri), gap vertikal seragam 8px, border-l transparan di sel
+  pertama agar ketiga pusat kolom presisi (0.01px) di semua lebar, label
+  mixed-case 10.5px agar "Salat hari ini" 1 baris di 360px. Data tak diubah.
+- HEADER SALAT (kartu tiket TIDAK disentuh): tanggal Masehi satu baris penuh
+  sebagai informasi utama (h2 22px), baris kedua Hijriah (ikon bulan sabit
+  aksen) + dua chip statistik kanan (Salat n/5 di blok brand, Berjamaah di
+  blok netral), lalu beam progres 4/5 dengan aria-label lengkap.
+- PANDUAN SALAT SUNNAH (section baru di bawah kartu jadwal, sebelum daftar
+  ibadah sunah terlacak): data src/lib/tazkiya/sunnahGuide.ts — 5 rawatib
+  muakkadah (qabliyah Subuh 2; qabliyah Zuhur 2/4 + varian niat 4 rakaat;
+  ba'diyah Zuhur, Magrib, Isya 2) + grup opsional ghairu muakkadah (qabliyah
+  Asar & Magrib dengan keterangan proporsional). Accordion framer-motion
+  (height auto, 0.28s), chip khatam jumlah rakaat (ornamen minimal), niat
+  Arab (quran-arabic/Amiri) + transliterasi + terjemahan, catatan hukum per
+  entri, footnote: niat di hati + 10 vs 12 rakaat Bukhari vs Tirmidzi/Nasa'i.
+  Lafaz terverifikasi artikel fikih (bankmuamalat.co.id, baznas.go.id);
+  klasifikasi rawatib muakkadah 12 rakaat vs ghairu terkonfirmasi via search.
+- Guard: tsc 0, eslint bersih, build sukses; QA lokal 2 tema × 360/375/390/
+  430/768/1280: overX 0 semua, stats gaps equal (≤0.01px), Target top=0 &
+  judul langsung terlihat & gap bawah 28px & tengah sempurna di tablet/
+  desktop, accordion buka-tutup halus, Arab terrender, header chip hidup
+  (catat Subuh berjamaah → 1/5 & 1 BERJAMAAH + beam 66px + popup), mood
+  pilih → aria-checked & hadis sinkron, Jurnal utuh, light byte-identical.

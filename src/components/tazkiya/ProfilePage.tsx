@@ -85,8 +85,8 @@ import { cn } from "@/lib/utils";
 
 const THEME_OPTIONS: { id: ThemeMode; label: string; hint: string; bg: string; dot: string }[] = [
   { id: "light", label: "Terang", hint: "Kanvas putih", bg: "linear-gradient(140deg,#ffffff,#ececef)", dot: "#FA5200" },
-  { id: "dark", label: "Gelap", hint: "Arang ember", bg: "linear-gradient(140deg,#2A2A2E,#1B1B1E)", dot: "#FA5200" },
-  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#1B1B1E 50%,#F2F2F4 50%)", dot: "#FA5200" },
+  { id: "dark", label: "Gelap", hint: "Arang hangat", bg: "linear-gradient(140deg,#372e29,#1c1a1a)", dot: "#FF5A00" },
+  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#1c1a1a 50%,#F2F2F4 50%)", dot: "#FA5200" },
 ];
 
 /** Jam perangkat HH:mm — aksen kanan-atas kepala profil. */
@@ -404,7 +404,9 @@ export function ProfilePage({
         </div>
       </section>
 
-      {/* ---------- Statistik personal, TANPA kartu ---------- */}
+      {/* ---------- Statistik personal, TANPA kartu ----------
+          Grid 3 kolom sama lebar; angka & label dipusatkan horizontal,
+          jarak vertikal angka→label seragam (gap tetap), baseline konsisten. */}
       <section aria-label="Statistik personal" className="animate-tk-fade-up">
         <div className="grid grid-cols-3">
           {[
@@ -412,9 +414,15 @@ export function ProfilePage({
             { value: `${focusDone}/5`, label: "Salat hari ini" },
             { value: todayZikir.toLocaleString("id-ID"), label: "Zikir hari ini" },
           ].map(({ value, label }, i) => (
-            <div key={label} className={cn("min-w-0 px-4", i === 0 && "pl-0", i > 0 && "border-l border-tk-line")}>
-              <p className="gs-display truncate text-[27px] font-extrabold leading-none text-tk-ink">{value}</p>
-              <p className="gs-overline mt-2">{label}</p>
+            <div
+              key={label}
+              className={cn(
+                "flex min-w-0 flex-col items-center gap-2 px-1.5 py-0.5 border-l",
+                i > 0 ? "border-tk-line" : "border-transparent"
+              )}
+            >
+              <p className="gs-display tnum text-center text-[27px] font-extrabold leading-none text-tk-ink">{value}</p>
+              <p className="text-center text-[10.5px] font-semibold leading-[1.3] tracking-[0.02em] text-tk-muted">{label}</p>
             </div>
           ))}
         </div>

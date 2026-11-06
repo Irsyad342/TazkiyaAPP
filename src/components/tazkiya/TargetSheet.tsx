@@ -11,7 +11,7 @@
  * dan seluruh fungsi pengaturan target dipertahankan.
  */
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { BookOpen, ChevronDown, ChevronLeft, Check, CircleDot, MoonStar, Save, Target } from "lucide-react";
 import { toast } from "sonner";
 import { m } from "framer-motion";
@@ -182,6 +182,12 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
   const [zikirDraft, setZikirDraft] = useState(String(initial.settings.zikirTarget));
   const [tasbihDraft, setTasbihDraft] = useState(String(initial.tasbih.target));
   const [openDetail, setOpenDetail] = useState<string | null>(null);
+  /** Halaman SELALU terbuka dari bagian paling atas — gulir internal di-reset
+      sekali saat mount, tanpa menyentuh posisi gulir saat pengguna berinteraksi. */
+  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
 
   /* ---------- Progres nyata hari ini ---------- */
   const prayerDone = PRAYER_IDS.filter((id) => selectPrayerDetail(prayerDetails, logs, today, id).status === "done").length;
@@ -449,7 +455,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 24 }}
       transition={{ duration: 0.22, ease: "easeOut" }}
-      className="absolute inset-0 z-40 flex flex-col overflow-hidden bg-tk-stage"
+      className="fixed inset-0 z-40 mx-auto flex w-full max-w-[430px] flex-col overflow-hidden bg-tk-stage"
       role="dialog"
       aria-modal="true"
       aria-label="Target Ibadah"
@@ -468,16 +474,19 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
           <h2 className="font-display text-lg font-bold tracking-[-0.01em] text-tk-ink">
             Target Ibadah<span className="text-tk-violet">.</span>
           </h2>
-          <p className="text-[11px] text-tk-muted">Sasaran harianmu dan perkembangannya hari ini</p>
+          <p className="text-[11px] text-tk-muted">Pantau perkembangan kebiasaan ibadahmu setiap hari</p>
         </div>
       </div>
 
       {/* ---------- Konten ---------- */}
-      <div className="thin-scrollbar relative z-10 flex-1 space-y-3.5 overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2">
+      <div
+        ref={scrollRef}
+        className="thin-scrollbar relative z-10 flex-1 space-y-3 overflow-y-auto px-4 pb-[max(1.75rem,calc(env(safe-area-inset-bottom)+1rem))] pt-2"
+      >
         {/* ---------- RINGKASAN PROGRES ---------- */}
         <section aria-label="Ringkasan progres target" className="glass rounded-[1.5rem] p-4">
           <div className="flex items-center gap-4">
-            <div className="relative h-[108px] w-[108px] shrink-0">
+            <div className="relative h-[96px] w-[96px] shrink-0">
               <svg aria-hidden viewBox="0 0 120 120" className="h-full w-full -rotate-90">
                 <circle cx="60" cy="60" r={RR} fill="none" strokeWidth="8" className="stroke-tk-track" />
                 <circle
@@ -494,17 +503,17 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
                 />
               </svg>
               <span className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="tnum font-display text-[22px] font-extrabold leading-none text-tk-ink">{summaryPct}%</span>
-                <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-tk-muted">Tercapai</span>
+                <span className="tnum font-display text-[20px] font-extrabold leading-none text-tk-ink">{summaryPct}%</span>
+                <span className="mt-1 text-[8.5px] font-semibold uppercase tracking-[0.08em] text-tk-muted">Tercapai</span>
               </span>
             </div>
             <div className="flex min-w-0 flex-1 gap-2">
               <MiniStat label="Total target" value={String(counted.length)} />
               <MiniStat label="Tercapai" value={String(achievedCount)} tone="ok" />
-              <MiniStat label="Sisa" value={String(counted.length - achievedCount)} tone="sisa" />
+              <MiniStat label="Berjalan" value={String(counted.length - achievedCount)} tone="sisa" />
             </div>
           </div>
-          <p className="mt-3 border-t border-tk-line-soft pt-2.5 text-[10.5px] leading-relaxed text-tk-muted">
+          <p className="mt-2.5 border-t border-tk-line-soft pt-2 text-[10.5px] leading-relaxed text-tk-muted">
             Dihitung dari catatan ibadah hari ini ({new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" })}). Sebuah target
             dianggap tercapai saat nilai hariannya terpenuhi.
           </p>

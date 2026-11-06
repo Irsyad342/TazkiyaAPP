@@ -82,8 +82,8 @@ export function MoodSection({
                     className={cn(
                       "flex rounded-[25%] transition-[box-shadow] duration-300",
                       active
-                        ? "ring-2 ring-tk-accent ring-offset-2 ring-offset-tk-stage light:shadow-[0_10px_22px_-8px_rgba(255,90,0,0.45)] dark:shadow-[0_10px_24px_-10px_rgba(255,90,0,0.4)]"
-                        : "light:shadow-[0_6px_14px_-6px_rgba(119,113,109,0.42)] light:ring-1 light:ring-[#2a2320]/[0.06] dark:shadow-[0_8px_18px_-10px_rgba(0,0,0,0.55)] dark:ring-1 dark:ring-white/[0.05]"
+                        ? "ring-2 ring-tk-accent ring-offset-2 ring-offset-tk-stage light:shadow-[0_10px_22px_-8px_rgba(255,90,0,0.45)] dark:shadow-[0_10px_24px_-10px_rgba(217,75,10,0.45)]"
+                        : "light:shadow-[0_6px_14px_-6px_rgba(119,113,109,0.42)] light:ring-1 light:ring-[#2a2320]/[0.06] dark:shadow-[0_10px_22px_-12px_rgba(12,6,2,0.6)] dark:ring-1 dark:ring-[#F5E8DC]/[0.07]"
                     )}
                   >
                     <MoodFace id={mo.id} className="h-16 w-16" />

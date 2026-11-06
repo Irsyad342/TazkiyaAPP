@@ -160,7 +160,7 @@ export default function Page() {
       // Warna bilah status/URL browser mengikuti tema aktif.
       document
         .querySelector('meta[name="theme-color"]')
-        ?.setAttribute("content", resolved === "light" ? "#F2F2F4" : "#1B1B1E");
+        ?.setAttribute("content", resolved === "light" ? "#F2F2F4" : "#1C1A1A");
     };
     apply();
     if (theme === "system") {
@@ -357,13 +357,13 @@ export default function Page() {
               : {
                   duration: 2600,
                   style: {
-                    background: "#242429",
-                    border: "1px solid #383838",
-                    color: "#FFFFFF",
+                    background: "#2e2825",
+                    border: "1px solid #473c34",
+                    color: "#F6EEE3",
                     borderRadius: "999px",
                     fontSize: "13px",
                     fontWeight: 600,
-                    boxShadow: "0 18px 48px -18px rgba(0,0,0,0.7)",
+                    boxShadow: "0 18px 48px -18px rgba(12,6,2,0.7)",
                   },
                 }
           }

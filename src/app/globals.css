@@ -82,25 +82,30 @@
   --breakpoint-lg: 302rem;
   --breakpoint-xl: 303rem;
   --breakpoint-2xl: 304rem;
-  --color-tk-ink: #ffffff;
-  --color-tk-muted: #a5a5ad;
-  --color-tk-deep: #6f6f78;
-  --color-tk-violet: #fa5200; /* BRAND FILL — orange identitas (sampel #FA5200) */
-  --color-tk-lavender: #2b1b10; /* permukaan hangat (soft brand block) */
-  --color-tk-lav-deco: #41281a; /* lapisan hangat lebih pekat */
-  --color-tk-line: #2c2c32;
-  --color-tk-accent: #ff6b26; /* orange untuk teks/ikon kecil di dark */
-  --color-tk-frame: #1b1b1e;
-  --color-tk-stage: #1b1b1e;
-  --color-tk-panel: #242429;
-  --color-tk-panel-soft: #1f1f23;
-  --color-tk-panel-strong: #33333a; /* input & pil tak-aktif (sampel #333) */
-  --color-tk-line-soft: #232328;
-  --color-tk-line-strong: #3c3c43;
-  --color-tk-track: #33333a;
+  /* Nilai warna dark disampling ulang ke palet hangat v18 (Deep Charcoal
+     #1C1A1A, Charcoal #272321, Warm Dark Gray #352B27, Muted Brown #49372F,
+     Burnt Orange #D94B0A, Primary Orange #FF5A00, Soft Orange #FF9A52,
+     Peach #EFC4A8, Warm Ivory #F5E8DC) — permukaan gelap bernuansa hangat
+     dengan tetap satu identitas orange. */
+  --color-tk-ink: #f6eee3;
+  --color-tk-muted: #a89e96;
+  --color-tk-deep: #7e756c;
+  --color-tk-violet: #ff5a00; /* BRAND FILL — Primary Orange palet v18 */
+  --color-tk-lavender: #3b2b20; /* permukaan hangat (soft brand block) */
+  --color-tk-lav-deco: #4d3522; /* lapisan hangat lebih pekat */
+  --color-tk-line: #3a322c;
+  --color-tk-accent: #ff9a52; /* Soft Orange untuk teks/ikon kecil di dark */
+  --color-tk-frame: #1c1a1a;
+  --color-tk-stage: #1c1a1a;
+  --color-tk-panel: #272321;
+  --color-tk-panel-soft: #211d1b;
+  --color-tk-panel-strong: #352b27; /* input & pil tak-aktif */
+  --color-tk-line-soft: #2c2724;
+  --color-tk-line-strong: #4a4038;
+  --color-tk-track: #352b27;
   --color-tk-aurora-a: transparent;
   --color-tk-aurora-b: transparent;
-  --color-tk-orb-deep: #2b1b10;
+  --color-tk-orb-deep: #35231a;
   /* Permukaan trio referensi: kartu PUTIH + kartu tugas abu terang */
   --color-tk-white-card: #ffffff;
   --color-tk-light-card: #e9e9e7;
@@ -113,7 +118,7 @@
   --color-tk-mint: #2b1b10;
   --color-tk-forest: #33333a;
   --color-tk-amber: #e0a458;
-  --color-tk-amber-soft: #2c2416;
+  --color-tk-amber-soft: #362a16;
   --color-tk-teal: #52b8a9;
   --color-tk-green: #58b877;
   --color-tk-green-soft: #1d2b22;
@@ -201,72 +206,73 @@
   --color-tk-sky-soft: #ecf2fd;
 }
 
-/* ---------- Mode gelap — PENGALAMAN UTAMA v7 ----------
-   Nilai disampling dari referensi: kanvas #1B1B1E, kartu #242429,
-   input/pil #33333A, orange #FA5200. */
+/* ---------- Mode gelap — PENGALAMAN UTAMA v18 ----------
+   Palet hangat dari palet referensi pengguna: kanvas Deep Charcoal #1C1A1A,
+   kartu Charcoal #272321, input/pil Warm Dark Gray #352B27, blok brand
+   Muted Brown, aksen Primary Orange #FF5A00 + Soft Orange #FF9A52. */
 html[data-theme="dark"] {
-  --background: #1b1b1e;
-  --foreground: #ffffff;
-  --card: #242429;
-  --card-foreground: #ffffff;
-  --popover: #242429;
-  --popover-foreground: #ffffff;
-  --primary: #fa5200;
+  --background: #1c1a1a;
+  --foreground: #f6eee3;
+  --card: #272321;
+  --card-foreground: #f6eee3;
+  --popover: #2e2825;
+  --popover-foreground: #f6eee3;
+  --primary: #ff5a00;
   --primary-foreground: #ffffff;
-  --secondary: #2b1b10;
-  --secondary-foreground: #ff9a66;
-  --muted: #1f1f23;
-  --muted-foreground: #a5a5ad;
-  --accent: #2b1b10;
-  --accent-foreground: #ff9a66;
+  --secondary: #3b2b20;
+  --secondary-foreground: #ff9a52;
+  --muted: #211d1b;
+  --muted-foreground: #a89e96;
+  --accent: #3b2b20;
+  --accent-foreground: #ff9a52;
   --destructive: #ff6369;
-  --border: #2c2c32;
-  --input: #3c3c43;
-  --ring: #fa5200;
-  --chart-1: #fa5200;
+  --border: #3a322c;
+  --input: #4a4038;
+  --ring: #ff5a00;
+  --chart-1: #ff5a00;
   --chart-2: #58b877;
   --chart-3: #6e9fe8;
   --chart-4: #e0a458;
   --chart-5: #c97b4a;
-  --sidebar: #17171a;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #fa5200;
+  --sidebar: #171412;
+  --sidebar-foreground: #f6eee3;
+  --sidebar-primary: #ff5a00;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #2b1b10;
-  --sidebar-accent-foreground: #ff9a66;
-  --sidebar-border: #2c2c32;
-  --sidebar-ring: #fa5200;
+  --sidebar-accent: #3b2b20;
+  --sidebar-accent-foreground: #ff9a52;
+  --sidebar-border: #3a322c;
+  --sidebar-ring: #ff5a00;
   /* Token Tazkiya versi gelap — nilai utama di @theme atas sudah dark;
      ulangi di sini agar selalu menang atas :root. */
-  --color-tk-ink: #ffffff;
-  --color-tk-muted: #a5a5ad;
-  --color-tk-deep: #6f6f78;
-  --color-tk-violet: #fa5200;
-  --color-tk-lavender: #2b1b10;
-  --color-tk-lav-deco: #41281a;
-  --color-tk-line: #2c2c32;
-  --color-tk-accent: #ff6b26;
-  --color-tk-frame: #1b1b1e;
-  --color-tk-stage: #1b1b1e;
-  --color-tk-panel: #242429;
-  --color-tk-panel-soft: #1f1f23;
-  --color-tk-panel-strong: #33333a;
-  --color-tk-line-soft: #232328;
-  --color-tk-line-strong: #3c3c43;
-  --color-tk-track: #33333a;
+  --color-tk-ink: #f6eee3;
+  --color-tk-muted: #a89e96;
+  --color-tk-deep: #7e756c;
+  --color-tk-violet: #ff5a00;
+  --color-tk-lavender: #3b2b20;
+  --color-tk-lav-deco: #4d3522;
+  --color-tk-line: #3a322c;
+  --color-tk-accent: #ff9a52;
+  --color-tk-frame: #1c1a1a;
+  --color-tk-stage: #1c1a1a;
+  --color-tk-panel: #272321;
+  --color-tk-panel-soft: #211d1b;
+  --color-tk-panel-strong: #352b27;
+  --color-tk-line-soft: #2c2724;
+  --color-tk-line-strong: #4a4038;
+  --color-tk-track: #352b27;
   --color-tk-white-card: #ffffff;
   --color-tk-light-card: #e9e9e7;
   --tk-inset: rgba(0, 0, 0, 0.28);
-  --tk-ring-soft: rgba(250, 82, 0, 0.22);
-  --tk-chart-grid: #2c2c32;
-  --tk-chart-axis: #7f7f7f;
-  --tk-empty-cell: #1f1f23;
-  --tk-float-shadow: 0 24px 64px -24px rgba(0, 0, 0, 0.75);
+  --tk-ring-soft: rgba(255, 90, 0, 0.22);
+  --tk-chart-grid: #372e29;
+  --tk-chart-axis: #8a7e76;
+  --tk-empty-cell: #221e1c;
+  --tk-float-shadow: 0 24px 64px -24px rgba(12, 6, 2, 0.8);
   --color-tk-lime: #1f4230;
   --color-tk-lime-ink: #93dcb2;
   --color-tk-lime-soft: #1b2d24;
   --color-tk-blue-soft: #1d2838;
-  --color-tk-amber-soft: #2c2416;
+  --color-tk-amber-soft: #362a16;
   --color-tk-green-soft: #1d2b22;
   --color-tk-sky-soft: #1d2838;
 }
@@ -280,7 +286,7 @@ html[data-theme="dark"] {
     background-color: #f2f2f4;
   }
   html[data-theme="dark"] {
-    background-color: #1b1b1e;
+    background-color: #1c1a1a;
   }
   /* General Sans sebagai font default seluruh aplikasi. Variabel --font-gs
      dipasang next/font pada <body>, jadi font-family HARUS diterapkan di
@@ -325,6 +331,22 @@ html[data-theme="dark"] {
     background: var(--color-tk-panel);
     border: 1px solid var(--color-tk-line);
     box-shadow: var(--tk-float-shadow);
+  }
+  /* ---------- Kedalaman permukaan dark v18: gradasi hangat tipis ----------
+     Dark tidak lagi datar satu warna: kartu mengkilap sedikit ke atas,
+     lapisan mengambang lebih terang, kartu hero mengalir Primary → Burnt. */
+  html[data-theme="dark"] .glass {
+    background: linear-gradient(180deg, #2a2523 0%, #262221 100%);
+  }
+  html[data-theme="dark"] .glass-strong {
+    background: linear-gradient(180deg, #332c28 0%, #2d2724 100%);
+  }
+  html[data-theme="dark"] .glass-violet {
+    background: linear-gradient(180deg, #402e20 0%, #38281d 100%);
+  }
+  html[data-theme="dark"] .glass-hero {
+    background: linear-gradient(168deg, #ff5a00 0%, #e04e06 55%, #d94b0a 100%);
+    box-shadow: 0 20px 48px -22px rgba(217, 75, 10, 0.55);
   }
   /* Blok hangat lembut — permukaan brand yang tidak menabrak */
   .glass-violet {

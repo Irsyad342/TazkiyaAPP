@@ -15,13 +15,16 @@
  */
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { AnimatePresence, m } from "framer-motion";
 import {
   BookMarked,
   Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   CloudSun,
   HandCoins,
+  Info,
   Moon,
   MoonStar,
   Plus,
@@ -52,6 +55,7 @@ import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { nextPrayerState, prayerTiming } from "@/lib/tazkiya/goals";
 import { nowTotalMinutes, resolvePrayerWindows, windowClock, type PrayerWindows } from "@/lib/tazkiya/prayerWindows";
 import { HADITH_QADA } from "@/lib/tazkiya/hadith";
+import { RAWATIB_MUAKKADAH, SUNNAH_GUIDE_FOOTNOTE, SUNNAH_LAINNYA, type SunnahGuideEntry } from "@/lib/tazkiya/sunnahGuide";
 import { ConfirmButton, GlassCard, SectionHeader, SegmentedTabs } from "./ui-bits";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { DayDetailSheet, prayerMetaFor } from "./DayDetailSheet";
@@ -79,6 +83,116 @@ const EXTRA_ICONS: Record<ExtraId, typeof Sun> = {
 function formatDayFullOf(date: string): string {
   const [y, m, d] = date.split("-").map((v) => parseInt(v, 10));
   return new Date(y, (m ?? 1) - 1, d ?? 1).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" });
+}
+
+/* ================= Panduan Salat Sunnah ================= */
+
+/** Baris accordion satu salat sunnah: nama + rakaat + waktu + tombol niat. */
+function SunnahGuideRow({ e, open, onToggle }: { e: SunnahGuideEntry; open: boolean; onToggle: () => void }) {
+  return (
+    <div>
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={onToggle}
+        className="tap flex w-full items-center gap-3 px-4 py-3 text-left"
+      >
+        {/* Chip jumlah rakaat berbentuk khatam — ornamen Islami minimal */}
+        <span
+          aria-hidden
+          className="tk-octagram flex h-8 w-8 shrink-0 items-center justify-center bg-tk-lavender text-[10px] font-extrabold text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent"
+        >
+          {e.rakaatNum}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[13.5px] font-semibold text-tk-ink">{e.name}</span>
+          <span className="block truncate text-[10.5px] text-tk-muted">
+            {e.timing} · {e.rakaat}
+          </span>
+        </span>
+        <span
+          className={cn(
+            "shrink-0 rounded-full px-2 py-1 text-[9px] font-bold uppercase tracking-[0.07em] transition-colors",
+            open ? "bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent" : "bg-tk-panel-soft text-tk-muted"
+          )}
+        >
+          Niat
+        </span>
+        <ChevronDown size={15} className={cn("shrink-0 text-tk-muted transition-transform", open && "rotate-180")} />
+      </button>
+      <AnimatePresence initial={false}>
+        {open ? (
+          <m.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="mx-4 mb-3.5 rounded-[1.1rem] border border-tk-line bg-tk-panel-soft p-3.5">
+              <p className="gs-overline">Niat</p>
+              <p dir="rtl" lang="ar" className="quran-arabic mt-2.5 text-right text-[22px] leading-[1.9] text-tk-ink">
+                {e.arab}
+              </p>
+              <p className="mt-2.5 text-[12px] font-medium italic leading-relaxed text-tk-accent">{e.translit}</p>
+              <p className="mt-1 text-[12.5px] leading-relaxed text-tk-muted">
+                <span className="font-bold text-tk-ink">Artinya:</span> &ldquo;{e.arti}&rdquo;
+              </p>
+              {e.variant ? (
+                <div className="mt-3 rounded-xl bg-tk-panel px-3 py-2.5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-tk-muted">{e.variant.label}</p>
+                  <p dir="rtl" lang="ar" className="quran-arabic mt-2 text-right text-[20px] leading-[1.9] text-tk-ink">
+                    {e.variant.arab}
+                  </p>
+                  <p className="mt-2 text-[12px] font-medium italic leading-relaxed text-tk-accent">{e.variant.translit}</p>
+                  <p className="mt-1 text-[12px] leading-relaxed text-tk-muted">
+                    <span className="font-bold text-tk-ink">Artinya:</span> &ldquo;{e.variant.arti}&rdquo;
+                  </p>
+                </div>
+              ) : null}
+              <p className="mt-2.5 flex items-start gap-1.5 text-[10.5px] leading-relaxed text-tk-muted/85">
+                <Info size={12} className="mt-0.5 shrink-0" aria-hidden />
+                {e.note}
+              </p>
+            </div>
+          </m.div>
+        ) : null}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/** Section panduan niat salat sunnah — di bawah kartu jadwal salat. */
+function SunnahGuideSection() {
+  const [open, setOpen] = useState<string | null>(null);
+  return (
+    <section aria-label="Panduan salat sunnah" className="animate-tk-fade-up">
+      <SectionHeader title="Panduan Salat Sunnah" caption="Lengkapi ibadah wajib dengan salat sunnah yang dianjurkan." />
+      <div className="space-y-3">
+        <div className="glass overflow-hidden rounded-[1.5rem]">
+          <p className="gs-overline px-4 pt-3.5">Rawatib Muakkadah</p>
+          <div className="mt-1.5">
+            {RAWATIB_MUAKKADAH.map((e, i) => (
+              <div key={e.id} className={cn(i > 0 && "border-t border-tk-line-soft")}>
+                <SunnahGuideRow e={e} open={open === e.id} onToggle={() => setOpen((v) => (v === e.id ? null : e.id))} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="glass overflow-hidden rounded-[1.5rem]">
+          <p className="gs-overline px-4 pt-3.5">Sunah Lainnya · Opsional</p>
+          <div className="mt-1.5">
+            {SUNNAH_LAINNYA.map((e, i) => (
+              <div key={e.id} className={cn(i > 0 && "border-t border-tk-line-soft")}>
+                <SunnahGuideRow e={e} open={open === e.id} onToggle={() => setOpen((v) => (v === e.id ? null : e.id))} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <p className="px-1 text-[10px] leading-relaxed text-tk-muted/85">{SUNNAH_GUIDE_FOOTNOTE}</p>
+      </div>
+    </section>
+  );
 }
 
 /* ================= Tab Hari Ini ================= */
@@ -119,31 +233,45 @@ function TodayTab({
   const extrasList = EXTRAS.filter((e) => tracked.includes(e.id));
 
   const [y, m, d] = today.split("-").map((v) => parseInt(v, 10));
-  const dateLabel = new Date(y, (m ?? 1) - 1, d ?? 1).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" });
+  const dateLabel = new Date(y, (m ?? 1) - 1, d ?? 1).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+  const hijriLabel = formatHijri(new Date());
 
   return (
     <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
       <div className="space-y-7 lg:col-span-7">
-        {/* Judul tanggal besar, gaya "Manage Task" */}
+        {/* Header rapi: Tanggal Masehi = informasi utama (satu baris penuh),
+            baris kedua Hijriah pendamping + statistik salat & berjamaah ringkas,
+            lalu beam progres. Kartu jadwal di bawah tidak tersentuh. */}
         <header className="animate-tk-fade-up">
-          <p className="flex items-center gap-1.5 text-[24px] font-bold tracking-[-0.02em] text-tk-ink">
-            {dateLabel}
-          </p>
-          <p className="mt-1 text-[12px] text-tk-muted">
-            Kamu sudah mencatat{" "}
-            <span className="tnum font-bold text-tk-ink">
-              {doneCount}
-              /5
-            </span>{" "}
-            salat hari ini
-            {jamaah > 0 ? (
-              <>
-                {" "}
-                · <span className="font-semibold text-tk-accent">{jamaah} berjamaah</span>
-              </>
-            ) : null}
-            {formatHijri(new Date()) ? <span className="text-tk-deep"> · {formatHijri(new Date())}</span> : null}
-          </p>
+          <h2 className="text-[22px] font-bold leading-tight tracking-[-0.02em] text-tk-ink">{dateLabel}</h2>
+          <div className="mt-1.5 flex items-center justify-between gap-3">
+            {hijriLabel ? (
+              <p className="flex min-w-0 items-center gap-1.5 text-[12px] text-tk-muted">
+                <MoonStar size={12.5} className="shrink-0 text-tk-accent" aria-hidden />
+                <span className="truncate">{hijriLabel}</span>
+              </p>
+            ) : (
+              <span aria-hidden />
+            )}
+            <div className="flex shrink-0 items-stretch gap-2" role="group" aria-label="Ringkasan salat hari ini">
+              <div className="flex flex-col items-center rounded-[0.9rem] bg-tk-lavender px-3 py-1.5">
+                <span className="tnum text-[15px] font-extrabold leading-none text-tk-violet dark:text-tk-accent">{doneCount}/5</span>
+                <span className="mt-1 text-[8.5px] font-semibold uppercase tracking-[0.07em] text-tk-muted">Salat</span>
+              </div>
+              <div className="flex flex-col items-center rounded-[0.9rem] bg-tk-panel-soft px-3 py-1.5">
+                <span className="tnum text-[15px] font-extrabold leading-none text-tk-ink">{jamaah}</span>
+                <span className="mt-1 text-[8.5px] font-semibold uppercase tracking-[0.07em] text-tk-muted">Berjamaah</span>
+              </div>
+            </div>
+          </div>
+          {/* Progres pencatatan salat hari ini */}
+          <div
+            className="tk-beam mt-3 h-1.5"
+            role="img"
+            aria-label={`Kamu sudah mencatat ${doneCount} dari 5 salat hari ini, ${jamaah} di antaranya berjamaah`}
+          >
+            <div className="tk-beam-fill" style={{ width: `${(doneCount / 5) * 100}%` }} />
+          </div>
         </header>
 
         {/* Daftar salat — kartu tiket bertumpuk, ketuk untuk mencatat */}
@@ -174,6 +302,9 @@ function TodayTab({
             </p>
           ) : null}
         </section>
+
+        {/* Panduan niat salat sunnah — section baru setelah seluruh kartu jadwal */}
+        <SunnahGuideSection />
       </div>
 
       {/* Ibadah sunah yang dilacak, daftar baris minimal */}
