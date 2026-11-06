@@ -6,8 +6,8 @@
  *    lega + tombol simpan tinta.
  * B. Mood check-in: lingkaran besar terpilih lavender.
  * C. Hadis kutipan editorial dengan sumber kitab + nomor jelas.
- * D. Riwayat: daftar kartu kecil berisi pratinjau + edit + hapus (konfirmasi).
- * Logika simpan/muat/hapus, mood, dan hadis-per-mood tidak berubah.
+ * D. Riwayat: daftar kartu kecil berisi pratinjau + edit (teks & mood) + hapus (konfirmasi).
+ * Logika simpan/muat/hapus dan hadis-per-mood tidak berubah.
  */
 
 import { useMemo, useState } from "react";
@@ -63,6 +63,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
      scroll pengguna tetap. */
   const [editingDate, setEditingDate] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<[string, string, string]>(["", "", ""]);
+  const [editMood, setEditMood] = useState<MoodId | undefined>(undefined);
 
   const activeMood = moodSel ?? moods[today]?.mood;
   const hadith = useMemo(() => hadithForMood(activeMood, today, hadithOffset), [activeMood, today, hadithOffset]);
@@ -305,6 +306,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                               }
                               setEditingDate(d);
                               setEditDraft(e.items);
+                              setEditMood(e.mood);
                             }}
                             className={cn(
                               "tap rounded-full border px-2.5 py-1 text-[10px] font-semibold transition-colors",
@@ -332,7 +334,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                       </div>
 
                       {editing ? (
-                        /* Panel edit inline pada posisi jurnal — tanpa scroll ke atas. */
+                        /* Panel edit inline pada posisi jurnal — teks + mood dapat diganti, tanpa scroll ke atas. */
                         <div className="mt-3 rounded-[1.1rem] border border-tk-line bg-tk-panel-soft p-3">
                           {([0, 1, 2] as const).map((i) => (
                             <textarea
@@ -350,6 +352,39 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                               className="tk-field mb-2 flex-1 resize-none py-2.5 text-[12px] leading-relaxed last:mb-0"
                             />
                           ))}
+
+                          {/* Mood jurnal ini ikut dapat diganti saat edit — bukan hanya teksnya. */}
+                          <div className="mt-1 border-t border-tk-line-soft pt-2.5">
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-[10.5px] font-bold text-tk-ink">Mood jurnal ini</p>
+                              <span className="text-[10px] font-semibold text-tk-muted">
+                                {editMood ? moodLabel(editMood) : "Tanpa mood"}
+                              </span>
+                            </div>
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {MOODS.map((mo) => {
+                                const active = editMood === mo.id;
+                                return (
+                                  <button
+                                    key={mo.id}
+                                    type="button"
+                                    aria-pressed={active}
+                                    aria-label={`Mood ${mo.label}`}
+                                    onClick={() => setEditMood(mo.id)}
+                                    className={cn(
+                                      "tap rounded-[25%] p-0.5 transition-[box-shadow] duration-200",
+                                      active
+                                        ? "ring-2 ring-tk-accent light:shadow-[0_8px_16px_-8px_rgba(255,90,0,0.45)] dark:shadow-[0_8px_18px_-10px_rgba(255,90,0,0.4)]"
+                                        : "light:ring-1 light:ring-[#2a2320]/[0.08] dark:ring-1 dark:ring-white/[0.06]"
+                                    )}
+                                  >
+                                    <MoodFace id={mo.id} className="h-8 w-8" />
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
                           <div className="mt-2.5 flex items-center justify-end gap-2">
                             <button
                               type="button"
@@ -360,7 +395,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                             </button>
                             <button
                               type="button"
-                              onClick={() => saveEdit(d, e.mood)}
+                              onClick={() => saveEdit(d, editMood)}
                               disabled={!canSaveEdit}
                               className={cn(
                                 "tap gs-ink-btn flex h-9 items-center justify-center gap-1.5 rounded-full px-4 text-[11.5px] font-bold transition-all",
