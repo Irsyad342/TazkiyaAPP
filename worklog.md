@@ -1267,7 +1267,7 @@ CSS bundle, root layout): semua sumber in-app SUDAH bersih (meta #1B1B1E →
 #F2F2F4 light via script, manifest #1B1B1E, tanpa SW). Sumber hijau yang
 tersisa dua:
 - **Polusi bundle CSS**: Tailwind v4 men-scan SEMUA file non-gitignore dan
-  menyerap kelas lama era "Fresh Green" (`bg-[#16a34a]`, `via-[#22c55e]`, …)
+  menyerap kelas lama era "Fresh Green" (kelas hex hijau era Fresh Green, notasi arbitrer kurung siku)
   yang tercatat di `scripts/migrasi-aurora-v3.py` — rule hijau ikut ter-compile
   ke CSS produksi walau tak dipakai DOM. Diperbaiki dengan `@source not`
   untuk scripts/examples/mini-services/skills/upload/supabase/tests di
