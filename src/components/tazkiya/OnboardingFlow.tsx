@@ -227,7 +227,14 @@ export function OnboardingFlow({
               className="relative z-10 flex items-center justify-between px-5 pt-[max(0.9rem,env(safe-area-inset-top))]"
             >
               <div className="flex items-center gap-2.5">
-                <SuioMark size={36} />
+                <m.span
+                  initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
+                  animate={entered ? { opacity: 1, scale: 1, rotate: 0 } : {}}
+                  transition={{ type: "spring", stiffness: 260, damping: 19, delay: 0.08 }}
+                  className="inline-flex will-change-transform"
+                >
+                  <SuioMark size={36} />
+                </m.span>
                 <div>
                   <p className="font-display text-[15px] font-extrabold leading-none tracking-[0.06em] text-white transition-colors duration-500 light:text-[#17171b]">
                     SUIO

@@ -45,6 +45,9 @@ export const metadata: Metadata = {
       { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
+    /* Apple touch icon: versi LIGHT permanen (kotak penuh — iOS yang membulatkan),
+       dipakai juga saat "Add to Home Screen" di Safari/iOS. */
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
 };
 
