@@ -985,3 +985,37 @@ redirect kunjungan pertama ✓, swipe ✓, Next/Lewati ✓, Mulai Sekarang→Daf
 kunjungan ulang langsung aplikasi ✓, pantulan /onboarding (flag & signedIn tersimulasi
 sesi fabrikasi) ✓, 0 overflow di 360/390/430/768/1280 + 360×640 ✓, reduced-motion animasi
 dekoratif mati ✓, 0 error halaman, tab Beranda/Qur'an/Sholat normal.
+
+## Task 48 — v13: ikon mood emoji dari referensi + pola bintang Daily Barakah dihapus
+
+Permintaan: (1) ganti SELURUH ikon ekspresi mood dengan ilustrasi emoji yang dipotong
+satu per satu dari kolase referensi (pertahankan kotak rounded + warna latar asli);
+(2) hapus motif bintang/starburst berulang + ornamen terpotong sisi kanan pada seksi
+Daily Barakah. Tanpa redesign halaman lain.
+
+### Emoji mood (7 aset individual)
+- scripts/crop_mood_emoji.py: deteksi grid 6x6 kolase (profil piksel non-putih),
+  bbox ketat per kotak, radius sudut diukur dari piksel (38-44px), mask rounded
+  supersample 4x (sudut luar transparan) → public/mood/{id}.png ~176px.
+  Pilihan: bahagia=kuning senyum lebar (0,0), tenang=senyum mata tertutup (0,2),
+  bersyukur=mata hati (2,3), lelah=Zzz (0,1), sedih=menangis dua aliran (5,0),
+  cemas=berkeringat gugup (4,2), campur-aduk=mulut bergelombang (5,3).
+  Verifikasi via contact sheet: tanpa bagian emoji lain, wajah utuh.
+- MoodFace.tsx ditulis ulang: render <img src="/mood/{id}.png">; MOOD_TONE dihapus.
+- MoodSection (Beranda): kotak emoji 64px menggantikan lingkaran pastel; selected =
+  ring oranye Tazkiya (tk-accent) + offset latar + glow rgba(250,82,0,.55) + skala
+  1.08 + whileTap; label tetap; stagger entrance & radiogroup dipertahankan.
+- JurnalPage: pemilih mood 52px + chip riwayat 20px memakai aset yang sama;
+  selected ring oranye (sebelumnya violet).
+
+### Pola bintang Daily Barakah (ref: teks "…kesulitan dari orang lain")
+- Hapus div.tk-geo-pattern (kisi khatam samar 112px kanan-atas) pada seksi Daily
+  Barakah HomePage.tsx dan Star8 oranye di sisi kanan judul; import Star8 dibersihkan.
+- Chip nomor khatam 01-04, OrnamentDivider, konten, dan layout tidak diubah.
+- tk-geo-pattern di QuranPage sengaja TIDAK disentuh (batasan pengguna).
+
+### QA
+tsc 0 · eslint 0 · build sukses. Browser: 7 img /mood/*.png termuat; klik Bersyukur →
+aria-checked + ring #ff6b26 (varian gelap) + skala 1.08 + toast "Tercatat"; persist
+setelah reload; Jurnal 7 emoji; .tk-geo-pattern=0 di Beranda, =1 di Al-Qur'an (utuh);
+0 overflow 360px; 0 error konsol; tema gelap & terang diverifikasi visual.

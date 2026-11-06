@@ -19,7 +19,7 @@ import { hadithForMood } from "@/lib/tazkiya/hadith";
 import { formatDayFull, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
 import { Chip, ConfirmButton, EmptyState, GlassCard, SectionHeader } from "./ui-bits";
 import { SubPageHeader } from "./SubPageHeader";
-import { MoodFace, MOOD_TONE } from "./MoodFace";
+import { MoodFace } from "./MoodFace";
 import { cn } from "@/lib/utils";
 
 /** Bagikan/salin kutipan ke perangkat (tanpa layanan eksternal). */
@@ -146,7 +146,6 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
             <div className="grid grid-cols-4 gap-2">
               {MOODS.map((mo) => {
                 const active = activeMood === mo.id;
-                const tone = MOOD_TONE[mo.id];
                 return (
                   <button
                     key={mo.id}
@@ -162,11 +161,11 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                     <span
                       aria-hidden
                       className={cn(
-                        "flex h-[52px] w-[52px] items-center justify-center rounded-full transition-all",
-                        active ? cn(tone.activeBg, "ring-2 ring-tk-violet") : "bg-tk-panel-soft"
+                        "flex rounded-[25%] transition-all",
+                        active && "shadow-[0_8px_18px_-8px_rgba(250,82,0,0.5)] ring-2 ring-tk-accent"
                       )}
                     >
-                      <MoodFace id={mo.id} className={cn("h-[38px] w-[38px]", tone.face)} />
+                      <MoodFace id={mo.id} className="h-[52px] w-[52px]" />
                     </span>
                     <span className={cn("text-[10px] font-bold leading-tight", active ? "text-tk-ink" : "text-tk-muted")}>
                       {mo.label}
@@ -242,7 +241,7 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                           {relativeDayLabel(d, today)}
                           {e.mood ? (
                             <span aria-label={`Mood ${moodLabel(e.mood)}`} className="inline-flex h-6 w-6 items-center justify-center">
-                              <MoodFace id={e.mood} className={cn("h-5 w-5", MOOD_TONE[e.mood].face)} />
+                              <MoodFace id={e.mood} className="h-5 w-5" />
                             </span>
                           ) : null}
                         </p>

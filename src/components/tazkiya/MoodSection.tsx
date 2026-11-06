@@ -2,9 +2,9 @@
 
 /**
  * Tazkiya v5 — Mood Check-in (Beranda) — tanpa kartu, komposisi editorial.
- * Tujuh ekspresi dari komponen bersama MoodFace (gaya garis konsisten)
- * dalam lingkaran lembut; pilihan aktif: lingkaran berwarna pastel + ring
- * lavender + pop animasi spring. Disimpan SATU catatan per tanggal —
+ * Tujuh ekspresi dari aset emoji MoodFace (kotak rounded dari kolase
+ * referensi); pilihan aktif: ring oranye Tazkiya + bayangan lembut + pop
+ * animasi spring. Disimpan SATU catatan per tanggal —
  * menekan berkali-kali hanya memperbarui pilihan hari itu. Pilihan lama
  * hari ini otomatis tampil terpilih. Bukan alat diagnosis.
  */
@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { m } from "framer-motion";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { MOODS, moodLabel, type MoodId } from "@/lib/tazkiya/types";
-import { MoodFace, MOOD_TONE } from "./MoodFace";
+import { MoodFace } from "./MoodFace";
 import type { SubPageId } from "./BottomNav";
 import { cn } from "@/lib/utils";
 
@@ -56,7 +56,6 @@ export function MoodSection({
         {[MOODS.slice(0, 4), MOODS.slice(4)].map((row, r) => (
           <div key={r} className="flex items-start justify-center gap-1">
             {row.map((mo, i) => {
-              const tone = MOOD_TONE[mo.id];
               const active = moodToday === mo.id;
               const order = r * 4 + i;
               return (
@@ -75,14 +74,15 @@ export function MoodSection({
                 >
                   <m.span
                     aria-hidden
-                    animate={{ scale: active ? 1.1 : 1 }}
+                    animate={{ scale: active ? 1.08 : 1 }}
                     transition={{ type: "spring", stiffness: 420, damping: 20 }}
                     className={cn(
-                      "flex h-[62px] w-[62px] items-center justify-center rounded-full transition-[background-color,box-shadow] duration-300",
-                      active ? cn(tone.activeBg, "ring-2 ring-tk-violet ring-offset-2 ring-offset-tk-stage") : "bg-tk-panel-soft"
+                      "flex rounded-[25%] transition-[box-shadow] duration-300",
+                      active &&
+                        "shadow-[0_10px_22px_-10px_rgba(250,82,0,0.55)] ring-2 ring-tk-accent ring-offset-2 ring-offset-tk-stage"
                     )}
                   >
-                    <MoodFace id={mo.id} className={cn("h-[50px] w-[50px]", tone.face)} />
+                    <MoodFace id={mo.id} className="h-16 w-16" />
                   </m.span>
                   <span className={cn("text-[10.5px] leading-none", active ? "font-bold text-tk-ink" : "font-medium text-tk-muted")}>
                     {mo.label}

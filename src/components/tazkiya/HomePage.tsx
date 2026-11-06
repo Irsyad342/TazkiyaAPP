@@ -45,7 +45,7 @@ import { ConfirmButton } from "./ui-bits";
 import { MoodSection } from "./MoodSection";
 import { JelajahiAktivitas } from "./JelajahiAktivitas";
 import { DayDetailSheet } from "./DayDetailSheet";
-import { Star8, OrnamentDivider } from "./ornaments";
+import { OrnamentDivider } from "./ornaments";
 import type { SubPageId, TabId } from "./BottomNav";
 import { cn } from "@/lib/utils";
 
@@ -947,12 +947,6 @@ function DailyBarakah() {
   ];
   return (
     <section aria-label="Daily Barakah" className="animate-tk-fade-up relative">
-      {/* Ornamen latar: kisi khatam samar di sudut kanan atas — isi ruang kosong */}
-      <div
-        aria-hidden
-        className="tk-geo-pattern absolute right-0 top-0 h-28 w-28"
-        style={{ maskSize: "44px 44px", WebkitMaskSize: "44px 44px" }}
-      />
       <div className="relative mb-1 flex items-end justify-between gap-3 px-0.5">
         <div className="flex items-baseline gap-2">
           <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Daily Barakah</h2>
@@ -960,7 +954,6 @@ function DailyBarakah() {
             بركة
           </span>
         </div>
-        <Star8 size={13} className="mb-0.5 text-tk-accent/70" />
       </div>
       <ol className="relative">
         {rows.map(({ label, text }, i) => (
