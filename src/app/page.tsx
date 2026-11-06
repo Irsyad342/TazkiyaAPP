@@ -34,6 +34,7 @@ import { ZikirDoaPage } from "@/components/tazkiya/ZikirDoaPage";
 import { RizqAmalPage } from "@/components/tazkiya/RizqAmalPage";
 import { ProfilePage } from "@/components/tazkiya/ProfilePage";
 import { TasbihSheet } from "@/components/tazkiya/TasbihSheet";
+import { TasbihFullscreen } from "@/components/tazkiya/TasbihFullscreen";
 import { TargetSheet } from "@/components/tazkiya/TargetSheet";
 import type { ZikirSlot } from "@/lib/tazkiya/types";
 
@@ -94,6 +95,7 @@ export default function Page() {
   const [subpage, setSubpage] = useState<SubPageId | null>(null);
   const [tasbihOpen, setTasbihOpen] = useState(false);
   const [tasbihSlot, setTasbihSlot] = useState<ZikirSlot>("harian");
+  const [tasbihFullOpen, setTasbihFullOpen] = useState(false);
   const [targetOpen, setTargetOpen] = useState(false);
   const [reader, setReader] = useState<{ surah: number; ayah?: number } | null>(null);
 
@@ -312,7 +314,9 @@ export default function Page() {
                 {subpage === null && tab === "profil" && <ProfilePage onOpenTargets={openTargets} onGoTracker={goTracker} />}
 
                 {subpage === "jurnal" && <JurnalPage onBack={() => setSubpage(null)} />}
-                {subpage === "zikir-doa" && <ZikirDoaPage onBack={() => setSubpage(null)} onOpenTasbih={openTasbih} />}
+                {subpage === "zikir-doa" && (
+                  <ZikirDoaPage onBack={() => setSubpage(null)} onOpenTasbih={openTasbih} onOpenTasbihFull={() => setTasbihFullOpen(true)} />
+                )}
                 {subpage === "rizq-amal" && <RizqAmalPage onBack={() => setSubpage(null)} />}
               </m.div>
             </AnimatePresence>
@@ -326,6 +330,8 @@ export default function Page() {
         </AnimatePresence>
 
         <AnimatePresence>{tasbihOpen && <TasbihSheet open={tasbihOpen} onClose={() => setTasbihOpen(false)} slot={tasbihSlot} />}</AnimatePresence>
+
+        <AnimatePresence>{tasbihFullOpen && <TasbihFullscreen open={tasbihFullOpen} onClose={() => setTasbihFullOpen(false)} slot="harian" />}</AnimatePresence>
 
         <AnimatePresence>{targetOpen && <TargetSheet onClose={() => setTargetOpen(false)} />}</AnimatePresence>
 

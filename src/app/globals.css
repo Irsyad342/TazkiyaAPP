@@ -1,6 +1,20 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Deteksi sumber Tailwind v4 memindai SEMUA file non-gitignore di proyek dan
+   sempat menyerap kelas lama era "Fresh Green" (bg-[#16a34a], via-[#22c55e], …)
+   yang tercatat di scripts/migrasi-aurora-v3.py — memasukkan ulang warna hijau
+   ke bundle CSS produksi meski tidak ada komponen yang memakainya. Seluruh
+   kode aplikasi ada di src/, jadi direktori non-src dikecualikan dari
+   pemindaian agar bundle hanya berisi kelas yang benar-benar dipakai. */
+@source not "../../scripts";
+@source not "../../examples";
+@source not "../../mini-services";
+@source not "../../skills";
+@source not "../../upload";
+@source not "../../supabase";
+@source not "../../tests";
+
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
 /* Varian lebar layar yang TIDAK ikut dipatok — hanya untuk pembingkaian

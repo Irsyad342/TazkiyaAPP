@@ -17,6 +17,7 @@ import { m } from "framer-motion";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { DAILY_DUAS, duaOfTheDay, type DailyDua } from "@/lib/tazkiya/duas";
 import { DOA_HARIAN_IDS, DOA_KATEGORI, DOA_KOLEKSI, ZIKIR_SETS, type DoaItem, type ZikirSet } from "@/lib/tazkiya/zikir-doa";
+import { ZIKIR_PRESETS } from "@/lib/tazkiya/types";
 import { relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
 import type { ZikirSlot } from "@/lib/tazkiya/types";
 import { Chip, EmptyState, GlassCard, SectionHeader, SegmentedTabs } from "./ui-bits";
@@ -31,12 +32,16 @@ const SLOT_LABEL: Record<ZikirSlot, string> = {
 };
 
 /** Padanan Arab untuk preset tasbih yang masyhur (tampilan, bukan data baru). */
-const PRESET_ARABIC: Record<string, { arabic: string; meaning: string }> = {
+export const PRESET_ARABIC: Record<string, { arabic: string; meaning: string }> = {
   Subhanallah: { arabic: "سُبْحَانَ اللهِ", meaning: "Mahasuci Allah" },
   "Alhamdulillah": { arabic: "اَلْحَمْدُ لِلّٰهِ", meaning: "Segala puji bagi Allah" },
   "Allahu Akbar": { arabic: "اَللهُ أَكْبَرُ", meaning: "Allah Mahabesar" },
   "Laa ilaaha illallah": { arabic: "لَا إِلٰهَ إِلَّا الله", meaning: "Tiada tuhan selain Allah" },
   "Astagfirullah": { arabic: "أَسْتَغْفِرُ اللهَ", meaning: "Aku memohon ampun kepada Allah" },
+  "Laa haula wa laa quwwata illaa billah": {
+    arabic: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِالله",
+    meaning: "Tiada daya dan kekuatan kecuali dengan pertolongan Allah",
+  },
 };
 
 type Tab = "zikir" | "doa";
@@ -111,7 +116,8 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
             strokeLinecap="round"
             className="stroke-tk-violet"
             strokeDasharray={`${dash} ${CIRC}`}
-            style={{ transition: "stroke-dasharray 0.5s cubic-bezier(0.22, 1, 0.36, 1)" }}
+            /* linecap round pada busur nol persen merender titik — sembunyikan */
+            style={{ transition: "stroke-dasharray 0.5s cubic-bezier(0.22, 1, 0.36, 1)", opacity: pct > 0 ? 1 : 0 }}
           />
         </svg>
         {/* titik lime di ujung busur, aksen tunggal */}
@@ -210,6 +216,67 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
   );
 }
 
+/* ================= Pilihan zikir di halaman utama ================= */
+
+/**
+ * Pemilihan jenis zikir SEBELUM berzikir: kartu preset berisi Arab, nama
+ * (transliterasi), arti, target hitungan berjalan, dan progres tersimpan
+ * hari ini untuk zikir tersebut. Ketuk → menjadi zikir aktif pada penghitung
+ * (satu state tasbih yang sama, tanpa sistem counter kedua).
+ */
+function ZikirPresetPicker() {
+  const tasbih = useWorshipStore((s) => s.tasbih);
+  const tasbihSetDhikr = useWorshipStore((s) => s.tasbihSetDhikr);
+  const zikirSessions = useWorshipStore((s) => s.zikirSessions);
+  const today = todayKey();
+
+  const savedToday = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const s of zikirSessions) {
+      if (s.date !== today) continue;
+      map[s.dhikr] = (map[s.dhikr] ?? 0) + s.count;
+    }
+    return map;
+  }, [zikirSessions, today]);
+
+  return (
+    <section aria-label="Pilih zikir" className="animate-tk-fade-up">
+      <SectionHeader title="Pilih Zikir" caption="Ketuk kartu untuk memakai zikir pada penghitung" />
+      <div className="grid grid-cols-2 gap-2.5">
+        {ZIKIR_PRESETS.map((z) => {
+          const meta = PRESET_ARABIC[z];
+          const active = tasbih.dhikr === z;
+          const saved = savedToday[z] ?? 0;
+          return (
+            <button
+              key={z}
+              type="button"
+              aria-pressed={active}
+              onClick={() => tasbihSetDhikr(z)}
+              className={cn(
+                "tap glass rounded-[1.25rem] p-3.5 text-left transition-all",
+                active && "ring-2 ring-tk-violet dark:ring-tk-accent"
+              )}
+            >
+              {meta ? (
+                <p className="quran-arabic text-right text-[20px] leading-[1.9] text-tk-ink">{meta.arabic}</p>
+              ) : null}
+              <p className="mt-2 text-[12.5px] font-bold leading-tight text-tk-ink">{z}</p>
+              {meta ? <p className="mt-1 text-[10px] italic leading-snug text-tk-muted">{meta.meaning}</p> : null}
+              <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                <Chip className={cn(active && "gs-ink-btn")}>Target {tasbih.target.toLocaleString("id-ID")}</Chip>
+                <Chip className={cn(saved > 0 && "border-tk-lime/40 bg-tk-lime/10 text-tk-lime-ink")}>
+                  Hari ini {saved.toLocaleString("id-ID")}×
+                </Chip>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 /* ================= Set zikir — daftar lipat tipografis ================= */
 
 function ZikirSetCard({ set, onOpenTasbih }: { set: ZikirSet; onOpenTasbih: (slot: ZikirSlot) => void }) {
@@ -293,7 +360,16 @@ function doaToCard(d: DoaItem) {
   return { title: `${d.title}${d.count ? ` · ${d.count}` : ""}`, arabic: d.arabic, transliteration: d.latin, meaning: d.meaning, source: d.source };
 }
 
-export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onOpenTasbih: (slot?: ZikirSlot) => void }) {
+export function ZikirDoaPage({
+  onBack,
+  onOpenTasbih,
+  onOpenTasbihFull,
+}: {
+  onBack: () => void;
+  onOpenTasbih: (slot?: ZikirSlot) => void;
+  /** Tombol Fullscreen pada penghitung → mode tasbih layar penuh. */
+  onOpenTasbihFull: () => void;
+}) {
   const [tab, setTab] = useState<Tab>("zikir");
   const [cat, setCat] = useState<(typeof DOA_KATEGORI)[number]["id"]>("harian");
 
@@ -326,8 +402,9 @@ export function ZikirDoaPage({ onBack, onOpenTasbih }: { onBack: () => void; onO
       {tab === "zikir" ? (
         <div key="zikir" className="tk-fade-in lg:grid lg:grid-cols-12 lg:gap-x-8">
           <div className="space-y-9 lg:col-span-5">
-            {/* Penghitung, fokus visual */}
-            <TasbihCounter onOpenFull={() => onOpenTasbih("harian")} />
+            {/* Pilihan zikir dulu, lalu penghitung sebagai fokus visual */}
+            <ZikirPresetPicker />
+            <TasbihCounter onOpenFull={onOpenTasbihFull} />
 
             {/* Riwayat zikir */}
             <section aria-label="Riwayat zikir">

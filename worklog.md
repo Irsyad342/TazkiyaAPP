@@ -1254,3 +1254,85 @@ progress 33% sesuai perhitungan, pencatatan Berjamaah tersimpan (header 1/5 ·
 1 berjamaah), Bulanan & Qada & Beranda tak berubah, 360/390/430/desktop tanpa
 overflow-x, konsol bersih, 0 longtask. Geolokasi headless tidak tersedia →
 mode GPS diverifikasi via unit check, bukan UI.
+
+## Task 53 — Perbaikan bug mobile & UI/UX (4 fokus, scope ketat)
+
+Permintaan: (1) hilangkan area hijau di bawah bottom nav mobile, (2) fullscreen
+Zikir jadi tasbih digital layar penuh, (3) perbaiki tambah/edit Jurnal Syukur,
+(4) rapikan halaman Target Ibadah. Halaman lain tidak boleh berubah.
+
+### 1. Area hijau — akar masalah
+Audit menyeluruh (meta theme-color, manifest PWA, safe-area, service worker,
+CSS bundle, root layout): semua sumber in-app SUDAH bersih (meta #1B1B1E →
+#F2F2F4 light via script, manifest #1B1B1E, tanpa SW). Sumber hijau yang
+tersisa dua:
+- **Polusi bundle CSS**: Tailwind v4 men-scan SEMUA file non-gitignore dan
+  menyerap kelas lama era "Fresh Green" (`bg-[#16a34a]`, `via-[#22c55e]`, …)
+  yang tercatat di `scripts/migrasi-aurora-v3.py` — rule hijau ikut ter-compile
+  ke CSS produksi walau tak dipakai DOM. Diperbaiki dengan `@source not`
+  untuk scripts/examples/mini-services/skills/upload/supabase/tests di
+  globals.css; build diverifikasi 0 kemunculan 16a34a/22c55e di semua CSS.
+- **Manifest PWA ter-cache di perangkat**: Chrome standalone menyetel warna
+  system nav bar dari theme_color manifest saat PWA ter-install; manifest lama
+  (#16A34A) bisa bertahan di instalasi lama sampai app update. Manifest kini
+  sudah benar dan di-serve `must-revalidate`; pengguna perlu restart/reinstall
+  PWA bila warna lama masih tampil setelah deploy ini.
+Plus hardening kecil: html background per tema sudah eksplisit (f2f2f4 /
+1b1b1e) — kanvas bawah selalu milik aplikasi.
+
+### 2. Zikir — pemilihan zikir di halaman utama + fullscreen
+- `ZikirPresetPicker` baru di ZikirDoaPage: 6 kartu preset (Arab, nama
+  transliterasi, arti, target berjalan, progres tersimpan hari ini per zikir
+  dari zikirSessions — data nyata); ketuk → tasbihSetDhikr.
+- `TasbihFullscreen.tsx` (komponen baru): overlay fixed inset-0 z-[45] menutup
+  semua elemen halaman (nav z-30, sheet z-40); Fullscreen API diminta saat
+  dibuka, fallback overlay tetap imersif; Esc / tombol × keluar. Isi: nama
+  zikir, Arab besar (38px), transliterasi + arti, angka 76px dalam cincin
+  progres (r=150), "12 / 33", badge persen/target tercapai, tombol hitung
+  (scale spring), minus, reset ber-konfirmasi (AlertDialog), Simpan, kontrol
+  getaran (hanya bila navigator.vibrate ada), animasi masuk/keluar spring +
+  guard settings.animations & prefers-reduced-motion. State = SATU store
+  (useWorshipStore tasbih) — tanpa sistem counter kedua; keluar tidak
+  menghapus hitungan (diverifikasi: 3→5, keluar tetap 5).
+- Tombol Expand penghitung halaman utama kini membuka fullscreen; TasbihSheet
+  tetap dipakai entri dari set zikir (perilaku lama utuh).
+- Artefak kecil ikut dibereskan: linecap round busur 0% merender titik di
+  puncak cincin — opacity 0 saat pct=0 (TasbihCounter, TasbihSheet,
+  TasbihFullscreen, ring TargetSheet).
+
+### 3. Jurnal Syukur
+- **Edit inline**: tombol Edit pada item riwayat kini membuka panel ekspand di
+  posisi jurnal (3 textarea terisi data lama + Simpan Perubahan/Batal),
+  menyimpan ke tanggal entri tsb. scroll tidak disentuh sama sekali
+  (diverifikasi: scrollY 700 tetap 700 setelah buka & simpan). Perilaku lama
+  yang berbahaya dihapus: memuat isi jurnal lama ke form atas (menimpa jurnal
+  hari ini) + scrollTo(top:0).
+- **Tombol simpan**: try/catch + toast error bila gagal, feedback "✓ Tersimpan"
+  1.6 dtk, disabled hanya saat kosong (tidak terkunci permanen), tanpa
+  double-submission (saveJournal idempoten per tanggal; diverifikasi).
+- **Riwayat**: tiap item kini menampilkan tanggal, waktu pembuatan (HH.mm dari
+  savedAt), isi, mood, Edit, dan Hapus ber-konfirmasi (sudah ada, dipertahankan).
+- Sinkronisasi: edit inline persisten setelah reload + push cloud (upsert 200,
+  mergeJournal updatedAt menang) — diverifikasi end-to-end.
+
+### 4. Target Ibadah (TargetSheet) — restrukturisasi layout
+Urutan baru: HEADER (judul + deskripsi) → RINGKASAN PROGRES (cincin SVG persen
++ 3 statistik: total target / tercapai / sisa, dihitung dari catatan hari
+ini) → DAFTAR TARGET (4 kartu: Salat Wajib, Bacaan Al-Qur'an, Zikir & Tasbih,
+Ibadah Tambahan — nama, deskripsi, bar progres, status chip
+Tercapai/Berjalan·%/Belum dikerjakan, tombol Lihat Detail) → DETAIL (panel
+ekspand inline: rincian per slot/satuan + seluruh kontrol pengaturan yang ada:
+satuan halaman/ayat/surah, target zikir & tasbih, sakelar ibadah tambahan).
+Semua angka dari data store nyata (selectPrayerDetail, log.quranPages/Verses,
+log.zikirCount, trackedExtras vs log.extras) — tanpa angka statis. Identitas
+visual SUIO utuh (glass, lavender/oranye, radius, tipografi).
+
+Verifikasi: tsc 0, eslint bersih, build sukses (standalone, artefak .next-prod,
+static+public disalin ke folder standalone). Browser QA (login akun QA):
+picker zikir 6 kartu + pilih → counter berganti; fullscreen buka/hitung/keluar/
+simpan/reset; jurnal edit inline scroll-preserved + persisten + hapus
+berkonfirmasi; target ring+statistik+4 kartu+detail+simpan target (150→kembali
+100) + sakelar; light & dark konsisten; 360/390/1280 tanpa overflow-x;
+regresi Beranda/Salat (5 kartu tiket utuh)/Qur'an/Profil OK; konsol bersih.
+Catatan: Fullscreen API tak tersedia di headless (fallback overlay yang
+diverifikasi); getaran disembunyikan otomatis di headless (perancangan).

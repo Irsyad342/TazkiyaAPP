@@ -55,6 +55,14 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
   const [moodSel, setMoodSel] = useState<MoodId | undefined>(existing?.mood ?? moods[today]?.mood);
   const [hadithOffset, setHadithOffset] = useState(0);
   const [savedAt, setSavedAt] = useState<string | null>(existing?.savedAt ?? null);
+  const [justSavedToday, setJustSavedToday] = useState(false);
+
+  /* Editing inline di riwayat: satu jurnal tertentu dibuka sebagai panel
+     ekspand pada posisinya — form "hari ini" di atas TIDAK tersentuh, jadi
+     menyimpan hasil edit tidak pernah menimpa jurnal hari ini dan posisi
+     scroll pengguna tetap. */
+  const [editingDate, setEditingDate] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState<[string, string, string]>(["", "", ""]);
 
   const activeMood = moodSel ?? moods[today]?.mood;
   const hadith = useMemo(() => hadithForMood(activeMood, today, hadithOffset), [activeMood, today, hadithOffset]);
@@ -63,15 +71,36 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
   const motionOK = animationsOn && !reduceMotion;
 
   const canSave = items.some((it) => it.trim().length > 0);
+  const canSaveEdit = editDraft.some((it) => it.trim().length > 0);
 
   const save = () => {
     if (!canSave) {
       toast.error("Tulis minimal satu hal yang kamu syukuri");
       return;
     }
-    saveJournal(today, items, activeMood);
-    setSavedAt(new Date().toISOString());
-    toast.success("Jurnal syukur tersimpan, terima kasih sudah merenung hari ini");
+    try {
+      saveJournal(today, items, activeMood);
+      setSavedAt(new Date().toISOString());
+      setJustSavedToday(true);
+      window.setTimeout(() => setJustSavedToday(false), 1600);
+      toast.success("Jurnal syukur tersimpan, terima kasih sudah merenung hari ini");
+    } catch {
+      toast.error("Gagal menyimpan jurnal. Periksa koneksi lalu coba lagi.");
+    }
+  };
+
+  const saveEdit = (d: string, mood: MoodId | undefined) => {
+    if (!canSaveEdit) {
+      toast.error("Tulis minimal satu hal yang kamu syukuri");
+      return;
+    }
+    try {
+      saveJournal(d, editDraft, mood);
+      setEditingDate(null);
+      toast.success("Perubahan jurnal tersimpan");
+    } catch {
+      toast.error("Gagal menyimpan perubahan. Coba lagi.");
+    }
   };
 
   const historyDates = useMemo(
@@ -134,7 +163,8 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                 !canSave && "cursor-not-allowed opacity-40"
               )}
             >
-              <BookHeart size={16} /> Simpan Jurnal
+              {justSavedToday ? <Check size={16} /> : <BookHeart size={16} />}
+              {justSavedToday ? "Tersimpan" : "Simpan Jurnal"}
             </button>
             <p className="mt-2.5 flex items-center justify-center gap-1.5 text-[10px] text-tk-muted/80">
               <Lock size={10} />
@@ -246,38 +276,51 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
               <ul className="divide-y divide-tk-line-soft">
                 {historyDates.map((d) => {
                   const e = journal[d];
+                  const editing = editingDate === d;
                   return (
                     <li key={d} className="px-4 py-3.5">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="flex items-center gap-2 font-display text-[13px] font-bold text-tk-ink">
-                          {relativeDayLabel(d, today)}
+                        <p className="flex min-w-0 items-center gap-2 font-display text-[13px] font-bold text-tk-ink">
+                          <span className="truncate">{relativeDayLabel(d, today)}</span>
+                          {e.savedAt ? (
+                            <span className="tnum shrink-0 text-[10px] font-medium text-tk-muted">
+                              {new Date(e.savedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                            </span>
+                          ) : null}
                           {e.mood ? (
-                            <span aria-label={`Mood ${moodLabel(e.mood)}`} className="inline-flex h-6 w-6 items-center justify-center">
+                            <span aria-label={`Mood ${moodLabel(e.mood)}`} className="inline-flex h-6 w-6 shrink-0 items-center justify-center">
                               <MoodFace id={e.mood} className="h-5 w-5" />
                             </span>
                           ) : null}
                         </p>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex shrink-0 items-center gap-1.5">
                           <button
                             type="button"
-                            aria-label={`Muulkan jurnal ${formatDayFull(d)} untuk diedit`}
+                            aria-expanded={editing}
+                            aria-label={`Edit jurnal ${formatDayFull(d)} langsung di riwayat`}
                             onClick={() => {
-                              setItems(e.items);
-                              setMoodSel(e.mood);
-                              setSavedAt(e.savedAt);
-                              toast.info("Jurnal dimuat ke atas, ubah lalu simpan kembali");
-                              // Konten aplikasi bergulir di dalam kontainer utama, bukan di window.
-                              document.getElementById("konten-tazkiya")?.scrollTo({ top: 0, behavior: "smooth" });
+                              if (editing) {
+                                setEditingDate(null);
+                                return;
+                              }
+                              setEditingDate(d);
+                              setEditDraft(e.items);
                             }}
-                            className="tap rounded-full border border-tk-line-strong bg-tk-panel px-2.5 py-1 text-[10px] font-semibold text-tk-ink"
+                            className={cn(
+                              "tap rounded-full border px-2.5 py-1 text-[10px] font-semibold transition-colors",
+                              editing
+                                ? "border-tk-violet bg-tk-lavender text-tk-violet dark:border-tk-accent dark:bg-tk-accent/15 dark:text-tk-accent"
+                                : "border-tk-line-strong bg-tk-panel text-tk-ink"
+                            )}
                           >
-                            Edit
+                            {editing ? "Tutup" : "Edit"}
                           </button>
                           <ConfirmButton
                             label={`Hapus jurnal ${formatDayFull(d)}`}
                             title={`Hapus jurnal ${relativeDayLabel(d, today)}?`}
                             description={`Jurnal syukur ${relativeDayLabel(d, today).toLowerCase()} akan dihapus permanen dari riwayat.`}
                             onConfirm={() => {
+                              if (editing) setEditingDate(null);
                               deleteJournal(d);
                               toast.info("Jurnal dihapus");
                             }}
@@ -287,14 +330,57 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
                           </ConfirmButton>
                         </div>
                       </div>
-                      <ul className="mt-1.5 space-y-0.5">
-                        {e.items.filter(Boolean).map((it, i) => (
-                          <li key={i} className="flex items-start gap-1.5 text-[11.5px] leading-relaxed text-tk-ink/85">
-                            <Heart size={10} className="mt-1 shrink-0 text-tk-violet dark:text-tk-accent" aria-hidden />
-                            <span>{it}</span>
-                          </li>
-                        ))}
-                      </ul>
+
+                      {editing ? (
+                        /* Panel edit inline pada posisi jurnal — tanpa scroll ke atas. */
+                        <div className="mt-3 rounded-[1.1rem] border border-tk-line bg-tk-panel-soft p-3">
+                          {([0, 1, 2] as const).map((i) => (
+                            <textarea
+                              key={i}
+                              value={editDraft[i]}
+                              maxLength={160}
+                              rows={2}
+                              onChange={(ev) => {
+                                const next = [...editDraft] as [string, string, string];
+                                next[i] = ev.target.value;
+                                setEditDraft(next);
+                              }}
+                              placeholder={i === 0 ? "Hal pertama yang saya syukuri…" : i === 1 ? "Hal kedua yang saya syukuri…" : "Hal ketiga, yang kecil pun boleh…"}
+                              aria-label={`Edit hal ${i + 1} jurnal ${formatDayFull(d)}`}
+                              className="tk-field mb-2 flex-1 resize-none py-2.5 text-[12px] leading-relaxed last:mb-0"
+                            />
+                          ))}
+                          <div className="mt-2.5 flex items-center justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setEditingDate(null)}
+                              className="tap flex h-9 items-center justify-center rounded-full border border-tk-line-strong bg-tk-panel px-3.5 text-[11.5px] font-semibold text-tk-ink"
+                            >
+                              Batal
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => saveEdit(d, e.mood)}
+                              disabled={!canSaveEdit}
+                              className={cn(
+                                "tap gs-ink-btn flex h-9 items-center justify-center gap-1.5 rounded-full px-4 text-[11.5px] font-bold transition-all",
+                                !canSaveEdit && "cursor-not-allowed opacity-40"
+                              )}
+                            >
+                              <Check size={13} strokeWidth={3} /> Simpan Perubahan
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <ul className="mt-1.5 space-y-0.5">
+                          {e.items.filter(Boolean).map((it, i) => (
+                            <li key={i} className="flex items-start gap-1.5 text-[11.5px] leading-relaxed text-tk-ink/85">
+                              <Heart size={10} className="mt-1 shrink-0 text-tk-violet dark:text-tk-accent" aria-hidden />
+                              <span>{it}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </li>
                   );
                 })}

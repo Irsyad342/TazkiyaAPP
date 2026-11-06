@@ -140,7 +140,8 @@ export function TasbihSheet({
               strokeLinecap="round"
               className="stroke-tk-violet"
               strokeDasharray={`${dash} ${CIRC}`}
-              style={{ transition: "stroke-dasharray 0.5s cubic-bezier(0.22, 1, 0.36, 1)" }}
+              /* linecap round pada busur nol persen merender titik — sembunyikan */
+              style={{ transition: "stroke-dasharray 0.5s cubic-bezier(0.22, 1, 0.36, 1)", opacity: pct > 0 ? 1 : 0 }}
             />
           </svg>
           {/* titik lime di ujung busur */}
