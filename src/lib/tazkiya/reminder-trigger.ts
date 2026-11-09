@@ -166,8 +166,11 @@ export function usePrayerReminder(homeVisible: boolean): {
   useEffect(() => {
     tick();
     const iv = window.setInterval(tick, TICK_SEC * 1000);
-    // Tick segera setelah hidrasi persist selesai (data pengguna siap).
+    // Tick segera setelah hidrasi persist selesai (data pengguna siap) —
+    // plus satu tick ulang 1,2 dtk untuk hidrasi yang selesai lebih dulu
+    // (pendengar onFinishHydration terpasang setelah event lewat).
     const off = useWorshipStore.persist.onFinishHydration(() => tick());
+    const t0 = window.setTimeout(tick, 1200);
     const onVisible = () => {
       if (document.visibilityState === "visible") tick();
     };
@@ -175,6 +178,7 @@ export function usePrayerReminder(homeVisible: boolean): {
     window.addEventListener("focus", onVisible);
     return () => {
       window.clearInterval(iv);
+      window.clearTimeout(t0);
       off();
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("focus", onVisible);
