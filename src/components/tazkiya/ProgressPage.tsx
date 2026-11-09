@@ -50,6 +50,8 @@ import {
 } from "@/lib/tazkiya/dates";
 import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { goalStatuses } from "@/lib/tazkiya/goals";
+import { buildWeeklyReport, lastCompletedWeekStart, weekHasAnyRecord } from "@/lib/tazkiya/weekly";
+import { WeeklyReflectionCard, WeeklyReflectionSheet } from "./WeeklyReflection";
 import { Chip, GlassCard, ProgressBar, ProgressRing, SectionHeader, SegmentedTabs } from "./ui-bits";
 import { DayDetailSheet } from "./DayDetailSheet";
 import { cn } from "@/lib/utils";
@@ -152,7 +154,7 @@ function StatCard({
   );
 }
 
-export function ProgressPage() {
+export function ProgressPage({ deferredForReminder = false }: { deferredForReminder?: boolean }) {
   const logs = useWorshipStore((s) => s.logs);
   const prayerDetails = useWorshipStore((s) => s.prayerDetails);
   const settings = useWorshipStore((s) => s.settings);
@@ -163,6 +165,10 @@ export function ProgressPage() {
   const dailyGoals = useWorshipStore((s) => s.dailyGoals);
   const zikirSessions = useWorshipStore((s) => s.zikirSessions);
   const goalDone = useWorshipStore((s) => s.goalDone);
+  const weeklyReflections = useWorshipStore((s) => s.weeklyReflections);
+  const reflectionViewed = useWorshipStore((s) => s.reflectionViewed);
+  const archiveWeeklyReflection = useWorshipStore((s) => s.archiveWeeklyReflection);
+  const markReflectionViewed = useWorshipStore((s) => s.markReflectionViewed);
 
   const today = todayKey();
   const reminderTimes = resolvePrayerSchedule(settings, today);
@@ -176,6 +182,49 @@ export function ProgressPage() {
      berganti tab periode. */
   const [sheetDate, setSheetDate] = useState<string | null>(null);
   const [barsIn, setBarsIn] = useState(false);
+
+  /* ---------- Weekly Reflection: arsip otomatis + buka sekali ---------- */
+  const [reflectionWeek, setReflectionWeek] = useState<string | null>(null);
+  const archivedRef = useRef(false);
+  const autoOpenedRef = useRef<string | null>(null);
+
+  // Saat halaman dibuka: minggu yang baru berakhir (Senin–Minggu sebelumnya)
+  // diarsipkan sebagai snapshot bila belum ada DAN memiliki catatan nyata.
+  useEffect(() => {
+    if (archivedRef.current) return;
+    archivedRef.current = true;
+    const lastWeek = lastCompletedWeekStart(today);
+    if (weeklyReflections[lastWeek]) return;
+    if (!weekHasAnyRecord({ logs, prayerDetails }, lastWeek)) return;
+    archiveWeeklyReflection(
+      buildWeeklyReport({ logs, prayerDetails, settings, journal, amalEntries, zikirSessions, today }, lastWeek)
+    );
+    // Sekali per mount — data dibaca dari snapshot state saat mount.
+  }, []);
+
+  // Tampil sekali: laporan minggu yang selesai & belum dilihat, ATAU laporan
+  // live minggu berjalan pada hari Minggu (penutup periode). Ditunda bila
+  // pengingat salat sedang tampil (prioritas reminder > refleksi).
+  useEffect(() => {
+    if (deferredForReminder || autoOpenedRef.current) return;
+    const lastWeek = lastCompletedWeekStart(today);
+    if (weeklyReflections[lastWeek] && !reflectionViewed[lastWeek]) {
+      autoOpenedRef.current = lastWeek;
+      setReflectionWeek(lastWeek);
+      return;
+    }
+    const isSunday = new Date().getDay() === 0;
+    const currentWeek = mondayOf(today);
+    if (isSunday && !reflectionViewed[currentWeek]) {
+      autoOpenedRef.current = currentWeek;
+      setReflectionWeek(currentWeek);
+    }
+  }, [deferredForReminder, weeklyReflections, reflectionViewed, today]);
+
+  const closeReflection = () => {
+    if (reflectionWeek) markReflectionViewed(reflectionWeek);
+    setReflectionWeek(null);
+  };
 
   useEffect(() => {
     const t = setTimeout(() => setBarsIn(true), 80);
@@ -272,6 +321,9 @@ export function ProgressPage() {
         <h1 className="text-[28px] font-extrabold tracking-[-0.03em] text-tk-ink">Progress</h1>
         <p className="mt-1 text-[12.5px] text-tk-muted">Perjalanan ibadahmu, satu langkah kecil setiap hari</p>
       </header>
+
+      {/* ================= KARTU WEEKLY REFLECTION ================= */}
+      <WeeklyReflectionCard onOpen={() => setReflectionWeek(mondayOf(today))} />
 
       {/* Tab garis periode (indikator menggeser) */}
       <SegmentedTabs
@@ -728,6 +780,9 @@ export function ProgressPage() {
           }}
         />
       ) : null}
+
+      {/* Refleksi mingguan — di atas segalanya kecuali pengingat salat (z-65 < z-70). */}
+      {reflectionWeek ? <WeeklyReflectionSheet weekStart={reflectionWeek} onClose={closeReflection} /> : null}
     </div>
   );
 }

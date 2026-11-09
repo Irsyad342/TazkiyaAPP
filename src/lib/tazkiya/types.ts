@@ -202,6 +202,54 @@ export interface ReadingEntry {
   auto?: boolean;
 }
 
+/* ---------- Weekly Reflection (Refleksi Ibadah Mingguan) ---------- */
+
+/** Statistik salat satu hari dalam minggu (slot yang sudah berlalu saja). */
+export interface WeeklyDayStats {
+  date: string; // YYYY-MM-DD
+  slots: number; // kesempatan yang sudah berlalu
+  done: number;
+  jamaah: number;
+  mandiri: number;
+  missed: number; // tercatat TIDAK dilaksanakan
+  unrecorded: number; // belum dicatat — BUKAN terlewat
+}
+
+/**
+ * Snapshot laporan refleksi satu minggu (Senin–Minggu). Disimpan saat
+ * minggu berakhir sehingga laporan lama tidak berubah oleh catatan baru.
+ */
+export interface WeeklyReflectionReport {
+  weekStart: string; // YYYY-MM-DD Senin (id minggu)
+  weekEnd: string; // YYYY-MM-DD Minggu
+  savedAt: string; // ISO saat laporan diarsipkan
+  days: WeeklyDayStats[]; // 7 hari Senin→Minggu
+  prayers: {
+    done: number;
+    jamaah: number;
+    mandiri: number;
+    missed: number;
+    unrecorded: number;
+    opportunities: number;
+    pct: number; // 0..100 dari slot yang sudah berlalu
+  };
+  perPrayer: Record<PrayerId, { done: number; jamaah: number; mandiri: number; missed: number; unrecorded: number; opportunities: number }>;
+  zikirTotal: number;
+  zikirDays: number;
+  quranPages: number;
+  quranVerses: number;
+  quranDays: number;
+  amalCount: number;
+  amalDays: number;
+  journalCount: number;
+  activeDays: number;
+  /** Kebiasaan terbaik minggu itu + alasan berbasis data (null bila belum ada). */
+  bestHabit: { id: string; label: string; reason: string } | null;
+  /** Area perbaikan dengan redaksi lembut (null bila tidak ada yang perlu disorot). */
+  improveArea: { id: string; label: string; text: string } | null;
+  motivation: string;
+}
+
 export interface ReminderTime {
   enabled: boolean;
   time: string; // HH:mm
@@ -245,6 +293,10 @@ export interface Settings {
   quranReadMode?: QuranReadMode;
   /** Efek suara kertas saat halaman mushaf berhasil dibalik (default aktif). */
   quranPageSound?: boolean;
+  /** Pengingat layar penuh saat masuk waktu salat (default aktif). */
+  fullscreenReminder?: boolean;
+  /** Notifikasi sistem saat aplikasi di latar/tersembunyi (default nonaktif; butuh izin). */
+  reminderNotify?: boolean;
   createdAt: string; // ISO, pertama kali memakai aplikasi
 }
 
@@ -441,6 +493,9 @@ export function createDefaultSettings(): Settings {
     readerLineHeight: 1.9,
     readerShowTranslation: true,
     quranReadMode: "terjemahan",
+    quranPageSound: true,
+    fullscreenReminder: true,
+    reminderNotify: false,
     createdAt: new Date().toISOString(),
   };
 }

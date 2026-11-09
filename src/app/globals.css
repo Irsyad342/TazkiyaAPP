@@ -1270,3 +1270,43 @@ html[data-anim="off"] .tk-tkt-bar-fill {
     transition: none !important;
   }
 }
+
+/* ---------- Pengingat Salat Layar Penuh: elemen atmosfer ----------
+   Semua animasi hanya transform & opacity, sangat lambat, dan BERHENTI
+   total bila setelan "Animasi transisi" mati atau sistem meminta
+   reduced-motion. Overlay ditutup → elemen ikut unmount (nol biaya). */
+@keyframes tk-twinkle {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+.tk-star {
+  opacity: 0.7;
+  animation: tk-twinkle 3.4s ease-in-out infinite;
+}
+@keyframes tk-float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+.tk-float-slow {
+  animation: tk-float-y 6s ease-in-out infinite;
+}
+@keyframes tk-drift-x {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(38px); }
+}
+.tk-cloud {
+  opacity: 0.8;
+  animation: tk-drift-x 22s ease-in-out infinite alternate;
+}
+html[data-anim="off"] .tk-star,
+html[data-anim="off"] .tk-float-slow,
+html[data-anim="off"] .tk-cloud {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html .tk-star,
+  html .tk-float-slow,
+  html .tk-cloud {
+    animation: none !important;
+  }
+}

@@ -32,9 +32,11 @@ import {
   type ReadingEntry,
   type Settings,
   type TasbihState,
+  type WeeklyReflectionReport,
   type ZikirSession,
   type ZikirSlot,
 } from "./types";
+import { capWeeklyReflections } from "./weekly";
 import type { CloudDoc } from "@/lib/sync/doc";
 
 /** ID unik sederhana untuk catatan baru. */function newId(prefix: string): string {
@@ -88,6 +90,14 @@ interface WorshipActions {
   /** Tandai/selesai target manual pada satu tanggal (target auto diturunkan dari data). */
   toggleGoalDone: (date: string, goalId: string) => void;
   clearReadingHistory: () => void;
+  /* ---- Weekly Reflection ---- */
+  /** Arsipkan snapshot laporan mingguan (tanpa menimpa snapshot lebih baru). */
+  archiveWeeklyReflection: (report: WeeklyReflectionReport) => void;
+  /** Tandai laporan minggu sebagai sudah dilihat (anti popup berulang). */
+  markReflectionViewed: (weekStart: string) => void;
+  /* ---- Pengingat layar penuh ---- */
+  /** Catat bahwa pengingat satu salat sudah disampaikan pada tanggal itu. */
+  markReminderShown: (prayer: PrayerId, dateKey: string) => void;
   resetAll: () => void;
   /** Ganti seluruh data dengan dokumen akun (dipakai sinkronisasi cloud). */
   importCloudData: (doc: CloudDoc) => void;
@@ -124,6 +134,12 @@ export type WorshipStore = {
   dailyGoals: DailyGoal[];
   /** Target manual yang ditandai selesai per tanggal (id target). */
   goalDone: Record<string, string[]>;
+  /** Riwayat refleksi mingguan (snapshot) — kunci = Senin minggu tersebut. */
+  weeklyReflections: Record<string, WeeklyReflectionReport>;
+  /** Status laporan mingguan yang sudah dilihat — kunci minggu → ISO waktu lihat. */
+  reflectionViewed: Record<string, string>;
+  /** Pengingat layar penuh yang sudah tampil — salat → tanggal (YYYY-MM-DD). */
+  reminderShown: Partial<Record<PrayerId, string>>;
 } & WorshipActions;
 
 /** Batu nisan penghapusan disimpan terbatas (cukup untuk mencegah kebangkitan). */
@@ -159,6 +175,9 @@ export const useWorshipStore = create<WorshipStore>()(
       zikirSessions: [],
       dailyGoals: DEFAULT_DAILY_GOALS,
       goalDone: {},
+      weeklyReflections: {},
+      reflectionViewed: {},
+      reminderShown: {},
 
       /**
        * Simpan catatan lengkap satu salat. `null` atau status "none"
@@ -471,6 +490,27 @@ export const useWorshipStore = create<WorshipStore>()(
 
       clearReadingHistory: () => set(() => ({ readingHistory: [] })),
 
+      /* ---------- Weekly Reflection ---------- */
+      archiveWeeklyReflection: (report) =>
+        set((s) => {
+          const prev = s.weeklyReflections[report.weekStart];
+          // Snapshot yang sudah ada tidak ditimpa kecuali laporan lebih baru.
+          if (prev && Date.parse(prev.savedAt || "0") >= Date.parse(report.savedAt)) return s;
+          return {
+            weeklyReflections: capWeeklyReflections({
+              ...s.weeklyReflections,
+              [report.weekStart]: report,
+            }),
+          };
+        }),
+
+      markReflectionViewed: (weekStart) =>
+        set((s) => ({ reflectionViewed: { ...s.reflectionViewed, [weekStart]: new Date().toISOString() } })),
+
+      /* ---------- Pengingat layar penuh ---------- */
+      markReminderShown: (prayer, dateKey) =>
+        set((s) => ({ reminderShown: { ...s.reminderShown, [prayer]: dateKey } })),
+
       resetAll: () =>
         set(() => ({
           settings: createDefaultSettings(),
@@ -491,6 +531,9 @@ export const useWorshipStore = create<WorshipStore>()(
           zikirSessions: [],
           dailyGoals: DEFAULT_DAILY_GOALS,
           goalDone: {},
+          weeklyReflections: {},
+          reflectionViewed: {},
+          reminderShown: {},
         })),
 
       /**
@@ -530,6 +573,9 @@ export const useWorshipStore = create<WorshipStore>()(
             zikirSessions: doc.zikirSessions ?? [],
             dailyGoals: (doc.dailyGoals ?? DEFAULT_DAILY_GOALS) as DailyGoal[],
             goalDone: doc.goalDone ?? {},
+            weeklyReflections: doc.weeklyReflections ?? {},
+            reflectionViewed: doc.reflectionViewed ?? {},
+            reminderShown: doc.reminderShown ?? {},
           };
         }),
 
@@ -560,6 +606,9 @@ export const useWorshipStore = create<WorshipStore>()(
           zikirSessions: [],
           dailyGoals: DEFAULT_DAILY_GOALS,
           goalDone: {},
+          weeklyReflections: {},
+          reflectionViewed: {},
+          reminderShown: {},
         })),
     }),
     {
@@ -620,7 +669,10 @@ export const useWorshipStore = create<WorshipStore>()(
         zikirSessions: s.zikirSessions,
         dailyGoals: s.dailyGoals,
         goalDone: s.goalDone,
-      }),
+        weeklyReflections: s.weeklyReflections,
+        reflectionViewed: s.reflectionViewed,
+        reminderShown: s.reminderShown,
+      })
     }
   )
 );

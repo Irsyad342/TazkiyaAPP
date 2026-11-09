@@ -38,6 +38,7 @@ import type { PrayerId } from "@/lib/tazkiya/types";
 import { formatGregorian, formatHijri, formatDayFull, todayKey } from "@/lib/tazkiya/dates";
 import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { formatCountdown, goalStatuses, nextPrayerState } from "@/lib/tazkiya/goals";
+import { notifyPermission, requestNotifyPermission } from "@/lib/tazkiya/reminder-trigger";
 import { SURAH_LIST } from "@/lib/tazkiya/quran";
 import { barakahOfTheDay } from "@/lib/tazkiya/barakah";
 import { duaOfTheDay } from "@/lib/tazkiya/duas";
@@ -172,10 +173,48 @@ function BottomSheet({
 
 /* ---------------- A. Sheet lonceng — pengingat salat (data nyata) ---------------- */
 
+/** Baris saklar kecil untuk preferensi pengingat (pola saklar Tugas Hari Ini). */
+function ReminderToggle({
+  title,
+  caption,
+  checked,
+  onChange,
+  ariaLabel,
+}: {
+  title: string;
+  caption: string;
+  checked: boolean;
+  onChange: () => void;
+  ariaLabel: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 px-3 py-2.5">
+      <span className="min-w-0 flex-1">
+        <span className="block text-[13px] font-semibold text-tk-ink">{title}</span>
+        <span className="mt-0.5 block text-[10.5px] leading-snug text-tk-muted">{caption}</span>
+      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        aria-label={ariaLabel}
+        onClick={onChange}
+        className={cn("tap relative h-5.5 w-10 shrink-0 rounded-full transition-colors", checked ? "bg-tk-violet" : "bg-tk-track")}
+      >
+        <span
+          aria-hidden
+          className={cn("absolute top-0.5 h-4.5 w-4.5 rounded-full bg-white shadow-sm transition-all", checked ? "left-[22px]" : "left-0.5")}
+        />
+      </button>
+    </div>
+  );
+}
+
 function ReminderSheet({ today, onClose }: { today: string; onClose: () => void }) {
   const settings = useWorshipStore((s) => s.settings);
   const logs = useWorshipStore((s) => s.logs);
   const prayerDetails = useWorshipStore((s) => s.prayerDetails);
+  const updateSettings = useWorshipStore((s) => s.updateSettings);
 
   const times = useMemo(() => resolvePrayerSchedule(settings, today), [settings, today]);
   const [now, setNow] = useState(() => new Date());
@@ -230,6 +269,39 @@ function ReminderSheet({ today, onClose }: { today: string; onClose: () => void 
           );
         })}
       </ul>
+
+      {/* Preferensi pengingat: layar penuh + notifikasi latar (izin sistem) */}
+      <div className="mt-1 rounded-2xl bg-tk-panel-soft">
+        <ReminderToggle
+          title="Pengingat layar penuh"
+          caption="Saat masuk waktu salat, tampilkan layar pengingat penuh di Beranda — sekali per waktunya."
+          checked={settings.fullscreenReminder !== false}
+          onChange={() => updateSettings({ fullscreenReminder: settings.fullscreenReminder === false })}
+          ariaLabel="Aktifkan atau matikan pengingat layar penuh"
+        />
+        <div className="mx-3 border-t border-tk-line-soft" />
+        <ReminderToggle
+          title="Notifikasi saat di latar"
+          caption="Pemberitahuan sistem ketika aplikasi tersembunyi. Memerlukan izin notifikasi perangkat."
+          checked={settings.reminderNotify === true && notifyPermission() === "granted"}
+          onChange={async () => {
+            if (settings.reminderNotify === true) {
+              updateSettings({ reminderNotify: false });
+              return;
+            }
+            const result = await requestNotifyPermission();
+            if (result === "granted") {
+              updateSettings({ reminderNotify: true });
+              toast.success("Notifikasi pengingat salat diaktifkan");
+            } else if (result === "unsupported") {
+              toast.info("Perangkat ini tidak mendukung notifikasi aplikasi web");
+            } else {
+              toast.info("Izin notifikasi belum diberikan — aktifkan di pengaturan peramban");
+            }
+          }}
+          ariaLabel="Aktifkan atau matikan notifikasi pengingat saat aplikasi di latar"
+        />
+      </div>
 
       <button
         type="button"

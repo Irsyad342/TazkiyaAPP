@@ -28,6 +28,7 @@ import {
   type ReadingEntry,
   type Settings,
   type TasbihState,
+  type WeeklyReflectionReport,
   type ZikirSession,
 } from "@/lib/tazkiya/types";
 import { hasAnyDayRecord } from "@/lib/tazkiya/stats";
@@ -54,6 +55,12 @@ export interface CloudDoc {
   zikirSessions?: ZikirSession[];
   dailyGoals?: DailyGoal[];
   goalDone?: Record<string, string[]>;
+  /** Snapshot refleksi mingguan — kunci = Senin minggu tersebut. */
+  weeklyReflections?: Record<string, WeeklyReflectionReport>;
+  /** Status laporan mingguan sudah dilihat — kunci minggu → ISO. */
+  reflectionViewed?: Record<string, string>;
+  /** Pengingat layar penuh sudah disampaikan — salat → tanggal. */
+  reminderShown?: Record<string, string>;
 }
 
 /** Ambil dokumen lengkap (termasuk pengaturan) dari state store saat ini. */
@@ -76,6 +83,9 @@ export function extractFullDoc(state: {
   zikirSessions: ZikirSession[];
   dailyGoals: DailyGoal[];
   goalDone: Record<string, string[]>;
+  weeklyReflections: Record<string, WeeklyReflectionReport>;
+  reflectionViewed: Record<string, string>;
+  reminderShown: Record<string, string>;
 }): CloudDoc {
   return {
     v: 1,
@@ -97,6 +107,9 @@ export function extractFullDoc(state: {
     zikirSessions: state.zikirSessions,
     dailyGoals: state.dailyGoals,
     goalDone: state.goalDone,
+    weeklyReflections: state.weeklyReflections,
+    reflectionViewed: state.reflectionViewed,
+    reminderShown: state.reminderShown,
   };
 }
 

@@ -242,6 +242,12 @@ export function mergeDocs(local: CloudDoc, cloud: CloudDoc, opts: MergeOptions):
   const amalGoals = mergeGoals(local.amalGoals ?? [], cloud.amalGoals ?? []);
   const dailyGoals = mergeDailyGoals(local.dailyGoals ?? [], cloud.dailyGoals ?? []);
   const goalDone = mergeGoalDone(local.goalDone ?? {}, cloud.goalDone ?? {});
+  // Refleksi mingguan: gabung per minggu; snapshot dengan savedAt terbaru menang.
+  const weeklyReflections = mergeWeeklyReflections(local.weeklyReflections ?? {}, cloud.weeklyReflections ?? {});
+  // Status dilihat: waktu terbaru menang (anti popup berulang lintas perangkat).
+  const reflectionViewed = mergeViewed(local.reflectionViewed ?? {}, cloud.reflectionViewed ?? {});
+  // Pengingat yang sudah disampaikan: tanggal terbaru menang per salat.
+  const reminderShown = mergeReminderShown(local.reminderShown ?? {}, cloud.reminderShown ?? {});
 
   return {
     v: 1,
@@ -263,10 +269,62 @@ export function mergeDocs(local: CloudDoc, cloud: CloudDoc, opts: MergeOptions):
     zikirSessions,
     dailyGoals,
     goalDone,
+    weeklyReflections,
+    reflectionViewed,
+    reminderShown,
   };
 }
 
 /* ---------- Penggabungan perluasan (semua idempoten & anti-duplikat) ---------- */
+
+/** Refleksi mingguan: unik per minggu; snapshot `savedAt` terbaru menang. */
+function mergeWeeklyReflections(
+  local: NonNullable<CloudDoc["weeklyReflections"]>,
+  cloud: NonNullable<CloudDoc["weeklyReflections"]>
+): NonNullable<CloudDoc["weeklyReflections"]> {
+  const out: NonNullable<CloudDoc["weeklyReflections"]> = {};
+  const weeks = new Set([...Object.keys(local), ...Object.keys(cloud)]);
+  for (const week of weeks) {
+    const l = local[week];
+    const c = cloud[week];
+    if (l && c) out[week] = Date.parse(l.savedAt || "0") >= Date.parse(c.savedAt || "0") ? l : c;
+    else out[week] = l ?? c;
+  }
+  return out;
+}
+
+/** Status dilihat refleksi: entri dengan ISO terbaru menang per minggu. */
+function mergeViewed(
+  local: NonNullable<CloudDoc["reflectionViewed"]>,
+  cloud: NonNullable<CloudDoc["reflectionViewed"]>
+): NonNullable<CloudDoc["reflectionViewed"]> {
+  const out: NonNullable<CloudDoc["reflectionViewed"]> = {};
+  const weeks = new Set([...Object.keys(local), ...Object.keys(cloud)]);
+  for (const week of weeks) {
+    const l = local[week];
+    const c = cloud[week];
+    if (l && c) out[week] = Date.parse(l) >= Date.parse(c) ? l : c;
+    else out[week] = l ?? c;
+  }
+  return out;
+}
+
+/** Pengingat tersampaikan: tanggal (YYYY-MM-DD) terbesar menang per salat. */
+function mergeReminderShown(
+  local: NonNullable<CloudDoc["reminderShown"]>,
+  cloud: NonNullable<CloudDoc["reminderShown"]>
+): NonNullable<CloudDoc["reminderShown"]> {
+  const out: NonNullable<CloudDoc["reminderShown"]> = {};
+  const prayers = new Set([...Object.keys(local), ...Object.keys(cloud)]);
+  for (const p of prayers) {
+    const l = local[p];
+    const c = cloud[p];
+    if (l && c) out[p] = l >= c ? l : c;
+    else out[p] = l ?? c;
+  }
+  return out;
+}
+
 
 function mergeById<T extends { id: string }>(local: T[], cloud: T[], savedAtOf: (t: T) => string): T[] {
   const byId = new Map<string, T>();

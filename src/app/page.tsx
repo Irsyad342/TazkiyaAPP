@@ -35,6 +35,8 @@ import { RizqAmalPage } from "@/components/tazkiya/RizqAmalPage";
 import { ProfilePage } from "@/components/tazkiya/ProfilePage";
 import { TasbihFullscreen } from "@/components/tazkiya/TasbihFullscreen";
 import { TargetSheet } from "@/components/tazkiya/TargetSheet";
+import { PrayerReminder } from "@/components/tazkiya/PrayerReminder";
+import { usePrayerReminder } from "@/lib/tazkiya/reminder-trigger";
 
 /*
  * Pembaca Al-Qur'an dimuat terpisah (lazy) — hanya diunduh saat pengguna
@@ -246,6 +248,21 @@ export default function Page() {
     setTab("sholat");
   }, []);
 
+  /*
+   * Pengingat layar penuh: mesin pemicu berjalan selama aplikasi aktif;
+   * overlay hanya disampaikan saat pengguna di Beranda (sesuai spesifikasi).
+   * Penyampaian di latar memakai notifikasi sistem bila didukung & diizinkan
+   * (lihat reminder-trigger.ts). Refleksi mingguan menunggu reminder:
+   * overlay reminder berada di atas dan ProgressPage menerima flag deferred.
+   */
+  const { reminder, dismiss } = usePrayerReminder(tab === "beranda" && !subpage);
+  const closeReminder = useCallback(() => dismiss(), [dismiss]);
+  const goScheduleFromReminder = useCallback(() => {
+    dismiss();
+    setSubpage(null);
+    setTab("sholat");
+  }, [dismiss]);
+
   if (!hydrated || !onboarded) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-[#101013] light:bg-[#e8e8ec]" aria-label="Memuat SUIO">
@@ -302,7 +319,7 @@ export default function Page() {
                 )}
                 {subpage === null && tab === "quran" && <QuranPage onOpenReader={openReader} />}
                 {subpage === null && tab === "sholat" && <PrayerPage />}
-                {subpage === null && tab === "progress" && <ProgressPage />}
+                {subpage === null && tab === "progress" && <ProgressPage deferredForReminder={!!reminder} />}
                 {subpage === null && tab === "profil" && <ProfilePage onOpenTargets={openTargets} onGoTracker={goTracker} />}
 
                 {subpage === "jurnal" && <JurnalPage onBack={() => setSubpage(null)} />}
@@ -324,6 +341,21 @@ export default function Page() {
         <AnimatePresence>{tasbihFullOpen && <TasbihFullscreen open={tasbihFullOpen} onClose={() => setTasbihFullOpen(false)} slot="harian" />}</AnimatePresence>
 
         <AnimatePresence>{targetOpen && <TargetSheet onClose={() => setTargetOpen(false)} />}</AnimatePresence>
+
+        {/* Pengingat salat layar penuh — DI ATAS segala overlay (prioritas tertinggi). */}
+        <AnimatePresence>
+          {reminder ? (
+            <PrayerReminder
+              key={`${reminder.prayer}-${reminder.time}`}
+              prayer={reminder.prayer}
+              time={reminder.time}
+              message={reminder.message}
+              onClose={closeReminder}
+              onGoSchedule={goScheduleFromReminder}
+              onGoRecord={goScheduleFromReminder}
+            />
+          ) : null}
+        </AnimatePresence>
 
         {/* Gerbang akun: inisialisasi sesi + dialog keputusan data (migrasi/gabung). */}
         <AuthGate />
