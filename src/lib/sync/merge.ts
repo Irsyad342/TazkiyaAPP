@@ -22,6 +22,7 @@
 import type {
   AyahBookmark,
   DailyLog,
+  DeletedReading,
   LastRead,
   PrayerDetail,
   PrayerId,
@@ -73,7 +74,9 @@ function mergeLogs(
   cloudLogs: Record<string, DailyLog>,
   mergedHistory: ReadingEntry[],
   localDetails: Record<string, DayDetails>,
-  cloudDetails: Record<string, DayDetails>
+  cloudDetails: Record<string, DayDetails>,
+  /** Tanggal yang memiliki catatan dihapus — counter dihitung ulang dari riwayat. */
+  tombstonedDates: Set<string>
 ): Record<string, DailyLog> {
   const dates = new Set<string>([
     ...Object.keys(localLogs),
@@ -109,17 +112,24 @@ function mergeLogs(
       extras[key] = !!(l?.extras?.[key] || c?.extras?.[key]);
     }
 
+    // Zikir: maksimum (anti catatan ganda bila data identik digabung ulang).
+    const zikirCount = Math.max(l?.zikirCount ?? 0, c?.zikirCount ?? 0);
+
     // Halaman/ayat: maks(total sisi, total dari riwayat gabungan) — tidak pernah menggandakan.
+    // Tanggal yang terdampak penghapusan dihitung ulang PENUH dari riwayat
+    // gabungan: counter lama yang masih memuat entri terhapus tidak boleh
+    // dipertahankan (justru sumber kebangkitan data yang sudah dihapus).
     const lPages = l?.quranPages ?? 0;
     const cPages = c?.quranPages ?? 0;
     const lVerses = l?.quranVerses ?? 0;
     const cVerses = c?.quranVerses ?? 0;
     const hTot = historyTotals.get(date);
+    if (tombstonedDates.has(date)) {
+      out[date] = { ...base, date, prayers, extras, quranPages: hTot?.pages ?? 0, quranVerses: hTot?.verses ?? 0, zikirCount };
+      continue;
+    }
     const quranPages = Math.max(lPages, cPages, hTot?.pages ?? 0);
     const quranVerses = Math.max(lVerses, cVerses, hTot?.verses ?? 0);
-
-    // Zikir: maksimum (anti catatan ganda bila data identik digabung ulang).
-    const zikirCount = Math.max(l?.zikirCount ?? 0, c?.zikirCount ?? 0);
 
     out[date] = { ...base, date, prayers, extras, quranPages, quranVerses, zikirCount };
   }
@@ -139,11 +149,31 @@ function mergeDetailsMaps(
   return out;
 }
 
-function mergeReadingHistory(local: ReadingEntry[], cloud: ReadingEntry[]): ReadingEntry[] {
+/**
+ * Gabungkan riwayat bacaan dengan penghormatan penuh pada batu nisan
+ * penghapusan: entri yang pernah dihapus (di perangkat mana pun) TIDAK
+ * PERNAH masuk kembali ke hasil gabungan — inilah kunci permanensi
+ * penghapusan riwayat lintas perangkat & sesi login.
+ */
+function mergeReadingHistory(local: ReadingEntry[], cloud: ReadingEntry[], tombstones: DeletedReading[]): ReadingEntry[] {
+  const dead = new Set(tombstones.map((d) => d.id));
   const byId = new Map<string, ReadingEntry>();
-  for (const e of local) byId.set(e.id, e);
-  for (const e of cloud) if (!byId.has(e.id)) byId.set(e.id, e);
+  for (const e of local) if (!dead.has(e.id)) byId.set(e.id, e);
+  for (const e of cloud) if (!byId.has(e.id) && !dead.has(e.id)) byId.set(e.id, e);
   return [...byId.values()].sort((a, b) => Date.parse(b.savedAt || "0") - Date.parse(a.savedAt || "0"));
+}
+
+/** Gabungkan batu nisan: unik per id, versi terbaru menang, maks 1000. */
+function mergeDeletedReadings(local: DeletedReading[], cloud: DeletedReading[]): DeletedReading[] {
+  const byId = new Map<string, DeletedReading>();
+  for (const d of cloud) byId.set(d.id, d);
+  for (const d of local) {
+    const cur = byId.get(d.id);
+    if (!cur || Date.parse(d.deletedAt || "0") > Date.parse(cur.deletedAt || "0")) byId.set(d.id, d);
+  }
+  return [...byId.values()]
+    .sort((a, b) => Date.parse(b.deletedAt || "0") - Date.parse(a.deletedAt || "0"))
+    .slice(0, 1000);
 }
 
 function mergeAyahBookmarks(local: AyahBookmark[], cloud: AyahBookmark[]): AyahBookmark[] {
@@ -169,12 +199,17 @@ function newestOf<T extends { savedAt: string }>(a: T | null | undefined, b: T |
  * & idempoten (merge(A, merge(A,B)) === merge(A,B)).
  */
 export function mergeDocs(local: CloudDoc, cloud: CloudDoc, opts: MergeOptions): CloudDoc {
-  const readingHistory = mergeReadingHistory(local.readingHistory ?? [], cloud.readingHistory ?? []);
+  const deletedReadings = mergeDeletedReadings(local.deletedReadings ?? [], cloud.deletedReadings ?? []);
+  const readingHistory = mergeReadingHistory(local.readingHistory ?? [], cloud.readingHistory ?? [], deletedReadings);
   const localDetails = local.prayerDetails ?? {};
   const cloudDetails = cloud.prayerDetails ?? {};
 
   const prayerDetails = mergeDetailsMaps(localDetails, cloudDetails);
-  const logs = mergeLogs(local.logs ?? {}, cloud.logs ?? {}, readingHistory, localDetails, cloudDetails);
+  const tombstonedDates = new Set<string>();
+  for (const e of (local.readingHistory ?? []).concat(cloud.readingHistory ?? [])) {
+    if (deletedReadings.some((d) => d.id === e.id)) tombstonedDates.add(e.date);
+  }
+  const logs = mergeLogs(local.logs ?? {}, cloud.logs ?? {}, readingHistory, localDetails, cloudDetails, tombstonedDates);
 
   const fridayZuhurAlt: Record<string, boolean> = {};
   for (const [k, v] of Object.entries(local.fridayZuhurAlt ?? {})) if (v) fridayZuhurAlt[k] = true;
@@ -218,6 +253,7 @@ export function mergeDocs(local: CloudDoc, cloud: CloudDoc, opts: MergeOptions):
     ayahBookmarks: mergeAyahBookmarks(local.ayahBookmarks ?? [], cloud.ayahBookmarks ?? []),
     lastRead,
     readingHistory,
+    deletedReadings,
     tasbih,
     qadaRecords,
     journal,

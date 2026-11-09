@@ -19,6 +19,7 @@ import {
   type AyahBookmark,
   type DailyGoal,
   type DailyLog,
+  type DeletedReading,
   type ExtraId,
   type JournalEntry,
   type LastRead,
@@ -36,8 +37,7 @@ import {
 } from "./types";
 import type { CloudDoc } from "@/lib/sync/doc";
 
-/** ID unik sederhana untuk catatan baru. */
-function newId(prefix: string): string {
+/** ID unik sederhana untuk catatan baru. */function newId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e6).toString(36)}`;
 }
 
@@ -104,6 +104,8 @@ export type WorshipStore = {
   ayahBookmarks: AyahBookmark[];
   lastRead: LastRead | null;
   readingHistory: ReadingEntry[];
+  /** Batu nisan penghapusan riwayat — membuat penghapusan permanen lintas sinkronisasi. */
+  deletedReadings: DeletedReading[];
   tasbih: TasbihState;
   fridayZuhurAlt: Record<string, boolean>;
   /** Daftar qada — paling baru dibuat di depan. */
@@ -124,6 +126,9 @@ export type WorshipStore = {
   goalDone: Record<string, string[]>;
 } & WorshipActions;
 
+/** Batu nisan penghapusan disimpan terbatas (cukup untuk mencegah kebangkitan). */
+const MAX_DELETED_READINGS = 1000;
+
 function upsertLog(
   logs: Record<string, DailyLog>,
   date: string,
@@ -143,6 +148,7 @@ export const useWorshipStore = create<WorshipStore>()(
       ayahBookmarks: [],
       lastRead: null,
       readingHistory: [],
+      deletedReadings: [],
       tasbih: { count: 0, target: 100, dhikr: DEFAULT_ZIKIR_DHIKR },
       fridayZuhurAlt: {},
       qadaRecords: [],
@@ -237,8 +243,37 @@ export const useWorshipStore = create<WorshipStore>()(
           };
         }),
 
+      /**
+       * Hapus catatan riwayat secara PERMANEN:
+       * 1. entri dibuang dari readingHistory,
+       * 2. counter halaman/ayat pada log harian ikut dikurangi (tidak boleh
+       *    tertinggal menggembungkan statistik),
+       * 3. id dicatat sebagai batu nisan agar penggabungan perangkat ↔ akun
+       *    tidak pernah menghidupkan kembali entri yang sudah dihapus.
+       */
       deleteReadingEntry: (id) =>
-        set((s) => ({ readingHistory: s.readingHistory.filter((e) => e.id !== id) })),
+        set((s) => {
+          const entry = s.readingHistory.find((e) => e.id === id);
+          if (!entry) return s;
+          const logs = { ...s.logs };
+          const dayLog = logs[entry.date];
+          if (dayLog) {
+            logs[entry.date] = {
+              ...dayLog,
+              quranPages: Math.max(0, dayLog.quranPages - (entry.pages ?? 0)),
+              quranVerses: Math.max(0, dayLog.quranVerses - (entry.verses ?? 0)),
+            };
+          }
+          const deletedReadings = [
+            { id, deletedAt: new Date().toISOString() },
+            ...s.deletedReadings.filter((d) => d.id !== id),
+          ].slice(0, MAX_DELETED_READINGS);
+          return {
+            readingHistory: s.readingHistory.filter((e) => e.id !== id),
+            deletedReadings,
+            logs,
+          };
+        }),
 
       saveBookmark: (b) => set(() => ({ bookmarks: [b] })),
 
@@ -445,6 +480,7 @@ export const useWorshipStore = create<WorshipStore>()(
           ayahBookmarks: [],
           lastRead: null,
           readingHistory: [],
+          deletedReadings: [],
           tasbih: { count: 0, target: 100, dhikr: DEFAULT_ZIKIR_DHIKR },
           fridayZuhurAlt: {},
           qadaRecords: [],
@@ -463,12 +499,18 @@ export const useWorshipStore = create<WorshipStore>()(
        * agar data lama dari cloud tetap aman.
        */
       importCloudData: (doc) =>
-        set(() => {
+        set((s) => {
           const base = createDefaultSettings();
           const settings = { ...base, ...(doc.settings ?? {}) };
           settings.trackedExtras = sanitizeTrackedExtras(settings.trackedExtras);
           settings.prayerTimesAuto = true;
           if (settings.geo) settings.geo = { ...settings.geo, auto: true };
+          // Batu nisan digabung aditif: penghapusan di perangkat ini TIDAK
+          // boleh dilupakan hanya karena dokumen akun belum mencatatnya.
+          const tombIds = new Set([
+            ...s.deletedReadings.map((d) => d.id),
+            ...(doc.deletedReadings ?? []).map((d) => d.id),
+          ]);
           return {
             settings,
             logs: doc.logs ?? {},
@@ -477,7 +519,8 @@ export const useWorshipStore = create<WorshipStore>()(
             bookmarks: doc.bookmarks ?? [],
             ayahBookmarks: doc.ayahBookmarks ?? [],
             lastRead: doc.lastRead ?? null,
-            readingHistory: doc.readingHistory ?? [],
+            readingHistory: (doc.readingHistory ?? []).filter((e) => !tombIds.has(e.id)),
+            deletedReadings: mergeDeletedReadings(s.deletedReadings, doc.deletedReadings ?? []),
             tasbih: doc.tasbih ?? { count: 0, target: 100, dhikr: DEFAULT_ZIKIR_DHIKR },
             qadaRecords: doc.qadaRecords ?? [],
             journal: doc.journal ?? {},
@@ -504,6 +547,10 @@ export const useWorshipStore = create<WorshipStore>()(
           ayahBookmarks: [],
           lastRead: null,
           readingHistory: [],
+          // Batu nisan TETAP disimpan di perangkat: saat login kembali,
+          // data akun yang masih memuat catatan lama tidak boleh
+          // menghidupkan kembali riwayat yang sudah dihapus pengguna.
+          deletedReadings: s.deletedReadings,
           tasbih: { ...s.tasbih, count: 0 },
           qadaRecords: [],
           journal: {},
@@ -562,6 +609,7 @@ export const useWorshipStore = create<WorshipStore>()(
         ayahBookmarks: s.ayahBookmarks,
         lastRead: s.lastRead,
         readingHistory: s.readingHistory,
+        deletedReadings: s.deletedReadings,
         tasbih: s.tasbih,
         fridayZuhurAlt: s.fridayZuhurAlt,
         qadaRecords: s.qadaRecords,
@@ -580,4 +628,17 @@ export const useWorshipStore = create<WorshipStore>()(
 /** Ambil log harian (buat kosong bila belum ada) tanpa memutasi store. */
 export function selectLog(logs: Record<string, DailyLog>, date: string): DailyLog {
   return logs[date] ?? createEmptyLog(date);
+}
+
+/** Gabungkan dua daftar batu nisan penghapusan (unik per id, terbaru dulu). */
+export function mergeDeletedReadings(local: DeletedReading[], cloud: DeletedReading[]): DeletedReading[] {
+  const byId = new Map<string, DeletedReading>();
+  for (const d of cloud) byId.set(d.id, d);
+  for (const d of local) {
+    const cur = byId.get(d.id);
+    if (!cur || Date.parse(d.deletedAt) > Date.parse(cur.deletedAt)) byId.set(d.id, d);
+  }
+  return [...byId.values()]
+    .sort((a, b) => Date.parse(b.deletedAt || "0") - Date.parse(a.deletedAt || "0"))
+    .slice(0, MAX_DELETED_READINGS);
 }

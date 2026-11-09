@@ -1530,3 +1530,34 @@ reduced-motion instan. Deploy Vercel live; verifikasi produksi: HTML baru,
 slide1 light/dark, Gelap→#171717, Mulai Sekarang→/auth?mode=register,
 login qa.mood.suio.20261106@gmail.com → Beranda, logout Profil → kembali
 /onboarding dengan theme tersimpan "dark" (tidak direset) ✓.
+
+## Task 63 — Al-Qur'an: Mode Mushaf + perbaikan permanensi riwayat (2026-11-09)
+Bug utama (riwayat hidup kembali): mergeReadingHistory aditif murni — entri
+dihapus di perangkat tetap ada di cloud lalu applyCloud/refresh/login
+menghidupkannya lagi; deleteReadingEntry juga tidak mengurangi counter
+logs. Perbaikan TOMBSTONE: DeletedReading{id,deletedAt} disimpan di store
+(persist, ikut CloudDoc + merge union, maks 1000), deleteReadingEntry
+mencatat nisan + mengurangi quranPages/quranVerses tanggal itu, mergeDocs
+menyaring entri bernisan & menghitung ulang counter tanggal terdampak dari
+riwayat gabungan, tombstone selamat dari clearWorshipData (logout) agar
+login ulang tidak memulihkan; cloud-sync DATA_KEYS + deletedReadings.
+10 uji merge lulus (scripts/test-tombstone.ts). Autosave kini butuh
+aktivitas nyata (interactedRef — buka-tutup tanpa gulir TIDAK mencatat).
+Reader dibangun ulang (shell + TranslationView): highlight orange yang
+bergerak mengikuti scroll DIHAPUS total (observer kini hanya melacak progres,
+tanpa state UI); sorotan ayat hanya muncul saat ayat diketuk (Dipilih +
+ring oranye hangat); bilah progres gulir dihapus. Kertas bacaan PUTIH
+permanen di kedua tema (quran-paper, Arab #111, terjemahan #4a4a4a) — dark
+mode tidak menggelapkan mushaf. Mode Mushaf baru (QuranMushaf.tsx):
+halaman 1..604 teks Utsmani Tanzil via AlQuran Cloud /page/{n}/quran-uthmani
+(endpoint /editions/ 404 — diverifikasi), cache LRU 12 halaman, band
+سُورَةُ + bismillah terpisah + penanda ﴿angka arab﴾ + chip juz + medalion
+nomor halaman; navigasi prev/next, lompat halaman, pilih surah
+(fetchAyahPage surah:ayah); flip ala mushaf: gesture pointer axis-lock,
+mvX→rotateY (origin sisi jilid), lepas >22% → flip keluar-masuk; reduced
+motion = instan. Mode tersimpan settings.quranReadMode; berpindah mode
+meneruskan posisi (mushaf→terjemahan membuka ayat teratas halaman; sesi
+masing-masing mencatat sendiri saat unmount). QA lokal: kertas putih
+light+dark, seleksi ayat, bookmark, 3 jalur pencatatan, hapus permanen
+(refresh + logout→login, tombstone bertahan), 360px tanpa overflow,
+console bersih, reduced motion. Deploy & verifikasi production menyusul.

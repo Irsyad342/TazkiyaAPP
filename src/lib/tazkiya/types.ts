@@ -143,6 +143,20 @@ export interface DailyLog {
 
 export type QuranTargetType = "halaman" | "ayat" | "surah";
 
+/** Mode membaca Al-Qur'an: kartu ayat + terjemahan, atau halaman mushaf. */
+export type QuranReadMode = "terjemahan" | "mushaf";
+
+/**
+ * Batu nisan penghapusan catatan riwayat bacaan. Disimpan terpisah agar
+ * penghapusan BERSIFAT PERMANEN: penggabungan perangkat ↔ akun selalu
+ * membuang entri ber-id ini, sehingga data yang dihapus tidak bangkit
+ * kembali dari cloud maupun localStorage (maks. 1000 terbaru).
+ */
+export interface DeletedReading {
+  id: string;
+  deletedAt: string; // ISO
+}
+
 export interface QuranBookmark {
   surah: number; // 1..114
   ayah: number;
@@ -227,6 +241,8 @@ export interface Settings {
   readerTransSize: number; // px 11..20
   readerLineHeight: number; // 1.7 | 1.9 | 2.2
   readerShowTranslation: boolean;
+  /** Mode pembaca Al-Qur'an: "terjemahan" (kartu ayat) atau "mushaf" (halaman). */
+  quranReadMode?: QuranReadMode;
   createdAt: string; // ISO, pertama kali memakai aplikasi
 }
 
@@ -422,6 +438,7 @@ export function createDefaultSettings(): Settings {
     readerTransSize: 13,
     readerLineHeight: 1.9,
     readerShowTranslation: true,
+    quranReadMode: "terjemahan",
     createdAt: new Date().toISOString(),
   };
 }

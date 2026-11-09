@@ -1,17 +1,22 @@
 "use client";
 
 /**
- * Tazkiya v4 — Pembaca Al-Qur'an (overlay layar penuh, reading-focused).
- * Layout baru: kepala putih bersih dengan bilah progres baca tipis, kolom
- * baca terpusat (maks 720px), bismillah dalam panel lembut, nomor ayat
- * lavender di kepala setiap ayat, terjemahan dalam panel tersendiri, dan
- * bilah status bawah berisi posisi ayat berjalan. Teks Uthmani + terjemahan
- * Kemenag, penanda per-ayat, pengaturan tampilan, dan pencatatan progres
- * OTOMATIS (ayat awal → ayat akhir) tetap sama.
+ * Tazkiya v5 — Pembaca Al-Qur'an (overlay layar penuh, reading-focused).
+ * Shell: kepala putih bersih, saklar mode Terjemahan ⇄ Mushaf, penanda,
+ * pengaturan tampilan, bilah status posisi. Isi:
+ * - Mode Terjemahan: kolom baca terpusat, kartu ayat di KERTAS PUTIH
+ *   permanen (Arab hitam, terjemahan abu gelap) di tema terang maupun
+ *   gelap. TANPA highlight otomatis mengikuti scroll — sorotan hanya
+ *   muncul saat pengguna mengetuk (memilih) ayat.
+ * - Mode Mushaf: halaman mushaf fisik (QuranMushaf).
+ * Pencatatan progres tetap OTOMATIS saat sesi berakhir, tetapi hanya bila
+ * ada aktivitas membaca nyata (pengguna pernah menggulir/membalik).
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  BookOpen,
+  BookText,
   Bookmark as BookmarkIcon,
   LoaderCircle,
   Minus,
@@ -28,20 +33,31 @@ import { useWorshipStore } from "@/lib/tazkiya/store";
 import { fetchSurah, getSurah, type SurahData } from "@/lib/tazkiya/quran";
 import { todayKey } from "@/lib/tazkiya/dates";
 import { cn } from "@/lib/utils";
+import { MushafView, type MushafPosition } from "./QuranMushaf";
 
 const LINE_HEIGHTS = [1.7, 1.9, 2.2];
 
-export function QuranReader({
+interface ReaderPosition {
+  surah: number;
+  ayah: number;
+}
+
+/* ================= Mode Terjemahan ================= */
+
+function TranslationView({
   surah,
   startAyah,
-  onClose,
+  animated,
+  onStatus,
+  onPosition,
 }: {
   surah: number;
-  startAyah?: number;
-  onClose: () => void;
+  startAyah: number;
+  animated: boolean;
+  onStatus: (ayah: number | null) => void;
+  onPosition: (pos: ReaderPosition) => void;
 }) {
   const settings = useWorshipStore((s) => s.settings);
-  const updateSettings = useWorshipStore((s) => s.updateSettings);
   const setLastRead = useWorshipStore((s) => s.setLastRead);
   const saveBookmark = useWorshipStore((s) => s.saveBookmark);
   const toggleAyahBookmark = useWorshipStore((s) => s.toggleAyahBookmark);
@@ -49,33 +65,25 @@ export function QuranReader({
   const addQuranProgress = useWorshipStore((s) => s.addQuranProgress);
 
   const meta = getSurah(surah);
-  const animated = settings.animations;
 
   const [data, setData] = useState<SurahData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [offline, setOffline] = useState(false);
-  const [currentAyah, setCurrentAyah] = useState(startAyah ?? 1);
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [selectedAyah, setSelectedAyah] = useState<number | null>(null);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const ayahRefs = useRef(new Map<number, HTMLDivElement>());
-  const lastReadRef = useRef(1);
+  const lastReadRef = useRef(startAyah);
   const lastSavedRef = useRef<{ surah: number; ayah: number } | null>(null);
 
-  // ---- Sesi bacaan otomatis: ayat awal → ayat akhir yang benar-benar terbaca ----
-  const sessionStart = Math.max(1, startAyah ?? 1);
+  // ---- Sesi bacaan otomatis: ayat awal → akhir yang benar-benar terbaca ----
+  const sessionStart = Math.max(1, startAyah);
   const sessionStartAt = useRef(Date.now());
   const minSeenRef = useRef(sessionStart);
   const maxSeenRef = useRef(sessionStart);
   const recordedRef = useRef(false);
+  const interactedRef = useRef(false); // ada aktivitas membaca nyata (gulir)?
   const dataRef = useRef<SurahData | null>(null);
-
-  useEffect(() => {
-    lastReadRef.current = currentAyah;
-    minSeenRef.current = Math.min(minSeenRef.current, currentAyah);
-    maxSeenRef.current = Math.max(maxSeenRef.current, currentAyah);
-  }, [currentAyah]);
 
   useEffect(() => {
     dataRef.current = data;
@@ -87,30 +95,21 @@ export function QuranReader({
     return s;
   }, [ayahBookmarks, surah]);
 
-  const reload = useCallback(
-    async (force = false) => {
-      setLoading(true);
-      setError(null);
-      const result = await fetchSurah(surah, force);
-      if (result.ok) setData(result.data);
-      else {
-        setError(result.message);
-        setOffline(result.offline);
-      }
-      setLoading(false);
-    },
-    [surah]
-  );
+  const reload = useCallback(async (force = false) => {
+    setLoading(true);
+    setError(null);
+    const result = await fetchSurah(surah, force);
+    if (result.ok) setData(result.data);
+    else setError(result.message);
+    setLoading(false);
+  }, [surah]);
 
   useEffect(() => {
     let alive = true;
     fetchSurah(surah).then((result) => {
       if (!alive) return;
       if (result.ok) setData(result.data);
-      else {
-        setError(result.message);
-        setOffline(result.offline);
-      }
+      else setError(result.message);
       setLoading(false);
     });
     return () => {
@@ -120,7 +119,7 @@ export function QuranReader({
 
   // Gulir ke ayat awal bila dibuka dari posisi tertentu.
   useEffect(() => {
-    if (data && startAyah && startAyah > 1) {
+    if (data && startAyah > 1) {
       const t = setTimeout(() => {
         ayahRefs.current.get(startAyah)?.scrollIntoView({ block: "start" });
       }, 120);
@@ -138,13 +137,14 @@ export function QuranReader({
 
   /**
    * Tutup sesi: simpan posisi terakhir, pindahkan penanda otomatis, dan
-   * catat rentang bacaan (ayat awal → akhir) ke tracker bila sesi bermakna
-   * (dibaca ≥15 dtk atau pengguna menggulir melewati posisi awal).
-   * Aman dipanggil dua kali — hanya sesi pertama yang direkam.
+   * catat rentang bacaan HANYA bila ada aktivitas membaca nyata (pengguna
+   * pernah menggulir/menyentuh isi bacaan) — membuka lalu membiarkan tanpa
+   * interaksi TIDAK mencatat riwayat.
    */
   const finishSession = useCallback(() => {
     if (recordedRef.current) return;
-    if (Date.now() - sessionStartAt.current < 1200) return; // buka-tutup kilat, abaikan
+    if (Date.now() - sessionStartAt.current < 1200) return; // buka-tutup kilat
+    if (!interactedRef.current) return; // tidak ada aktivitas membaca
     const d = dataRef.current;
     if (!d) return; // teks tak termuat (error/offline), jangan mengarang progres
     recordedRef.current = true;
@@ -178,7 +178,7 @@ export function QuranReader({
     finishSessionRef.current = finishSession;
   }, [finishSession]);
 
-  // Rekam posisi terakhir berkala; saat pembaca ditutup, sesi ditutup otomatis.
+  // Rekam posisi terakhir berkala; saat view ditutup, sesi ditutup otomatis.
   useEffect(() => {
     const interval = setInterval(commitLastRead, 2500);
     return () => {
@@ -187,7 +187,11 @@ export function QuranReader({
     };
   }, [commitLastRead]);
 
-  // Deteksi ayat yang sedang terlihat saat menggulir.
+  /**
+   * Lacak ayat terlihat untuk PROGRES saja (min/max/posisi terakhir) —
+   * TIDAK mengubah tampilan: tidak ada highlight yang berpindah sendiri
+   * mengikuti scroll. Aktivitas membaca (gulir) dicatat di sini juga.
+   */
   useEffect(() => {
     if (!data) return;
     const root = scrollRef.current;
@@ -200,7 +204,11 @@ export function QuranReader({
           const n = Number((entry.target as HTMLElement).dataset.ayah);
           if (!Number.isNaN(n) && (top === null || n < top)) top = n;
         }
-        if (top !== null) setCurrentAyah(top);
+        if (top === null) return;
+        interactedRef.current = true;
+        lastReadRef.current = top;
+        minSeenRef.current = Math.min(minSeenRef.current, top);
+        maxSeenRef.current = Math.max(maxSeenRef.current, top);
       },
       { root, rootMargin: "-30% 0px -60% 0px", threshold: 0 }
     );
@@ -208,8 +216,186 @@ export function QuranReader({
     return () => observer.disconnect();
   }, [data]);
 
+  const onSelectAyah = (n: number) => {
+    const next = selectedAyah === n ? null : n;
+    setSelectedAyah(next);
+    onStatus(next);
+    if (next !== null) onPosition({ surah, ayah: next });
+  };
+
+  return (
+    <div ref={scrollRef} className="thin-scrollbar relative z-10 min-h-0 flex-1 overflow-y-auto px-3 pb-8 pt-4 sm:px-6">
+      {/* Kertas bacaan: PUTIH permanen di kedua tema */}
+      <div className="quran-paper mx-auto max-w-[720px] rounded-[1.5rem] border border-[#e8e2da] px-4 py-5 shadow-[0_10px_36px_-18px_rgba(60,40,10,0.3)] sm:px-6">
+        {loading ? (
+          <div className="flex flex-col items-center gap-3 py-20 text-center">
+            <LoaderCircle size={30} className="animate-spin text-[#b45309]" />
+            <p className="text-sm text-[#8a8a8a]">Mengambil {meta?.latin}…</p>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center gap-3 py-16 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#fdf1e3] text-[#b45309]">
+              <TriangleAlert size={22} />
+            </span>
+            <p className="max-w-[280px] font-display text-sm font-bold text-[#111111]">Gagal memuat surah</p>
+            <p className="max-w-[280px] text-xs leading-relaxed text-[#8a8a8a]">{error}</p>
+            <button
+              type="button"
+              onClick={() => void reload(true)}
+              className="tap mt-1 flex min-h-[42px] items-center gap-2 rounded-full bg-[#171717] px-5 text-sm font-bold text-white"
+            >
+              <RotateCcw size={15} /> Coba lagi
+            </button>
+          </div>
+        ) : data ? (
+          <>
+            {/* Panel pembuka surah */}
+            <div className="quran-hairline mb-6 rounded-[1.1rem] border border-[#e8e2da] bg-[#faf6f0] px-5 py-6 text-center">
+              <p className="quran-arabic text-[26px] leading-[1.7] text-[#111111]">{data.surah.arabic}</p>
+              {data.bismillah ? (
+                <p className="quran-bismillah mt-2 text-[22px] leading-[1.9] text-[#111111]">{data.bismillah}</p>
+              ) : null}
+              {data.fromCache ? (
+                <p className="quran-hint mt-2 text-[10px]">Dibaca dari simpanan perangkat (offline)</p>
+              ) : null}
+            </div>
+
+            {data.ayahs.map((ayah) => {
+              const selected = selectedAyah === ayah.number;
+              return (
+                <div
+                  key={ayah.number}
+                  data-ayah={ayah.number}
+                  ref={(el) => {
+                    if (el) ayahRefs.current.set(ayah.number, el);
+                    else ayahRefs.current.delete(ayah.number);
+                  }}
+                  onClick={() => onSelectAyah(ayah.number)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onSelectAyah(ayah.number);
+                    }
+                  }}
+                  aria-pressed={selected}
+                  aria-label={`Ayat ${ayah.number}${selected ? " (dipilih)" : ""} — ketuk untuk memilih`}
+                  className={cn(
+                    "mb-3 cursor-pointer rounded-[1.4rem] border px-4 py-4 outline-none transition-colors sm:px-5",
+                    selected
+                      ? "border-[#f0b27a] bg-[#fff7ef] shadow-[inset_0_0_0_1px_#f0b27a]"
+                      : "border-transparent hover:border-[#eee3d4]"
+                  )}
+                >
+                  <div className="mb-2.5 flex items-center justify-between gap-2">
+                    <span
+                      className={cn(
+                        "tnum flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-[11px] font-bold",
+                        selected ? "bg-[#e04a00] text-white" : "bg-[#f8ede1] text-[#c2410c]"
+                      )}
+                    >
+                      {ayah.number}
+                    </span>
+                    {selected ? (
+                      <span className="rounded-full bg-[#f8ede1] px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wide text-[#c2410c]">
+                        Dipilih
+                      </span>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleAyahBookmark(surah, ayah.number);
+                      }}
+                      aria-label={bookmarkSet.has(ayah.number) ? `Hapus penanda ayat ${ayah.number}` : `Tandai ayat ${ayah.number}`}
+                      className={cn(
+                        "tap flex h-8 w-8 items-center justify-center rounded-full border transition-colors",
+                        bookmarkSet.has(ayah.number)
+                          ? "border-[#e5b380] bg-[#fdf3e7] text-[#c2410c]"
+                          : "border-[#e8e2da] bg-white text-[#8a8a8a] hover:text-[#c2410c]"
+                      )}
+                    >
+                      <BookmarkIcon size={13} />
+                    </button>
+                  </div>
+                  <p
+                    className="quran-arabic text-right text-[#111111]"
+                    style={{ fontSize: settings.readerArabicSize, lineHeight: settings.readerLineHeight }}
+                  >
+                    {ayah.text}
+                  </p>
+                  {settings.readerShowTranslation && ayah.translation ? (
+                    <p
+                      className="quran-translation mt-3 rounded-xl bg-[#f7f4ef] px-3 py-2.5 leading-relaxed"
+                      style={{ fontSize: settings.readerTransSize }}
+                    >
+                      {ayah.translation}
+                    </p>
+                  ) : null}
+                </div>
+              );
+            })}
+            <p className="quran-hint pb-1 pt-2 text-center text-[10.5px]">
+              Sumber: AlQuran Cloud, teks Uthmani (Tanzil) &amp; terjemahan Kemenag RI · ketuk ayat untuk memilih
+            </p>
+          </>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+/* ================= Shell pembaca ================= */
+
+export function QuranReader({
+  surah,
+  startAyah,
+  onClose,
+}: {
+  surah: number;
+  startAyah?: number;
+  onClose: () => void;
+}) {
+  const settings = useWorshipStore((s) => s.settings);
+  const updateSettings = useWorshipStore((s) => s.updateSettings);
+  const saveBookmark = useWorshipStore((s) => s.saveBookmark);
+
+  const animated = settings.animations;
+  const mode = settings.quranReadMode ?? "terjemahan";
+
+  const [activeSurah, setActiveSurah] = useState(surah);
+  const [activeStartAyah, setActiveStartAyah] = useState(Math.max(1, startAyah ?? 1));
+  const [statusAyah, setStatusAyah] = useState<number | null>(null);
+  const [mushafPos, setMushafPos] = useState<MushafPosition | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // Posisi terakhir per mode — dipakai tombol penanda.
+  const posRef = useRef<ReaderPosition>({ surah, ayah: Math.max(1, startAyah ?? 1) });
+
+  const meta = getSurah(activeSurah);
+
+  const handleTransPosition = useCallback((pos: ReaderPosition) => {
+    posRef.current = pos;
+  }, []);
+  const handleMushafPosition = useCallback((pos: MushafPosition) => {
+    posRef.current = { surah: pos.surah, ayah: pos.ayah };
+    setMushafPos(pos);
+  }, []);
+
+  const switchMode = (next: "terjemahan" | "mushaf") => {
+    if (next === mode) return;
+    updateSettings({ quranReadMode: next });
+    if (next === "terjemahan" && mushafPos) {
+      // Lanjutkan dari posisi halaman mushaf yang sedang dibaca.
+      setActiveSurah(mushafPos.surah);
+      setActiveStartAyah(Math.max(1, mushafPos.ayah));
+      setStatusAyah(null);
+    }
+    if (next === "mushaf") setStatusAyah(null);
+  };
+
   const lhIdx = Math.max(0, LINE_HEIGHTS.indexOf(settings.readerLineHeight));
-  const readPct = data ? Math.round((currentAyah / Math.max(1, meta?.verses ?? data.ayahs.length)) * 100) : 0;
 
   return (
     <m.div
@@ -219,36 +405,50 @@ export function QuranReader({
       transition={{ duration: 0.24 * (animated ? 1 : 0), ease: "easeOut" }}
       className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-tk-stage"
       role="dialog"
-      aria-label={`Pembaca surah ${meta?.latin ?? ""}`}
+      aria-label={`Pembaca ${mode === "mushaf" ? "mushaf" : `surah ${meta?.latin ?? ""}`}`}
     >
-      {/* ---------- Kepala pembaca: putih bersih + bilah progres tipis ---------- */}
+      {/* ---------- Kepala pembaca + saklar mode ---------- */}
       <header className="glass-strong relative z-20 rounded-none border-0 border-b border-tk-line px-3 pb-2.5 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <div className="mx-auto flex max-w-[760px] items-center gap-2">
           <button
             type="button"
-            onClick={() => {
-              finishSession();
-              onClose();
-            }}
+            onClick={onClose}
             aria-label="Kembali ke daftar surah"
             className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-ink transition-colors hover:border-tk-violet/40"
           >
             <X size={18} />
           </button>
           <div className="min-w-0 flex-1 text-center">
-            <p className="truncate font-display text-[15px] font-bold leading-tight tracking-[-0.01em] text-tk-ink">
-              {meta?.latin}
-              {settings.showArabic ? <span className="quran-arabic ml-2 text-[15px] font-normal text-tk-violet dark:text-tk-accent">{meta?.arabic}</span> : null}
-            </p>
-            <p className="text-[10.5px] text-tk-muted">
-              Surah {surah} · {meta?.verses} ayat · {meta?.place}
-            </p>
+            {mode === "mushaf" ? (
+              <>
+                <p className="truncate font-display text-[15px] font-bold leading-tight tracking-[-0.01em] text-tk-ink">
+                  Mode Mushaf
+                  {mushafPos ? <span className="quran-arabic ml-2 text-[14px] font-normal text-tk-violet dark:text-tk-accent">{getSurah(mushafPos.surah)?.arabic}</span> : null}
+                </p>
+                <p className="text-[10.5px] text-tk-muted">
+                  {mushafPos
+                    ? `Halaman ${mushafPos.page} dari 604 · Juz ${mushafPos.juz}${mushafPos.surahsOnPage.length > 1 ? ` · ${mushafPos.surahsOnPage.length} surah` : ""}`
+                    : "Membuka halaman…"}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="truncate font-display text-[15px] font-bold leading-tight tracking-[-0.01em] text-tk-ink">
+                  {meta?.latin}
+                  {settings.showArabic ? <span className="quran-arabic ml-2 text-[15px] font-normal text-tk-violet dark:text-tk-accent">{meta?.arabic}</span> : null}
+                </p>
+                <p className="text-[10.5px] text-tk-muted">
+                  Surah {activeSurah} · {meta?.verses} ayat · {meta?.place}
+                </p>
+              </>
+            )}
           </div>
           <button
             type="button"
             onClick={() => {
-              saveBookmark({ surah, ayah: currentAyah, savedAt: new Date().toISOString() });
-              toast.success(`Penanda disimpan: ${meta?.latin} ayat ${currentAyah}`);
+              const pos = posRef.current;
+              saveBookmark({ surah: pos.surah, ayah: pos.ayah, savedAt: new Date().toISOString() });
+              toast.success(`Penanda disimpan: ${getSurah(pos.surah)?.latin ?? "Surah"} ayat ${pos.ayah}`);
             }}
             aria-label="Simpan penanda posisi ini"
             className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-violet transition-colors hover:border-tk-violet/50 dark:text-tk-accent"
@@ -269,12 +469,29 @@ export function QuranReader({
           </button>
         </div>
 
-        {/* Bilah progres baca */}
-        <div aria-hidden className="mx-auto mt-2.5 h-[3px] max-w-[760px] overflow-hidden rounded-full bg-tk-track">
-          <div
-            className="tk-bar-grow-x h-full rounded-full bg-tk-violet"
-            style={{ width: `${readPct}%` }}
-          />
+        {/* Saklar mode Terjemahan / Mushaf */}
+        <div className="mx-auto mt-2.5 flex max-w-[760px] items-center gap-1 rounded-full border border-tk-line bg-tk-panel p-1" role="tablist" aria-label="Mode membaca">
+          {(
+            [
+              { id: "terjemahan" as const, label: "Terjemahan", icon: BookOpen },
+              { id: "mushaf" as const, label: "Mushaf", icon: BookText },
+            ]
+          ).map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={mode === t.id}
+              onClick={() => switchMode(t.id)}
+              className={cn(
+                "tap flex min-h-[34px] flex-1 items-center justify-center gap-1.5 rounded-full text-[12px] font-bold transition-all",
+                mode === t.id ? "gs-ink-btn" : "text-tk-muted hover:text-tk-ink"
+              )}
+            >
+              <t.icon size={14} />
+              {t.label}
+            </button>
+          ))}
         </div>
 
         {settingsOpen ? (
@@ -303,180 +520,125 @@ export function QuranReader({
                 </button>
               </div>
             </div>
-            <div className="flex items-center justify-between gap-2">
-              <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-tk-muted">
-                <Type size={12} /> Ukuran terjemahan
+            {mode === "terjemahan" ? (
+              <>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-tk-muted">
+                    <Type size={12} /> Ukuran terjemahan
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      aria-label="Perkecil terjemahan"
+                      onClick={() => updateSettings({ readerTransSize: Math.max(11, settings.readerTransSize - 1) })}
+                      className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-ink"
+                    >
+                      <Minus size={13} />
+                    </button>
+                    <span className="w-10 text-center text-xs font-semibold text-tk-ink">{settings.readerTransSize}px</span>
+                    <button
+                      type="button"
+                      aria-label="Perbesar terjemahan"
+                      onClick={() => updateSettings({ readerTransSize: Math.min(20, settings.readerTransSize + 1) })}
+                      className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-ink"
+                    >
+                      <Plus size={13} />
+                    </button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-tk-muted">Jarak antarbaris</p>
+                  <button
+                    type="button"
+                    onClick={() => updateSettings({ readerLineHeight: LINE_HEIGHTS[(lhIdx + 1) % LINE_HEIGHTS.length] })}
+                    className="tap rounded-full border border-tk-line bg-tk-panel px-3 py-1.5 text-xs font-semibold text-tk-ink"
+                  >
+                    {settings.readerLineHeight === 1.7 ? "Rapat" : settings.readerLineHeight === 1.9 ? "Sedang" : "Lega"}
+                  </button>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-tk-muted">Tampilkan terjemahan</p>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={settings.readerShowTranslation}
+                    onClick={() => updateSettings({ readerShowTranslation: !settings.readerShowTranslation })}
+                    className={cn(
+                      "tap relative h-6 w-11 rounded-full border transition-colors",
+                      settings.readerShowTranslation ? "border-tk-violet/60 bg-tk-violet" : "border-tk-line bg-tk-panel-soft"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "absolute top-0.5 rounded-full bg-white shadow transition-all",
+                        settings.readerShowTranslation ? "left-[22px]" : "left-0.5"
+                      )}
+                      style={{ height: 18, width: 18 }}
+                    />
+                  </button>
+                </div>
+                <p className="text-[10.5px] leading-relaxed text-tk-muted">
+                  Bacaan dicatat otomatis saat pembaca ditutup, hanya bila ada aktivitas membaca. Sorotan ayat muncul
+                  saat kamu mengetuk ayatnya, bukan mengikuti gulir.
+                </p>
+              </>
+            ) : (
+              <p className="text-[10.5px] leading-relaxed text-tk-muted">
+                Halaman mushaf (Utsmani, 604 halaman) dari AlQuran Cloud. Geser kiri/kanan untuk membalik halaman,
+                pilih surah atau lompat halaman dari bilah navigasi. Progres dicatat dari halaman yang benar-benar
+                kamu buka saat sesi berakhir.
               </p>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  aria-label="Perkecil terjemahan"
-                  onClick={() => updateSettings({ readerTransSize: Math.max(11, settings.readerTransSize - 1) })}
-                  className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-ink"
-                >
-                  <Minus size={13} />
-                </button>
-                <span className="w-10 text-center text-xs font-semibold text-tk-ink">{settings.readerTransSize}px</span>
-                <button
-                  type="button"
-                  aria-label="Perbesar terjemahan"
-                  onClick={() => updateSettings({ readerTransSize: Math.min(20, settings.readerTransSize + 1) })}
-                  className="tap flex h-8 w-8 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-ink"
-                >
-                  <Plus size={13} />
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-tk-muted">Jarak antarbaris</p>
-              <button
-                type="button"
-                onClick={() => updateSettings({ readerLineHeight: LINE_HEIGHTS[(lhIdx + 1) % LINE_HEIGHTS.length] })}
-                className="tap rounded-full border border-tk-line bg-tk-panel px-3 py-1.5 text-xs font-semibold text-tk-ink"
-              >
-                {settings.readerLineHeight === 1.7 ? "Rapat" : settings.readerLineHeight === 1.9 ? "Sedang" : "Lega"}
-              </button>
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-tk-muted">Tampilkan terjemahan</p>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={settings.readerShowTranslation}
-                onClick={() => updateSettings({ readerShowTranslation: !settings.readerShowTranslation })}
-                className={cn(
-                  "tap relative h-6 w-11 rounded-full border transition-colors",
-                  settings.readerShowTranslation ? "border-tk-violet/60 bg-tk-violet" : "border-tk-line bg-tk-panel-soft"
-                )}
-              >
-                <span
-                  className={cn(
-                    "absolute top-0.5 rounded-full bg-white shadow transition-all",
-                    settings.readerShowTranslation ? "left-[22px]" : "left-0.5"
-                  )}
-                  style={{ height: 18, width: 18 }}
-                />
-              </button>
-            </div>
-            <p className="text-[10.5px] leading-relaxed text-tk-muted">
-              Bacaan dicatat otomatis saat pembaca ditutup, dari ayat awal sampai ayat terakhir yang kamu baca, lalu
-              penanda ikut berpindah. Semua pengaturan juga tersimpan otomatis di perangkat Anda.
-            </p>
+            )}
           </div>
         ) : null}
       </header>
 
-      {/* ---------- Isi ayat: kolom baca terpusat ---------- */}
-      <div ref={scrollRef} className="thin-scrollbar relative z-10 flex-1 overflow-y-auto px-4 pb-8 pt-5 sm:px-6">
-        <div className="mx-auto max-w-[720px]">
-          {loading ? (
-            <div className="flex flex-col items-center gap-3 pt-24 text-center">
-              <LoaderCircle size={30} className="animate-spin text-tk-violet" />
-              <p className="text-sm text-tk-muted">Mengambil {meta?.latin}…</p>
-            </div>
-          ) : error ? (
-            <div className="flex flex-col items-center gap-3 pt-20 text-center">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-tk-amber-soft text-tk-amber">
-                <TriangleAlert size={22} />
-              </span>
-              <p className="max-w-[280px] font-display text-sm font-bold text-tk-ink">Gagal memuat surah</p>
-              <p className="max-w-[280px] text-xs leading-relaxed text-tk-muted">{error}</p>
-              <button
-                type="button"
-                onClick={() => void reload(true)}
-                className="tap mt-1 flex min-h-[42px] items-center gap-2 rounded-full gs-ink-btn px-5 text-sm font-bold"
-              >
-                <RotateCcw size={15} /> Coba lagi
-              </button>
-            </div>
-          ) : data ? (
-            <>
-              {/* Panel pembuka surah */}
-              <div className="mb-6 rounded-[1.75rem] bg-tk-panel-soft px-5 py-6 text-center">
-                <p className="quran-arabic text-[26px] leading-[1.7] text-tk-ink">{data.surah.arabic}</p>
-                {data.bismillah ? (
-                  <p className="quran-bismillah mt-2 text-[22px] leading-[1.9] text-tk-violet">{data.bismillah}</p>
-                ) : null}
-                {data.fromCache ? (
-                  <p className="mt-2 text-[10px] text-tk-muted">Dibaca dari simpanan perangkat (offline)</p>
-                ) : null}
-              </div>
-
-              {data.ayahs.map((ayah) => {
-                const active = ayah.number === currentAyah;
-                return (
-                  <div
-                    key={ayah.number}
-                    data-ayah={ayah.number}
-                    ref={(el) => {
-                      if (el) ayahRefs.current.set(ayah.number, el);
-                      else ayahRefs.current.delete(ayah.number);
-                    }}
-                    className={cn(
-                      "mb-3 rounded-[1.4rem] border px-4 py-4 transition-colors sm:px-5",
-                      active ? "border-tk-lav-deco bg-tk-lavender" : "border-transparent"
-                    )}
-                  >
-                    <div className="mb-2.5 flex items-center justify-between gap-2">
-                      <span
-                        className={cn(
-                          "tnum flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-[11px] font-bold",
-                          active ? "bg-tk-violet text-white" : "bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent"
-                        )}
-                      >
-                        {ayah.number}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        {active ? (
-                          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-tk-violet" />
-                        ) : null}
-                        <button
-                          type="button"
-                          onClick={() => toggleAyahBookmark(surah, ayah.number)}
-                          aria-label={bookmarkSet.has(ayah.number) ? `Hapus penanda ayat ${ayah.number}` : `Tandai ayat ${ayah.number}`}
-                          className={cn(
-                            "tap flex h-8 w-8 items-center justify-center rounded-full border transition-colors",
-                            bookmarkSet.has(ayah.number)
-                              ? "border-tk-violet/50 bg-tk-lavender text-tk-violet dark:bg-tk-accent/20 dark:text-tk-accent"
-                              : "border-tk-line bg-tk-panel text-tk-muted hover:text-tk-violet"
-                          )}
-                        >
-                          <BookmarkIcon size={13} />
-                        </button>
-                      </div>
-                    </div>
-                    <p
-                      className="quran-arabic text-right text-tk-ink"
-                      style={{ fontSize: settings.readerArabicSize, lineHeight: settings.readerLineHeight }}
-                    >
-                      {ayah.text}
-                    </p>
-                    {settings.readerShowTranslation && ayah.translation ? (
-                      <p
-                        className="mt-3 rounded-xl bg-tk-panel-soft px-3 py-2.5 leading-relaxed text-tk-ink/85"
-                        style={{ fontSize: settings.readerTransSize }}
-                      >
-                        {ayah.translation}
-                      </p>
-                    ) : null}
-                  </div>
-                );
-              })}
-              <p className="pb-2 pt-3 text-center text-[10.5px] text-tk-muted">
-                Sumber: AlQuran Cloud, teks Uthmani (Tanzil) &amp; terjemahan Kemenag RI
-              </p>
-            </>
-          ) : null}
-        </div>
-      </div>
+      {/* ---------- Isi sesuai mode ---------- */}
+      {mode === "mushaf" ? (
+        <MushafView
+          key={`mushaf-${activeSurah}-${activeStartAyah}`}
+          targetSurah={activeSurah}
+          targetAyah={activeStartAyah}
+          animated={animated}
+          arabicSize={settings.readerArabicSize}
+          onPosition={handleMushafPosition}
+        />
+      ) : (
+        <TranslationView
+          key={`trans-${activeSurah}-${activeStartAyah}`}
+          surah={activeSurah}
+          startAyah={activeStartAyah}
+          animated={animated}
+          onStatus={setStatusAyah}
+          onPosition={handleTransPosition}
+        />
+      )}
 
       {/* ---------- Bilah status posisi baca ---------- */}
       <div className="glass-strong relative z-20 rounded-none border-0 border-t border-tk-line px-4 pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2">
         <div className="mx-auto flex max-w-[760px] items-center justify-between gap-3">
-          <p className="tnum text-[11px] font-semibold text-tk-muted">
-            Ayat <span className="font-bold text-tk-ink">{currentAyah}</span> dari {meta?.verses ?? "0"}
-          </p>
-          <p className="truncate text-[10px] text-tk-muted/80">Progres bacaan tercatat otomatis saat ditutup</p>
+          {mode === "mushaf" ? (
+            <>
+              <p className="tnum text-[11px] font-semibold text-tk-muted">
+                Halaman <span className="font-bold text-tk-ink">{mushafPos?.page ?? "–"}</span> dari 604
+                {mushafPos ? <span> · Juz {mushafPos.juz}</span> : null}
+              </p>
+              <p className="truncate text-[10px] text-tk-muted/80">Progres halaman tercatat otomatis saat ditutup</p>
+            </>
+          ) : (
+            <>
+              <p className="tnum text-[11px] font-semibold text-tk-muted">
+                {statusAyah ? (
+                  <>
+                    Ayat <span className="font-bold text-tk-ink">{statusAyah}</span> dipilih · dari {meta?.verses ?? "0"}
+                  </>
+                ) : (
+                  <>Ketuk ayat untuk memilih · {meta?.verses ?? "0"} ayat</>
+                )}
+              </p>
+              <p className="truncate text-[10px] text-tk-muted/80">Progres bacaan tercatat otomatis saat ditutup</p>
+            </>
+          )}
         </div>
       </div>
     </m.div>

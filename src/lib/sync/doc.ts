@@ -18,6 +18,7 @@ import {
   type AyahBookmark,
   type DailyGoal,
   type DailyLog,
+  type DeletedReading,
   type JournalEntry,
   type LastRead,
   type PrayerDetail,
@@ -41,6 +42,8 @@ export interface CloudDoc {
   ayahBookmarks?: AyahBookmark[];
   lastRead?: LastRead | null;
   readingHistory?: ReadingEntry[];
+  /** Batu nisan penghapusan riwayat — penghapusan permanen lintas perangkat. */
+  deletedReadings?: DeletedReading[];
   tasbih?: TasbihState;
   /* ---- Perluasan Nūr Companion (opsional — dokumen lama tetap terbaca) ---- */
   qadaRecords?: QadaRecord[];
@@ -63,6 +66,7 @@ export function extractFullDoc(state: {
   ayahBookmarks: AyahBookmark[];
   lastRead: LastRead | null;
   readingHistory: ReadingEntry[];
+  deletedReadings: DeletedReading[];
   tasbih: TasbihState;
   qadaRecords: QadaRecord[];
   journal: Record<string, JournalEntry>;
@@ -83,6 +87,7 @@ export function extractFullDoc(state: {
     ayahBookmarks: state.ayahBookmarks,
     lastRead: state.lastRead,
     readingHistory: state.readingHistory,
+    deletedReadings: state.deletedReadings,
     tasbih: state.tasbih,
     qadaRecords: state.qadaRecords,
     journal: state.journal,

@@ -95,6 +95,7 @@ function subscribeStore() {
     "ayahBookmarks",
     "lastRead",
     "readingHistory",
+    "deletedReadings",
     "tasbih",
     "qadaRecords",
     "journal",

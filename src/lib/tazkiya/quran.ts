@@ -260,3 +260,149 @@ export function normalizeArabic(s: string): string {
     .replace(/\u0629/g, "ه")
     .trim();
 }
+
+/* ---------------- Mode Mushaf (per halaman 1..604) ---------------- */
+
+const PAGE_INDEX_KEY = "tazkiya-quran-pindex";
+const MAX_CACHED_PAGES = 12;
+
+/** Ayat satu halaman mushaf — teks Utsmani murni dari API (Tanzil). */
+export interface MushafAyah {
+  surah: number;
+  numberInSurah: number;
+  global: number;
+  text: string; // teks Utsmani apa adanya (ayat 1 surah > 1 masih memuat bismillah di awal)
+  juz: number;
+}
+
+export interface MushafPage {
+  page: number;
+  juz: number; // juz terbanyak di halaman ini
+  ayahs: MushafAyah[];
+  fetchedAt: number;
+  fromCache?: boolean;
+}
+
+export type MushafFetchResult =
+  | { ok: true; data: MushafPage }
+  | { ok: false; offline: boolean; message: string };
+
+/** Lepas prefiks bismillah dari ayat 1 (kecuali Al-Fatihah & At-Taubah). */
+export function stripBismillah(text: string, surah: number, numberInSurah: number): { text: string; bismillah: string | null } {
+  if (numberInSurah !== 1 || surah === 1 || surah === 9) return { text, bismillah: null };
+  if (text.startsWith("بِسْمِ")) {
+    const parts = text.split(" ");
+    if (parts.length > 4 && parts[3].includes("حِيم")) {
+      return { text: parts.slice(4).join(" "), bismillah: parts.slice(0, 4).join(" ") };
+    }
+  }
+  return { text, bismillah: null };
+}
+
+/** Angka Arab-Indic (٠١٢٣٤٥٦٧٨٩) untuk penanda mushaf. */
+export function toArabicDigits(n: number): string {
+  return String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[Number(d)]);
+}
+
+function readPageCache(page: number): MushafPage | null {
+  try {
+    const raw = localStorage.getItem(`tazkiya-quran-p${page}`);
+    if (!raw) return null;
+    const list = pageList();
+    localStorage.setItem(PAGE_INDEX_KEY, JSON.stringify([...list.filter((p) => p !== page), page]));
+    return JSON.parse(raw) as MushafPage;
+  } catch {
+    return null;
+  }
+}
+
+function pageList(): number[] {
+  try {
+    const raw = localStorage.getItem(PAGE_INDEX_KEY);
+    return raw ? (JSON.parse(raw) as number[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writePageCache(data: MushafPage) {
+  try {
+    localStorage.setItem(`tazkiya-quran-p${data.page}`, JSON.stringify(data));
+    let list = [...pageList().filter((p) => p !== data.page), data.page];
+    while (list.length > MAX_CACHED_PAGES) {
+      const oldest = list.shift();
+      if (oldest != null) localStorage.removeItem(`tazkiya-quran-p${oldest}`);
+    }
+    localStorage.setItem(PAGE_INDEX_KEY, JSON.stringify(list));
+  } catch {
+    /* simpan penuh — mushaf tetap jalan tanpa cache */
+  }
+}
+
+function isPageCacheValid(c: MushafPage | null, page: number): boolean {
+  try {
+    if (!c || c.page !== page || !Array.isArray(c.ayahs) || c.ayahs.length === 0) return false;
+    if (Date.now() - (c.fetchedAt ?? 0) > MAX_AGE_MS) return false;
+    return typeof c.ayahs[0]?.text === "string" && c.ayahs[0].text.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+/** Nomor halaman mushaf untuk satu ayat (1 permintaan ringan, dipakai untuk lompat surah). */
+export async function fetchAyahPage(surah: number, ayah: number): Promise<number | null> {
+  try {
+    const res = await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/quran-uthmani`);
+    if (!res.ok) return null;
+    const json = await res.json();
+    const d = Array.isArray(json?.data) ? json.data[0] : json?.data;
+    const p = d?.page;
+    return typeof p === "number" && p >= 1 && p <= 604 ? p : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Ambil satu halaman mushaf: utamakan cache, lalu jaringan; gagal total → offline. */
+export async function fetchMushafPage(page: number, force = false): Promise<MushafFetchResult> {
+  if (!Number.isInteger(page) || page < 1 || page > 604) {
+    return { ok: false, offline: false, message: "Nomor halaman mushaf tidak valid" };
+  }
+  if (!force) {
+    const cached = readPageCache(page);
+    if (cached && isPageCacheValid(cached, page)) return { ok: true, data: { ...cached, fromCache: true } };
+  }
+  try {
+    const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`);
+    if (!res.ok) return { ok: false, offline: false, message: `Server menjawab ${res.status}` };
+    const json = await res.json();
+    const ed = json?.data;
+    const list = Array.isArray(ed) ? ed[0]?.ayahs : ed?.ayahs;
+    if (json?.code !== 200 || !Array.isArray(list) || list.length === 0) {
+      return { ok: false, offline: false, message: "Format data halaman mushaf tidak dikenal" };
+    }
+    const ayahs: MushafAyah[] = list.map(
+      (a: { surah?: { number?: number }; numberInSurah?: number; number?: number; text?: string; juz?: number }) => ({
+        surah: a.surah?.number ?? 0,
+        numberInSurah: a.numberInSurah ?? 0,
+        global: a.number ?? 0,
+        text: (a.text ?? "").trim(),
+        juz: a.juz ?? 0,
+      })
+    );
+    const juzCounts = new Map<number, number>();
+    for (const a of ayahs) juzCounts.set(a.juz, (juzCounts.get(a.juz) ?? 0) + 1);
+    const juz = [...juzCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 1;
+    const data: MushafPage = { page, juz, ayahs, fetchedAt: Date.now() };
+    writePageCache(data);
+    return { ok: true, data };
+  } catch {
+    const cached = readPageCache(page);
+    if (cached && isPageCacheValid(cached, page)) return { ok: true, data: { ...cached, fromCache: true } };
+    return {
+      ok: false,
+      offline: true,
+      message: "Tidak dapat terhubung ke internet. Halaman mushaf ini belum tersimpan di perangkat.",
+    };
+  }
+}

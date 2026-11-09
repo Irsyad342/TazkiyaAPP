@@ -567,6 +567,72 @@ html[data-anim="off"] .animate-tk-pulse {
   font-family: var(--font-amiri), "Amiri Quran", Amiri, serif;
 }
 
+/* ---------- Kertas bacaan Al-Qur'an: PUTIH di kedua tema ----------
+   Area bacaan menyerupai kertas mushaf: latar putih permanen, teks Arab
+   hitam, terjemahan abu gelap. Tidak memakai token tema agar mode gelap
+   tidak pernah menggelapkan halaman bacaan. */
+.quran-paper {
+  background: #ffffff;
+  color: #111111;
+}
+.quran-paper .quran-translation {
+  color: #4a4a4a;
+}
+.quran-paper .quran-hint {
+  color: #8a8a8a;
+}
+.quran-paper .quran-hairline {
+  border-color: #e8e2da;
+}
+
+/* ---------- Mode Mushaf ---------- */
+.quran-mushaf {
+  direction: rtl;
+  font-family: var(--font-amiri), "Amiri Quran", Amiri, "Scheherazade New", serif;
+  text-align: justify;
+  text-align-last: center;
+  color: #000000;
+  word-spacing: 0.02em;
+}
+.quran-mushaf .quran-ayah-end {
+  font-family: var(--font-amiri), "Amiri Quran", Amiri, serif;
+  color: #b45309; /* emas tembaga penanda akhir ayat — gaya mushaf cetak */
+  white-space: nowrap;
+  font-size: 0.72em;
+}
+.quran-surah-band {
+  font-family: var(--font-amiri), "Amiri Quran", Amiri, serif;
+  background: #f8f3ec;
+  border: 1px solid #e5d9c9;
+  color: #111111;
+}
+.quran-page-medal {
+  font-family: var(--font-amiri), "Amiri Quran", Amiri, serif;
+  background: #f8f3ec;
+  border: 1px solid #e5d9c9;
+  color: #7a4a10;
+}
+.quran-juz-chip {
+  background: #f1f6ef;
+  border: 1px solid #dbe7d6;
+  color: #2f6b3f;
+}
+/* Panggung flip halaman: perspektif sekali di induk, anak berputar Y. */
+.mushaf-flip-stage {
+  perspective: 1600px;
+  transform-style: preserve-3d;
+}
+.mushaf-flip-sheet {
+  transform-style: preserve-3d;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mushaf-flip-sheet {
+    transition: none !important;
+  }
+}
+
 /* ---------- Hemat paint daftar panjang ---------- */
 .tk-list-cv > * {
   content-visibility: auto;
