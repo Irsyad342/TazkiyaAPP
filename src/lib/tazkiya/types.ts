@@ -243,6 +243,8 @@ export interface Settings {
   readerShowTranslation: boolean;
   /** Mode pembaca Al-Qur'an: "terjemahan" (kartu ayat) atau "mushaf" (halaman). */
   quranReadMode?: QuranReadMode;
+  /** Efek suara kertas saat halaman mushaf berhasil dibalik (default aktif). */
+  quranPageSound?: boolean;
   createdAt: string; // ISO, pertama kali memakai aplikasi
 }
 

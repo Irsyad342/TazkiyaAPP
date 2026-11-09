@@ -1561,3 +1561,48 @@ masing-masing mencatat sendiri saat unmount). QA lokal: kertas putih
 light+dark, seleksi ayat, bookmark, 3 jalur pencatatan, hapus permanen
 (refresh + logout→login, tombstone bertahan), 360px tanpa overflow,
 console bersih, reduced motion. Deploy & verifikasi production menyusul.
+
+## Task 64 — Al-Qur'an: Surah Based Digital Mushaf + realistic page turn + suara kertas (2026-11-09)
+Mushaf Mode diubah dari mushaf 604 halaman penuh menjadi SURAH BASED: hanya
+surah yang dibuka yang tampil, dipaginasi mengikuti nomor halaman mushaf
+Madinah resmi per ayat dari teks Utsmani Tanzil (field `page` API — sudah
+ada di fetchSurah, ter-cache offline). Ayat surah lain tidak pernah ikut;
+urutan asli; teruji Al-Waqiah 1–96 lengkap tanpa terlewat/terduplikasi
+(16+34+26+20 ayat pada 4 halaman, hlm 534–537), Ar-Rahman 4 hal (531–534),
+Al-Kausar 1 hal (602), Al-Baqarah 48 hal (2–49). Halaman terakhir surah =
+akhir bacaan (next disabled, tidak melanjutkan surah berikut). Penghitung
+internal "Halaman i dari n" + medalion nomor halaman mushaf asli + label
+"hlm mushaf N" — jujur membedakan paginasi internal vs mushaf cetak.
+Desain: kertas IVORY hangat (#fbf8f0) permanen di kedua tema (mode gelap
+tetap ivory, Arab hitam), bingkai ganda sangat halus, band nama surah +
+baris meta (Surah ke-N · tempat · jumlah ayat), basmalah terpisah di
+halaman 1 (kecuali Al-Fatihah/At-Taubah), label lanjutan ﴾ سُورَةُ ﴿ di
+halaman berikutnya, chip juz, penanda ayat tembaga — tanpa card di dalam
+kertas. Animasi: lembar dua muka 3D (depan = halaman asal ter-offset
+scrollTop, belakang = perkamen ivory berhias samar), rotateY pada jilid
+kanan mengikuti gestur (axis-lock, peta dx→0–170°), bayangan permukaan di
+sisi jilid + bayangan jatuh pada halaman di bawah (gradien + multiply,
+opacity ∝ sin sudut via motion values — hanya transform/opacity), easing
+natural commit 0.6s / batal 0.42s, lepas ≥24% lebar → balik. Mode hemat
+animasi = pergantian instan tanpa lembar. Suara: page-sound.ts menyintesis
+swish kertas via Web Audio (noise→bandpass sweep 480→2600→720 Hz, envelope
+dua gelombang, OfflineAudioContext render sekali) — tanpa aset eksternal,
+bebas lisensi, off-friendly; AudioContext dibuat malas dari gestur,
+sumber tunggal (tidak menumpuk), bunyi HANYA saat flip berhasil (swipe
+batal/lompat tanpa suara), volume 0.22; toggle "Suara halaman" di
+pengaturan pembaca (settings.quranPageSound, tersimpan+tersinkron,
+teruji persisten setelah reload). Navigasi: swipe dua arah, tombol
+prev/next (disabled di tepi surah), lompat halaman internal 1–n, pilih
+surah (langsung pindah surah, surah sama → halaman 1). Progres &
+penanda tetap SATU sistem: sesi mushaf mencatat halaman + rentang ayat
+yang benar-benar dikunjungi; pindah Terjemahan⇄Mushaf menyambung posisi
+(teruji: mushaf hlm internal 30 Baqarah → terjemahan ayat 197; pilih
+ayat 200 → mushaf halaman memuat 197–202). Perbaikan bawaan (bug lama
+terdeteksi saat QA): pelacak ayat mode terjemahan menghitung ayat yang
+hanya dilewati 120 ms sebelum lompatan posisi (entri "2:1-6" padahal
+dibuka di ayat 6) — kini pelacak baru aktif SETELAH guliran pertama
+(scrolledOnceRef, deterministik via event scroll) + reset ref sesi saat
+surah/ayat awal berubah; teruji: buka-tutup di posisi = tanpa entri
+hantu, buka di ayat 6 + scroll = tercatat "2:6-8". Uji unit paginasi
+scripts/test-mushaf-pages.ts 5/5 lulus. Build produksi lulus. Deploy &
+verifikasi production menyusul.

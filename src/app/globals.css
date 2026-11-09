@@ -567,12 +567,12 @@ html[data-anim="off"] .animate-tk-pulse {
   font-family: var(--font-amiri), "Amiri Quran", Amiri, serif;
 }
 
-/* ---------- Kertas bacaan Al-Qur'an: PUTIH di kedua tema ----------
-   Area bacaan menyerupai kertas mushaf: latar putih permanen, teks Arab
-   hitam, terjemahan abu gelap. Tidak memakai token tema agar mode gelap
-   tidak pernah menggelapkan halaman bacaan. */
+/* ---------- Kertas bacaan Al-Qur'an: IVORY hangat di kedua tema ----------
+   Area bacaan menyerupai kertas mushaf cetak: latar ivory permanen, teks
+   Arab hitam, terjemahan abu gelap. Tidak memakai token tema agar mode
+   gelap tidak pernah menggelapkan halaman bacaan. */
 .quran-paper {
-  background: #ffffff;
+  background: #fbf8f0;
   color: #111111;
 }
 .quran-paper .quran-translation {
@@ -582,7 +582,7 @@ html[data-anim="off"] .animate-tk-pulse {
   color: #8a8a8a;
 }
 .quran-paper .quran-hairline {
-  border-color: #e8e2da;
+  border-color: #e9e1d2;
 }
 
 /* ---------- Mode Mushaf ---------- */
@@ -617,18 +617,75 @@ html[data-anim="off"] .animate-tk-pulse {
   border: 1px solid #dbe7d6;
   color: #2f6b3f;
 }
-/* Panggung flip halaman: perspektif sekali di induk, anak berputar Y. */
-.mushaf-flip-stage {
-  perspective: 1600px;
+/* ---------- Panggung & lembar balik halaman (paper page turn 3D) ----------
+   Perspektif sekali di induk; lembar dua muka berputar pada jilid kanan
+   (mushaf RTL). Hanya transform + opacity — ringan untuk Android kelas
+   menengah. Bayangan memakai gradien murni, tanpa filter berat. */
+.mushaf-stage {
+  perspective: 1900px;
   transform-style: preserve-3d;
 }
-.mushaf-flip-sheet {
+.mushaf-grab {
+  cursor: grab;
+}
+.mushaf-leaf {
   transform-style: preserve-3d;
-  will-change: transform;
+  z-index: 20;
+}
+.mushaf-face {
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+.mushaf-face-back {
+  transform: rotateY(180deg);
+}
+/* Perkamen: sisi belakang lembar — ivory sama, hiasan samar di tengah. */
+.mushaf-verso {
+  background: #fbf8f0;
+}
+.mushaf-verso-orn {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(176, 141, 87, 0.1) 0%, rgba(176, 141, 87, 0.04) 26%, transparent 42%),
+    linear-gradient(to left, rgba(120, 95, 55, 0.07), rgba(120, 95, 55, 0) 34px);
+}
+/* Bayangan permukaan lembar di sisi jilid (mengikuti sudut via opacity). */
+.mushaf-leaf-shade {
+  background: linear-gradient(to left, rgba(72, 54, 22, 0.85), rgba(72, 54, 22, 0.28) 34%, transparent 62%);
+  mix-blend-mode: multiply;
+}
+/* Bayangan lembar jatuh ke halaman di bawahnya (dekat jilid). */
+.mushaf-cast-shadow {
+  background: linear-gradient(to left, rgba(60, 44, 18, 0.9), rgba(60, 44, 18, 0.25) 45%, transparent 78%);
+  mix-blend-mode: multiply;
+  border-radius: 1rem;
+}
+/* Bayangan jilid statis halus di setiap kertas. */
+.quran-paper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(to left, rgba(120, 95, 55, 0.055), rgba(120, 95, 55, 0) 26px);
+}
+/* Bingkai ganda sangat halus khas tepi halaman mushaf. */
+.mushaf-frame {
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgba(167, 143, 101, 0.32);
+  border-radius: 0.85rem;
+  pointer-events: none;
+}
+.mushaf-frame::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(167, 143, 101, 0.16);
+  border-radius: 0.65rem;
 }
 @media (prefers-reduced-motion: reduce) {
-  .mushaf-flip-sheet {
+  .mushaf-leaf {
     transition: none !important;
   }
 }

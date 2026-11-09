@@ -249,6 +249,40 @@ export async function fetchSurah(n: number, force = false): Promise<SurahFetchRe
   }
 }
 
+/* ---------------- Mushaf berbasis surah ---------------- */
+
+/** Satu halaman mushaf milik satu surah: ayat-ayat surah itu yang berada
+ * pada halaman mushaf Madinah ke-`page` (pengelompokan memakai nomor
+ * halaman resmi Tanzil per ayat — tanpa ayat surah lain). */
+export interface MushafSurahPage {
+  page: number; // nomor halaman mushaf Madinah
+  juz: number; // juz ayat pertama pada halaman ini
+  ayahs: { numberInSurah: number; text: string }[];
+}
+
+/**
+ * Pecah ayat-ayat satu surah menjadi halaman-halaman mushaf mengikuti
+ * nomor halaman per ayat dari teks Utsmani Tanzil. Hasilnya hanya memuat
+ * ayat surah tersebut (halaman bersama surah lain tetap ditampilkan
+ * sebagai bagian surah ini saja), urutan ayat asli, tanpa duplikasi.
+ */
+export function paginateSurahForMushaf(data: SurahData): MushafSurahPage[] {
+  const pages: MushafSurahPage[] = [];
+  let lastPage = 0;
+  for (const a of data.ayahs) {
+    // Guard: nomor halaman harus monoton naik; 0/ mundur → ikut halaman sebelumnya.
+    const page = a.page > lastPage ? a.page : lastPage || 1;
+    lastPage = page;
+    const last = pages[pages.length - 1];
+    if (last && last.page === page) {
+      last.ayahs.push({ numberInSurah: a.number, text: a.text });
+    } else {
+      pages.push({ page, juz: a.juz || last?.juz || 1, ayahs: [{ numberInSurah: a.number, text: a.text }] });
+    }
+  }
+  return pages;
+}
+
 /* ---------------- Util pencarian ---------------- */
 
 /** Normalisasi teks Arab untuk pencarian (lepas harakat, samakan alef/yaa/taa). */

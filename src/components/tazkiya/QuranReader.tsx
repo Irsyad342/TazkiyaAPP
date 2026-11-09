@@ -75,6 +75,11 @@ function TranslationView({
   const ayahRefs = useRef(new Map<number, HTMLDivElement>());
   const lastReadRef = useRef(startAyah);
   const lastSavedRef = useRef<{ surah: number; ayah: number } | null>(null);
+  /** Pelacak ayat baru aktif SETELAH guliran pertama: saat dibuka di posisi
+   *  lompat (startAyah > 1), ayat yang terlihat sekilas di puncak halaman
+   *  sebelum lompatan tidak dihitung sebagai "terbaca". Deterministik —
+   *  digerakkan event scroll, bukan timing. */
+  const scrolledOnceRef = useRef(startAyah <= 1);
 
   // ---- Sesi bacaan otomatis: ayat awal → akhir yang benar-benar terbaca ----
   const sessionStart = Math.max(1, startAyah);
@@ -88,6 +93,19 @@ function TranslationView({
   useEffect(() => {
     dataRef.current = data;
   }, [data]);
+
+  // Sesi baru setiap kali surah/ayat awal berubah — ref pelacak di-reset agar
+  // rentang yang dicatat selalu dimulai dari posisi pembukaan sesi ini.
+  useEffect(() => {
+    const s = Math.max(1, startAyah);
+    scrolledOnceRef.current = startAyah <= 1;
+    minSeenRef.current = s;
+    maxSeenRef.current = s;
+    lastReadRef.current = s;
+    recordedRef.current = false;
+    sessionStartAt.current = Date.now();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [surah, startAyah]);
 
   const bookmarkSet = useMemo(() => {
     const s = new Set<number>();
@@ -126,6 +144,18 @@ function TranslationView({
       return () => clearTimeout(t);
     }
   }, [data, startAyah]);
+
+  // Guliran pertama (dari lompatan maupun pengguna) membuka pelacak ayat.
+  useEffect(() => {
+    if (!data) return;
+    const root = scrollRef.current;
+    if (!root) return;
+    const onScroll = () => {
+      scrolledOnceRef.current = true;
+    };
+    root.addEventListener("scroll", onScroll, { passive: true, once: true });
+    return () => root.removeEventListener("scroll", onScroll);
+  }, [data]);
 
   const commitLastRead = useCallback(() => {
     const ayah = lastReadRef.current;
@@ -198,6 +228,7 @@ function TranslationView({
     if (!root) return;
     const observer = new IntersectionObserver(
       (entries) => {
+        if (!scrolledOnceRef.current) return; // belum ada guliran sama sekali
         let top: number | null = null;
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
@@ -363,6 +394,7 @@ export function QuranReader({
 
   const animated = settings.animations;
   const mode = settings.quranReadMode ?? "terjemahan";
+  const pageSound = settings.quranPageSound ?? true;
 
   const [activeSurah, setActiveSurah] = useState(surah);
   const [activeStartAyah, setActiveStartAyah] = useState(Math.max(1, startAyah ?? 1));
@@ -381,6 +413,13 @@ export function QuranReader({
   const handleMushafPosition = useCallback((pos: MushafPosition) => {
     posRef.current = { surah: pos.surah, ayah: pos.ayah };
     setMushafPos(pos);
+  }, []);
+
+  /** Dari mushaf: pindah membaca surah lain (mushaf tetap mode surah). */
+  const jumpSurahFromMushaf = useCallback((target: number) => {
+    setActiveSurah(target);
+    setActiveStartAyah(1);
+    setStatusAyah(null);
   }, []);
 
   const switchMode = (next: "terjemahan" | "mushaf") => {
@@ -425,10 +464,10 @@ export function QuranReader({
                   Mode Mushaf
                   {mushafPos ? <span className="quran-arabic ml-2 text-[14px] font-normal text-tk-violet dark:text-tk-accent">{getSurah(mushafPos.surah)?.arabic}</span> : null}
                 </p>
-                <p className="text-[10.5px] text-tk-muted">
+                <p className="truncate text-[10.5px] text-tk-muted">
                   {mushafPos
-                    ? `Halaman ${mushafPos.page} dari 604 · Juz ${mushafPos.juz}${mushafPos.surahsOnPage.length > 1 ? ` · ${mushafPos.surahsOnPage.length} surah` : ""}`
-                    : "Membuka halaman…"}
+                    ? `Surah ${getSurah(mushafPos.surah)?.latin ?? ""} · Halaman ${mushafPos.index + 1} dari ${mushafPos.total} · Juz ${mushafPos.juz}`
+                    : "Menyiapkan mushaf…"}
                 </p>
               </>
             ) : (
@@ -583,11 +622,37 @@ export function QuranReader({
                 </p>
               </>
             ) : (
-              <p className="text-[10.5px] leading-relaxed text-tk-muted">
-                Halaman mushaf (Utsmani, 604 halaman) dari AlQuran Cloud. Geser kiri/kanan untuk membalik halaman,
-                pilih surah atau lompat halaman dari bilah navigasi. Progres dicatat dari halaman yang benar-benar
-                kamu buka saat sesi berakhir.
-              </p>
+              <>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-tk-muted">
+                    <Type size={12} /> Suara halaman
+                  </p>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={pageSound}
+                    onClick={() => updateSettings({ quranPageSound: !pageSound })}
+                    className={cn(
+                      "tap relative h-6 w-11 rounded-full border transition-colors",
+                      pageSound ? "border-tk-violet/60 bg-tk-violet" : "border-tk-line bg-tk-panel-soft"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "absolute top-0.5 rounded-full bg-white shadow transition-all",
+                        pageSound ? "left-[22px]" : "left-0.5"
+                      )}
+                      style={{ height: 18, width: 18 }}
+                    />
+                  </button>
+                </div>
+                <p className="text-[10.5px] leading-relaxed text-tk-muted">
+                  Mushaf berbasis surah: hanya surah yang sedang dibuka, dipaginasi mengikuti halaman mushaf Madinah
+                  (Utsmani, Tanzil) tanpa ayat surah lain. Geser kanan/kiri untuk membalik halaman dengan animasi
+                  kertas 3D; suara lembut berbunyi saat halaman berhasil dibalik dan bisa dimatikan di atas. Progres
+                  dan penanda tercatat dari halaman yang benar-benar kamu buka saat sesi berakhir.
+                </p>
+              </>
             )}
           </div>
         ) : null}
@@ -597,11 +662,13 @@ export function QuranReader({
       {mode === "mushaf" ? (
         <MushafView
           key={`mushaf-${activeSurah}-${activeStartAyah}`}
-          targetSurah={activeSurah}
-          targetAyah={activeStartAyah}
+          surah={activeSurah}
+          startAyah={activeStartAyah}
           animated={animated}
           arabicSize={settings.readerArabicSize}
+          pageSound={pageSound}
           onPosition={handleMushafPosition}
+          onJumpSurah={jumpSurahFromMushaf}
         />
       ) : (
         <TranslationView
@@ -620,8 +687,14 @@ export function QuranReader({
           {mode === "mushaf" ? (
             <>
               <p className="tnum text-[11px] font-semibold text-tk-muted">
-                Halaman <span className="font-bold text-tk-ink">{mushafPos?.page ?? "–"}</span> dari 604
-                {mushafPos ? <span> · Juz {mushafPos.juz}</span> : null}
+                {mushafPos ? (
+                  <>
+                    Halaman <span className="font-bold text-tk-ink">{mushafPos.index + 1}</span> dari {mushafPos.total} · hlm mushaf{" "}
+                    <span className="font-bold text-tk-ink">{mushafPos.page}</span>
+                  </>
+                ) : (
+                  "Menyiapkan mushaf…"
+                )}
               </p>
               <p className="truncate text-[10px] text-tk-muted/80">Progres halaman tercatat otomatis saat ditutup</p>
             </>
