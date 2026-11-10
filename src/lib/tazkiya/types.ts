@@ -293,6 +293,8 @@ export interface Settings {
   quranReadMode?: QuranReadMode;
   /** Efek suara kertas saat halaman mushaf berhasil dibalik (default aktif). */
   quranPageSound?: boolean;
+  /** Tampilkan terjemahan di bawah ayat pada Mode Mushaf (default nonaktif). */
+  quranMushafTranslation?: boolean;
   /** Pengingat layar penuh saat masuk waktu salat (default aktif). */
   fullscreenReminder?: boolean;
   /** Notifikasi sistem saat aplikasi di latar/tersembunyi (default nonaktif; butuh izin). */
@@ -494,6 +496,7 @@ export function createDefaultSettings(): Settings {
     readerShowTranslation: true,
     quranReadMode: "terjemahan",
     quranPageSound: true,
+    quranMushafTranslation: false,
     fullscreenReminder: true,
     reminderNotify: false,
     createdAt: new Date().toISOString(),

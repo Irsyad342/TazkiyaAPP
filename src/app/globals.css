@@ -554,6 +554,19 @@ html[data-anim="off"] .animate-tk-pulse {
   }
 }
 
+/* ---------- Font resmi Mushaf Standar Indonesia ----------
+   LPMQ Isep Misbah — font resmi LPMQ Kementerian Agama RI untuk MSI
+   (dirilis gratis oleh Kemenag RI). Diunduh browser hanya saat karakter
+   Arab tampil (unicode-range). */
+@font-face {
+  font-family: "LPMQ Isep Misbah";
+  src: url("/fonts/LPMQ-Isep-Misbah.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
+}
+
 /* ---------- Tipografi Arab (Amiri Quran) ---------- */
 .quran-arabic {
   font-feature-settings: normal;
@@ -585,29 +598,35 @@ html[data-anim="off"] .animate-tk-pulse {
   border-color: #e9e1d2;
 }
 
-/* ---------- Mode Mushaf ---------- */
+/* ---------- Mode Mushaf — teks MUSHAF STANDAR INDONESIA ----------
+   Teks MSI (Kemenag RI) dirender dengan LPMQ Isep Misbah, font resmi LPMQ
+   untuk Mushaf Standar Indonesia. Amiri Quran hanya fallback aksara. */
 .quran-mushaf {
   direction: rtl;
-  font-family: var(--font-amiri), "Amiri Quran", Amiri, "Scheherazade New", serif;
+  font-family: "LPMQ Isep Misbah", var(--font-amiri), "Amiri Quran", Amiri, "Scheherazade New", serif;
   text-align: justify;
   text-align-last: center;
   color: #000000;
   word-spacing: 0.02em;
 }
 .quran-mushaf .quran-ayah-end {
-  font-family: var(--font-amiri), "Amiri Quran", Amiri, serif;
+  font-family: "LPMQ Isep Misbah", var(--font-amiri), "Amiri Quran", Amiri, serif;
   color: #b45309; /* emas tembaga penanda akhir ayat — gaya mushaf cetak */
   white-space: nowrap;
   font-size: 0.72em;
 }
+.quran-mushaf .quran-bismillah,
+.quran-mushaf .quran-surah-band,
+.quran-mushaf .quran-arabic,
+.quran-page-medal {
+  font-family: "LPMQ Isep Misbah", var(--font-amiri), "Amiri Quran", Amiri, serif;
+}
 .quran-surah-band {
-  font-family: var(--font-amiri), "Amiri Quran", Amiri, serif;
   background: #f8f3ec;
   border: 1px solid #e5d9c9;
   color: #111111;
 }
 .quran-page-medal {
-  font-family: var(--font-amiri), "Amiri Quran", Amiri, serif;
   background: #f8f3ec;
   border: 1px solid #e5d9c9;
   color: #7a4a10;
@@ -631,6 +650,11 @@ html[data-anim="off"] .animate-tk-pulse {
 .mushaf-leaf {
   transform-style: preserve-3d;
   z-index: 20;
+}
+/* Pembungkus antara panggung (perspektif) dan lembar — wajib preserve-3d
+   agar rotasi lembar tetap memakai perspektif panggung. */
+.mushaf-3d {
+  transform-style: preserve-3d;
 }
 .mushaf-face {
   backface-visibility: hidden;
@@ -684,7 +708,52 @@ html[data-anim="off"] .animate-tk-pulse {
   border: 1px solid rgba(167, 143, 101, 0.16);
   border-radius: 0.65rem;
 }
+/* Terjemahan di bawah ayat (Mode Mushaf, opsional): struktur ayat berubah
+   halus dari alur justify murni menjadi blok ayat + terjemahan. */
+.msi-ayah-wrap {
+  display: inline;
+}
+.quran-mushaf[data-tr="1"] .msi-ayah-wrap {
+  display: block;
+  margin-bottom: 0.55em;
+}
+.msi-translation {
+  display: block;
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+  color: #4a4a4a;
+  background: #f7f4ef;
+  border-radius: 0.7rem;
+  margin-top: 0.5em;
+  padding: 0.45em 0.8em;
+  line-height: 1.55;
+}
+
+/* ---------- Intro pembuka mushaf (SUIO Mushaf Opening Experience) ----------
+   Sampul buku membuka 3D di atas panggung; murni transform + opacity. */
+.mushaf-intro {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  perspective: 1700px;
+  background: var(--color-tk-stage, #0f0e0c);
+}
+.mushaf-intro-cover {
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.mushaf-intro-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .mushaf-intro-cover,
   .mushaf-leaf {
     transition: none !important;
   }

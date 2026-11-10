@@ -34,6 +34,7 @@ import { fetchSurah, getSurah, type SurahData } from "@/lib/tazkiya/quran";
 import { todayKey } from "@/lib/tazkiya/dates";
 import { cn } from "@/lib/utils";
 import { MushafView, type MushafPosition } from "./QuranMushaf";
+import { MushafIntro } from "./MushafIntro";
 
 const LINE_HEIGHTS = [1.7, 1.9, 2.2];
 
@@ -401,6 +402,9 @@ export function QuranReader({
   const [statusAyah, setStatusAyah] = useState<number | null>(null);
   const [mushafPos, setMushafPos] = useState<MushafPosition | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  /** SUIO Mushaf Opening Experience: intro pembuka tiap kali masuk Mushaf Mode
+   *  (buka awal di mode mushaf, atau berpindah dari mode terjemahan). */
+  const [mushafIntro, setMushafIntro] = useState(mode === "mushaf");
 
   // Posisi terakhir per mode — dipakai tombol penanda.
   const posRef = useRef<ReaderPosition>({ surah, ayah: Math.max(1, startAyah ?? 1) });
@@ -431,7 +435,10 @@ export function QuranReader({
       setActiveStartAyah(Math.max(1, mushafPos.ayah));
       setStatusAyah(null);
     }
-    if (next === "mushaf") setStatusAyah(null);
+    if (next === "mushaf") {
+      setStatusAyah(null);
+      setMushafIntro(true);
+    }
   };
 
   const lhIdx = Math.max(0, LINE_HEIGHTS.indexOf(settings.readerLineHeight));
@@ -446,7 +453,9 @@ export function QuranReader({
       role="dialog"
       aria-label={`Pembaca ${mode === "mushaf" ? "mushaf" : `surah ${meta?.latin ?? ""}`}`}
     >
-      {/* ---------- Kepala pembaca + saklar mode ---------- */}
+      {/* ---------- Kepala pembaca + saklar mode (HANYA mode terjemahan;
+          Mushaf Mode sepenuhnya imersif tanpa header) ---------- */}
+      {mode === "terjemahan" ? (
       <header className="glass-strong relative z-20 rounded-none border-0 border-b border-tk-line px-3 pb-2.5 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <div className="mx-auto flex max-w-[760px] items-center gap-2">
           <button
@@ -458,29 +467,13 @@ export function QuranReader({
             <X size={18} />
           </button>
           <div className="min-w-0 flex-1 text-center">
-            {mode === "mushaf" ? (
-              <>
-                <p className="truncate font-display text-[15px] font-bold leading-tight tracking-[-0.01em] text-tk-ink">
-                  Mode Mushaf
-                  {mushafPos ? <span className="quran-arabic ml-2 text-[14px] font-normal text-tk-violet dark:text-tk-accent">{getSurah(mushafPos.surah)?.arabic}</span> : null}
-                </p>
-                <p className="truncate text-[10.5px] text-tk-muted">
-                  {mushafPos
-                    ? `Surah ${getSurah(mushafPos.surah)?.latin ?? ""} · Halaman ${mushafPos.index + 1} dari ${mushafPos.total} · Juz ${mushafPos.juz}`
-                    : "Menyiapkan mushaf…"}
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="truncate font-display text-[15px] font-bold leading-tight tracking-[-0.01em] text-tk-ink">
-                  {meta?.latin}
-                  {settings.showArabic ? <span className="quran-arabic ml-2 text-[15px] font-normal text-tk-violet dark:text-tk-accent">{meta?.arabic}</span> : null}
-                </p>
-                <p className="text-[10.5px] text-tk-muted">
-                  Surah {activeSurah} · {meta?.verses} ayat · {meta?.place}
-                </p>
-              </>
-            )}
+            <p className="truncate font-display text-[15px] font-bold leading-tight tracking-[-0.01em] text-tk-ink">
+              {meta?.latin}
+              {settings.showArabic ? <span className="quran-arabic ml-2 text-[15px] font-normal text-tk-violet dark:text-tk-accent">{meta?.arabic}</span> : null}
+            </p>
+            <p className="text-[10.5px] text-tk-muted">
+              Surah {activeSurah} · {meta?.verses} ayat · {meta?.place}
+            </p>
           </div>
           <button
             type="button"
@@ -657,6 +650,7 @@ export function QuranReader({
           </div>
         ) : null}
       </header>
+      ) : null}
 
       {/* ---------- Isi sesuai mode ---------- */}
       {mode === "mushaf" ? (
@@ -669,6 +663,8 @@ export function QuranReader({
           pageSound={pageSound}
           onPosition={handleMushafPosition}
           onJumpSurah={jumpSurahFromMushaf}
+          onExit={onClose}
+          onSwitchToTranslation={() => switchMode("terjemahan")}
         />
       ) : (
         <TranslationView
@@ -680,40 +676,33 @@ export function QuranReader({
           onPosition={handleTransPosition}
         />
       )}
-
-      {/* ---------- Bilah status posisi baca ---------- */}
-      <div className="glass-strong relative z-20 rounded-none border-0 border-t border-tk-line px-4 pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2">
-        <div className="mx-auto flex max-w-[760px] items-center justify-between gap-3">
-          {mode === "mushaf" ? (
-            <>
-              <p className="tnum text-[11px] font-semibold text-tk-muted">
-                {mushafPos ? (
-                  <>
-                    Halaman <span className="font-bold text-tk-ink">{mushafPos.index + 1}</span> dari {mushafPos.total} · hlm mushaf{" "}
-                    <span className="font-bold text-tk-ink">{mushafPos.page}</span>
-                  </>
-                ) : (
-                  "Menyiapkan mushaf…"
-                )}
-              </p>
-              <p className="truncate text-[10px] text-tk-muted/80">Progres halaman tercatat otomatis saat ditutup</p>
-            </>
-          ) : (
-            <>
-              <p className="tnum text-[11px] font-semibold text-tk-muted">
-                {statusAyah ? (
-                  <>
-                    Ayat <span className="font-bold text-tk-ink">{statusAyah}</span> dipilih · dari {meta?.verses ?? "0"}
-                  </>
-                ) : (
-                  <>Ketuk ayat untuk memilih · {meta?.verses ?? "0"} ayat</>
-                )}
-              </p>
-              <p className="truncate text-[10px] text-tk-muted/80">Progres bacaan tercatat otomatis saat ditutup</p>
-            </>
-          )}
+      {/* ---------- Bilah status posisi baca (HANYA mode terjemahan) ---------- */}
+      {mode === "terjemahan" ? (
+        <div className="glass-strong relative z-20 rounded-none border-0 border-t border-tk-line px-4 pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2">
+          <div className="mx-auto flex max-w-[760px] items-center justify-between gap-3">
+            <p className="tnum text-[11px] font-semibold text-tk-muted">
+              {statusAyah ? (
+                <>
+                  Ayat <span className="font-bold text-tk-ink">{statusAyah}</span> dipilih · dari {meta?.verses ?? "0"}
+                </>
+              ) : (
+                <>Ketuk ayat untuk memilih · {meta?.verses ?? "0"} ayat</>
+              )}
+            </p>
+            <p className="truncate text-[10px] text-tk-muted/80">Progres bacaan tercatat otomatis saat ditutup</p>
+          </div>
         </div>
-      </div>
+      ) : null}
+
+      {/* ---------- SUIO Mushaf Opening Experience (mushaf saja) ---------- */}
+      {mushafIntro && mode === "mushaf" ? (
+        <MushafIntro
+          surahName={meta?.latin ?? ""}
+          animated={animated}
+          pageSound={pageSound}
+          onDone={() => setMushafIntro(false)}
+        />
+      ) : null}
     </m.div>
   );
 }
