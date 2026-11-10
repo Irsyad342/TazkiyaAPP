@@ -49,6 +49,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { requestNotifyPermission } from "@/lib/tazkiya/reminder-trigger";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -832,6 +833,23 @@ export function ProfilePage({
                   aria-label="Aktifkan pengingat"
                 />
               </div>
+              {/* Pengingat layar penuh (fullscreen reminder) — tampilan imersif
+                  saat waktu salat masuk dan aplikasi sedang terbuka. Default AKTIF. */}
+              <div className="mt-2.5 flex items-center justify-between rounded-xl bg-tk-panel px-3.5 py-3">
+                <div>
+                  <p className="text-[13.5px] font-semibold text-tk-ink">Pengingat layar penuh</p>
+                  <p className="text-[11px] text-tk-muted">Tampilan imersif saat waktu salat masuk dan aplikasi terbuka</p>
+                </div>
+                <Switch
+                  checked={settings.fullscreenReminder !== false}
+                  onCheckedChange={(v) => {
+                    updateSettings({ fullscreenReminder: v });
+                    if (v) void requestNotifyPermission();
+                    toast.info(v ? "Pengingat layar penuh diaktifkan" : "Pengingat layar penuh dimatikan");
+                  }}
+                  aria-label="Pengingat layar penuh"
+                />
+              </div>
               <div className={cn("mt-2.5 space-y-2 transition-opacity", !settings.remindersEnabled && "pointer-events-none opacity-40")}>
                 {autoTimes ? (
                   <p className="flex items-start gap-1.5 rounded-xl bg-tk-lavender px-3 py-2 text-[11px] leading-relaxed text-tk-violet">
@@ -878,8 +896,8 @@ export function ProfilePage({
               </div>
               <p className="mt-2.5 flex items-start gap-1.5 text-[10.5px] leading-relaxed text-tk-muted/85">
                 <Info size={12} className="mt-0.5 shrink-0" />
-                Pengingat baru tersimpan sebagai preferensi di perangkat ini. Notifikasi sistem (alarm/berbunyi) belum
-                aktif pada versi prototipe.
+                Saat aplikasi terbuka, pengingat tampil layar penuh; saat di latar, lewat notifikasi sistem bila izin
+                diberikan (diminta otomatis saat pengingat layar penuh diaktifkan). Preferensi tersimpan di perangkat ini.
               </p>
             </div>
           ) : null}

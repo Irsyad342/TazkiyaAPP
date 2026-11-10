@@ -37,6 +37,7 @@ import { TasbihFullscreen } from "@/components/tazkiya/TasbihFullscreen";
 import { TargetSheet } from "@/components/tazkiya/TargetSheet";
 import { PrayerReminder } from "@/components/tazkiya/PrayerReminder";
 import { usePrayerReminder } from "@/lib/tazkiya/reminder-trigger";
+import type { PrayerId } from "@/lib/tazkiya/types";
 
 /*
  * Pembaca Al-Qur'an dimuat terpisah (lazy) — hanya diunduh saat pengguna
@@ -262,6 +263,22 @@ export default function Page() {
     setSubpage(null);
     setTab("sholat");
   }, [dismiss]);
+  /*
+   * "Catat Salat" dari pengingat → mekanisme pencatatan EXISTING: menuju
+   * halaman Sholat lalu membuka dialog pencatatan untuk salat yang bersangkutan.
+   * Status tetap dipilih pengguna di dialog (tidak dianggap selesai otomatis).
+   * ID dikonsumsi PrayerPage lewat onAutoRecordDone agar tidak terbuka ulang.
+   */
+  const [recordFromReminder, setRecordFromReminder] = useState<PrayerId | null>(null);
+  const goRecordFromReminder = useCallback(
+    (prayer: PrayerId) => {
+      dismiss();
+      setSubpage(null);
+      setTab("sholat");
+      setRecordFromReminder(prayer);
+    },
+    [dismiss]
+  );
 
   if (!hydrated || !onboarded) {
     return (
@@ -318,7 +335,9 @@ export default function Page() {
                   />
                 )}
                 {subpage === null && tab === "quran" && <QuranPage onOpenReader={openReader} />}
-                {subpage === null && tab === "sholat" && <PrayerPage />}
+                {subpage === null && tab === "sholat" && (
+                  <PrayerPage autoRecord={recordFromReminder} onAutoRecordDone={() => setRecordFromReminder(null)} />
+                )}
                 {subpage === null && tab === "progress" && <ProgressPage deferredForReminder={!!reminder} />}
                 {subpage === null && tab === "profil" && <ProfilePage onOpenTargets={openTargets} onGoTracker={goTracker} />}
 
@@ -349,10 +368,10 @@ export default function Page() {
               key={`${reminder.prayer}-${reminder.time}`}
               prayer={reminder.prayer}
               time={reminder.time}
-              message={reminder.message}
+              next={reminder.next}
               onClose={closeReminder}
               onGoSchedule={goScheduleFromReminder}
-              onGoRecord={goScheduleFromReminder}
+              onGoRecord={() => goRecordFromReminder(reminder.prayer)}
             />
           ) : null}
         </AnimatePresence>

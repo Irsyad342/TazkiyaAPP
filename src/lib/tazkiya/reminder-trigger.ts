@@ -36,8 +36,10 @@ export interface ActivePrayerReminder {
   prayer: PrayerId;
   /** Waktu masuk "HH:MM" sesuai jadwal efektif. */
   time: string;
-  /** Pesan pengingat sesuai salat. */
+  /** Pesan pengingat sesuai salat (notifikasi sistem & fallback). */
   message: string;
+  /** Salat berikutnya untuk chip informasi ("Menuju Isya 19:05"). */
+  next?: { id: PrayerId; time: string; tomorrow?: boolean };
 }
 
 /** Pesan pengingat per salat (satu sumber untuk overlay & notifikasi). */
@@ -147,6 +149,7 @@ export function usePrayerReminder(homeVisible: boolean): {
         prayer: current,
         time: times[current].time,
         message: reminderMessage(current),
+        next: { id: state.next, time: state.nextTime, tomorrow: state.tomorrow },
       };
 
       if (typeof document !== "undefined" && document.visibilityState === "hidden") {

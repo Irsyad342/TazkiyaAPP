@@ -1379,3 +1379,76 @@ html[data-anim="off"] .tk-cloud {
     animation: none !important;
   }
 }
+
+/* ---------- Pengingat Salat V2: lanskap atmosferik berlapis ----------
+   Lanjutan sistem di atas: napas cahaya, rotasi sinar, awan mengapung,
+   partikel debu cahaya, kilau pantulan air, dan burung yang melintas.
+   Prinsip sama: HANYA transform & opacity, durasi sangat panjang agar
+   terasa seperti atmosfer (bukan animasi), dan berhenti total saat
+   setelan animasi mati / reduced-motion / overlay ditutup. */
+@keyframes pr-breathe {
+  0%, 100% { opacity: 0.82; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.045); }
+}
+.pr-breathe {
+  animation: pr-breathe 9s ease-in-out infinite;
+}
+/* Serif display khusus headline pengingat (Fraunces via --font-pr). */
+.pr-serif {
+  font-family: var(--font-pr), Georgia, "Times New Roman", serif;
+}
+@keyframes pr-rays-spin {
+  to { transform: rotate(360deg); }
+}
+.pr-rays {
+  animation: pr-rays-spin 140s linear infinite;
+}
+@keyframes pr-drift {
+  0% { transform: translate3d(-26px, 0, 0); }
+  100% { transform: translate3d(34px, 0, 0); }
+}
+.pr-cloud {
+  animation: pr-drift var(--pr-dur, 56s) ease-in-out infinite alternate;
+}
+@keyframes pr-mote {
+  0% { transform: translate3d(0, 8px, 0); opacity: 0; }
+  25% { opacity: var(--pr-op, 0.7); }
+  75% { opacity: var(--pr-op, 0.7); }
+  100% { transform: translate3d(0, -30px, 0); opacity: 0; }
+}
+.pr-mote {
+  animation: pr-mote var(--pr-dur, 14s) ease-in-out infinite;
+}
+@keyframes pr-glint {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.75; }
+}
+.pr-glint {
+  animation: pr-glint 6.5s ease-in-out infinite;
+}
+@keyframes pr-bird {
+  0% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(30px, -12px, 0); }
+  100% { transform: translate3d(60px, -4px, 0); }
+}
+.pr-bird {
+  animation: pr-bird var(--pr-dur, 38s) ease-in-out infinite alternate;
+}
+html[data-anim="off"] .pr-breathe,
+html[data-anim="off"] .pr-rays,
+html[data-anim="off"] .pr-cloud,
+html[data-anim="off"] .pr-mote,
+html[data-anim="off"] .pr-glint,
+html[data-anim="off"] .pr-bird {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html .pr-breathe,
+  html .pr-rays,
+  html .pr-cloud,
+  html .pr-mote,
+  html .pr-glint,
+  html .pr-bird {
+    animation: none !important;
+  }
+}

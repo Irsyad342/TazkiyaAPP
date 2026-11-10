@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import { Amiri_Quran } from "next/font/google";
+import { Amiri_Quran, Fraunces } from "next/font/google";
 import "./globals.css";
 
 /*
@@ -31,6 +31,20 @@ const amiriQuran = Amiri_Quran({
   variable: "--font-amiri",
   subsets: ["arabic"],
   weight: "400",
+  display: "swap",
+  preload: false,
+});
+
+/*
+ * Fraunces — serif display elegan KHUSUS headline Pengingat Salat layar
+ * penuh (identitas visual atmosferik). preload: false → tidak memengaruhi
+ * buka pertama aplikasi; hanya terunduh saat reminder dirender.
+ */
+const fraunces = Fraunces({
+  variable: "--font-pr",
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  style: ["normal", "italic"],
   display: "swap",
   preload: false,
 });
@@ -77,7 +91,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body
-        className={`${generalSans.variable} ${amiriQuran.variable} antialiased bg-background text-foreground`}
+        className={`${generalSans.variable} ${amiriQuran.variable} ${fraunces.variable} antialiased bg-background text-foreground`}
       >
         {children}
       </body>

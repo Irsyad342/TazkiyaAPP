@@ -930,11 +930,31 @@ function QadaTab({ today }: { today: string }) {
 
 /* ================= Halaman Sholat ================= */
 
-export function PrayerPage() {
+export function PrayerPage({
+  autoRecord,
+  onAutoRecordDone,
+}: {
+  /** Salat yang diminta dibuka langsung dari Pengingat Salat layar penuh. */
+  autoRecord?: PrayerId | null;
+  /** Konsumsi permintaan sekali agar dialog tidak terbuka ulang. */
+  onAutoRecordDone?: () => void;
+} = {}) {
   const today = todayKey();
   const [tab, setTab] = useState<Tab>("hari-ini");
   const [recording, setRecording] = useState<PrayerMeta | null>(null);
   const [motivation, setMotivation] = useState<{ variant: MotivationVariant; prayer: string } | null>(null);
+
+  /*
+   * "Catat Salat" dari Pengingat layar penuh → dialog pencatatan EXISTING
+   * untuk salat yang bersangkutan. Status TIDAK dianggap selesai otomatis —
+   * pengguna tetap memilih status di dialog (spesifikasi fitur).
+   */
+  useEffect(() => {
+    if (!autoRecord) return;
+    const meta = PRAYERS.find((p) => p.id === autoRecord);
+    if (meta) setRecording(meta);
+    onAutoRecordDone?.();
+  }, [autoRecord, onAutoRecordDone]);
 
   const logs = useWorshipStore((s) => s.logs);
   const prayerDetails = useWorshipStore((s) => s.prayerDetails);
