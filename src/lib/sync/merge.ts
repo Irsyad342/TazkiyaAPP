@@ -23,6 +23,7 @@ import type {
   AyahBookmark,
   DailyLog,
   DeletedReading,
+  JournalXEntry,
   LastRead,
   PrayerDetail,
   PrayerId,
@@ -238,6 +239,7 @@ export function mergeDocs(local: CloudDoc, cloud: CloudDoc, opts: MergeOptions):
   const amalEntries = mergeById(local.amalEntries ?? [], cloud.amalEntries ?? [], (e) => e.savedAt ?? "");
   const zikirSessions = mergeById(local.zikirSessions ?? [], cloud.zikirSessions ?? [], (z) => z.savedAt ?? "").slice(0, 500);
   const journal = mergeJournal(local.journal ?? {}, cloud.journal ?? {});
+  const journalX = mergeJournalX(local.journalX, cloud.journalX);
   const moods = mergeMoods(local.moods ?? {}, cloud.moods ?? {});
   const amalGoals = mergeGoals(local.amalGoals ?? [], cloud.amalGoals ?? []);
   const dailyGoals = mergeDailyGoals(local.dailyGoals ?? [], cloud.dailyGoals ?? []);
@@ -263,6 +265,7 @@ export function mergeDocs(local: CloudDoc, cloud: CloudDoc, opts: MergeOptions):
     tasbih,
     qadaRecords,
     journal,
+    journalX,
     moods,
     amalEntries,
     amalGoals,
@@ -348,6 +351,39 @@ function mergeJournal(
       const ct = Date.parse(c.updatedAt ?? c.savedAt ?? "0");
       out[date] = lt >= ct ? l : c;
     } else out[date] = l ?? c;
+  }
+  return out;
+}
+
+/**
+ * Jurnal kategori (refleksi/emosi/harapan): gabung per kategori & tanggal,
+ * entri dengan `updatedAt`/`savedAt` terbaru menang — pola sama dengan
+ * mergeJournal. Kategori tanpa bucket di salah satu sisi tetap ditangani.
+ */
+function mergeJournalX(
+  local: CloudDoc["journalX"],
+  cloud: CloudDoc["journalX"]
+): NonNullable<CloudDoc["journalX"]> {
+  const out: NonNullable<CloudDoc["journalX"]> = { refleksi: {}, emosi: {}, harapan: {} };
+  const cats = new Set([
+    ...Object.keys(local ?? {}),
+    ...Object.keys(cloud ?? {}),
+  ]) as Set<keyof NonNullable<CloudDoc["journalX"]>>;
+  for (const cat of cats) {
+    const lb = (local?.[cat] ?? {}) as Record<string, JournalXEntry>;
+    const cb = (cloud?.[cat] ?? {}) as Record<string, JournalXEntry>;
+    const merged: Record<string, JournalXEntry> = {};
+    const dates = new Set([...Object.keys(lb), ...Object.keys(cb)]);
+    for (const date of dates) {
+      const l = lb[date];
+      const c = cb[date];
+      if (l && c) {
+        const lt = Date.parse(l.updatedAt ?? l.savedAt ?? "0");
+        const ct = Date.parse(c.updatedAt ?? c.savedAt ?? "0");
+        merged[date] = lt >= ct ? l : c;
+      } else merged[date] = (l ?? c) as JournalXEntry;
+    }
+    out[cat] = merged;
   }
   return out;
 }

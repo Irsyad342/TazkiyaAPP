@@ -332,6 +332,7 @@ function SearchSheet({
     () => [
       { label: "Catat Salat", sub: "Halaman Sholat", go: () => onNavigate("sholat") },
       { label: "Baca Al-Qur'an", sub: "Halaman Al-Qur'an", go: () => onNavigate("quran") },
+      { label: "Jurnal Saya", sub: "Refleksi & Syukur", go: () => onOpenSubpage("jurnal") },
       { label: "Jurnal Syukur", sub: "Refleksi", go: () => onOpenSubpage("jurnal") },
       { label: "Zikir & Doa", sub: "Refleksi", go: () => onOpenSubpage("zikir-doa") },
       { label: "Tasbih Digital", sub: "Zikir & Doa", go: () => onOpenSubpage("zikir-doa") },

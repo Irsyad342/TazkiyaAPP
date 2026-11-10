@@ -22,6 +22,8 @@ import {
   type DeletedReading,
   type ExtraId,
   type JournalEntry,
+  type JournalCat,
+  type JournalXEntry,
   type LastRead,
   type MoodId,
   type PrayerDetail,
@@ -78,6 +80,12 @@ interface WorshipActions {
   saveJournal: (date: string, items: [string, string, string], mood?: MoodId) => void;
   deleteJournal: (date: string) => void;
   setMood: (date: string, mood: MoodId) => void;
+  /* ---- Jurnal kategori (refleksi/emosi/harapan) ---- */
+  saveJournalX: (
+    cat: JournalCat,
+    entry: { date: string; title: string; text: string; answers?: (string | undefined)[]; mood?: MoodId }
+  ) => void;
+  deleteJournalX: (cat: JournalCat, date: string) => void;
   /* ---- Rizq & Amal ---- */
   addAmalEntry: (date: string, kind: AmalKind, title: string, note?: string) => void;
   deleteAmalEntry: (id: string) => void;
@@ -122,6 +130,11 @@ export type WorshipStore = {
   qadaRecords: QadaRecord[];
   /** Jurnal syukur per tanggal. */
   journal: Record<string, JournalEntry>;
+  /**
+   * Jurnal kategori (refleksi/emosi/harapan) — satu catatan per kategori per
+   * tanggal. Jurnal Syukur TETAP di `journal` (data lama tidak disentuh).
+   */
+  journalX: Record<JournalCat, Record<string, JournalXEntry>>;
   /** Mood check-in per tanggal (yang terbaru menang). */
   moods: Record<string, { mood: MoodId; savedAt: string }>;
   /** Catatan amal kebaikan & sedekah — paling baru di depan. */
@@ -154,6 +167,16 @@ function upsertLog(
   return { ...logs, [date]: mutate({ ...current, prayers: { ...current.prayers }, extras: { ...current.extras } }) };
 }
 
+/**
+ * Bucket kosong jurnal kategori — dipakai inisialisasi, reset, logout, dan
+ * impor dokumen akun tanpa field baru, agar bentuk `journalX` selalu utuh.
+ */
+export const EMPTY_JOURNAL_X: Record<JournalCat, Record<string, JournalXEntry>> = {
+  refleksi: {},
+  emosi: {},
+  harapan: {},
+};
+
 export const useWorshipStore = create<WorshipStore>()(
   persist(
     (set, get) => ({
@@ -169,6 +192,7 @@ export const useWorshipStore = create<WorshipStore>()(
       fridayZuhurAlt: {},
       qadaRecords: [],
       journal: {},
+      journalX: EMPTY_JOURNAL_X,
       moods: {},
       amalEntries: [],
       amalGoals: DEFAULT_AMAL_GOALS,
@@ -427,6 +451,37 @@ export const useWorshipStore = create<WorshipStore>()(
           return { journal };
         }),
 
+      /* ---------- Jurnal kategori (refleksi/emosi/harapan) ---------- */
+      saveJournalX: (cat, entry) =>
+        set((s) => {
+          const prev = s.journalX[cat]?.[entry.date];
+          const now = new Date().toISOString();
+          const next: JournalXEntry = {
+            date: entry.date,
+            title: entry.title.trim(),
+            text: entry.text.trim(),
+            answers: entry.answers,
+            mood: entry.mood ?? prev?.mood,
+            // savedAt dipertahankan dari pembuatan pertama (urutan riwayat stabil),
+            // updatedAt menandai waktu edit terakhir untuk LWW sinkronisasi.
+            savedAt: prev?.savedAt ?? now,
+            updatedAt: prev ? now : undefined,
+          };
+          return {
+            journalX: {
+              ...s.journalX,
+              [cat]: { ...s.journalX[cat], [entry.date]: next },
+            },
+          };
+        }),
+
+      deleteJournalX: (cat, date) =>
+        set((s) => {
+          const bucket = { ...s.journalX[cat] };
+          delete bucket[date];
+          return { journalX: { ...s.journalX, [cat]: bucket } };
+        }),
+
       setMood: (date, mood) =>
         set((s) => ({
           moods: { ...s.moods, [date]: { mood, savedAt: new Date().toISOString() } },
@@ -525,6 +580,7 @@ export const useWorshipStore = create<WorshipStore>()(
           fridayZuhurAlt: {},
           qadaRecords: [],
           journal: {},
+          journalX: EMPTY_JOURNAL_X,
           moods: {},
           amalEntries: [],
           amalGoals: DEFAULT_AMAL_GOALS,
@@ -567,6 +623,7 @@ export const useWorshipStore = create<WorshipStore>()(
             tasbih: doc.tasbih ?? { count: 0, target: 100, dhikr: DEFAULT_ZIKIR_DHIKR },
             qadaRecords: doc.qadaRecords ?? [],
             journal: doc.journal ?? {},
+            journalX: doc.journalX ?? EMPTY_JOURNAL_X,
             moods: (doc.moods ?? {}) as Record<string, { mood: MoodId; savedAt: string }>,
             amalEntries: doc.amalEntries ?? [],
             amalGoals: (doc.amalGoals ?? DEFAULT_AMAL_GOALS) as AmalGoal[],
@@ -600,6 +657,7 @@ export const useWorshipStore = create<WorshipStore>()(
           tasbih: { ...s.tasbih, count: 0 },
           qadaRecords: [],
           journal: {},
+          journalX: EMPTY_JOURNAL_X,
           moods: {},
           amalEntries: [],
           amalGoals: DEFAULT_AMAL_GOALS,
@@ -663,6 +721,7 @@ export const useWorshipStore = create<WorshipStore>()(
         fridayZuhurAlt: s.fridayZuhurAlt,
         qadaRecords: s.qadaRecords,
         journal: s.journal,
+        journalX: s.journalX,
         moods: s.moods,
         amalEntries: s.amalEntries,
         amalGoals: s.amalGoals,

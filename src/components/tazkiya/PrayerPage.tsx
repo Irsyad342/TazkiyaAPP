@@ -14,8 +14,8 @@
  * (formulir + CTA orange) dipertahankan dengan logika utuh.
  */
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { AnimatePresence, m } from "framer-motion";
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { AnimatePresence, m, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import {
   BookMarked,
   Check,
@@ -397,6 +397,114 @@ function formatDurFull(min: number): string {
   return `${m} menit`;
 }
 
+/**
+ * Tilt 3D ringan pada kartu tiket salat — kartu terasa seperti kartu fisik.
+ *
+ * - Pointer bergerak → rotasi X/Y kecil (maks ±6°) + geser X tipis; bayangan
+ *   ikut bergeser mengikuti arah (motion template, tanpa re-render React).
+ * - Tekan → kartu terangkat (scale + translate) lalu kembali dengan spring.
+ * - Sentuh (touch): rentang lebih kecil; `touch-action: pan-y` menjaga scroll
+ *   vertikal halaman tetap normal, dan pointercancel (saat mulai scroll)
+ *   mengembalikan kartu ke posisi normal — tidak ada kartu tertinggal miring.
+ * - Keyboard: fokus memberi terangkat lembut; Enter membuka pencatatan (native).
+ * - Hormati prefers-reduced-motion & setelan animasi: tanpa motionOK →
+ *   button biasa tanpa transform.
+ * - DESAIN KARTU TIDAK BERUBAH: kelas `tk-tkt*` dan seluruh isinya persis;
+ *   hanya ditambah kelas `tk-tkt--motion` yang mematikan transisi CSS
+ *   transform/box-shadow agar tidak berkonflik dengan update per-frame.
+ */
+function TiltWrap({
+  motionOK,
+  active,
+  className,
+  ariaLabel,
+  onClick,
+  children,
+}: {
+  motionOK: boolean;
+  active: boolean;
+  className: string;
+  ariaLabel: string;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  const rx = useMotionValue(0);
+  const ry = useMotionValue(0);
+  const tx = useMotionValue(0);
+  const lift = useMotionValue(0);
+  const shX = useMotionValue(0);
+  const shY = useMotionValue(0);
+  const spring = { stiffness: 300, damping: 24 };
+  const srx = useSpring(rx, spring);
+  const sry = useSpring(ry, spring);
+  const stx = useSpring(tx, spring);
+  const slift = useSpring(lift, { stiffness: 380, damping: 26 });
+  const sshX = useSpring(shX, spring);
+  const sshY = useSpring(shY, spring);
+
+  const neutral = useMotionTemplate`0 ${sshY}px 32px -20px rgba(23,23,26,0.32)`;
+  const orange = useMotionTemplate`0 ${sshY}px 44px -18px rgba(250,82,0,0.5)`;
+
+  const reset = () => {
+    rx.set(0);
+    ry.set(0);
+    tx.set(0);
+    lift.set(0);
+    shX.set(0);
+    shY.set(0);
+  };
+
+  if (!motionOK) {
+    return (
+      <button type="button" onClick={onClick} aria-label={ariaLabel} className={className}>
+        {children}
+      </button>
+    );
+  }
+
+  return (
+    <m.button
+      type="button"
+      onClick={onClick}
+      aria-label={ariaLabel}
+      className={cn(className, "tk-tkt--motion")}
+      style={{
+        rotateX: srx,
+        rotateY: sry,
+        x: stx,
+        y: slift,
+        boxShadow: active ? orange : neutral,
+        transformPerspective: 900,
+      }}
+      onPointerDown={(e) => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        lift.set(-3);
+        shY.set(6);
+      }}
+      onPointerUp={reset}
+      onPointerCancel={reset}
+      onPointerLeave={reset}
+      onPointerMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const px = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1) - 0.5;
+        const py = Math.min(Math.max((e.clientY - rect.top) / rect.height, 0), 1) - 0.5;
+        const range = e.pointerType === "mouse" || e.pointerType === "pen" ? 1 : 0.5;
+        ry.set(px * 7 * range);
+        rx.set(-py * 5.5 * range);
+        tx.set(px * 6 * range);
+        shX.set(px * 6 * range);
+        shY.set(16 + py * 6 * range);
+      }}
+      onFocus={(e) => {
+        if (e.currentTarget.matches(":focus-visible")) lift.set(-2);
+      }}
+      onBlur={reset}
+    >
+      {children}
+    </m.button>
+  );
+}
+
 function PrayerTickets({
   today,
   prayers,
@@ -412,6 +520,11 @@ function PrayerTickets({
   now: Date;
   onRecord: (meta: PrayerMeta) => void;
 }) {
+  /* Gerak 3D hanya saat animasi aktif & reduced-motion tidak diminta. */
+  const animationsOn = useWorshipStore((s2) => s2.settings.animations);
+  const reduceMotion = useReducedMotion();
+  const motionOK = animationsOn && !reduceMotion;
+
   /** Slot pertama yang belum masuk waktunya — penerima penanda "Berikutnya". */
   const nowTotal = nowTotalMinutes(now);
   const nextIdx = (() => {
@@ -484,10 +597,11 @@ function PrayerTickets({
             className="tk-tkt-slot"
             style={{ zIndex: isActive ? 30 : 20 - i, "--i": i } as CSSProperties}
           >
-            <button
-              type="button"
+            <TiltWrap
+              motionOK={motionOK}
+              active={isActive}
               onClick={() => onRecord(p)}
-              aria-label={`Catat ${p.label}, mulai ${time.replace(":", ".")}, batas akhir ${w.endLabel} ${w.end ? w.end.replace(":", ".") : "tidak tersedia"}`}
+              ariaLabel={`Catat ${p.label}, mulai ${time.replace(":", ".")}, batas akhir ${w.endLabel} ${w.end ? w.end.replace(":", ".") : "tidak tersedia"}`}
               className={cn(
                 "tk-tkt",
                 isActive && "tk-tkt--active",
@@ -564,7 +678,7 @@ function PrayerTickets({
                   {w.endNote}
                 </span>
               ) : null}
-            </button>
+            </TiltWrap>
           </li>
         );
       })}

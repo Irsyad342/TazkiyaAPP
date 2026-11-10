@@ -378,6 +378,81 @@ export interface JournalEntry {
   updatedAt?: string; // ISO, terisi setelah edit
 }
 
+/* ---------- Jurnal: empat kategori (pengalaman jurnal personal) ---------- */
+
+/**
+ * Kategori jurnal non-syukur. Jurnal Syukur TETAP memakai struktur
+ * `journal` yang ada (data lama tidak disentuh); tiga kategori baru ini
+ * punya penyimpanan sendiri dengan bentuk serupa (satu catatan per tanggal
+ * per kategori, LWW saat sinkronisasi).
+ */
+export type JournalCat = "refleksi" | "emosi" | "harapan";
+
+/** Satu catatan jurnal kategori — satu per kategori per tanggal. */
+export interface JournalXEntry {
+  date: string; // YYYY-MM-DD (tanggal jurnal, bisa dipilih lewat kalender)
+  title: string; // judul jurnal
+  text: string; // isi tulisan bebas
+  /** Jawaban pertanyaan panduan (opsional, urut sesuai pertanyaan kategori). */
+  answers?: (string | undefined)[];
+  /** Mood emoji (khusus Jurnal Emosi & Penerimaan Diri). */
+  mood?: MoodId;
+  savedAt: string; // ISO
+  updatedAt?: string; // ISO, terisi setelah edit
+}
+
+export const JOURNAL_CATS: {
+  id: JournalCat;
+  label: string;
+  short: string;
+  desc: string;
+  questions: string[];
+}[] = [
+  {
+    id: "refleksi",
+    label: "Jurnal Refleksi Diri",
+    short: "Refleksi Diri",
+    desc: "Luangkan waktu untuk melihat kembali perjalananmu, memahami kesalahan, dan menemukan pelajaran dari setiap pengalaman.",
+    questions: [
+      "Apa yang terjadi hari ini?",
+      "Apa hal yang sudah saya lakukan dengan baik?",
+      "Apa yang perlu saya perbaiki?",
+      "Apa pelajaran yang saya dapatkan hari ini?",
+      "Apa yang akan saya lakukan dengan lebih baik besok?",
+    ],
+  },
+  {
+    id: "emosi",
+    label: "Jurnal Emosi & Penerimaan Diri",
+    short: "Emosi & Penerimaan",
+    desc: "Kenali perasaanmu, pahami apa yang kamu alami, dan berikan ruang bagi dirimu untuk bertumbuh.",
+    questions: [
+      "Bagaimana perasaan saya hari ini?",
+      "Apa yang membuat saya merasakan hal tersebut?",
+      "Apa yang sebenarnya saya butuhkan?",
+      "Apa yang ingin saya lepaskan atau maafkan?",
+      "Bagaimana saya bisa memperlakukan diri sendiri dengan lebih baik?",
+    ],
+  },
+  {
+    id: "harapan",
+    label: "Jurnal Harapan & Ikhtiar",
+    short: "Harapan & Ikhtiar",
+    desc: "Tuliskan harapanmu, sertakan doa, dan mulai wujudkan dengan ikhtiar terbaik.",
+    questions: [
+      "Apa yang ingin saya capai?",
+      "Mengapa tujuan tersebut penting bagi saya?",
+      "Apa doa dan harapan saya?",
+      "Langkah kecil apa yang bisa saya mulai hari ini?",
+      "Apa bentuk ikhtiar yang akan saya lakukan?",
+    ],
+  },
+];
+
+export function journalCatMeta(cat: JournalCat) {
+  return JOURNAL_CATS.find((c) => c.id === cat) ?? JOURNAL_CATS[0];
+}
+
 /* ---------- Rizq & Amal ---------- */
 
 export type AmalKind = "sedekah" | "membantu" | "silaturahmi" | "niat-baik" | "berbagi-ilmu" | "lainnya";

@@ -1078,6 +1078,16 @@ section[data-live="false"] .tk-ob-card-float {
   transform: scale(1.016);
   box-shadow: 0 22px 44px -18px rgba(250, 82, 0, 0.55);
 }
+/* Kartu dengan tilt 3D (TiltWrap): transisi transform/box-shadow CSS
+   DIMATIKAN agar tidak bertabrakan dengan update transform per-frame dari
+   framer-motion; warna latar tetap bertransisi. Scroll vertikal aman karena
+   touch-action pan-y — gerak horizontal menghasilkan tilt, gerak vertikal
+   tetap menggulir halaman. */
+.tk-tkt--motion {
+  transition: background-color 340ms;
+  touch-action: pan-y;
+  will-change: transform;
+}
 .tk-tkt--active::before {
   background: rgba(255, 255, 255, 0.9);
 }
@@ -1434,6 +1444,24 @@ html[data-anim="off"] .tk-cloud {
 .pr-bird {
   animation: pr-bird var(--pr-dur, 38s) ease-in-out infinite alternate;
 }
+/* Float sangat halus untuk banner Jurnal — hanya transform, berhenti bila
+   animasi dimatikan / reduced-motion. */
+@keyframes pr-float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.pr-float-soft {
+  animation: pr-float-soft 7.5s ease-in-out infinite;
+}
+html[data-anim="off"] .pr-float-soft {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html .pr-float-soft {
+    animation: none !important;
+  }
+}
+
 html[data-anim="off"] .pr-breathe,
 html[data-anim="off"] .pr-rays,
 html[data-anim="off"] .pr-cloud,

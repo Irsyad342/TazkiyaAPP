@@ -142,6 +142,19 @@ export function monthCalendarDayKeys(todayKeyStr: string, monthOffset = 0): (str
   return cells;
 }
 
+/** Sel kalender untuk bulan arbitrasi (0 = Januari) — dipakai kalender jurnal
+    yang bisa menavigasi bulan bebas, tidak terkait "hari ini". */
+export function calendarDayKeys(year: number, month: number): (string | null)[] {
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month + 1, 0);
+  const cells: (string | null)[] = [];
+  for (let i = 0; i < (first.getDay() + 6) % 7; i++) cells.push(null);
+  for (let day = 1; day <= last.getDate(); day++) {
+    cells.push(`${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`);
+  }
+  return cells;
+}
+
 export function daysBetween(a: string, b: string): number {
   const da = keyToDate(a).getTime();
   const db = keyToDate(b).getTime();
