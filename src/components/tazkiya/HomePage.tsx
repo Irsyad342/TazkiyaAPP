@@ -38,6 +38,7 @@ import type { PrayerId } from "@/lib/tazkiya/types";
 import { formatGregorian, formatHijri, formatDayFull, todayKey } from "@/lib/tazkiya/dates";
 import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { formatCountdown, goalStatuses, nextPrayerState } from "@/lib/tazkiya/goals";
+import { prayersForDate, prayerLabelForDate } from "@/lib/tazkiya/friday";
 import { notifyPermission, requestNotifyPermission } from "@/lib/tazkiya/reminder-trigger";
 import { SURAH_LIST } from "@/lib/tazkiya/quran";
 import { barakahOfTheDay } from "@/lib/tazkiya/barakah";
@@ -223,7 +224,7 @@ function ReminderSheet({ today, onClose }: { today: string; onClose: () => void 
     return () => window.clearInterval(iv);
   }, []);
   const state = nextPrayerState(times, now);
-  const nextLabel = PRAYER_ORDER.find((p) => p.id === state.next)?.label ?? state.next;
+  const nextLabel = prayerLabelForDate(state.next, today);
 
   return (
     <BottomSheet title="Pengingat Ibadah" onClose={onClose}>
@@ -580,7 +581,7 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
     return () => window.clearInterval(iv);
   }, []);
   const state = nextPrayerState(times, now);
-  const nextLabel = PRAYER_ORDER.find((p) => p.id === state.next)?.label ?? state.next;
+  const nextLabel = prayerLabelForDate(state.next, today);
 
   return (
     <button
@@ -594,6 +595,9 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
         {PRAYER_ORDER.map(({ id, label }) => {
           const done = prayerDetails[today]?.[id]?.status === "done" || logs[today]?.prayers?.[id];
           const missed = prayerDetails[today]?.[id]?.status === "missed";
+          /* Label mengikuti tanggal: pada Jumat slot Zuhur tampil sebagai Salat Jumat. */
+          const displayLabel = prayerLabelForDate(id, today);
+          const isJumatSlot = displayLabel !== label;
           return (
             <li key={id} className="flex items-center gap-2.5">
               {/* Radio bulat gaya kartu putih referensi */}
@@ -606,8 +610,13 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
               >
                 {done ? <Check size={10} strokeWidth={3.2} className="text-white" /> : null}
               </span>
-              <span className={cn("min-w-0 flex-1 truncate text-[12px]", done ? "font-semibold text-[#17171B]" : "font-medium text-[#55555C]")}>
-                {label}
+              <span className={cn("flex min-w-0 flex-1 items-center gap-1.5 truncate text-[12px]", done ? "font-semibold text-[#17171B]" : "font-medium text-[#55555C]")}>
+                <span className="truncate">{displayLabel}</span>
+                {isJumatSlot ? (
+                  <span className="shrink-0 rounded-full bg-[#FA5200]/10 px-1.5 py-px text-[8px] font-extrabold uppercase tracking-[0.08em] text-[#FA5200]">
+                    Jumat
+                  </span>
+                ) : null}
                 {missed ? " · terlewat" : ""}
               </span>
               <span className="tnum shrink-0 text-[10px] font-semibold text-[#9A9AA1]">{times[id].time}</span>

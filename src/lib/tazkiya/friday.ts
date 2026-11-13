@@ -11,6 +11,38 @@
  */
 
 import { useEffect, useState } from "react";
+import { PRAYERS, SALAT_JUMAT, ZUHUR_ALTERNATIF, type PrayerId, type PrayerMeta } from "./types";
+import { isFriday } from "./dates";
+
+/* ---------- Sumber tunggal slot salat per tanggal ---------- */
+
+/**
+ * Sumber kebenaran slot salat untuk satu tanggal lokal.
+ *
+ * SELALU mengembalikan tepat LIMA slot (Subuh, Zuhur, Asar, Magrib, Isya);
+ * pada hari Jumat slot posisi Zuhur DIGANTIKAN oleh Salat Jumat — bukan
+ * ditambah — sehingga tidak pernah ada dua kartu untuk satu waktu salat.
+ * Hari lain (termasuk Sabtu setelah Jumat berakhir) kembali ke Zuhur.
+ * Bila pengguna memilih alternatif (fridayZuhurAlt untuk tanggal itu),
+ * slot tetap satu dengan label Zuhur (alternatif Salat Jumat).
+ */
+export function prayersForDate(dateKey: string, fridayZuhurAlt = false): PrayerMeta[] {
+  return PRAYERS.map((p) =>
+    p.id === "zuhur" && isFriday(dateKey)
+      ? fridayZuhurAlt
+        ? ZUHUR_ALTERNATIF
+        : SALAT_JUMAT
+      : p
+  );
+}
+
+/** Label tampilan slot `id` pada tanggal tertentu ("Salat Jumat" pada Jumat). */
+export function prayerLabelForDate(id: PrayerId, dateKey: string, fridayZuhurAlt = false): string {
+  if (id === "zuhur" && isFriday(dateKey)) {
+    return fridayZuhurAlt ? ZUHUR_ALTERNATIF.label : SALAT_JUMAT.label;
+  }
+  return PRAYERS.find((p) => p.id === id)?.label ?? id;
+}
 
 /* ---------- Waktu pelaksanaan efektif ---------- */
 

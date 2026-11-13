@@ -1,42 +1,56 @@
 "use client";
 
 /**
- * SUIO — Kartu spesial Salat Jumat & panel detailnya.
+ * SUIO — Kartu slot Salat Jumat (pengganti Zuhur pada hari Jumat).
  *
- * Menggantikan TAMPILAN slot Zuhur pada hari Jumat (slot pengganti, bukan
- * salat tambahan — id tetap "zuhur" sehingga statistik tetap 5 waktu).
+ * SATU KELUARGA dengan kartu tiket salat lain: memakai kelas `tk-tkt` yang
+ * sama (bentuk, rounded 22px, proporsi, tipografi, spacing, perforasi, foot
+ * status) + varian `tk-tkt--jumat` sebagai pembeda khusus: gradasi warm
+ * halus, garis aksen soft orange, ornamen geometris octagram yang sangat
+ * halus, badge JUMAT, aksen kubah masjid kecil, dan countdown menuju waktu
+ * pelaksanaan yang dikonfigurasi pengguna.
  *
- * Desain: premium Islamic aesthetic — permukaan berlapis warm ivory → cream
- * → peach (light) / deep charcoal → warm brown (dark), ornamen geometris
- * bintang segi-delapan yang sangat halus, siluet kubah masjid, pendar cahaya
- * lembut, garis aksen bronze-gold, tipografi serif display (Fraunces).
- *
- * Interaksi 3D: tilt perspektif kecil (maks ±6°), ornamen ber-parallax,
- * opacity cahaya latar ikut bergeser, tekan = terangkat, lepas = spring
- * kembali. Ketuk → card reveal: panel detail mengembang di slot yang sama
- * (jadwal, checklist persiapan, status, catatan pribadi).
+ * Interaksi ELEGANT 3D JUMMAH CARD:
+ * - Entrance (sekali saat kartu muncul): fade + slide + scale ringan,
+ *   ornamen menyusul, cahaya orange perlahan — total ±0,8 dtk.
+ * - Sentuhan: terangkat, perspektif kecil mengikuti arah sentuhan, ornamen
+ *   ber-parallax, cahaya menguat, lepas = spring kembali.
+ * - Ketuk → panel persiapan mengembang (staggered fade): jadwal masjid,
+ *   checklist persiapan per tanggal Jumat, catatan pribadi, pencatatan.
  *
  * Kinerja: hanya transform & opacity via motion values (tanpa re-render
- * React per frame), SVG ornamen statis, keyframes CSS sangat lambat yang
- * berhenti pada reduced-motion / setelan animasi mati.
+ * per frame), keyframes CSS sangat lambat yang berhenti pada reduced-motion
+ * / setelan animasi mati, tanpa blur berat, tanpa canvas/video.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, m, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
-import { CalendarClock, Check, ChevronDown, Clock3, Info, MapPin, MoonStar, Sparkles, Star, Trash2 } from "lucide-react";
+import { Check, ChevronDown, Info, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { FRIDAY_PREP_ITEMS, SALAT_JUMAT, type PrayerDetail, type PrayerMeta } from "@/lib/tazkiya/types";
 import { formatDayFull } from "@/lib/tazkiya/dates";
 import { fridayTimeOf, useFridayCountdown } from "@/lib/tazkiya/friday";
-import type { PrayerWindow } from "@/lib/tazkiya/prayerWindows";
 import { prayerTiming } from "@/lib/tazkiya/goals";
+import type { PrayerWindow } from "@/lib/tazkiya/prayerWindows";
 import { ConfirmButton } from "./ui-bits";
 import { cn } from "@/lib/utils";
 
-/* ===================== Ornamen SVG ===================== */
+/* ===================== Aksen dekoratif (arsitektur masjid) ===================== */
 
-/** Bintang segi-delapan (ornamen geometris Islami) — sangat halus. */
+/** Kubah + menara kecil — aksen di samping nama slot. */
+function DomeAccent({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden focusable="false" fill="none">
+      <path d="M12 4.6c2.6 1.9 4 3.8 4 5.9H8c0-2.1 1.4-4 4-5.9Z" fill="currentColor" opacity="0.9" />
+      <path d="M12 3.1c.7.9.7 1.6 0 2.5-.7-.9-.7-1.6 0-2.5Z" fill="currentColor" />
+      <path d="M6.4 19.4v-5.6c0-.8.5-1.3 1.2-1.3h8.8c.7 0 1.2.5 1.2 1.3v5.6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M4.6 19.4h14.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** Bintang segi-delapan — ornamen geometris yang sangat halus. */
 function OctagramOrnament({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 100 100" className={className} aria-hidden focusable="false">
@@ -50,42 +64,19 @@ function OctagramOrnament({ className }: { className?: string }) {
   );
 }
 
-/** Siluet kubah masjid + dua menara (baris bawah kartu). */
-function MosqueSilhouette({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 320 84" className={className} aria-hidden focusable="false" preserveAspectRatio="xMidYMax slice">
-      <g fill="currentColor">
-        {/* menara kiri */}
-        <path d="M38 84 V34 q0 -10 6 -16 q6 6 6 16 V84 Z" />
-        <circle cx="44" cy="14" r="3.4" />
-        <path d="M44 8 q1.6 2.4 0 4.6 q-1.6 -2.2 0 -4.6 Z" />
-        {/* menara kanan */}
-        <path d="M282 84 V34 q0 -10 6 -16 q6 6 6 16 V84 Z" />
-        <circle cx="288" cy="14" r="3.4" />
-        <path d="M288 8 q1.6 2.4 0 4.6 q-1.6 -2.2 0 -4.6 Z" />
-        {/* bangunan + kubah utama */}
-        <path d="M92 84 V56 q0 -6 5 -6 H223 q5 0 5 6 V84 Z" />
-        <path d="M160 16 q26 18 26 38 H134 q0 -20 26 -38 Z" />
-        <path d="M160 8 q1.8 2.6 0 5 q-1.8 -2.4 0 -5 Z" />
-        {/* kubah kecil sisi */}
-        <path d="M116 84 V62 q0 -10 9 -12 q9 2 9 12 V84 Z" />
-        <path d="M186 84 V62 q0 -10 9 -12 q9 2 9 12 V84 Z" />
-      </g>
-    </svg>
-  );
-}
+/* ===================== Util status ===================== */
 
-/* ===================== Kartu ===================== */
-
-function statusLabel(detail: PrayerDetail, w: PrayerWindow, today: string): string {
+function statusText(detail: PrayerDetail, w: PrayerWindow, today: string): string {
   if (detail.status === "done") {
-    if (detail.kind === "berjamaah") return "Berjamaah — selesai";
+    if (detail.kind === "berjamaah") return "Berjamaah";
     const t = prayerTiming(detail, w.start, today);
     return t === "late" ? "Terlambat" : t === "ontime" ? "Tepat waktu" : "Dilaksanakan";
   }
   if (detail.status === "missed") return "Tidak dilaksanakan";
   return "Belum dicatat";
 }
+
+/* ===================== Kartu ===================== */
 
 export function FridayCard({
   today,
@@ -94,7 +85,6 @@ export function FridayCard({
   now,
   motionOK,
   onRecord,
-  /** Sinyal eksternal (layar penuh "Mulai Persiapan") — tiap kenaikan membuka panel. */
   openSignal = 0,
 }: {
   today: string;
@@ -104,6 +94,7 @@ export function FridayCard({
   motionOK: boolean;
   /** Buka mekanisme pencatatan existing (dialog Salat Jumat, berjamaah). */
   onRecord: (meta: PrayerMeta) => void;
+  /** Sinyal eksternal (layar penuh "Mulai Persiapan") — tiap kenaikan membuka panel. */
   openSignal?: number;
 }) {
   const settingsFriday = useWorshipStore((s) => s.settings.friday);
@@ -112,15 +103,15 @@ export function FridayCard({
   const setFridayPrepCheck = useWorshipStore((s) => s.setFridayPrepCheck);
   const setFridayPrepNote = useWorshipStore((s) => s.setFridayPrepNote);
   const setFridayZuhurAlt = useWorshipStore((s) => s.setFridayZuhurAlt);
+  const reduceMotion = useReducedMotion();
+  const anim = motionOK && !reduceMotion;
 
-  const animationsOn = useWorshipStore((s) => s.settings.animations);
   const [expanded, setExpanded] = useState(false);
   useEffect(() => {
     if (openSignal > 0) setExpanded(true);
   }, [openSignal]);
 
   const info = useMemo(() => fridayTimeOf(settingsFriday, w.start), [settingsFriday, w.start]);
-  const active = info.fallback ? "belum diatur" : info.time;
 
   /* Countdown — interval 1 dtk hanya hidup saat kartu Jumat tampil. */
   const cd = useFridayCountdown(info.time, true, now);
@@ -128,14 +119,17 @@ export function FridayCard({
 
   const doneCount = useMemo(() => FRIDAY_PREP_ITEMS.reduce((n, _it, i) => n + (fridayPrep?.checks?.[i] ? 1 : 0), 0), [fridayPrep]);
 
-  /* ---------- Tilt 3D + parallax ornamen + cahaya ---------- */
+  const isDone = detail.status === "done";
+  const isMissed = detail.status === "missed";
+
+  /* ---------- Tilt 3D: terangkat + perspektif mengikuti sentuhan ---------- */
   const rx = useMotionValue(0);
   const ry = useMotionValue(0);
   const tx = useMotionValue(0);
   const lift = useMotionValue(0);
   const ornX = useMotionValue(0);
   const ornY = useMotionValue(0);
-  const lightO = useMotionValue(0.75);
+  const lightO = useMotionValue(0.55);
   const spring = { stiffness: 280, damping: 22 };
   const srx = useSpring(rx, spring);
   const sry = useSpring(ry, spring);
@@ -152,7 +146,7 @@ export function FridayCard({
     lift.set(0);
     ornX.set(0);
     ornY.set(0);
-    lightO.set(0.75);
+    lightO.set(0.55);
   };
 
   const onMove = (e: React.PointerEvent<HTMLElement>) => {
@@ -160,13 +154,13 @@ export function FridayCard({
     const px = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1) - 0.5;
     const py = Math.min(Math.max((e.clientY - rect.top) / rect.height, 0), 1) - 0.5;
     const range = e.pointerType === "mouse" || e.pointerType === "pen" ? 1 : 0.55;
-    ry.set(px * 6 * range);
-    rx.set(-py * 4.5 * range);
-    tx.set(px * 5 * range);
-    // Ornamen bergerak lebih jauh → kesan kedalaman berlapis.
-    ornX.set(px * 14 * range);
-    ornY.set(py * 10 * range);
-    lightO.set(0.75 + Math.abs(px) * 0.5 * range);
+    ry.set(px * 5 * range);
+    rx.set(-py * 3.5 * range);
+    tx.set(px * 4 * range);
+    // Ornamen & cahaya bergerak lebih jauh → kesan kedalaman berlapis.
+    ornX.set(px * 12 * range);
+    ornY.set(py * 9 * range);
+    lightO.set(0.55 + Math.abs(px) * 0.4 * range);
   };
 
   /* Catatan pribadi — draf lokal + simpan debounce. */
@@ -186,145 +180,139 @@ export function FridayCard({
   const [timeDraft, setTimeDraft] = useState(settingsFriday?.time ?? "");
   useEffect(() => setTimeDraft(settingsFriday?.time ?? ""), [settingsFriday?.time]);
 
-  const isDone = detail.status === "done";
-  const isMissed = detail.status === "missed";
-
-  const surface = (
-    <m.div
-      className="fr-card tap relative block cursor-pointer overflow-hidden rounded-[1.55rem] text-left light:shadow-[0_22px_44px_-22px_rgba(120,72,20,0.35)] dark:shadow-[0_22px_44px_-22px_rgba(0,0,0,0.75)]"
-      style={
-        motionOK
-          ? ({ rotateX: srx, rotateY: sry, x: stx, y: slift, transformPerspective: 1000 } as const)
-          : undefined
-      }
-      onPointerMove={motionOK ? onMove : undefined}
-      onPointerLeave={motionOK ? reset : undefined}
-      onPointerCancel={motionOK ? reset : undefined}
-      onPointerDown={motionOK ? () => (lift.set(-3), lightO.set(0.95)) : undefined}
-      onPointerUp={motionOK ? reset : undefined}
-      onClick={() => setExpanded((v) => !v)}
-      role="button"
-      tabIndex={0}
-      aria-expanded={expanded}
-      aria-label={`Salat Jumat, kartu persiapan dan pencatatan. Ketuk untuk ${expanded ? "menutup" : "membuka"} panel detail`}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          setExpanded((v) => !v);
-        }
-      }}
-    >
-      {/* Permukaan berlapis + cahaya + ornamen + siluet */}
-      <span aria-hidden className="fr-card-surface absolute inset-0 rounded-[1.55rem]" />
-      <m.span
-        aria-hidden
-        className="fr-card-light absolute -right-10 -top-16 h-48 w-48 rounded-full"
-        style={motionOK ? { opacity: slightO } : { opacity: 0.75 }}
-      />
-      <m.span
-        aria-hidden
-        className="absolute right-4 top-3 text-[#B7791F]/45 dark:text-[#D9A441]/30"
-        style={motionOK ? ({ x: sornX, y: sornY } as const) : undefined}
-      >
-        <OctagramOrnament className="h-20 w-20" />
-      </m.span>
-      <MosqueSilhouette className="pointer-events-none absolute bottom-0 left-0 h-[62px] w-[78%] text-[#B7791F]/14 dark:text-[#D9A441]/12" />
-
-      {/* Konten */}
-      <div className="relative px-5 pb-4 pt-4">
-        <div className="flex items-center justify-between gap-2">
-          <span className="fr-chip inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.1em]">
-            <Star size={10} aria-hidden /> Jumat yang penuh berkah
-          </span>
-          <span
-            className={cn(
-              "rounded-full px-2.5 py-1 text-[9.5px] font-bold",
-              isDone
-                ? "fr-chip-ok"
-                : isMissed
-                  ? "fr-chip-miss"
-                  : "fr-chip"
-            )}
-          >
-            {statusLabel(detail, w, today)}
-          </span>
-        </div>
-
-        <h3 className="pr-serif mt-2 text-[26px] font-semibold leading-[1.08] tracking-[-0.01em] text-tk-ink">
-          Salat Jumat
-        </h3>
-
-        {/* Informasi inti: waktu masuk Zuhur, jadwal pelaksanaan, persiapan */}
-        <div className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-1.5">
-          <div>
-            <p className="flex items-center gap-1 text-[9.5px] font-semibold uppercase tracking-[0.08em] text-tk-muted">
-              <Clock3 size={10} aria-hidden /> Masuk Zuhur
-            </p>
-            <p className="tnum text-[14.5px] font-bold leading-tight text-tk-ink">{w.start.replace(":", ".")}</p>
-          </div>
-          <div>
-            <p className="flex items-center gap-1 text-[9.5px] font-semibold uppercase tracking-[0.08em] text-tk-muted">
-              <MapPin size={10} aria-hidden /> Jadwal Jumat
-            </p>
-            <p className="tnum text-[14.5px] font-bold leading-tight text-tk-ink">{arrived ? "Telah tiba" : active.replace(":", ".")}</p>
-          </div>
-          <div className="col-span-2">
-            <p className="flex items-center gap-1 text-[9.5px] font-semibold uppercase tracking-[0.08em] text-tk-muted">
-              <Sparkles size={10} aria-hidden /> Persiapan
-            </p>
-            <p className="text-[12px] font-semibold leading-tight text-tk-ink">
-              {doneCount > 0 ? `${doneCount} dari ${FRIDAY_PREP_ITEMS.length} persiapan selesai` : "Belum disiapkan — buka kartu untuk mulai"}
-            </p>
-          </div>
-        </div>
-
-        {/* Countdown / status tiba */}
-        <div className="fr-count mt-3 rounded-[1.1rem] px-4 py-2.5">
-          {arrived ? (
-            <>
-              <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em]">
-                <CalendarClock size={11} aria-hidden /> Salat Jumat Telah Tiba
-              </p>
-              <p className="mt-0.5 text-[11px] text-tk-muted">
-                Waktunya telah masuk — catat pelaksanaanmu setelah selesai, ya.
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em]">
-                <CalendarClock size={11} aria-hidden /> Menuju Salat Jumat
-              </p>
-              <p className="tnum mt-0.5 text-[24px] font-bold leading-none tracking-[0.06em] text-tk-ink" aria-live="off">
-                {cd.h} <span className="fr-sep">:</span> {cd.m} <span className="fr-sep">:</span> {cd.s}
-              </p>
-            </>
-          )}
-          {info.fallback ? (
-            <p className="mt-1 flex items-center gap-1 text-[9.5px] leading-snug text-tk-muted/85">
-              <Info size={9.5} aria-hidden /> Mengikuti waktu masuk Zuhur — waktu pelaksanaan di masjid dapat berbeda.
-            </p>
-          ) : (
-            <p className="mt-1 flex items-center gap-1 text-[9.5px] leading-snug text-tk-muted/85">
-              <MapPin size={9.5} aria-hidden /> Sesuai waktu pelaksanaan yang kamu atur.
-            </p>
-          )}
-        </div>
-
-        <p className="mt-2 flex items-center justify-between text-[9.5px] font-semibold text-tk-muted">
-          <span>{expanded ? "Ketuk untuk menutup panel" : "Ketuk kartu untuk persiapan & pencatatan"}</span>
-          <m.span animate={{ rotate: motionOK ? (expanded ? 180 : 0) : 0 }} transition={{ duration: 0.3 }}>
-            <ChevronDown size={13} />
-          </m.span>
-        </p>
-      </div>
-    </m.div>
-  );
+  /** Progress countdown: dari masuk Zuhur menuju waktu pelaksanaan. */
+  const barPct = (() => {
+    const [sh, sm] = w.start.split(":").map((v) => parseInt(v, 10) || 0);
+    const startSec = sh * 3600 + sm * 60;
+    const [jh, jm] = info.time.split(":").map((v) => parseInt(v, 10) || 0);
+    const targetSec = jh * 3600 + jm * 60;
+    const nowSec = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+    if (targetSec <= startSec) return 0;
+    return Math.min(100, Math.max(0, Math.round(((nowSec - startSec) / (targetSec - startSec)) * 100)));
+  })();
 
   return (
     <div className="relative" style={{ zIndex: 30 }}>
-      {surface}
+      {/* ---------- Entrance: fade + slide + scale, ornamen & cahaya menyusul ---------- */}
+      <m.div
+        initial={anim ? { opacity: 0, y: 26, scale: 0.965 } : false}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <m.div
+          className={cn(
+            "tk-tkt tk-tkt--jumat tk-tkt--motion tap relative block cursor-pointer text-left",
+            isDone && "tk-tkt--done",
+            isMissed && "tk-tkt--missed"
+          )}
+          style={anim ? ({ rotateX: srx, rotateY: sry, x: stx, y: slift, transformPerspective: 900 } as const) : undefined}
+          onPointerMove={anim ? onMove : undefined}
+          onPointerLeave={anim ? reset : undefined}
+          onPointerCancel={anim ? reset : undefined}
+          onPointerDown={anim ? () => (lift.set(-3), lightO.set(0.95)) : undefined}
+          onPointerUp={anim ? reset : undefined}
+          onClick={() => setExpanded((v) => !v)}
+          role="button"
+          tabIndex={0}
+          aria-expanded={expanded}
+          aria-label={`Salat Jumat, mulai ${w.start.replace(":", ".")}. Ketuk untuk ${expanded ? "menutup" : "membuka"} panel persiapan dan pencatatan`}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setExpanded((v) => !v);
+            }
+          }}
+        >
+          {/* Ornamen octagram + cahaya orange — parallax mengikuti sentuhan */}
+          <m.span
+            aria-hidden
+            className="fr-orn pointer-events-none absolute -right-1 top-1.5"
+            style={anim ? ({ x: sornX, y: sornY } as const) : undefined}
+            initial={anim ? { opacity: 0, scale: 0.85 } : false}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <OctagramOrnament className="h-[74px] w-[74px]" />
+          </m.span>
+          <m.span
+            aria-hidden
+            className="fr-light pointer-events-none absolute -right-8 -top-12 h-40 w-40 rounded-full"
+            style={anim ? { opacity: slightO } : { opacity: 0.55 }}
+            initial={anim ? { opacity: 0 } : false}
+            animate={{ opacity: 0.55 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          />
 
-      {/* ---------- Card reveal: panel detail mengembang ---------- */}
+          {/* Baris utama tiket — struktur sama dengan kartu salat lain */}
+          <span className="tk-tkt-row">
+            <span className="tk-tkt-side tk-tkt-side--l">
+              <span className="tk-tkt-name">
+                <span className="tk-tkt-ic" aria-hidden>
+                  <DomeAccent className="h-[13px] w-[13px]" />
+                </span>
+                Salat Jumat
+                <span className="fr-badge" aria-hidden>
+                  Jumat
+                </span>
+              </span>
+              <span className="tk-tkt-time tnum">{w.start.replace(":", ".")}</span>
+            </span>
+            <span className="tk-tkt-mid" aria-hidden>
+              <span className="tk-tkt-dash" />
+            </span>
+            <span className="tk-tkt-side tk-tkt-side--r">
+              <span className="tk-tkt-name tk-tkt-name--end">{w.endLabel || "Berakhir"}</span>
+              <span className="tk-tkt-time tk-tkt-time--end tnum">{w.end ? w.end.replace(":", ".") : "—"}</span>
+            </span>
+          </span>
+
+          {/* Perforasi + sisi status — keluarga tiket */}
+          <span className="tk-tkt-perf" aria-hidden />
+          <span className="tk-tkt-foot">
+            <span className={cn("tk-tkt-status", isDone && "tk-tkt-status--done", isMissed && "tk-tkt-status--missed")}>
+              <span className="tk-tkt-dot" aria-hidden />
+              {statusText(detail, w, today)}
+              {doneCount > 0 ? <span className="fr-prep tnum">· {doneCount}/{FRIDAY_PREP_ITEMS.length} persiapan</span> : null}
+            </span>
+            <span className="fr-badge fr-badge--solid">
+              {expanded ? "Tutup Panel" : "Persiapan"}
+              <ChevronDown size={9} className={cn("transition-transform", expanded && "rotate-180")} />
+            </span>
+          </span>
+
+          {/* Countdown menuju waktu pelaksanaan — gaya baris live tiket */}
+          <span className="fr-live">
+            <span className="fr-live-top">
+              <span className="fr-live-label">{arrived ? "Salat Jumat Telah Tiba" : "Menuju Salat Jumat"}</span>
+              {arrived ? (
+                <span className="fr-live-note">waktu masjid dapat berbeda</span>
+              ) : info.fallback ? (
+                <span className="fr-live-note">
+                  <Info size={9} aria-hidden /> mengikuti masuk Zuhur
+                </span>
+              ) : null}
+            </span>
+            {arrived ? (
+              <span className="fr-live-count fr-live-count--arrived">Saatnya — catat pelaksanaanmu setelah selesai</span>
+            ) : (
+              <span className="fr-live-count tnum" aria-live="off">
+                {cd.h} : {cd.m} : {cd.s}
+              </span>
+            )}
+            <span className="fr-live-bar" aria-hidden>
+              <span className="fr-live-bar-fill" style={{ width: `${barPct}%` }} />
+            </span>
+            <span className="fr-live-foot">
+              <MapPin size={9} aria-hidden />
+              {info.fallback
+                ? "Waktu pelaksanaan di masjid dapat berbeda — atur di panel."
+                : "Sesuai waktu pelaksanaan yang kamu atur"}
+            </span>
+          </span>
+        </m.div>
+      </m.div>
+
+      {/* ---------- Card reveal: panel persiapan mengembang, staggered fade ---------- */}
       <AnimatePresence initial={false}>
         {expanded ? (
           <m.div
@@ -336,40 +324,42 @@ export function FridayCard({
             className="overflow-hidden"
           >
             <m.div
-              initial={{ y: 12 }}
+              initial={{ y: 10 }}
               animate={{ y: 0 }}
               transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
               className="fr-panel mt-2.5 rounded-[1.3rem] p-4"
             >
               {/* Jadwal pelaksanaan yang dapat disesuaikan */}
-              <p className="fr-overline">Jadwal Pelaksanaan</p>
-              <div className="mt-1.5 flex items-end gap-2">
-                <label className="min-w-0 flex-1">
-                  <span className="sr-only">Waktu pelaksanaan Salat Jumat di masjid</span>
-                  <input
-                    type="time"
-                    value={timeDraft}
-                    onChange={(e) => setTimeDraft(e.target.value || "")}
-                    className="tk-field w-full py-2 text-[13px] tnum"
-                  />
-                </label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFridaySettings({ time: timeDraft || null });
-                    toast.success(timeDraft ? `Jadwal Jumat disimpan: ${timeDraft.replace(":", ".")}` : "Jadwal dihapus — mengikuti waktu masuk Zuhur");
-                  }}
-                  className="tap gs-ink-btn flex h-[38px] shrink-0 items-center rounded-full px-4 text-[11.5px] font-bold"
-                >
-                  Simpan
-                </button>
-              </div>
-              <p className="mt-1 text-[9.5px] leading-snug text-tk-muted/85">
-                Sesuaikan dengan jadwal masjid setempat. Tanpa pengaturan, aplikasi memakai waktu masuk Zuhur.
-              </p>
+              <m.div initial={anim ? { opacity: 0, y: 8 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.08 }}>
+                <p className="fr-overline">Jadwal Pelaksanaan</p>
+                <div className="mt-1.5 flex items-end gap-2">
+                  <label className="min-w-0 flex-1">
+                    <span className="sr-only">Waktu pelaksanaan Salat Jumat di masjid</span>
+                    <input
+                      type="time"
+                      value={timeDraft}
+                      onChange={(e) => setTimeDraft(e.target.value || "")}
+                      className="tk-field w-full py-2 text-[13px] tnum"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFridaySettings({ time: timeDraft || null });
+                      toast.success(timeDraft ? `Jadwal Jumat disimpan: ${timeDraft.replace(":", ".")}` : "Jadwal dihapus — mengikuti waktu masuk Zuhur");
+                    }}
+                    className="tap gs-ink-btn flex h-[38px] shrink-0 items-center rounded-full px-4 text-[11.5px] font-bold"
+                  >
+                    Simpan
+                  </button>
+                </div>
+                <p className="mt-1 text-[9.5px] leading-snug text-tk-muted/85">
+                  Sesuaikan dengan jadwal masjid setempat. Tanpa pengaturan, countdown memakai waktu masuk Zuhur.
+                </p>
+              </m.div>
 
               {/* Checklist persiapan */}
-              <div className="mt-4 flex items-start justify-between gap-3">
+              <m.div initial={anim ? { opacity: 0, y: 8 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.16 }} className="mt-4 flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="fr-overline">Persiapkan Jumatmu</p>
                   <p className="mt-1 tnum text-[12px] font-bold text-tk-ink">
@@ -380,12 +370,12 @@ export function FridayCard({
                   </p>
                 </div>
                 <PrepRing done={doneCount} total={FRIDAY_PREP_ITEMS.length} />
-              </div>
+              </m.div>
               <ul className="mt-2.5 space-y-1.5" aria-label="Checklist persiapan Salat Jumat">
                 {FRIDAY_PREP_ITEMS.map((it, i) => {
                   const checked = !!fridayPrep?.checks?.[i];
                   return (
-                    <li key={i}>
+                    <m.li key={i} initial={anim ? { opacity: 0, y: 6 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 + i * 0.045 }}>
                       <button
                         type="button"
                         aria-pressed={checked}
@@ -405,16 +395,16 @@ export function FridayCard({
                         </span>
                         <span className={cn("text-[12px] leading-snug", checked ? "font-semibold text-tk-ink" : "text-tk-ink/85")}>{it}</span>
                       </button>
-                    </li>
+                    </m.li>
                   );
                 })}
               </ul>
 
               {/* Status pelaksanaan + pencatatan existing */}
-              <div className="mt-4 rounded-[1.1rem] border border-tk-line bg-tk-panel p-3.5">
+              <m.div initial={anim ? { opacity: 0, y: 8 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.62 }} className="mt-4 rounded-[1.1rem] border border-tk-line bg-tk-panel p-3.5">
                 <p className="fr-overline">Status Pelaksanaan</p>
                 <p className="mt-1 text-[12.5px] font-semibold text-tk-ink">
-                  {statusLabel(detail, w, today)} · {w.start.replace(":", ".")} — {w.end ? w.end.replace(":", ".") : "tanpa batas"} ({w.endLabel || "jendela Zuhur"})
+                  {statusText(detail, w, today)} · {w.start.replace(":", ".")} — {w.end ? w.end.replace(":", ".") : "tanpa batas"} ({w.endLabel || "jendela Zuhur"})
                 </p>
                 <p className="mt-0.5 text-[9.5px] leading-snug text-tk-muted/85">
                   Tidak otomatis dianggap selesai — status dicatat manual lewat mekanisme pencatatan yang sudah ada.
@@ -442,10 +432,10 @@ export function FridayCard({
                     </ConfirmButton>
                   ) : null}
                 </div>
-              </div>
+              </m.div>
 
               {/* Catatan pribadi */}
-              <label className="mt-4 block">
+              <m.label initial={anim ? { opacity: 0, y: 8 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.7 }} className="mt-4 block">
                 <span className="fr-overline">Catatan Pribadi</span>
                 <textarea
                   value={note}
@@ -456,17 +446,17 @@ export function FridayCard({
                   aria-label="Catatan pribadi Salat Jumat"
                   className="tk-field mt-1.5 w-full resize-none py-2.5 text-[12px] leading-relaxed"
                 />
-              </label>
+              </m.label>
 
               <p className="mt-2 flex items-center gap-1.5 text-[9.5px] leading-snug text-tk-muted/80">
-                <MoonStar size={10} aria-hidden /> Persiapan & catatan tersimpan untuk Jumat {formatDayFull(today)} dan terpisah dari pekan lain.
+                Persiapan & catatan tersimpan untuk Jumat {formatDayFull(today)} dan terpisah dari pekan lain.
               </p>
               <button
                 type="button"
                 onClick={() => setExpanded(false)}
-                className="tap mt-3 flex min-h-[38px] w-full items-center justify-center gap-1.5 rounded-full border border-tk-line-strong bg-tk-panel text-[11.5px] font-bold text-tk-ink"
+                className="tap mt-3 flex min-h-[38px] w-full items-center justify-center rounded-full border border-tk-line-strong bg-tk-panel text-[11.5px] font-bold text-tk-ink"
               >
-                <Trash2 size={0} aria-hidden className="hidden" /> Tutup Panel
+                Tutup Panel
               </button>
             </m.div>
           </m.div>

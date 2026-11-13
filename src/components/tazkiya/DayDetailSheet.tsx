@@ -16,13 +16,20 @@ import {
   selectPrayerDetail,
   type PrayerId,
 } from "@/lib/tazkiya/types";
-import { formatDayFull, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
+import { formatDayFull, isFriday, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
 import { cn } from "@/lib/utils";
 
-/** Meta salat sesuai slot pada tanggal tertentu (Jumat → Salat Jumat). */
+/**
+ * Meta salat sesuai slot pada tanggal tertentu. Slot Zuhur hanya berlabel
+ * "Salat Jumat" pada tanggal JUMAT (isFriday) — di hari lain tetap "Zuhur",
+ * sehingga riwayat tanggal lama tidak pernah salah tampil sebagai Jumat.
+ * (Bug lama: tanpa cek isFriday, sheet riwayat hari apa pun menampilkan
+ * slot Zuhur sebagai "Salat Jumat".)
+ */
 export function prayerMetaFor(date: string, id: PrayerId, fridayAlt: boolean) {
-  if (id === "zuhur" && !fridayAlt) return SALAT_JUMAT;
-  if (id === "zuhur" && fridayAlt) return ZUHUR_ALTERNATIF;
+  if (id === "zuhur" && isFriday(date)) {
+    return fridayAlt ? ZUHUR_ALTERNATIF : SALAT_JUMAT;
+  }
   return PRAYERS.find((p) => p.id === id) ?? PRAYERS[0];
 }
 

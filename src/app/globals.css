@@ -1444,71 +1444,200 @@ html[data-anim="off"] .tk-cloud {
 .pr-bird {
   animation: pr-bird var(--pr-dur, 38s) ease-in-out infinite alternate;
 }
-/* ================= Salat Jumat (pengalaman khusus) ================= */
+/* ================= Salat Jumat (varian keluarga tiket) ================= */
 
-/* Permukaan kartu Jumat: berlapis warm ivory → cream → peach (light) /
-   deep charcoal → warm brown (dark), tanpa warna neon. */
-.fr-card-surface {
-  background: linear-gradient(158deg, #FDF6EA 0%, #FAEBD2 34%, #F7DDAF 68%, #F3C98F 100%);
+/* Varian kartu tiket khusus Jumat — satu keluarga dengan .tk-tkt:
+   permukaan panel sama + gradasi warm sangat halus, garis aksen soft orange,
+   bayangan hangat; tidak ada warna neon, kontras tetap seimbang. */
+.tk-tkt--jumat {
+  background-image: linear-gradient(135deg, rgba(250, 82, 0, 0.05), rgba(255, 171, 64, 0.09) 42%, rgba(250, 82, 0, 0.02) 78%);
+  box-shadow: 0 18px 36px -20px rgba(250, 82, 0, 0.38);
 }
-html[data-theme="dark"] .fr-card-surface {
-  background: linear-gradient(158deg, #221B15 0%, #281F17 40%, #2E241A 72%, #352A1E 100%);
+html[data-theme="dark"] .tk-tkt--jumat {
+  background-image: linear-gradient(135deg, rgba(255, 107, 38, 0.07), rgba(217, 164, 65, 0.07) 45%, rgba(255, 107, 38, 0.03) 80%);
+  box-shadow: 0 18px 36px -20px rgba(0, 0, 0, 0.8);
 }
-/* Pendar cahaya lembut (opacity digerakkan tilt via motion value) */
-.fr-card-light {
-  background: radial-gradient(circle, rgba(255,205,130,0.5), rgba(255,205,130,0) 70%);
+/* Garis aksen kiri — soft orange khas Jumat (menggantikan aksen status). */
+.tk-tkt--jumat::before {
+  background: var(--color-tk-accent);
 }
-html[data-theme="dark"] .fr-card-light {
-  background: radial-gradient(circle, rgba(217,164,65,0.28), rgba(217,164,65,0) 70%);
+/* Ornamen geometris octagram — sangat halus, dua tema. */
+.fr-orn {
+  color: rgba(250, 82, 0, 0.13);
 }
-/* Teks di atas permukaan ivory terang tetap charcoal; di dark tetap ivory */
-.fr-card { color: var(--color-tk-ink); }
-.fr-chip {
-  background: rgba(183,121,31,0.14);
-  color: #8A5A18;
+html[data-theme="dark"] .fr-orn {
+  color: rgba(217, 164, 65, 0.14);
 }
-html[data-theme="dark"] .fr-chip { background: rgba(217,164,65,0.14); color: #D9A441; }
-.fr-chip-ok { background: rgba(124,158,107,0.18); color: #4C7A3F; }
-html[data-theme="dark"] .fr-chip-ok { background: rgba(124,158,107,0.2); color: #A4C79A; }
-.fr-chip-miss { background: rgba(229,72,77,0.14); color: #C0353A; }
-html[data-theme="dark"] .fr-chip-miss { background: rgba(229,72,77,0.18); color: #F08C90; }
-/* Blok countdown */
-.fr-count {
-  background: rgba(255,255,255,0.5);
-  border: 1px solid rgba(183,121,31,0.18);
+/* Pendar cahaya orange lembut (opacity digerakkan tilt/entrance). */
+.fr-light {
+  background: radial-gradient(circle, rgba(255, 171, 64, 0.28), rgba(255, 171, 64, 0) 70%);
 }
-html[data-theme="dark"] .fr-count {
-  background: rgba(255,236,200,0.07);
-  border-color: rgba(217,164,65,0.25);
+html[data-theme="dark"] .fr-light {
+  background: radial-gradient(circle, rgba(250, 130, 40, 0.16), rgba(250, 130, 40, 0) 70%);
 }
-.fr-sep { opacity: 0.45; font-weight: 400; }
-/* Panel detail (card reveal) */
+/* Badge JUMAT — pil kecil soft orange di samping nama slot. */
+.fr-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: rgba(250, 82, 0, 0.11);
+  padding: 2px 7px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-tk-accent);
+}
+html[data-theme="dark"] .fr-badge {
+  background: rgba(255, 107, 38, 0.14);
+  color: #FF8A50;
+}
+.fr-badge--solid {
+  background: rgba(250, 82, 0, 0.12);
+}
+/* Ringkasan persiapan pada foot status. */
+.fr-prep {
+  color: var(--color-tk-muted);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Baris countdown gaya baris live tiket. */
+.fr-live {
+  display: block;
+  margin: 2px 0 13px;
+  border-radius: 14px;
+  border: 1px solid rgba(250, 82, 0, 0.16);
+  background: rgba(250, 82, 0, 0.05);
+  padding: 9px 12px 10px;
+}
+html[data-theme="dark"] .fr-live {
+  border-color: rgba(255, 107, 38, 0.2);
+  background: rgba(255, 107, 38, 0.06);
+}
+.tk-tkt--active .fr-live {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+}
+.fr-live-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.fr-live-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-tk-accent);
+}
+.tk-tkt--active .fr-live-label {
+  color: #ffffff;
+}
+.fr-live-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--color-tk-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tk-tkt--active .fr-live-note {
+  color: rgba(255, 255, 255, 0.75);
+}
+.fr-live-count {
+  display: block;
+  margin-top: 3px;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.05;
+  color: var(--color-tk-ink);
+  font-variant-numeric: tabular-nums;
+}
+.tk-tkt--active .fr-live-count {
+  color: #ffffff;
+}
+.fr-live-count--arrived {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--color-tk-accent);
+}
+.tk-tkt--active .fr-live-count--arrived {
+  color: #ffffff;
+}
+.fr-live-bar {
+  display: block;
+  margin-top: 7px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(250, 82, 0, 0.14);
+  overflow: hidden;
+}
+html[data-theme="dark"] .fr-live-bar {
+  background: rgba(255, 107, 38, 0.16);
+}
+.tk-tkt--active .fr-live-bar {
+  background: rgba(255, 255, 255, 0.25);
+}
+.fr-live-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-tk-accent), #FFAB40);
+  transition: width 1s linear;
+}
+.tk-tkt--active .fr-live-bar-fill {
+  background: #ffffff;
+}
+.fr-live-foot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 7px;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-tk-muted);
+}
+.tk-tkt--active .fr-live-foot {
+  color: rgba(255, 255, 255, 0.78);
+}
+/* Panel detail (card reveal) — keluarga panel aplikasi. */
 .fr-panel {
   background: var(--color-tk-panel);
   border: 1px solid var(--color-tk-line);
-  box-shadow: 0 14px 30px -22px rgba(120,72,20,0.3);
+  box-shadow: 0 14px 30px -22px rgba(120, 72, 20, 0.3);
 }
-html[data-theme="dark"] .fr-panel { box-shadow: 0 14px 30px -22px rgba(0,0,0,0.7); }
+html[data-theme="dark"] .fr-panel { box-shadow: 0 14px 30px -22px rgba(0, 0, 0, 0.7); }
 .fr-overline {
   font-size: 9.5px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #8A5A18;
+  color: var(--color-tk-accent);
 }
-html[data-theme="dark"] .fr-overline { color: #D9A441; }
-/* Checklist */
 .fr-check { transition: background-color 200ms, border-color 200ms; }
 .fr-check:hover { background: var(--color-tk-panel-soft); }
 .fr-check-on {
-  border-color: rgba(250,82,0,0.35);
-  background: rgba(250,82,0,0.07);
+  border-color: rgba(250, 82, 0, 0.35);
+  background: rgba(250, 82, 0, 0.07);
 }
-html[data-theme="dark"] .fr-check-on { border-color: rgba(255,107,38,0.35); background: rgba(255,107,38,0.1); }
-.fr-ring-track { stroke: rgba(183,121,31,0.22); }
-html[data-theme="dark"] .fr-ring-track { stroke: rgba(217,164,65,0.22); }
+html[data-theme="dark"] .fr-check-on { border-color: rgba(255, 107, 38, 0.35); background: rgba(255, 107, 38, 0.1); }
+.fr-ring-track { stroke: rgba(250, 82, 0, 0.18); }
+html[data-theme="dark"] .fr-ring-track { stroke: rgba(255, 107, 38, 0.2); }
 
-/* Partikel cahaya & sinar matahari fullscreen — sangat lambat, berhenti
+/* Partikel cahaya & sinar matahari fullscreen Jumat — sangat lambat, berhenti
    pada reduced-motion / setelan animasi mati. */
 @keyframes fr-mote-float {
   0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.5; }

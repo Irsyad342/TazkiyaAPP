@@ -51,6 +51,7 @@ import {
   type PrayerMeta,
 } from "@/lib/tazkiya/types";
 import { formatHijri, isFriday, monthCalendarDayKeys, todayKey } from "@/lib/tazkiya/dates";
+import { prayersForDate } from "@/lib/tazkiya/friday";
 import { resolvePrayerSchedule } from "@/lib/tazkiya/prayerTimes";
 import { nextPrayerState, prayerTiming } from "@/lib/tazkiya/goals";
 import { nowTotalMinutes, resolvePrayerWindows, windowClock, type PrayerWindows } from "@/lib/tazkiya/prayerWindows";
@@ -213,9 +214,9 @@ function TodayTab({
 
   const friday = isFriday(today);
   const schedule = useMemo(() => resolvePrayerSchedule(settings, today), [settings, today]);
-  const prayersToday: PrayerMeta[] = friday
-    ? PRAYERS.map((p) => (p.id === "zuhur" ? (fridayZuhurAlt ? ZUHUR_ALTERNATIF : SALAT_JUMAT) : p))
-    : PRAYERS;
+  /* Satu sumber slot (friday.ts): Jumat = Subuh, Salat Jumat, Asar, Magrib, Isya —
+     slot Zuhur DIGANTIKAN, bukan ditambah. Hari lain kembali ke Zuhur otomatis. */
+  const prayersToday: PrayerMeta[] = prayersForDate(today, fridayZuhurAlt);
   const windows = useMemo(() => resolvePrayerWindows(settings, today, prayersToday), [settings, today, prayersToday]);
 
   const detailOf = (id: PrayerId): PrayerDetail => selectPrayerDetail(prayerDetails, logs, today, id);
