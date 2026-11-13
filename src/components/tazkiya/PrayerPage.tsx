@@ -614,7 +614,19 @@ function PrayerTickets({
               className="tk-tkt-slot"
               style={{ zIndex: isActive ? 30 : 20 - i, "--i": i } as CSSProperties}
             >
-              <FridayCard today={today} w={w} detail={detail} now={now} motionOK={motionOK} onRecord={onRecord} openSignal={fridayOpenSignal} />
+              <FridayCard
+                today={today}
+                w={w}
+                detail={detail}
+                now={now}
+                motionOK={motionOK}
+                phase={phase}
+                isNext={isNext}
+                nextLabel={prayers[i + 1]?.label}
+                nextTime={prayers[i + 1] ? windows[prayers[i + 1].id]?.start ?? undefined : undefined}
+                onRecord={onRecord}
+                openSignal={fridayOpenSignal}
+              />
             </li>
           );
         }

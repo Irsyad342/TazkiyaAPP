@@ -1444,45 +1444,20 @@ html[data-anim="off"] .tk-cloud {
 .pr-bird {
   animation: pr-bird var(--pr-dur, 38s) ease-in-out infinite alternate;
 }
-/* ================= Salat Jumat (varian keluarga tiket) ================= */
+/* ================= Salat Jumat (varian keluarga tiket, v3 minimalis) ================= */
 
-/* Varian kartu tiket khusus Jumat — satu keluarga dengan .tk-tkt:
-   permukaan panel sama + gradasi warm sangat halus, garis aksen soft orange,
-   bayangan hangat; tidak ada warna neon, kontras tetap seimbang. */
-.tk-tkt--jumat {
-  background-image: linear-gradient(135deg, rgba(250, 82, 0, 0.05), rgba(255, 171, 64, 0.09) 42%, rgba(250, 82, 0, 0.02) 78%);
-  box-shadow: 0 18px 36px -20px rgba(250, 82, 0, 0.38);
-}
-html[data-theme="dark"] .tk-tkt--jumat {
-  background-image: linear-gradient(135deg, rgba(255, 107, 38, 0.07), rgba(217, 164, 65, 0.07) 45%, rgba(255, 107, 38, 0.03) 80%);
-  box-shadow: 0 18px 36px -20px rgba(0, 0, 0, 0.8);
-}
-/* Garis aksen kiri — soft orange khas Jumat (menggantikan aksen status). */
-.tk-tkt--jumat::before {
-  background: var(--color-tk-accent);
-}
-/* Ornamen geometris octagram — sangat halus, dua tema. */
-.fr-orn {
-  color: rgba(250, 82, 0, 0.13);
-}
-html[data-theme="dark"] .fr-orn {
-  color: rgba(217, 164, 65, 0.14);
-}
-/* Pendar cahaya orange lembut (opacity digerakkan tilt/entrance). */
-.fr-light {
-  background: radial-gradient(circle, rgba(255, 171, 64, 0.28), rgba(255, 171, 64, 0) 70%);
-}
-html[data-theme="dark"] .fr-light {
-  background: radial-gradient(circle, rgba(250, 130, 40, 0.16), rgba(250, 130, 40, 0) 70%);
-}
-/* Badge JUMAT — pil kecil soft orange di samping nama slot. */
+/* Kartu Jumat TIDAK melakukan override visual apa pun terhadap keluarga
+   .tk-tkt (tanpa garis kiri khusus, tanpa gradasi, tanpa ornamen, tanpa
+   glow). Karakter Jumat: badge tunggal, ikon kubah, baris persiapan.
+   Active/next/done/missed mengikuti gaya tiket lain persis. */
+
+/* Badge "Jumat" — satu-satunya badge, pil kecil soft orange. */
 .fr-badge {
   display: inline-flex;
   align-items: center;
-  gap: 2.5px;
   flex-shrink: 0;
   border-radius: 999px;
-  background: rgba(250, 82, 0, 0.11);
+  background: rgba(250, 82, 0, 0.1);
   padding: 2px 7px;
   font-size: 8px;
   font-weight: 800;
@@ -1491,129 +1466,118 @@ html[data-theme="dark"] .fr-light {
   color: var(--color-tk-accent);
 }
 html[data-theme="dark"] .fr-badge {
-  background: rgba(255, 107, 38, 0.14);
+  background: rgba(255, 107, 38, 0.13);
   color: #FF8A50;
 }
-.fr-badge--solid {
-  background: rgba(250, 82, 0, 0.12);
-}
-/* Ringkasan persiapan pada foot status. */
-.fr-prep {
+/* Countdown kecil pada baris status (Belum masuk waktu · 05:12:40). */
+.fr-cd {
   color: var(--color-tk-muted);
   font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-/* Baris countdown gaya baris live tiket. */
-.fr-live {
-  display: block;
-  margin: 2px 0 13px;
-  border-radius: 14px;
-  border: 1px solid rgba(250, 82, 0, 0.16);
-  background: rgba(250, 82, 0, 0.05);
-  padding: 9px 12px 10px;
-}
-html[data-theme="dark"] .fr-live {
-  border-color: rgba(255, 107, 38, 0.2);
-  background: rgba(255, 107, 38, 0.06);
-}
-.tk-tkt--active .fr-live {
-  border-color: rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.12);
-}
-.fr-live-top {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-.fr-live-label {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-tk-accent);
-}
-.tk-tkt--active .fr-live-label {
-  color: #ffffff;
-}
-.fr-live-note {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 8.5px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: none;
-  color: var(--color-tk-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.tk-tkt--active .fr-live-note {
-  color: rgba(255, 255, 255, 0.75);
-}
-.fr-live-count {
-  display: block;
-  margin-top: 3px;
-  font-size: 23px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  line-height: 1.05;
-  color: var(--color-tk-ink);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
-.tk-tkt--active .fr-live-count {
-  color: #ffffff;
+.tk-tkt--active .fr-cd {
+  color: rgba(255, 255, 255, 0.85);
 }
-.fr-live-count--arrived {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0;
+/* Pengingat kecil saat waktu telah tiba — menyatu, tanpa kotak/border. */
+.fr-hint {
+  display: block;
+  margin: -6px 0 11px;
+  padding: 0;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.4;
   color: var(--color-tk-accent);
 }
-.tk-tkt--active .fr-live-count--arrived {
-  color: #ffffff;
+.tk-tkt--active .fr-hint {
+  color: rgba(255, 255, 255, 0.92);
 }
-.fr-live-bar {
-  display: block;
-  margin-top: 7px;
-  height: 4px;
+/* Baris persiapan ringkas — satu baris tenang di dasar kartu. */
+.fr-prep-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 4px 0 12px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: var(--color-tk-panel-soft);
+  border: none;
+  text-align: left;
+  transition: background-color 200ms;
+}
+.fr-prep-row:hover {
+  background: var(--color-tk-panel-strong);
+}
+.fr-prep-label {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-tk-muted);
+}
+.fr-prep-bar {
+  flex: 1 1 auto;
+  min-width: 24px;
+  height: 3px;
   border-radius: 999px;
-  background: rgba(250, 82, 0, 0.14);
+  background: var(--color-tk-line-soft);
   overflow: hidden;
 }
-html[data-theme="dark"] .fr-live-bar {
-  background: rgba(255, 107, 38, 0.16);
-}
-.tk-tkt--active .fr-live-bar {
-  background: rgba(255, 255, 255, 0.25);
-}
-.fr-live-bar-fill {
+.fr-prep-bar-fill {
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--color-tk-accent), #FFAB40);
-  transition: width 1s linear;
+  background: var(--color-tk-accent);
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.tk-tkt--active .fr-live-bar-fill {
+.fr-prep-count {
+  flex-shrink: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--color-tk-ink);
+  font-variant-numeric: tabular-nums;
+}
+.fr-prep-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-tk-accent);
+  white-space: nowrap;
+}
+/* Saat kartu aktif (waktu tiba, oranye seperti keluarga tiket), semua
+   elemen internal ikut memakai tinta terang — kontras tetap seimbang. */
+.tk-tkt--active .tk-tkt-note {
+  color: rgba(255, 255, 255, 0.85);
+}
+.tk-tkt--active .fr-prep-row {
+  background: rgba(255, 255, 255, 0.14);
+}
+.tk-tkt--active .fr-prep-row:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.tk-tkt--active .fr-prep-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+.tk-tkt--active .fr-prep-bar {
+  background: rgba(255, 255, 255, 0.28);
+}
+.tk-tkt--active .fr-prep-bar-fill {
   background: #ffffff;
 }
-.fr-live-foot {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 7px;
-  font-size: 9px;
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--color-tk-muted);
+.tk-tkt--active .fr-prep-count,
+.tk-tkt--active .fr-prep-more {
+  color: #ffffff;
 }
-.tk-tkt--active .fr-live-foot {
-  color: rgba(255, 255, 255, 0.78);
+.tk-tkt--active .fr-badge {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
 }
-/* Panel detail (card reveal) — keluarga panel aplikasi. */
+/* Panel persiapan expandable — permukaan panel aplikasi, hairline. */
 .fr-panel {
   background: var(--color-tk-panel);
   border: 1px solid var(--color-tk-line);
@@ -1634,8 +1598,6 @@ html[data-theme="dark"] .fr-panel { box-shadow: 0 14px 30px -22px rgba(0, 0, 0, 
   background: rgba(250, 82, 0, 0.07);
 }
 html[data-theme="dark"] .fr-check-on { border-color: rgba(255, 107, 38, 0.35); background: rgba(255, 107, 38, 0.1); }
-.fr-ring-track { stroke: rgba(250, 82, 0, 0.18); }
-html[data-theme="dark"] .fr-ring-track { stroke: rgba(255, 107, 38, 0.2); }
 
 /* Partikel cahaya & sinar matahari fullscreen Jumat — sangat lambat, berhenti
    pada reduced-motion / setelan animasi mati. */
