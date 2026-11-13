@@ -258,6 +258,65 @@ export interface ReminderTime {
 /** Metode sudut perhitungan jadwal salat otomatis (didefinisikan di prayerTimes.ts). */
 export type PrayerCalcMethod = "kemenag" | "mwl" | "egypt" | "isna" | "makkah";
 
+/* ---------- Pengalaman khusus Salat Jumat ---------- */
+
+/** Pengaturan pengalaman Salat Jumat (tersinkron lewat settings). */
+export interface FridaySettings {
+  /** Pengalaman khusus Jumat aktif (kartu spesial, layar penuh, pengingat). */
+  enabled: boolean;
+  /**
+   * Waktu pelaksanaan Salat Jumat di masjid ("HH:MM"). Null = belum diatur —
+   * aplikasi memakai waktu masuk Zuhur sebagai referensi sementara dengan
+   * keterangan bahwa waktu pelaksanaan di masjid dapat berbeda.
+   */
+  time: string | null;
+  /** Layar penuh "Jumat Telah Menyapa" muncul N menit sebelum waktu pelaksanaan (0 = mati). */
+  fullscreenMinutes: number;
+  notif: {
+    /** Pengingat 15 menit sebelum waktu pelaksanaan. */
+    before: boolean;
+    /** Pengingat ketika waktu pelaksanaan tiba. */
+    atTime: boolean;
+    /** Pengingat persiapan Jumat. */
+    prep: boolean;
+    /** Pengingat membaca Al-Kahfi. */
+    kahfi: boolean;
+  };
+  /** Waktu pengingat persiapan (default 08:00). */
+  prepTime: string;
+  /** Waktu pengingat Al-Kahfi (default 08:30). */
+  kahfiTime: string;
+}
+
+export const DEFAULT_FRIDAY_SETTINGS: FridaySettings = {
+  enabled: true,
+  time: null,
+  fullscreenMinutes: 30,
+  notif: { before: true, atTime: true, prep: true, kahfi: true },
+  prepTime: "08:00",
+  kahfiTime: "08:30",
+};
+
+/** Checklist persiapan Jumat — pengingat sunnah, bukan syarat sah. */
+export const FRIDAY_PREP_ITEMS: string[] = [
+  "Mandi Jumat",
+  "Membersihkan diri",
+  "Memakai pakaian bersih dan terbaik",
+  "Menggunakan wewangian bagi yang dianjurkan",
+  "Memotong kuku dan merapikan diri",
+  "Membaca Surah Al-Kahfi",
+  "Memperbanyak selawat",
+  "Berangkat lebih awal ke masjid",
+];
+
+/** Checklist persiapan per tanggal Jumat — tidak tercampur antarpekan. */
+export interface FridayPrepData {
+  checks: Record<number, boolean>;
+  note?: string;
+  savedAt: string; // ISO
+  updatedAt?: string; // ISO, terisi setelah perubahan berikutnya
+}
+
 export interface Settings {
   name: string;
   /** Foto profil — data URL WebP kecil (±256px, hasil konversi otomatis; JPEG bila browser tak mendukung enkode WebP). */
@@ -297,6 +356,8 @@ export interface Settings {
   quranMushafTranslation?: boolean;
   /** Pengingat layar penuh saat masuk waktu salat (default aktif). */
   fullscreenReminder?: boolean;
+  /** Pengalaman khusus Salat Jumat (kartu, countdown, checklist, layar penuh). */
+  friday?: FridaySettings;
   /** Notifikasi sistem saat aplikasi di latar/tersembunyi (default nonaktif; butuh izin). */
   reminderNotify?: boolean;
   createdAt: string; // ISO, pertama kali memakai aplikasi
@@ -574,6 +635,7 @@ export function createDefaultSettings(): Settings {
     quranMushafTranslation: false,
     fullscreenReminder: true,
     reminderNotify: false,
+    friday: DEFAULT_FRIDAY_SETTINGS,
     createdAt: new Date().toISOString(),
   };
 }

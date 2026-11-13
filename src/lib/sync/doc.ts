@@ -22,6 +22,7 @@ import {
   type JournalEntry,
   type JournalCat,
   type JournalXEntry,
+  type FridayPrepData,
   type LastRead,
   type PrayerDetail,
   type PrayerId,
@@ -53,6 +54,8 @@ export interface CloudDoc {
   journal?: Record<string, JournalEntry>;
   /** Jurnal kategori baru (refleksi/emosi/harapan) — dokumen lama tetap terbaca. */
   journalX?: Record<JournalCat, Record<string, JournalXEntry>>;
+  /** Checklist persiapan Jumat per tanggal — dokumen lama tetap terbaca. */
+  fridayPrep?: Record<string, FridayPrepData>;
   moods?: Record<string, { mood: string; savedAt: string }>;
   amalEntries?: AmalEntry[];
   amalGoals?: AmalGoal[];
@@ -82,6 +85,7 @@ export function extractFullDoc(state: {
   qadaRecords: QadaRecord[];
   journal: Record<string, JournalEntry>;
   journalX: Record<JournalCat, Record<string, JournalXEntry>>;
+  fridayPrep: Record<string, FridayPrepData>;
   moods: Record<string, { mood: string; savedAt: string }>;
   amalEntries: AmalEntry[];
   amalGoals: AmalGoal[];
@@ -107,6 +111,7 @@ export function extractFullDoc(state: {
     qadaRecords: state.qadaRecords,
     journal: state.journal,
     journalX: state.journalX,
+    fridayPrep: state.fridayPrep,
     moods: state.moods,
     amalEntries: state.amalEntries,
     amalGoals: state.amalGoals,
@@ -138,6 +143,7 @@ export function isEmptyDoc(doc: CloudDoc | null | undefined): boolean {
   if (doc.qadaRecords && doc.qadaRecords.length > 0) return false;
   if (doc.journal && Object.keys(doc.journal).length > 0) return false;
   if (doc.journalX && Object.values(doc.journalX).some((b) => Object.keys(b ?? {}).length > 0)) return false;
+  if (doc.fridayPrep && Object.keys(doc.fridayPrep).length > 0) return false;
   if (doc.moods && Object.keys(doc.moods).length > 0) return false;
   if (doc.amalEntries && doc.amalEntries.length > 0) return false;
   if (doc.zikirSessions && doc.zikirSessions.length > 0) return false;

@@ -27,7 +27,7 @@ import { useWorshipStore } from "./store";
 import { resolvePrayerSchedule } from "./prayerTimes";
 import { nextPrayerState } from "./goals";
 import { PRAYERS, type PrayerId } from "./types";
-import { todayKey } from "./dates";
+import { isFriday, todayKey } from "./dates";
 
 /** Durasi kilat pemeriksaan waktu (detik) — cukup rapat, hemat baterai. */
 const TICK_SEC = 20;
@@ -139,6 +139,11 @@ export function usePrayerReminder(homeVisible: boolean): {
       if (!current) return null; // belum masuk waktu salat mana pun hari ini
       // Preferensi pengguna (default aktif).
       if (cur.settings.fullscreenReminder === false) return null;
+      // Hari Jumat: slot Zuhur = Salat Jumat — pengingatnya dikuasai mesin
+      // pengalaman Jumat (friday-trigger) agar tidak tampil dua overlay.
+      if (isFriday(today) && current === "zuhur" && (cur.settings.friday?.enabled ?? true) && !cur.fridayZuhurAlt?.[today]) {
+        return null;
+      }
       // Sudah pernah disampaikan pada waktunya ini?
       if (cur.reminderShown[current] === today) return null;
       // Sudah dicatat selesai oleh pengguna → tidak perlu diingatkan.

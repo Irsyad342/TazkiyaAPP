@@ -24,6 +24,7 @@ import type {
   DailyLog,
   DeletedReading,
   JournalXEntry,
+  FridayPrepData,
   LastRead,
   PrayerDetail,
   PrayerId,
@@ -240,6 +241,7 @@ export function mergeDocs(local: CloudDoc, cloud: CloudDoc, opts: MergeOptions):
   const zikirSessions = mergeById(local.zikirSessions ?? [], cloud.zikirSessions ?? [], (z) => z.savedAt ?? "").slice(0, 500);
   const journal = mergeJournal(local.journal ?? {}, cloud.journal ?? {});
   const journalX = mergeJournalX(local.journalX, cloud.journalX);
+  const fridayPrep = mergeFridayPrep(local.fridayPrep, cloud.fridayPrep);
   const moods = mergeMoods(local.moods ?? {}, cloud.moods ?? {});
   const amalGoals = mergeGoals(local.amalGoals ?? [], cloud.amalGoals ?? []);
   const dailyGoals = mergeDailyGoals(local.dailyGoals ?? [], cloud.dailyGoals ?? []);
@@ -266,6 +268,7 @@ export function mergeDocs(local: CloudDoc, cloud: CloudDoc, opts: MergeOptions):
     qadaRecords,
     journal,
     journalX,
+    fridayPrep,
     moods,
     amalEntries,
     amalGoals,
@@ -384,6 +387,28 @@ function mergeJournalX(
       } else merged[date] = (l ?? c) as JournalXEntry;
     }
     out[cat] = merged;
+  }
+  return out;
+}
+
+/**
+ * Checklist persiapan Jumat per tanggal: entri dengan `updatedAt`/`savedAt`
+ * terbaru menang — pola sama dengan mergeJournal.
+ */
+function mergeFridayPrep(
+  local: CloudDoc["fridayPrep"],
+  cloud: CloudDoc["fridayPrep"]
+): NonNullable<CloudDoc["fridayPrep"]> {
+  const out: NonNullable<CloudDoc["fridayPrep"]> = {};
+  const dates = new Set([...Object.keys(local ?? {}), ...Object.keys(cloud ?? {})]);
+  for (const date of dates) {
+    const l = local?.[date];
+    const c = cloud?.[date];
+    if (l && c) {
+      const lt = Date.parse(l.updatedAt ?? l.savedAt ?? "0");
+      const ct = Date.parse(c.updatedAt ?? c.savedAt ?? "0");
+      out[date] = lt >= ct ? l : c;
+    } else out[date] = (l ?? c) as FridayPrepData;
   }
   return out;
 }

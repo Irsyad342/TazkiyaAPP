@@ -1444,6 +1444,99 @@ html[data-anim="off"] .tk-cloud {
 .pr-bird {
   animation: pr-bird var(--pr-dur, 38s) ease-in-out infinite alternate;
 }
+/* ================= Salat Jumat (pengalaman khusus) ================= */
+
+/* Permukaan kartu Jumat: berlapis warm ivory → cream → peach (light) /
+   deep charcoal → warm brown (dark), tanpa warna neon. */
+.fr-card-surface {
+  background: linear-gradient(158deg, #FDF6EA 0%, #FAEBD2 34%, #F7DDAF 68%, #F3C98F 100%);
+}
+html[data-theme="dark"] .fr-card-surface {
+  background: linear-gradient(158deg, #221B15 0%, #281F17 40%, #2E241A 72%, #352A1E 100%);
+}
+/* Pendar cahaya lembut (opacity digerakkan tilt via motion value) */
+.fr-card-light {
+  background: radial-gradient(circle, rgba(255,205,130,0.5), rgba(255,205,130,0) 70%);
+}
+html[data-theme="dark"] .fr-card-light {
+  background: radial-gradient(circle, rgba(217,164,65,0.28), rgba(217,164,65,0) 70%);
+}
+/* Teks di atas permukaan ivory terang tetap charcoal; di dark tetap ivory */
+.fr-card { color: var(--color-tk-ink); }
+.fr-chip {
+  background: rgba(183,121,31,0.14);
+  color: #8A5A18;
+}
+html[data-theme="dark"] .fr-chip { background: rgba(217,164,65,0.14); color: #D9A441; }
+.fr-chip-ok { background: rgba(124,158,107,0.18); color: #4C7A3F; }
+html[data-theme="dark"] .fr-chip-ok { background: rgba(124,158,107,0.2); color: #A4C79A; }
+.fr-chip-miss { background: rgba(229,72,77,0.14); color: #C0353A; }
+html[data-theme="dark"] .fr-chip-miss { background: rgba(229,72,77,0.18); color: #F08C90; }
+/* Blok countdown */
+.fr-count {
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(183,121,31,0.18);
+}
+html[data-theme="dark"] .fr-count {
+  background: rgba(255,236,200,0.07);
+  border-color: rgba(217,164,65,0.25);
+}
+.fr-sep { opacity: 0.45; font-weight: 400; }
+/* Panel detail (card reveal) */
+.fr-panel {
+  background: var(--color-tk-panel);
+  border: 1px solid var(--color-tk-line);
+  box-shadow: 0 14px 30px -22px rgba(120,72,20,0.3);
+}
+html[data-theme="dark"] .fr-panel { box-shadow: 0 14px 30px -22px rgba(0,0,0,0.7); }
+.fr-overline {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8A5A18;
+}
+html[data-theme="dark"] .fr-overline { color: #D9A441; }
+/* Checklist */
+.fr-check { transition: background-color 200ms, border-color 200ms; }
+.fr-check:hover { background: var(--color-tk-panel-soft); }
+.fr-check-on {
+  border-color: rgba(250,82,0,0.35);
+  background: rgba(250,82,0,0.07);
+}
+html[data-theme="dark"] .fr-check-on { border-color: rgba(255,107,38,0.35); background: rgba(255,107,38,0.1); }
+.fr-ring-track { stroke: rgba(183,121,31,0.22); }
+html[data-theme="dark"] .fr-ring-track { stroke: rgba(217,164,65,0.22); }
+
+/* Partikel cahaya & sinar matahari fullscreen — sangat lambat, berhenti
+   pada reduced-motion / setelan animasi mati. */
+@keyframes fr-mote-float {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.5; }
+  50% { transform: translate3d(4px, -14px, 0); opacity: 0.95; }
+}
+.fr-mote {
+  animation: fr-mote-float 7s ease-in-out infinite;
+}
+@keyframes fr-rays-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.fr-rays-slow {
+  animation: fr-rays-rotate 90s linear infinite;
+}
+html[data-anim="off"] .fr-mote,
+html[data-anim="off"] .fr-rays-slow {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html .fr-mote,
+  html .fr-rays-slow {
+    animation: none !important;
+  }
+}
+
+/* ================= Salat Jumat (end) ================= */
+
 /* Float sangat halus untuk banner Jurnal — hanya transform, berhenti bila
    animasi dimatikan / reduced-motion. */
 @keyframes pr-float-soft {

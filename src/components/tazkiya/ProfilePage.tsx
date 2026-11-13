@@ -41,6 +41,7 @@ import {
   LogOut,
   MapPin,
   Minus,
+  MoonStar,
   Pencil,
   ListChecks,
   Sparkles,
@@ -49,7 +50,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
-import { requestNotifyPermission } from "@/lib/tazkiya/reminder-trigger";
+import { requestNotifyPermission, notifyPermission } from "@/lib/tazkiya/reminder-trigger";
+import { DEFAULT_FRIDAY_SETTINGS, type FridaySettings } from "@/lib/tazkiya/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -112,7 +114,165 @@ function AutoBadge() {
   );
 }
 
-type Panel = "riwayat" | "pengingat" | "lokasi" | null;
+/**
+ * Panel pengaturan pengalaman khusus Salat Jumat:
+ * pengalaman aktif, waktu pelaksanaan di masjid, layar penuh N menit
+ * sebelum, empat pengingat notifikasi (sebelum / saat tiba / persiapan /
+ * Al-Kahfi), izin notifikasi sistem, dan keterangan disclaimers.
+ */
+function FridaySettingsPanel() {
+  const settings = useWorshipStore((s) => s.settings);
+  const fs = settings.friday ?? DEFAULT_FRIDAY_SETTINGS;
+  const setFridaySettings = useWorshipStore((s) => s.setFridaySettings);
+  const [perm, setPerm] = useState(notifyPermission());
+  const patch = (p: Partial<FridaySettings>) => setFridaySettings(p);
+
+  return (
+    <div className="bg-tk-panel-soft/60 px-4 py-4">
+      {/* Aktif/nonaktif pengalaman */}
+      <div className="flex items-center justify-between rounded-xl bg-tk-panel px-3.5 py-3">
+        <div>
+          <p className="text-[13.5px] font-semibold text-tk-ink">Pengalaman Salat Jumat</p>
+          <p className="text-[11px] text-tk-muted">Kartu spesial, countdown, checklist & layar penuh</p>
+        </div>
+        <Switch
+          checked={fs.enabled}
+          onCheckedChange={(v) => {
+            patch({ enabled: v });
+            toast.info(v ? "Pengalaman Salat Jumat diaktifkan" : "Pengalaman Salat Jumat dimatikan");
+          }}
+          aria-label="Aktifkan pengalaman Salat Jumat"
+        />
+      </div>
+
+      {/* Waktu pelaksanaan */}
+      <div className="mt-2.5 rounded-xl bg-tk-panel px-3.5 py-3">
+        <label htmlFor="friday-time" className="text-[13.5px] font-semibold text-tk-ink">
+          Waktu pelaksanaan di masjid
+        </label>
+        <p className="mt-0.5 text-[11px] leading-snug text-tk-muted">
+          Sesuaikan dengan masjid setempat. Tanpa pengaturan, countdown memakai waktu masuk Zuhur.
+        </p>
+        <div className="mt-2 flex items-center gap-2">
+          <input
+            id="friday-time"
+            type="time"
+            value={fs.time ?? ""}
+            onChange={(e) => patch({ time: e.target.value || null })}
+            className="rounded-lg border border-tk-line bg-tk-panel-strong px-2.5 py-1.5 text-xs text-tk-ink outline-none transition-colors focus:border-tk-violet/60"
+          />
+          {fs.time ? (
+            <button
+              type="button"
+              onClick={() => patch({ time: null })}
+              className="tap rounded-full border border-tk-line-strong bg-tk-panel px-3 py-1.5 text-[10.5px] font-semibold text-tk-muted"
+            >
+              Hapus
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Layar penuh N menit sebelum */}
+      <div className="mt-2.5 rounded-xl bg-tk-panel px-3.5 py-3">
+        <p className="text-[13.5px] font-semibold text-tk-ink">Layar penuh &ldquo;Jumat Telah Menyapa&rdquo;</p>
+        <p className="mt-0.5 text-[11px] text-tk-muted">Tampil sebelum waktu pelaksanaan saat aplikasi terbuka</p>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {[0, 15, 30, 45].map((m) => (
+            <button
+              key={m}
+              type="button"
+              aria-pressed={(fs.fullscreenMinutes ?? 30) === m}
+              onClick={() => patch({ fullscreenMinutes: m })}
+              className={cn(
+                "tap rounded-full px-3 py-1.5 text-[11px] font-bold transition-colors",
+                (fs.fullscreenMinutes ?? 30) === m
+                  ? "gs-ink-btn"
+                  : "border border-tk-line-strong bg-tk-panel text-tk-ink"
+              )}
+            >
+              {m === 0 ? "Mati" : `${m} mnt`}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Empat pengingat */}
+      <div className="mt-2.5 space-y-2">
+        {(
+          [
+            ["before", "Pengingat sebelum waktu Jumat", "15 menit sebelum pelaksanaan", undefined],
+            ["atTime", "Pengingat saat waktu tiba", "Ketika waktu pelaksanaan masuk", undefined],
+            ["prep", "Pengingat persiapan", undefined, "prepTime"],
+            ["kahfi", "Pengingat membaca Al-Kahfi", undefined, "kahfiTime"],
+          ] as const
+        ).map(([key, title, sub, timeField]) => (
+          <div key={key} className="flex items-center justify-between rounded-xl bg-tk-panel px-3.5 py-2.5">
+            <div className="min-w-0">
+              <p className="text-[13px] font-medium text-tk-ink">{title}</p>
+              <p className="text-[10.5px] text-tk-muted">{sub ?? (timeField ? `Waktu ${fs[timeField].replace(":", ".")}` : "")}</p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2.5">
+              {timeField ? (
+                <input
+                  type="time"
+                  value={fs[timeField]}
+                  onChange={(e) => patch({ [timeField]: e.target.value || fs[timeField] } as Partial<FridaySettings>)}
+                  className="rounded-lg border border-tk-line bg-tk-panel-strong px-2.5 py-1.5 text-xs text-tk-ink outline-none transition-colors focus:border-tk-violet/60"
+                  aria-label={`Waktu ${title}`}
+                />
+              ) : null}
+              <Switch
+                checked={fs.notif[key]}
+                onCheckedChange={(v) => {
+                  patch({ notif: { ...fs.notif, [key]: v } });
+                  if (v && notifyPermission() === "default") {
+                    void requestNotifyPermission().then(() => setPerm(notifyPermission()));
+                  }
+                }}
+                aria-label={title}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Izin notifikasi */}
+      <div className="mt-2.5 flex items-center justify-between rounded-xl bg-tk-panel px-3.5 py-3">
+        <div>
+          <p className="text-[13.5px] font-semibold text-tk-ink">Notifikasi sistem</p>
+          <p className="text-[11px] leading-snug text-tk-muted">
+            {perm === "granted"
+              ? "Izin diberikan — pengingat tampil di latar."
+              : perm === "denied"
+                ? "Izin ditolak — aktifkan di pengaturan browser."
+                : "Butuh izin untuk pengingat saat aplikasi di latar."}
+          </p>
+        </div>
+        {perm === "granted" ? (
+          <span className="rounded-full bg-tk-lavender px-2.5 py-1 text-[10px] font-bold text-tk-violet">Aktif</span>
+        ) : (
+          <button
+            type="button"
+            onClick={() => void requestNotifyPermission().then((r) => setPerm(r === "unsupported" ? perm : r))}
+            className="tap gs-ink-btn rounded-full px-3.5 py-2 text-[11px] font-bold"
+          >
+            {perm === "denied" ? "Cek Ulang" : "Beri Izin"}
+          </button>
+        )}
+      </div>
+
+      <p className="mt-2.5 flex items-start gap-1.5 text-[10.5px] leading-relaxed text-tk-muted/85">
+        <Info size={12} className="mt-0.5 shrink-0" />
+        Pengingat masing-masing tampil maksimal sekali per Jumat (tidak berulang). Mengingat tiba bukan penanda salat
+        selesai — pencatatan tetap manual di kartu Salat Jumat. Checklist merupakan pengingat sunnah, bukan syarat sah
+        Salat Jumat.
+      </p>
+    </div>
+  );
+}
+
+type Panel = "riwayat" | "pengingat" | "jumat" | "lokasi" | null;
 
 export function ProfilePage({
   onOpenTargets,
@@ -688,6 +848,24 @@ export function ProfilePage({
             />
           </GroupRow>
           <GroupRow
+            icon={MoonStar}
+            title="Salat Jumat"
+            caption={
+              (settings.friday ?? DEFAULT_FRIDAY_SETTINGS).enabled
+                ? (settings.friday?.time
+                    ? `Aktif · pelaksanaan ${settings.friday.time.replace(":", ".")}`
+                    : "Aktif · mengikuti waktu masuk Zuhur")
+                : "Nonaktif"
+            }
+            onClick={() => togglePanel("jumat")}
+            control
+          >
+            <ChevronDown
+              size={16}
+              className={cn("shrink-0 text-tk-muted/70 transition-transform", openPanel === "jumat" && "rotate-180")}
+            />
+          </GroupRow>
+          <GroupRow
             icon={LocateFixed}
             title="Lokasi & Jadwal"
             caption={settings.geo ? (settings.geo.label ?? "Koordinat perangkat") : "Otomatis dari GPS, belum aktif"}
@@ -900,6 +1078,11 @@ export function ProfilePage({
                 diberikan (diminta otomatis saat pengingat layar penuh diaktifkan). Preferensi tersimpan di perangkat ini.
               </p>
             </div>
+          ) : null}
+
+          {/* ---- Panel: Salat Jumat ---- */}
+          {openPanel === "jumat" ? (
+            <FridaySettingsPanel />
           ) : null}
 
           {/* ---- Panel: Lokasi & jadwal ---- */}

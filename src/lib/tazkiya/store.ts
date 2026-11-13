@@ -24,9 +24,12 @@ import {
   type JournalEntry,
   type JournalCat,
   type JournalXEntry,
+  type FridayPrepData,
+  type FridaySettings,
   type LastRead,
   type MoodId,
   type PrayerDetail,
+  DEFAULT_FRIDAY_SETTINGS,
   type PrayerId,
   type QadaRecord,
   type QuranBookmark,
@@ -86,6 +89,10 @@ interface WorshipActions {
     entry: { date: string; title: string; text: string; answers?: (string | undefined)[]; mood?: MoodId }
   ) => void;
   deleteJournalX: (cat: JournalCat, date: string) => void;
+  /* ---- Pengalaman khusus Salat Jumat ---- */
+  setFridaySettings: (patch: Partial<FridaySettings>) => void;
+  setFridayPrepCheck: (date: string, idx: number, val: boolean) => void;
+  setFridayPrepNote: (date: string, note: string) => void;
   /* ---- Rizq & Amal ---- */
   addAmalEntry: (date: string, kind: AmalKind, title: string, note?: string) => void;
   deleteAmalEntry: (id: string) => void;
@@ -135,6 +142,8 @@ export type WorshipStore = {
    * tanggal. Jurnal Syukur TETAP di `journal` (data lama tidak disentuh).
    */
   journalX: Record<JournalCat, Record<string, JournalXEntry>>;
+  /** Checklist persiapan Jumat per tanggal Jumat (tidak tercampur antarpekan). */
+  fridayPrep: Record<string, FridayPrepData>;
   /** Mood check-in per tanggal (yang terbaru menang). */
   moods: Record<string, { mood: MoodId; savedAt: string }>;
   /** Catatan amal kebaikan & sedekah — paling baru di depan. */
@@ -193,6 +202,7 @@ export const useWorshipStore = create<WorshipStore>()(
       qadaRecords: [],
       journal: {},
       journalX: EMPTY_JOURNAL_X,
+      fridayPrep: {},
       moods: {},
       amalEntries: [],
       amalGoals: DEFAULT_AMAL_GOALS,
@@ -482,6 +492,40 @@ export const useWorshipStore = create<WorshipStore>()(
           return { journalX: { ...s.journalX, [cat]: bucket } };
         }),
 
+      /* ---------- Pengalaman khusus Salat Jumat ---------- */
+      setFridaySettings: (patch) =>
+        set((s) => {
+          const prev = s.settings.friday ?? DEFAULT_FRIDAY_SETTINGS;
+          const notif = patch.notif ? { ...prev.notif, ...patch.notif } : prev.notif;
+          return { settings: { ...s.settings, friday: { ...prev, ...patch, notif } } };
+        }),
+
+      setFridayPrepCheck: (date, idx, val) =>
+        set((s) => {
+          const prev = s.fridayPrep[date];
+          const now = new Date().toISOString();
+          const next: FridayPrepData = {
+            checks: { ...(prev?.checks ?? {}), [idx]: val },
+            note: prev?.note,
+            savedAt: prev?.savedAt ?? now,
+            updatedAt: prev ? now : undefined,
+          };
+          return { fridayPrep: { ...s.fridayPrep, [date]: next } };
+        }),
+
+      setFridayPrepNote: (date, note) =>
+        set((s) => {
+          const prev = s.fridayPrep[date];
+          const now = new Date().toISOString();
+          const next: FridayPrepData = {
+            checks: { ...(prev?.checks ?? {}) },
+            note,
+            savedAt: prev?.savedAt ?? now,
+            updatedAt: prev ? now : undefined,
+          };
+          return { fridayPrep: { ...s.fridayPrep, [date]: next } };
+        }),
+
       setMood: (date, mood) =>
         set((s) => ({
           moods: { ...s.moods, [date]: { mood, savedAt: new Date().toISOString() } },
@@ -581,6 +625,7 @@ export const useWorshipStore = create<WorshipStore>()(
           qadaRecords: [],
           journal: {},
           journalX: EMPTY_JOURNAL_X,
+          fridayPrep: {},
           moods: {},
           amalEntries: [],
           amalGoals: DEFAULT_AMAL_GOALS,
@@ -624,6 +669,7 @@ export const useWorshipStore = create<WorshipStore>()(
             qadaRecords: doc.qadaRecords ?? [],
             journal: doc.journal ?? {},
             journalX: doc.journalX ?? EMPTY_JOURNAL_X,
+            fridayPrep: doc.fridayPrep ?? {},
             moods: (doc.moods ?? {}) as Record<string, { mood: MoodId; savedAt: string }>,
             amalEntries: doc.amalEntries ?? [],
             amalGoals: (doc.amalGoals ?? DEFAULT_AMAL_GOALS) as AmalGoal[],
@@ -658,6 +704,7 @@ export const useWorshipStore = create<WorshipStore>()(
           qadaRecords: [],
           journal: {},
           journalX: EMPTY_JOURNAL_X,
+          fridayPrep: {},
           moods: {},
           amalEntries: [],
           amalGoals: DEFAULT_AMAL_GOALS,
@@ -722,6 +769,7 @@ export const useWorshipStore = create<WorshipStore>()(
         qadaRecords: s.qadaRecords,
         journal: s.journal,
         journalX: s.journalX,
+        fridayPrep: s.fridayPrep,
         moods: s.moods,
         amalEntries: s.amalEntries,
         amalGoals: s.amalGoals,

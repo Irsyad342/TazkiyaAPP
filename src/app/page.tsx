@@ -37,6 +37,8 @@ import { TasbihFullscreen } from "@/components/tazkiya/TasbihFullscreen";
 import { TargetSheet } from "@/components/tazkiya/TargetSheet";
 import { PrayerReminder } from "@/components/tazkiya/PrayerReminder";
 import { usePrayerReminder } from "@/lib/tazkiya/reminder-trigger";
+import { FridayFullscreen } from "@/components/tazkiya/FridayFullscreen";
+import { useFridayExperience } from "@/lib/tazkiya/friday-trigger";
 import type { PrayerId } from "@/lib/tazkiya/types";
 
 /*
@@ -264,6 +266,25 @@ export default function Page() {
     setTab("sholat");
   }, [dismiss]);
   /*
+   * Pengalaman khusus Salat Jumat: layar penuh "Jumat Telah Menyapa" muncul
+   * N menit sebelum waktu pelaksanaan (mesin friday-trigger). "Mulai
+   * Persiapan" menuju halaman Sholat lalu memicu panel kartu Jumat lewat
+   * event 'suio-open-friday' (PrayerPage mendengarkannya). Pengingat salat
+   * salat reguler TIDAK menampilkan Zuhur pada Jumat (dikuasai mesin Jumat).
+   */
+  const { friday: fridayExp, dismiss: dismissFriday } = useFridayExperience(tab === "beranda" && !subpage);
+  const goFridaySchedule = useCallback(() => {
+    dismissFriday();
+    setSubpage(null);
+    setTab("sholat");
+  }, [dismissFriday]);
+  const goFridayPrepare = useCallback(() => {
+    dismissFriday();
+    setSubpage(null);
+    setTab("sholat");
+    window.setTimeout(() => window.dispatchEvent(new CustomEvent("suio-open-friday")), 350);
+  }, [dismissFriday]);
+  /*
    * "Catat Salat" dari pengingat → mekanisme pencatatan EXISTING: menuju
    * halaman Sholat lalu membuka dialog pencatatan untuk salat yang bersangkutan.
    * Status tetap dipilih pengguna di dialog (tidak dianggap selesai otomatis).
@@ -372,6 +393,21 @@ export default function Page() {
               onClose={closeReminder}
               onGoSchedule={goScheduleFromReminder}
               onGoRecord={() => goRecordFromReminder(reminder.prayer)}
+            />
+          ) : null}
+        </AnimatePresence>
+
+        {/* Pengalaman khusus Salat Jumat — di bawah prioritas pengingat salat. */}
+        <AnimatePresence>
+          {fridayExp ? (
+            <FridayFullscreen
+              key={fridayExp.date}
+              date={fridayExp.date}
+              jumatTime={fridayExp.jumatTime}
+              fallback={fridayExp.fallback}
+              onClose={dismissFriday}
+              onGoSchedule={goFridaySchedule}
+              onPrepare={goFridayPrepare}
             />
           ) : null}
         </AnimatePresence>

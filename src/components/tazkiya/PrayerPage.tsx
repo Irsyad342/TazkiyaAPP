@@ -57,6 +57,7 @@ import { nowTotalMinutes, resolvePrayerWindows, windowClock, type PrayerWindows 
 import { HADITH_QADA } from "@/lib/tazkiya/hadith";
 import { RAWATIB_MUAKKADAH, SUNNAH_GUIDE_FOOTNOTE, SUNNAH_LAINNYA, type SunnahGuideEntry } from "@/lib/tazkiya/sunnahGuide";
 import { ConfirmButton, GlassCard, SectionHeader, SegmentedTabs } from "./ui-bits";
+import { FridayCard } from "./FridayCard";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { DayDetailSheet, prayerMetaFor } from "./DayDetailSheet";
 import { MotivationPopup, type MotivationVariant } from "./MotivationPopup";
@@ -227,6 +228,14 @@ function TodayTab({
     const iv = window.setInterval(() => setNow(new Date()), 30_000);
     return () => window.clearInterval(iv);
   }, []);
+
+  /* Sinyal dari pengalaman layar penuh Jumat ("Mulai Persiapan") → buka panel kartu. */
+  const [fridayOpenSignal, setFridayOpenSignal] = useState(0);
+  useEffect(() => {
+    const h = () => setFridayOpenSignal((n) => n + 1);
+    window.addEventListener("suio-open-friday", h);
+    return () => window.removeEventListener("suio-open-friday", h);
+  }, []);
   const state = nextPrayerState(schedule, now);
   const nextMeta = prayersToday.find((p) => p.id === state.next) ?? prayersToday[0];
 
@@ -289,6 +298,7 @@ function TodayTab({
             detailOf={detailOf}
             now={now}
             onRecord={onRecord}
+            fridayOpenSignal={fridayOpenSignal}
           />
           {friday ? (
             <p className="mt-1.5 px-1 text-[10.5px] leading-relaxed text-tk-muted">
@@ -512,6 +522,7 @@ function PrayerTickets({
   detailOf,
   now,
   onRecord,
+  fridayOpenSignal = 0,
 }: {
   today: string;
   prayers: PrayerMeta[];
@@ -519,6 +530,7 @@ function PrayerTickets({
   detailOf: (id: PrayerId) => PrayerDetail;
   now: Date;
   onRecord: (meta: PrayerMeta) => void;
+  fridayOpenSignal?: number;
 }) {
   /* Gerak 3D hanya saat animasi aktif & reduced-motion tidak diminta. */
   const animationsOn = useWorshipStore((s2) => s2.settings.animations);
@@ -590,6 +602,21 @@ function PrayerTickets({
               : "Belum dicatat";
 
         const showNote = !w.end || isActive || w.endNote?.startsWith("Batas akhir Isya");
+
+        /* Slot Salat Jumat (pengganti Zuhur pada hari Jumat): kartu spesial
+           dengan desain, interaksi 3D, countdown, dan panel persiapan sendiri.
+           Pencatatan tetap lewat onRecord → dialog existing. */
+        if (p.label === "Salat Jumat") {
+          return (
+            <li
+              key={p.id}
+              className="tk-tkt-slot"
+              style={{ zIndex: isActive ? 30 : 20 - i, "--i": i } as CSSProperties}
+            >
+              <FridayCard today={today} w={w} detail={detail} now={now} motionOK={motionOK} onRecord={onRecord} openSignal={fridayOpenSignal} />
+            </li>
+          );
+        }
 
         return (
           <li
