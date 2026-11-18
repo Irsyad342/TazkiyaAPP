@@ -101,18 +101,35 @@ const HIJRI_MONTH_ALIASES: Record<string, number> = {
  */
 export function formatHijri(d: Date = new Date()): string {
   try {
+    /* Bulan diambil sebagai ANGKA (nu-latn) lalu dipetakan ke nama Indonesia —
+     * kebal varian ICU antarperangkat: sebagian Android memberi nama bulan
+     * lokal yang tak ada di tabel alias (mis. "juni") sehingga tanggal
+     * Hijriah tampil salah. Angka 1..12 selalu konsisten. */
+    const numFmt = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura-nu-latn", {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+    });
+    const parts = numFmt.formatToParts(d);
+    const day = parts.find((p) => p.type === "day")?.value ?? "";
+    const monthNum = Number(parts.find((p) => p.type === "month")?.value);
+    const year = parts.find((p) => p.type === "year")?.value ?? "";
+    if (day && year && Number.isInteger(monthNum) && monthNum >= 1 && monthNum <= 12) {
+      return `${day} ${HIJRI_MONTHS_ID[monthNum - 1]} ${year} H`;
+    }
+    /* Fallback lama: nama bulan lokal dicocokkan ke tabel alias. */
     const fmt = new Intl.DateTimeFormat("id-u-ca-islamic-umalqura", {
       day: "numeric",
       month: "long",
       year: "numeric",
     });
-    const parts = fmt.formatToParts(d);
-    const day = parts.find((p) => p.type === "day")?.value ?? "";
-    const monthRaw = (parts.find((p) => p.type === "month")?.value ?? "").toLowerCase();
-    const year = parts.find((p) => p.type === "year")?.value ?? "";
+    const p2 = fmt.formatToParts(d);
+    const day2 = p2.find((p) => p.type === "day")?.value ?? "";
+    const monthRaw = (p2.find((p) => p.type === "month")?.value ?? "").toLowerCase();
+    const year2 = p2.find((p) => p.type === "year")?.value ?? "";
     const idx = HIJRI_MONTH_ALIASES[monthRaw.replace(/['’]/g, "'")] ?? -1;
     const month = idx >= 0 ? HIJRI_MONTHS_ID[idx] : monthRaw;
-    return `${day} ${month} ${year} H`;
+    return `${day2} ${month} ${year2} H`;
   } catch {
     return "";
   }

@@ -499,7 +499,7 @@ function CategoryCards({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 22, delay: motionOK ? i * 0.07 : 0 }}
               whileTap={motionOK ? { y: -4, scale: 1.02 } : undefined}
-              className="tap su-card-shadow group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-tk-line bg-tk-panel p-4 text-left"
+              className="tap su-card-shadow glass group relative flex flex-col overflow-hidden rounded-[1.4rem] p-4 text-left"
             >
               {/* Aksen lembut berbeda per kartu (variasi terkontrol) */}
               <span

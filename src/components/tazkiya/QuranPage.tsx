@@ -359,7 +359,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
       <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
         {/* ---------- Hero lanjutkan bacaan (featured blok lavender lembut) ---------- */}
         <section aria-label="Lanjutkan bacaan" className="animate-tk-fade-up lg:col-span-7">
-          <div className="relative flex h-full flex-col justify-between overflow-hidden rounded-[1.6rem] bg-tk-lavender p-5 su-card-shadow sm:p-6">
+          <div className="glass-violet relative flex h-full flex-col justify-between overflow-hidden rounded-[1.4rem] p-5 su-card-shadow sm:p-6">
             {/* Ornamen latar: kisi khatam samar di sudut kanan atas */}
             <div
               aria-hidden
@@ -413,8 +413,8 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
 
         {/* ---------- Target bacaan hari ini (kartu putih ringkas + ring) ---------- */}
         <section aria-label="Target bacaan harian" className="animate-tk-fade-up mt-6 lg:col-span-5 lg:mt-0">
-          {/* Radius dipadatkan ke 1.6rem — sama dengan kartu hero di sebelahnya */}
-          <div className="glass flex h-full items-center gap-5 rounded-[1.6rem] p-5">
+          {/* Radius kartu 1.4rem — sejajar dengan kartu hero di sebelahnya */}
+          <div className="glass flex h-full items-center gap-5 rounded-[1.4rem] p-5">
             <div className="relative inline-flex shrink-0 items-center justify-center" style={{ width: 92, height: 92 }}>
               <svg width={92} height={92} className="-rotate-90">
                 <circle cx={46} cy={46} r={40} fill="none" strokeWidth={8} className="stroke-tk-track" />
@@ -509,7 +509,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
               className="tap block w-full text-left"
               aria-label={`Buka ${topMeta.latin}, dibaca ${topEntry[1].count} kali`}
             >
-              <div className="relative h-full overflow-hidden rounded-[1.75rem] bg-tk-lavender p-5">
+              <div className="glass-violet relative h-full overflow-hidden rounded-[1.4rem] p-5">
                 {/* Ornamen latar: kisi khatam samar di sudut kanan atas */}
                 <div
                   aria-hidden

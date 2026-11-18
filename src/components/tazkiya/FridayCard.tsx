@@ -302,7 +302,7 @@ export function FridayCard({
               initial={{ y: 8 }}
               animate={{ y: 0 }}
               transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-              className="fr-panel mt-2.5 rounded-[1.3rem] p-4"
+              className="glass su-card-shadow mt-2.5 rounded-[1.4rem] p-4"
             >
               {/* Checklist 8 sunnah — baris kecil, tanpa ring dekoratif */}
               <div className="flex items-baseline justify-between gap-3">

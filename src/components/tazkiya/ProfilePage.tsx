@@ -18,6 +18,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { m } from "framer-motion";
@@ -45,6 +46,7 @@ import {
   MoonStar,
   Pencil,
   ListChecks,
+  Gauge,
   Sparkles,
   Target,
   Vibrate,
@@ -1264,6 +1266,53 @@ export function ProfilePage({
             </div>
           </RiseIn>
         </GroupList>
+        {/* ---------- Liquid Glass Appearance ---------- */}
+        <GroupList className="mt-3 su-card-shadow" ariaLabel="Tampilan Liquid Glass">
+          <RiseIn i={0} y={12} className="flex items-center gap-3.5 px-4 py-3.5">
+            <Droplets size={18} strokeWidth={1.8} className="shrink-0 text-tk-muted" />
+            <div className="min-w-0 flex-1">
+              <p className="text-[14px] font-medium text-tk-ink">Liquid Glass</p>
+              <p className="text-[11px] text-tk-muted">Material kaca translusen di seluruh aplikasi</p>
+            </div>
+            <Switch
+              checked={settings.glassEffects}
+              onCheckedChange={(v) => updateSettings({ glassEffects: v })}
+              aria-label="Liquid Glass"
+            />
+          </RiseIn>
+          <RiseIn i={1} y={12} className="flex items-start gap-3.5 px-4 pb-4 pt-0.5">
+            <Gauge size={18} strokeWidth={1.8} className="mt-1 shrink-0 text-tk-muted" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="text-[14px] font-medium text-tk-ink">Intensitas Glass</p>
+                <p className="text-[10.5px] font-bold text-tk-violet">
+                  {settings.glassIntensity < 34 ? "Subtle" : settings.glassIntensity < 67 ? "Balanced" : "Strong"}
+                </p>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={settings.glassIntensity}
+                disabled={!settings.glassEffects}
+                onChange={(e) => updateSettings({ glassIntensity: Number(e.target.value) })}
+                aria-label="Intensitas Liquid Glass"
+                className="su-glass-range mt-2.5 w-full"
+                style={{ "--su-range-p": `${settings.glassIntensity}%` } as CSSProperties}
+              />
+              <div className="mt-1 flex justify-between text-[9.5px] font-semibold uppercase tracking-[0.08em] text-tk-muted">
+                <span>Subtle</span>
+                <span>Balanced</span>
+                <span>Strong</span>
+              </div>
+              <p className="mt-1.5 text-[10px] leading-relaxed text-tk-muted/80">
+                Perubahan langsung terasa di semua halaman. Efek transisi diatur lewat saklar &ldquo;Animasi transisi&rdquo;.
+              </p>
+            </div>
+          </RiseIn>
+        </GroupList>
+
 
         <GroupList className="mt-3 su-card-shadow" ariaLabel="Saklar preferensi">
           {[

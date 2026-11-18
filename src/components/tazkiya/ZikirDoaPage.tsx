@@ -154,27 +154,29 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
         </m.span>
       </m.button>
 
-      {/* Kontrol: kurangi · reset · simpan */}
-      <div className="mt-6 flex items-center gap-2.5">
-        <button
-          type="button"
-          onClick={tasbihMinus}
-          aria-label="Kurangi satu hitungan"
-          className="tap flex h-12 w-12 items-center justify-center rounded-full bg-tk-panel-soft text-tk-ink"
-        >
-          <span aria-hidden className="block h-[2px] w-[14px] rounded-full bg-current" />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            tasbihReset();
-            toast.info("Hitungan tasbih direset");
-          }}
-          aria-label="Reset hitungan tasbih"
-          className="tap flex h-12 w-12 items-center justify-center rounded-full bg-tk-panel-soft text-tk-muted"
-        >
-          <RotateCcw size={17} />
-        </button>
+      {/* Kontrol simetris: kiri (kurangi · reset) — tengah (simpan) — kanan (layar penuh) */}
+      <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+        <div className="flex items-center gap-2.5 justify-self-start">
+          <button
+            type="button"
+            onClick={tasbihMinus}
+            aria-label="Kurangi satu hitungan"
+            className="tap flex h-11 w-11 items-center justify-center rounded-full bg-tk-panel-soft text-tk-ink"
+          >
+            <span aria-hidden className="block h-[2px] w-[14px] rounded-full bg-current" />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              tasbihReset();
+              toast.info("Hitungan tasbih direset");
+            }}
+            aria-label="Reset hitungan tasbih"
+            className="tap flex h-11 w-11 items-center justify-center rounded-full bg-tk-panel-soft text-tk-muted"
+          >
+            <RotateCcw size={17} />
+          </button>
+        </div>
         <button
           type="button"
           onClick={() => {
@@ -182,29 +184,31 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
             if (n === 0) toast.error("Hitungan masih 0, berzikir dulu ya");
             else toast.success(`${n.toLocaleString("id-ID")} zikir ditambahkan ke catatan harian`);
           }}
-          className="tap flex h-12 items-center justify-center gap-2 rounded-full gs-ink-btn px-5 text-[13.5px] font-bold"
+          className="tap flex h-11 items-center justify-center gap-2 rounded-full gs-ink-btn px-6 text-[13.5px] font-bold"
         >
           Simpan Harian
         </button>
-        <button
-          type="button"
-          onClick={onOpenFull}
-          aria-label="Buka tasbih layar penuh"
-          className="tap flex h-12 w-12 items-center justify-center rounded-full bg-tk-panel-soft text-tk-muted"
-        >
-          <Expand size={16} />
-        </button>
+        <div className="flex items-center gap-2.5 justify-self-end">
+          <button
+            type="button"
+            onClick={onOpenFull}
+            aria-label="Buka tasbih layar penuh"
+            className="tap flex h-11 w-11 items-center justify-center rounded-full bg-tk-panel-soft text-tk-muted"
+          >
+            <Expand size={16} />
+          </button>
+        </div>
       </div>
 
-      {/* Pemilihan target */}
-      <div className="mt-5 flex items-center gap-1.5" role="group" aria-label="Target hitungan">
+      {/* Pemilihan target — rata tengah, lebar tombol seragam */}
+      <div className="mt-5 flex items-center justify-center gap-2" role="group" aria-label="Target hitungan">
         {[33, 100, 500, 1000].map((n) => (
           <button
             key={n}
             type="button"
             onClick={() => tasbihSetTarget(n)}
             className={cn(
-              "tap su-card-shadow rounded-full px-3.5 py-1.5 text-[11px] font-bold transition-all",
+              "tap su-card-shadow min-w-[64px] rounded-full py-1.5 text-center text-[11px] font-bold transition-all",
               tasbih.target === n ? "gs-ink-btn" : "bg-tk-panel-soft text-tk-muted hover:text-tk-ink"
             )}
           >
@@ -400,7 +404,7 @@ export function ZikirDoaPage({
 
       {tab === "zikir" ? (
         <div key="zikir" className="tk-fade-in lg:grid lg:grid-cols-12 lg:gap-x-8">
-          <div className="space-y-7 lg:col-span-5">
+          <div className="space-y-6 lg:col-span-5">
             {/* Pilihan zikir dulu, lalu penghitung sebagai fokus visual */}
             <ZikirPresetPicker />
             <TasbihCounter onOpenFull={onOpenTasbihFull} />
@@ -439,7 +443,7 @@ export function ZikirDoaPage({
           </div>
 
           {/* Set zikir — hanya bacaan, tanpa opsi tasbih */}
-          <section aria-label="Set zikir" className="mt-7 space-y-3 lg:col-span-7 lg:mt-0">
+          <section aria-label="Set zikir" className="mt-6 space-y-3 lg:col-span-7 lg:mt-0">
             <SectionHeader title="Set Zikir" caption="Bacaan masyhur dengan sumber, dilipat agar ringan di layar" />
             {ZIKIR_SETS.map((set) => (
               <ZikirSetCard key={set.id} set={set} />
@@ -451,8 +455,8 @@ export function ZikirDoaPage({
           {/* Doa Hari Ini, blok editorial lavender */}
           <div className="lg:col-span-5">
             <SectionHeader title="Doa Hari Ini" caption={dua.title} />
-            {/* Padding & radius 1.4rem — sejajar dengan kartu lain di halaman ini */}
-            <div className="rounded-[1.4rem] bg-tk-lavender p-4">
+            {/* Material glass-violet & radius 1.4rem — sejajar dengan kartu lain di halaman ini */}
+            <div className="glass-violet rounded-[1.4rem] p-4">
               {dua.arabic ? <p className="quran-arabic text-right text-[22px] leading-[1.95] text-tk-ink">{dua.arabic}</p> : null}
               {dua.transliteration ? <p className="mt-3 text-[11.5px] italic leading-relaxed text-tk-muted">&ldquo;{dua.transliteration}&rdquo;</p> : null}
               <p className="mt-2.5 text-[12.5px] leading-relaxed text-tk-ink/95">{dua.meaning}</p>
@@ -461,7 +465,7 @@ export function ZikirDoaPage({
           </div>
 
           {/* Kategori + daftar doa */}
-          <div className="mt-7 lg:col-span-7 lg:mt-0">
+          <div className="mt-6 lg:col-span-7 lg:mt-0">
             <SectionHeader title="Kumpulan Doa" caption={DOA_KATEGORI.find((k) => k.id === cat)?.caption} />
             <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5" role="group" aria-label="Kategori doa">
               {DOA_KATEGORI.map((k) => (

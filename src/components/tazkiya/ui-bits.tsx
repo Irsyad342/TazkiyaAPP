@@ -363,7 +363,7 @@ export function GroupList({
     <div
       role="group"
       aria-label={ariaLabel}
-      className={cn("glass divide-y divide-tk-line-soft overflow-hidden rounded-[1.5rem]", className)}
+      className={cn("glass divide-y divide-tk-line-soft overflow-hidden rounded-[1.4rem]", className)}
     >
       {children}
     </div>
@@ -438,7 +438,7 @@ export function Chip({ children, className }: { children: ReactNode; className?:
 
 export function EmptyState({ icon, title, caption }: { icon: ReactNode; title: string; caption?: string }) {
   return (
-    <div className="relative flex flex-col items-center gap-2.5 rounded-[1.5rem] bg-tk-panel-soft px-4 py-9 text-center">
+    <div className="relative flex flex-col items-center gap-2.5 rounded-[1.4rem] bg-tk-panel-soft px-4 py-9 text-center">
       <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-tk-lavender text-tk-violet">
         {icon}
       </div>

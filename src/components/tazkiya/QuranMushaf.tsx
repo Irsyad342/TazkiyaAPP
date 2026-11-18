@@ -634,7 +634,7 @@ export function MushafView({
   );
 
   return (
-    <div ref={rootRef} className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-tk-stage">
+    <div ref={rootRef} className="tk-mushaf-safe relative flex min-h-0 flex-1 flex-col overflow-hidden bg-tk-stage">
       {/* Ruang mushaf: memenuhi viewport, safe-area diperhitungkan */}
       <div
         ref={stageRef}

@@ -562,3 +562,166 @@ export function AmbientParticles({
     </span>
   );
 }
+
+
+/* ------------------------------------------------------------------ */
+/* PinchStack — bungkus kartu dengan gesture dua jari                  */
+/* "pinch-to-stack & spread-to-expand" ala tumpukan kartu remi.        */
+/*                                                                     */
+/* Mekanisme:                                                          */
+/* - Posisi pointer aktif (pointerId → {x,y}) hidup di useRef; semua   */
+/*   update gesture menulis ke MotionValue → NOL re-render React per   */
+/*   pointermove.                                                      */
+/* - Saat 2 jari menempel, jarak awal dicatat (dist0). Jari MENDEKAT   */
+/*   (pinch) → progres naik menuju 1 → kartu "terkompresi": dua layer  */
+/*   hantu muncul di belakang + kartu asli mengecil/miring (tumpukan). */
+/*   Jari MENJAUH (spread) → progres turun → kartu membuka ke normal.  */
+/* - rawProgress dihaluskan useSpring(500/38): mengikuti jari nyaris   */
+/*   1:1 namun lembut; jari dilepas → spring kembali ke 0 natural.     */
+/* - touchAction "pan-y": SATU jari tetap scroll vertikal halaman;     */
+/*   pinch-zoom dua jari tidak diizinkan browser, sehingga             */
+/*   pointermove kedua pointer tetap sampai ke komponen ini.           */
+/* - Ketukan sisa setelah pinch (progres pernah > 0.15) disupresi      */
+/*   sekali via onClickCapture agar tidak memicu navigasi kartu.       */
+/*                                                                     */
+/* Komponen MURNI visual+gesture: tidak menerima/mengetahui data apa   */
+/* pun — hanya membungkus children yang sudah ada.                     */
+/* ------------------------------------------------------------------ */
+
+export function PinchStack({
+  children,
+  className,
+  disabled,
+}: {
+  children: ReactNode;
+  className?: string;
+  disabled?: boolean;
+}) {
+  const anim = useAnim();
+  /* Seluruh state gesture di ref — tidak pernah memicu re-render. */
+  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const dist0 = useRef<number | null>(null);
+  const pinched = useRef(false);
+
+  /* Progres pinch mentah (mengikuti jari) + versi spring untuk display. */
+  const rawProgress = useMotionValue(0);
+  const displayProgress = useSpring(rawProgress, { stiffness: 500, damping: 38 });
+
+  /* Dua layer hantu "kartu remi" DI BELAKANG konten (render duluan). */
+  const ghostA = {
+    x: useTransform(displayProgress, (p) => -p * 14),
+    y: useTransform(displayProgress, (p) => -p * 10),
+    rotate: useTransform(displayProgress, (p) => -p * 4),
+    scale: useTransform(displayProgress, (p) => 1 - p * 0.03),
+    opacity: useTransform(displayProgress, (p) => (p > 0.02 ? Math.min(0.9, p * 1.4) : 0)),
+  };
+  const ghostB = {
+    x: useTransform(displayProgress, (p) => p * 16),
+    y: useTransform(displayProgress, (p) => -p * 18),
+    rotate: useTransform(displayProgress, (p) => p * 5),
+    scale: useTransform(displayProgress, (p) => 1 - p * 0.05),
+    opacity: useTransform(displayProgress, (p) => (p > 0.02 ? Math.min(0.72, p * 1.1) : 0)),
+  };
+
+  /* Kartu asli sedikit terkompresi + tilt 3D saat menumpuk. */
+  const contentStyle = {
+    scale: useTransform(displayProgress, (p) => 1 - p * 0.08),
+    rotateX: useTransform(displayProgress, (p) => p * 7),
+    y: useTransform(displayProgress, (p) => -p * 10),
+    rotate: useTransform(displayProgress, (p) => -p * 1.5),
+    transformPerspective: 900,
+  };
+
+  if (!anim || disabled) {
+    return (
+      <div className={className} style={{ touchAction: "pan-y" }}>
+        {children}
+      </div>
+    );
+  }
+
+  /* Jarak dua pointer teratas (Map mempertahankan urutan turun). */
+  const distFirstTwo = (): number | null => {
+    let a: { x: number; y: number } | undefined;
+    let b: { x: number; y: number } | undefined;
+    for (const p of pointers.current.values()) {
+      if (!a) a = p;
+      else {
+        b = p;
+        break;
+      }
+    }
+    return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : null;
+  };
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    /* Jumlah pointer mencapai 2 → rekam jarak awal pinch. */
+    if (pointers.current.size === 2) dist0.current = distFirstTwo();
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const pts = pointers.current;
+    if (!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pts.size < 2) {
+      rawProgress.set(0);
+      return;
+    }
+    /* Baseline hilang (mis. salah satu dari tiga jari terangkat) → rekam ulang. */
+    if (dist0.current == null) dist0.current = distFirstTwo();
+    const base = dist0.current;
+    if (base == null || base <= 0) return;
+    const dist = distFirstTwo();
+    if (dist == null) return;
+    /* Jari MENDEKAT → progres naik (kartu terkompresi); MENJAUH → turun. */
+    const p = Math.min(Math.max((base - dist) / (base * 0.45), 0), 1);
+    rawProgress.set(p);
+    if (p > 0.15) pinched.current = true;
+  };
+
+  const removePointer = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!pointers.current.delete(e.pointerId)) return;
+    if (rawProgress.get() > 0.15) pinched.current = true;
+    /* Salah satu jari hilang saat pinch → reset progres (spring ke 0). */
+    dist0.current = null;
+    rawProgress.set(0);
+  };
+
+  /* Ketukan sisa setelah pinch tidak boleh menavigasi kartu:
+     blok sekali, lalu flag direset agar tap berikutnya normal. */
+  const onClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (pinched.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      pinched.current = false;
+    }
+  };
+
+  return (
+    <div
+      className={cn("relative", className)}
+      style={{ touchAction: "pan-y" }}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={removePointer}
+      onPointerCancel={removePointer}
+      onPointerLeave={removePointer}
+      onClickCapture={onClickCapture}
+    >
+      <m.div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-[inherit] tk-card-white su-card-shadow"
+        style={ghostA}
+      />
+      <m.div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-[inherit] tk-card-white su-card-shadow"
+        style={ghostB}
+      />
+      <m.div className="relative" style={contentStyle}>
+        {children}
+      </m.div>
+    </div>
+  );
+}

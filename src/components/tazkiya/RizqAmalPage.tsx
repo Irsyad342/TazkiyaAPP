@@ -88,7 +88,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
         <div className="space-y-6 lg:col-span-7">
           {/* ---------- Hero tracker: blok statistik angka besar ---------- */}
           <Reveal><section aria-label="Ringkasan kebaikan">
-            <div className="glass su-card-shadow rounded-[1.5rem] p-5">
+            <div className="glass su-card-shadow rounded-[1.4rem] p-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <p className="gs-overline">Kebaikan hari ini</p>

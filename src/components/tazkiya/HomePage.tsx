@@ -50,7 +50,7 @@ import { JelajahiAktivitas } from "./JelajahiAktivitas";
 import { DayDetailSheet } from "./DayDetailSheet";
 import { OrnamentDivider } from "./ornaments";
 import type { SubPageId, TabId } from "./BottomNav";
-import { AmbientParticles, DragCard, RiseIn, TiltCard } from "./motion-bits";
+import { AmbientParticles, DragCard, PinchStack, RiseIn, TiltCard } from "./motion-bits";
 import { cn } from "@/lib/utils";
 
 const PRAYER_ORDER: { id: PrayerId; label: string }[] = [
@@ -595,6 +595,10 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
   const nextLabel = prayerLabelForDate(state.next, today);
 
   return (
+    /* Pinch-to-Stack: cubit dua jari → kartu menumpuk seperti remi;
+       lebarkan → membuka kembali. Murni lapisan visual+gesture — checklist,
+       data, dan desain kartu tidak berubah. */
+    <PinchStack className="rounded-[1.4rem] su-interactive">
     <TiltCard
       as="button"
       onClick={() => onNavigate("sholat")}
@@ -602,7 +606,7 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
       className="tap tk-card-white su-card-shadow rounded-[1.4rem] p-4"
       maxTilt={3.5}
     >
-      <p className="text-[13.5px] font-bold tracking-[-0.01em] text-[#17171B]">Salat Lima Waktu</p>
+      <p className="text-[13.5px] font-bold tracking-[-0.01em] text-tk-ink">Salat Lima Waktu</p>
       <ul className="mt-2.5 space-y-2" role="group" aria-label="Status salat hari ini">
         {PRAYER_ORDER.map(({ id, label }) => {
           const done = prayerDetails[today]?.[id]?.status === "done" || logs[today]?.prayers?.[id];
@@ -617,30 +621,42 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
                 aria-hidden
                 className={cn(
                   "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px]",
-                  done ? "border-[#17171B] bg-[#17171B]" : missed ? "border-[#FA5200]" : "border-[#D6D6DA]"
+                  done ? "border-tk-ink bg-tk-ink" : missed ? "border-tk-accent" : "border-tk-line-strong"
                 )}
               >
-                {done ? <Check size={10} strokeWidth={3.2} className="text-white" /> : null}
+                {done ? <Check size={10} strokeWidth={3.2} className="text-tk-panel" /> : null}
               </span>
-              <span className={cn("flex min-w-0 flex-1 items-center gap-1.5 text-[12px]", done ? "font-semibold text-[#17171B]" : "font-medium text-[#55555C]")}>
-                <span className="line-clamp-2 min-w-0">{displayLabel}</span>
-                {isJumatSlot ? (
-                  <span className="shrink-0 rounded-full bg-[#FA5200]/10 px-1.5 py-px text-[8px] font-extrabold uppercase tracking-[0.08em] text-[#FA5200]">
-                    Jumat
-                  </span>
-                ) : null}
+              {/* Label + status menyatu dalam SATU kolom teks (line-clamp-2 +
+                  flex-1 min-w-0) sehingga tidak mungkin bertumpuk; badge Jumat
+                  dan jam tetap di luar sebagai flex-item shrink-0. */}
+              <span
+                className={cn(
+                  "line-clamp-2 min-w-0 flex-1 text-[12px]",
+                  done ? "font-semibold text-tk-ink" : "font-medium text-tk-muted"
+                )}
+              >
+                {displayLabel}
                 {missed ? " · terlewat" : ""}
               </span>
-              <span className="tnum shrink-0 text-[10px] font-semibold text-[#9A9AA1]">{times[id].time}</span>
+              {isJumatSlot ? (
+                <span className="shrink-0 rounded-full bg-tk-accent/10 px-1.5 py-px text-[8px] font-extrabold uppercase tracking-[0.08em] text-tk-accent">
+                  Jumat
+                </span>
+              ) : null}
+              <span className="tnum shrink-0 text-[10px] font-semibold text-tk-deep">{times[id].time}</span>
             </li>
           );
         })}
       </ul>
-      <p className="mt-3 flex items-center gap-1 border-t border-[#ECECEE] pt-2.5 text-[10.5px] font-semibold text-[#8A8A91]">
+      {/* Footer satu baris: ikon shrink-0, label truncate (min-w-0), jam
+          shrink-0 sehingga jam tidak pernah tertutup saat kartu sempit. */}
+      <p className="mt-3 flex items-center gap-1 border-t border-tk-line-soft pt-2.5 text-[10.5px] font-semibold text-tk-deep">
         <Bell size={10} className="shrink-0" />
-        Berikutnya · {nextLabel} {state.nextTime}
+        <span className="min-w-0 flex-1 truncate">Berikutnya · {nextLabel}</span>
+        <span className="tnum shrink-0 whitespace-nowrap">{state.nextTime}</span>
       </p>
     </TiltCard>
+    </PinchStack>
   );
 }
 
@@ -677,7 +693,9 @@ function RingCard({ today, onNavigate }: { today: string; onNavigate: (tab: TabI
       className="tap su-glass rounded-[1.4rem] p-4"
       maxTilt={3.5}
     >
-      <div className="flex items-center gap-3.5">
+      {/* h-full + items-center: saat kartu melar (grid stretch di baris
+          berdampingan dengan kartu Salat), konten tetap di tengah vertikal. */}
+      <div className="flex h-full items-center gap-3.5">
         <div className="relative inline-flex shrink-0 items-center justify-center" style={{ width: 64, height: 64 }}>
           <svg width={64} height={64} className="-rotate-90">
             <circle cx={32} cy={32} r={27} fill="none" strokeWidth={6} className="stroke-tk-line-strong" />
@@ -729,32 +747,38 @@ function KebaikanCard({
   const amal = amalEntries.filter((a) => a.date === today).length;
   const jurnal = journal[today]?.items.filter(Boolean).length ?? 0;
 
+  /* caption = teks tampilan ringkas (kartu dipadatkan); detail = kalimat
+     penuh yang dipakai aria-label agar pembaca layar tetap mendapat konteks. */
   const rows = [
     {
       label: "Al-Qur'an",
       value: `${quran}/${settings.quranDailyTarget} hlm`,
-      caption: `Target ${settings.quranDailyTarget} halaman setiap hari`,
+      caption: `Target ${settings.quranDailyTarget} halaman/hari`,
+      detail: `Target ${settings.quranDailyTarget} halaman setiap hari`,
       done: quran >= settings.quranDailyTarget && settings.quranDailyTarget > 0,
       go: () => onNavigate("quran"),
     },
     {
       label: "Zikir & Doa",
       value: zikir.toLocaleString("id-ID"),
-      caption: `Zikir harian, target ${settings.zikirTarget.toLocaleString("id-ID")} hitungan`,
+      caption: `Target ${settings.zikirTarget.toLocaleString("id-ID")} hitungan`,
+      detail: `Zikir harian, target ${settings.zikirTarget.toLocaleString("id-ID")} hitungan`,
       done: zikir >= settings.zikirTarget && settings.zikirTarget > 0,
       go: () => onOpenSubpage("zikir-doa"),
     },
     {
       label: "Amal",
       value: `${amal} amal`,
-      caption: "Sedekah, bantu sesama, kebaikan kecil",
+      caption: "Sedekah & kebaikan kecil",
+      detail: "Sedekah, bantu sesama, kebaikan kecil",
       done: amal > 0,
       go: () => onOpenSubpage("rizq-amal"),
     },
     {
       label: "Jurnal",
       value: jurnal > 0 ? `${jurnal} syukur` : "kosong",
-      caption: "Tuliskan rasa syukur dan renungan hari ini",
+      caption: "Tuliskan rasa syukur hari ini",
+      detail: "Tuliskan rasa syukur dan renungan hari ini",
       done: jurnal > 0,
       go: () => onOpenSubpage("jurnal"),
     },
@@ -769,7 +793,7 @@ function KebaikanCard({
         : `${doneCount} dari ${rows.length} sudah tercatat, lanjutkan yang lain.`;
 
   return (
-    <section aria-label="Ibadah pendukung hari ini" className="glass-hero flex h-full flex-col rounded-[1.4rem] p-4.5">
+    <section aria-label="Ibadah pendukung hari ini" className="glass-hero flex h-full flex-col rounded-[1.4rem] p-4">
       {/* Butiran cahaya Liquid Glass di atas permukaan orange — dekoratif,
           pointer-events-none, tidak menghalangi klik tombol di dalamnya. */}
       <AmbientParticles count={6} />
@@ -779,14 +803,19 @@ function KebaikanCard({
           {doneCount}/{rows.length}
         </span>
       </div>
-      <ul className="mt-1 flex-1 divide-y divide-white/12" role="group">
-        {rows.map(({ label, value, caption, done, go }) => (
+      {/* Mobile: 4 aktivitas 2×2 (tanpa divide) agar kartu tidak menjulang
+          tinggi; lg: kembali daftar vertikal ber-garis seperti semula. */}
+      <ul
+        className="mt-1 grid flex-1 grid-cols-2 gap-x-4 lg:grid-cols-1 lg:gap-x-0 lg:divide-y lg:divide-white/12"
+        role="group"
+      >
+        {rows.map(({ label, value, caption, detail, done, go }) => (
           <li key={label}>
             <button
               type="button"
               onClick={go}
-              aria-label={`${label}: ${value}, ${caption}. Ketuk untuk mencatat.`}
-              className="tap flex w-full items-center gap-2.5 py-3 text-left"
+              aria-label={`${label}: ${value}, ${detail}. Ketuk untuk mencatat.`}
+              className="tap flex w-full items-center gap-2.5 py-2.5 text-left lg:py-3"
             >
               <span
                 aria-hidden
@@ -809,22 +838,22 @@ function KebaikanCard({
           </li>
         ))}
       </ul>
-      <div className="mt-1 border-t border-white/20 pt-2.5">
-        <p className="flex items-center gap-1.5 text-[10.5px] font-medium leading-snug text-white/90">
+      {/* Insight + tombol jadi SATU baris: teks flex-1 clamp-2 di kiri,
+          tombol compact shrink-0 di kanan. */}
+      <div className="mt-1 flex items-center gap-2 border-t border-white/20 pt-2.5">
+        <p className="flex min-w-0 flex-1 items-center gap-1.5 text-[10.5px] font-medium leading-snug text-white/90">
           <Sparkles size={11} className="su-breathe shrink-0" aria-hidden />
-          {insight}
+          <span className="min-w-0 flex-1 line-clamp-2">{insight}</span>
         </p>
-        <div className="mt-2 flex justify-end">
-          <button
-            type="button"
-            onClick={() => onNavigate("progress")}
-            aria-label="Lihat perkembangan ibadah di halaman Progress"
-            className="tap flex shrink-0 items-center gap-0.5 rounded-full bg-white/16 px-2.5 py-1 text-[10px] font-bold text-white transition-colors hover:bg-white/25"
-          >
-            Lihat perkembangan
-            <ChevronRight size={11} aria-hidden />
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => onNavigate("progress")}
+          aria-label="Lihat perkembangan ibadah di halaman Progress"
+          className="tap flex shrink-0 items-center gap-0.5 rounded-full bg-white/16 px-2.5 py-1 text-[10px] font-bold text-white transition-colors hover:bg-white/25"
+        >
+          Lihat perkembangan
+          <ChevronRight size={11} aria-hidden />
+        </button>
       </div>
     </section>
   );
@@ -907,16 +936,16 @@ function TodayTasks({ today }: { today: string }) {
               }}
               className={cn(
                 "tap flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors",
-                done ? "bg-[#17171B] text-white" : "bg-[#17171B]/8 text-transparent hover:bg-[#17171B]/14"
+                done ? "bg-tk-ink text-tk-panel" : "bg-tk-ink/8 text-transparent hover:bg-tk-ink/14"
               )}
             >
               <Check size={14} strokeWidth={3} />
             </button>
             <span className="min-w-0 flex-1">
-              <span className={cn("block text-[13px] leading-snug", done ? "font-semibold text-[#17171B] line-through opacity-60" : "font-semibold text-[#17171B]")}>
+              <span className={cn("block text-[13px] leading-snug", done ? "font-semibold text-tk-ink line-through opacity-60" : "font-semibold text-tk-ink")}>
                 {goal.label}
               </span>
-              <span className={cn("mt-0.5 block text-[10.5px] font-medium", auto ? "text-[#8A8A91]" : "text-[#A4A4AA]")}>
+              <span className="mt-0.5 block text-[10.5px] font-medium text-tk-deep">
                 {auto ? "Otomatis dari catatan ibadahmu" : "Tugas pribadi"}
               </span>
             </span>
@@ -956,7 +985,7 @@ function TodayTasks({ today }: { today: string }) {
                     title={`Hapus tugas "${g.label}"?`}
                     description="Tugas pribadi ini akan dihapus dari daftar. Catatan ibadah yang sudah ada tidak terpengaruh."
                     onConfirm={() => deleteDailyGoal(g.id)}
-                    className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tk-muted/70 transition-colors hover:bg-[#E5484D]/10 hover:text-[#E5484D]"
+                    className="tap flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tk-muted/70 transition-colors hover:bg-tk-rose/10 hover:text-tk-rose"
                   >
                     <Trash2 size={13} />
                   </ConfirmButton>
@@ -1122,7 +1151,11 @@ export function HomePage({
             )}
           </button>
           <div className="min-w-0 text-center">
-            <p className="gs-overline truncate">
+            {/* Sapaan utuh: tanpa truncate/ellipsis — membungkus natural (maks
+                2 baris pendek), text-balance menjaga kedua baris seimbang.
+                leading-[1.35]! menimpa line-height:1 bawaan gs-overline agar
+                wrap-nya ber napas. */}
+            <p className="gs-overline text-balance leading-[1.35]!">
               Assalamu&apos;alaikum, {greeting.toLowerCase()}
             </p>
             <h1 className="mt-1.5 line-clamp-2 break-words text-[21px] font-bold leading-tight tracking-[-0.02em] text-tk-ink">
@@ -1179,19 +1212,28 @@ export function HomePage({
         <CircleDateStrip today={today} />
       </RiseIn>
 
-      {/* ---------- D. Trio kartu: putih+cincin | orange ---------- */}
-      <RiseIn i={3} className="mt-6 grid grid-cols-2 items-stretch gap-3 lg:col-span-12">
-        <div className="flex flex-col gap-3">
-          <SalatCheckCard today={today} onNavigate={onNavigate} />
-          <RingCard today={today} onNavigate={onNavigate} />
+      {/* ---------- D. Trio kartu: putih | cincin (baris 1) + orange penuh (baris 2) ---------- */}
+      <RiseIn i={3} className="mt-6 lg:col-span-12">
+        <div className="grid grid-cols-2 items-stretch gap-3 lg:grid-cols-12 lg:gap-x-8">
+          {/* Mobile: kedua kartu pendamping BERDAMPINGAN (Salat | Target) —
+              wrapper larut dengan display:contents sehingga keduanya menjadi
+              sel grid langsung dan sama tinggi. lg: pola 12 kolom semula,
+              kolom kiri span 7 berisi kartu putih + cincin bertumpuk. */}
+          <div className="max-lg:contents lg:col-span-7 lg:row-span-2 lg:flex lg:flex-col lg:gap-3">
+            <SalatCheckCard today={today} onNavigate={onNavigate} />
+            <RingCard today={today} onNavigate={onNavigate} />
+          </div>
+          {/* Kartu promo ORANGE dibungkus DragCard: bisa disentak horizontal dan
+              kembali dengan spring. Wrapper di luar section — seluruh tombol di
+              dalamnya tetap berfungsi; radius mengikuti kartu agar bayangan
+              terangkat data-lifted tidak kotak. Mobile: full-width di baris
+              kedua sehingga tingginya hanya setinggi isinya — tidak lagi
+              ter-stretch setinggi kolom kiri dan tertutup dock bawah.
+              lg: kembali ke kanan (kolom 8-12, memanjang 2 baris). */}
+          <DragCard className="col-span-2 rounded-[1.4rem] lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1">
+            <KebaikanCard today={today} onNavigate={onNavigate} onOpenSubpage={onOpenSubpage} />
+          </DragCard>
         </div>
-        {/* Kartu promo ORANGE dibungkus DragCard: bisa disentak horizontal dan
-            kembali dengan spring. Wrapper di luar section — seluruh tombol di
-            dalamnya tetap berfungsi; radius mengikuti kartu agar bayangan
-            terangkat data-lifted tidak kotak. */}
-        <DragCard className="rounded-[1.4rem]">
-          <KebaikanCard today={today} onNavigate={onNavigate} onOpenSubpage={onOpenSubpage} />
-        </DragCard>
       </RiseIn>
 
       {/* ---------- E. Tugas Hari Ini ---------- */}

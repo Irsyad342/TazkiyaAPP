@@ -341,6 +341,10 @@ export interface Settings {
   remindersEnabled: boolean;
   reminderTimes: Record<PrayerId, ReminderTime>;
   animations: boolean;
+  /** Material Liquid Glass global (blur + translusi) — matikan untuk permukaan solid. */
+  glassEffects: boolean;
+  /** Intensitas Liquid Glass 0..100 (0=Subtle, 50=Balanced, 100=Strong). */
+  glassIntensity: number;
   vibration: boolean;
   showArabic: boolean;
   theme: ThemeMode;
@@ -623,6 +627,8 @@ export function createDefaultSettings(): Settings {
       isya: { enabled: true, time: "19:15" },
     },
     animations: true,
+    glassEffects: true,
+    glassIntensity: 50,
     vibration: true,
     showArabic: true,
     theme: "dark",
