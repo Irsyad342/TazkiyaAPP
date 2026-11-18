@@ -42,6 +42,7 @@ import { formatCountdown, goalStatuses, nextPrayerState } from "@/lib/tazkiya/go
 import { prayersForDate, prayerLabelForDate } from "@/lib/tazkiya/friday";
 import { notifyPermission, requestNotifyPermission } from "@/lib/tazkiya/reminder-trigger";
 import { SURAH_LIST } from "@/lib/tazkiya/quran";
+import { quoteForDate } from "@/lib/tazkiya/quotes";
 import { barakahOfTheDay } from "@/lib/tazkiya/barakah";
 import { duaOfTheDay } from "@/lib/tazkiya/duas";
 import { ConfirmButton } from "./ui-bits";
@@ -660,90 +661,58 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
   );
 }
 
-/* ---------------- D2. Kartu progress bar gelap — ringkasan target ---------------- */
+/* ---------------- D2'. Kartu Daily Islamic Quotes — editorial harian ---------------- */
 
-function RingCard({ today, onNavigate }: { today: string; onNavigate: (tab: TabId) => void }) {
-  const dailyGoals = useWorshipStore((s) => s.dailyGoals);
-  const logs = useWorshipStore((s) => s.logs);
-  const prayerDetails = useWorshipStore((s) => s.prayerDetails);
-  const zikirSessions = useWorshipStore((s) => s.zikirSessions);
-  const amalEntries = useWorshipStore((s) => s.amalEntries);
-  const goalDone = useWorshipStore((s) => s.goalDone);
-
-  const statuses = useMemo(
-    () =>
-      goalStatuses(dailyGoals, today, {
-        logs,
-        prayerDetails,
-        zikirSessions,
-        amalEntries,
-        goalDone,
-        subuhOntime: null,
-      }),
-    [dailyGoals, today, logs, prayerDetails, zikirSessions, amalEntries, goalDone]
-  );
-  const done = statuses.filter((g) => g.done).length;
-  const pct = statuses.length > 0 ? Math.round((done / statuses.length) * 100) : 0;
-  const complete = statuses.length > 0 && done === statuses.length;
-  const footerText = complete
-    ? "Semua target tercapai — mantap!"
-    : done === 0
-      ? "Mulai aktivitas pertamamu"
-      : `${statuses.length - done} aktivitas tersisa hari ini`;
-
+/* Kutipan Islami berganti otomatis per hari lokal (rotasi deterministik dari
+   tanggal — konsisten sepanjang hari, sebaran merata antar hari). Kartu
+   editorial: tipografi Fraunces, ornamen bintang segi-delapan, glow hangat
+   di pojok, dan garis tipis di atas baris sumber. */
+function QuoteCard({ today }: { today: string }) {
+  const quote = useMemo(() => quoteForDate(today), [today]);
   return (
-    <TiltCard
-      as="button"
-      onClick={() => onNavigate("progress")}
-      ariaLabel={`Target harian ${done} dari ${statuses.length} selesai, buka analitik`}
-      className="tap su-glass rounded-[1.4rem] p-4"
-      maxTilt={3.5}
+    <div
+      className="su-card-shadow relative flex h-full min-h-[172px] flex-col overflow-hidden rounded-[1.4rem] border border-tk-line-soft bg-tk-panel light:bg-[linear-gradient(150deg,#FFFDFB_0%,#FFF6EC_58%,#FFEFDF_100%)] dark:bg-[linear-gradient(150deg,#2C241D_0%,#26201B_55%,#201A16_100%)]"
     >
-      {/* Komposisi horizontal tiga bagian mengisi penuh tinggi kartu yang
-          ter-stretch (grid berdampingan dengan kartu Salat): judul + persen
-          besar di atas, progress bar horizontal di tengah, footer dinamis
-          menempel di bawah — tanpa ring lingkaran dan tanpa ruang kosong
-          yang membuat konten "mengambang". */}
-      <div className="flex h-full flex-col justify-between gap-3">
-        {/* ATAS — judul + jumlah selesai di kiri, persen besar di kanan */}
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <span className="block text-[13px] font-bold text-tk-ink">Target Harian</span>
-            <span className="mt-1 block leading-snug">
-              <span className="tnum text-[15px] font-extrabold text-tk-ink">{done}</span>
-              <span className="text-[11px] text-tk-muted">/{statuses.length} aktivitas selesai</span>
-            </span>
-          </div>
-          <div className="shrink-0 text-right">
-            <span className={cn("gs-display tnum block text-[28px] font-extrabold leading-none", complete ? "text-tk-accent" : "text-tk-ink")}>
-              {pct}%
-            </span>
-            <span className="mt-1.5 block text-[10px] text-tk-muted">progres hari ini</span>
-          </div>
-        </div>
-        {/* TENGAH — progress bar horizontal (bukan ring) dengan animasi width */}
-        <div
-          role="img"
-          aria-label={`Progres target harian ${pct} persen`}
-          className="h-2.5 w-full overflow-hidden rounded-full bg-tk-line-soft"
-        >
-          <span
-            className="block h-full rounded-full bg-gradient-to-r from-tk-accent to-[#FF9A52]"
-            style={{ width: `${pct}%`, transition: "width 800ms cubic-bezier(0.22, 1, 0.36, 1)" }}
-          />
-        </div>
-        {/* BAWAH — footer dinamis menempel di dasar kartu */}
-        <div
-          className={cn(
-            "flex items-center gap-1.5 border-t border-tk-line-soft pt-2.5 text-[10.5px] font-semibold",
-            complete ? "text-tk-accent" : "text-tk-deep"
-          )}
-        >
-          <Sparkles size={12} className="shrink-0" aria-hidden />
-          <span className="min-w-0 leading-snug">{footerText}</span>
-        </div>
+      {/* Kilau hangat di dua pojok — peach (light) / copper (dark) */}
+      <span aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-[#FFE3C9]/60 blur-2xl dark:bg-[#FF9A52]/10" />
+      <span aria-hidden className="pointer-events-none absolute -bottom-14 -left-10 h-32 w-32 rounded-full bg-[#FFD9B8]/45 blur-2xl dark:bg-[#D9A05B]/10" />
+
+      {/* Overline: ornamen bintang segi-8 (geometris Islami) + kategori */}
+      <div className="relative flex items-center gap-1.5 px-4 pt-3.5">
+        <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden className="shrink-0 text-tk-copper dark:text-tk-amber">
+          <rect x="2.4" y="2.4" width="7.2" height="7.2" fill="none" stroke="currentColor" strokeWidth="1" />
+          <rect x="2.4" y="2.4" width="7.2" height="7.2" fill="none" stroke="currentColor" strokeWidth="1" transform="rotate(45 6 6)" />
+        </svg>
+        <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-tk-copper dark:text-tk-amber">
+          {quote.theme}
+        </span>
       </div>
-    </TiltCard>
+
+      {/* Kutipan — serif display editorial; melar flex-1 agar seimbang */}
+      <div className="relative flex min-w-0 flex-1 items-center px-4 py-2.5">
+        <p className="font-pr text-[15px] font-medium leading-[1.38] tracking-[-0.005em] text-tk-ink">
+          {quote.text}
+        </p>
+      </div>
+
+      {/* Footer: garis tipis + sumber (ayat/hadis) atau penanda refleksi */}
+      <div className="relative px-4 pb-3.5">
+        <span aria-hidden className="block h-px w-full bg-tk-line-soft" />
+        <p className="mt-2 flex min-w-0 items-center gap-1.5 text-[10px] font-semibold text-tk-deep">
+          {quote.source ? (
+            <>
+              <BookOpen size={11} strokeWidth={2} className="shrink-0 text-tk-copper dark:text-tk-amber" />
+              <span className="truncate font-pr italic">{quote.source}</span>
+            </>
+          ) : (
+            <>
+              <Sparkles size={11} strokeWidth={2} className="shrink-0 text-tk-copper dark:text-tk-amber" />
+              <span>Refleksi hari ini</span>
+            </>
+          )}
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -1242,7 +1211,7 @@ export function HomePage({
               kolom kiri span 7 berisi kartu putih + cincin bertumpuk. */}
           <div className="max-lg:contents lg:col-span-7 lg:row-span-2 lg:flex lg:flex-col lg:gap-3">
             <SalatCheckCard today={today} onNavigate={onNavigate} />
-            <RingCard today={today} onNavigate={onNavigate} />
+            <QuoteCard today={today} />
           </div>
           {/* Kartu promo ORANGE dibungkus DragCard: bisa disentak horizontal dan
               kembali dengan spring. Wrapper di luar section — seluruh tombol di

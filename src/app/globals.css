@@ -83,7 +83,7 @@
   --breakpoint-xl: 303rem;
   --breakpoint-2xl: 304rem;
   /* Nilai warna dark disampling ulang ke palet hangat v18 (Deep Charcoal
-     #171717, Surface #24211F, Elevated #39312D, Warm Brown #32231A,
+     #191411, Surface #26201B, Elevated #3E332B, Warm Brown #32231A,
      Burnt Orange #D94B0A, Primary Orange #FF5A00, Soft Orange #FF9A52,
      Peach #EFC4A8, Warm Ivory #F5E8DC) — permukaan gelap bernuansa hangat
      dengan tetap satu identitas orange. */
@@ -95,14 +95,19 @@
   --color-tk-lav-deco: #41301f; /* lapisan hangat lebih pekat */
   --color-tk-line: #322c28;
   --color-tk-accent: #ff9a52; /* Soft Orange untuk teks/ikon kecil di dark */
-  --color-tk-frame: #171717;
-  --color-tk-stage: #171717;
-  --color-tk-panel: #24211f;
-  --color-tk-panel-soft: #1f1c1a;
-  --color-tk-panel-strong: #39312d; /* input & pil tak-aktif */
-  --color-tk-line-soft: #2a2522;
-  --color-tk-line-strong: #463d36;
-  --color-tk-track: #39312d;
+  /* Aksen modul 3.9: copper & amber — variasi warna antar modul di dark */
+  --color-tk-copper: #d9a05b;
+  --color-tk-amber: #ffb35c;
+  --color-tk-cream: #2c241d;
+  --color-tk-peach: #ffc99e;
+  --color-tk-frame: #191411;
+  --color-tk-stage: #191411;
+  --color-tk-panel: #26201b;
+  --color-tk-panel-soft: #201a16;
+  --color-tk-panel-strong: #3e332b; /* input & pil tak-aktif */
+  --color-tk-line-soft: #2c241f;
+  --color-tk-line-strong: #4a3d33;
+  --color-tk-track: #3e332b;
   --color-tk-aurora-a: transparent;
   --color-tk-aurora-b: transparent;
   --color-tk-orb-deep: #2b1d15;
@@ -134,9 +139,9 @@
      (target jarak konten terakhir ke nav: 24–32px). Tema-tidak tergantung. */
   --tk-nav-reserve: calc(62px + max(1.1rem, env(safe-area-inset-bottom)) + 28px);
   /* ---------- LIGHT — pasangan setara dari identitas v7 ---------- */
-  --background: #f7f5f2;
+  --background: #f6f2eb;
   --foreground: #202020;
-  --card: #ffffff;
+  --card: #fffdfb;
   --card-foreground: #202020;
   --popover: #ffffff;
   --popover-foreground: #17171b;
@@ -144,12 +149,12 @@
   --primary-foreground: #ffffff;
   --secondary: #ffe0cc;
   --secondary-foreground: #c94300;
-  --muted: #f0eeea;
+  --muted: #f1ebe1;
   --muted-foreground: #77716d;
   --accent: #ffe0cc;
   --accent-foreground: #c94300;
   --destructive: #d33b40;
-  --border: #e7e2dd;
+  --border: #e8e1d7;
   --input: #d8d2cb;
   --ring: #ff5a00;
   --chart-1: #ff5a00;
@@ -181,13 +186,18 @@
   --color-tk-lav-deco: #ffd1b3;
   --color-tk-line: #e7e2dd;
   --color-tk-accent: #c94300;
+  /* Aksen modul 3.9: copper & amber — variasi warna antar modul di light */
+  --color-tk-copper: #a26a3d;
+  --color-tk-amber: #a85f1c;
+  --color-tk-cream: #fff6ea;
+  --color-tk-peach: #ffe0cc;
   --color-tk-frame: #f7f5f2;
-  --color-tk-stage: #f7f5f2;
-  --color-tk-panel: #ffffff;
-  --color-tk-panel-soft: #f0eeea;
-  --color-tk-panel-strong: #ffffff;
-  --color-tk-line-soft: #eeeae5;
-  --color-tk-line-strong: #d8d2cb;
+  --color-tk-stage: #f6f2eb;
+  --color-tk-panel: #fffdfb;
+  --color-tk-panel-soft: #f1ebe1;
+  --color-tk-panel-strong: #fffdfb;
+  --color-tk-line-soft: #ece5da;
+  --color-tk-line-strong: #d9d0c4;
   --color-tk-track: #ede8e3;
   --color-tk-white-card: #ffffff;
   --color-tk-light-card: #f0eeea;
@@ -211,23 +221,23 @@
    kartu Surface #24211F, input/pil Elevated #39312D, blok brand
    Muted Brown, aksen Primary Orange #FF5A00 + Soft Orange #FF9A52. */
 html[data-theme="dark"] {
-  --background: #171717;
+  --background: #191411;
   --foreground: #f7f3ef;
-  --card: #24211f;
+  --card: #26201b;
   --card-foreground: #f7f3ef;
-  --popover: #302925;
+  --popover: #322a24;
   --popover-foreground: #f7f3ef;
   --primary: #ff5a00;
   --primary-foreground: #ffffff;
-  --secondary: #302925;
+  --secondary: #322a24;
   --secondary-foreground: #ff9a52;
-  --muted: #1f1c1a;
+  --muted: #201a16;
   --muted-foreground: #b5aaa3;
-  --accent: #302925;
+  --accent: #322a24;
   --accent-foreground: #ff9a52;
   --destructive: #ff6369;
-  --border: #322c28;
-  --input: #463d36;
+  --border: #342b25;
+  --input: #4a3d33;
   --ring: #ff5a00;
   --chart-1: #ff5a00;
   --chart-2: #58b877;
@@ -238,7 +248,7 @@ html[data-theme="dark"] {
   --sidebar-foreground: #f7f3ef;
   --sidebar-primary: #ff5a00;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #302925;
+  --sidebar-accent: #322a24;
   --sidebar-accent-foreground: #ff9a52;
   --sidebar-border: #322c28;
   --sidebar-ring: #ff5a00;
@@ -252,14 +262,14 @@ html[data-theme="dark"] {
   --color-tk-lav-deco: #41301f;
   --color-tk-line: #322c28;
   --color-tk-accent: #ff9a52;
-  --color-tk-frame: #171717;
-  --color-tk-stage: #171717;
-  --color-tk-panel: #24211f;
-  --color-tk-panel-soft: #1f1c1a;
-  --color-tk-panel-strong: #39312d;
-  --color-tk-line-soft: #2a2522;
-  --color-tk-line-strong: #463d36;
-  --color-tk-track: #39312d;
+  --color-tk-frame: #191411;
+  --color-tk-stage: #191411;
+  --color-tk-panel: #26201b;
+  --color-tk-panel-soft: #201a16;
+  --color-tk-panel-strong: #3e332b;
+  --color-tk-line-soft: #2c241f;
+  --color-tk-line-strong: #4a3d33;
+  --color-tk-track: #3e332b;
   --color-tk-white-card: #2a2624;
   --color-tk-light-card: #2e2926;
   --tk-inset: rgba(0, 0, 0, 0.28);
@@ -432,7 +442,7 @@ html[data-theme="dark"][data-glass-level="strong"] {
     /* Dark Luminous Glass: charcoal translusen berlapis, pantulan diagonal,
        inner highlight, border luminous tipis, dan glow ambient oranye SUIO
        yang terkontrol (aksen, bukan permukaan oranye penuh). */
-    background: linear-gradient(160deg, rgba(50, 44, 40, var(--su-ad)) 0%, rgba(36, 32, 29, calc(var(--su-ad) - 0.1)) 52%, rgba(46, 40, 36, var(--su-ad)) 100%);
+    background: linear-gradient(160deg, rgba(58, 46, 38, var(--su-ad)) 0%, rgba(43, 34, 28, calc(var(--su-ad) - 0.1)) 52%, rgba(52, 41, 34, var(--su-ad)) 100%);
     border: 1px solid var(--su-border-d);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d)),
@@ -442,7 +452,7 @@ html[data-theme="dark"][data-glass-level="strong"] {
       var(--su-shadow-d);
   }
   html[data-theme="dark"] .glass-strong {
-    background: linear-gradient(160deg, rgba(58, 50, 45, var(--su-float-ad)) 0%, rgba(40, 35, 32, calc(var(--su-float-ad) - 0.06)) 100%);
+    background: linear-gradient(160deg, rgba(63, 51, 42, var(--su-float-ad)) 0%, rgba(46, 37, 31, calc(var(--su-float-ad) - 0.06)) 100%);
     border: 1px solid var(--su-border-d);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, calc(var(--su-inner-d) + 0.06)),
@@ -488,7 +498,7 @@ html[data-theme="dark"][data-glass-level="strong"] {
       var(--su-shadow);
   }
   html[data-theme="dark"] .tk-card-white {
-    background: linear-gradient(155deg, rgba(50, 44, 40, var(--su-ad)) 0%, rgba(36, 32, 29, calc(var(--su-ad) - 0.08)) 100%);
+    background: linear-gradient(155deg, rgba(58, 46, 38, var(--su-ad)) 0%, rgba(36, 32, 29, calc(var(--su-ad) - 0.08)) 100%);
     color: #f2efe9;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d)),
@@ -1583,7 +1593,7 @@ html[data-anim="off"] .tk-cloud {
     0 16px 40px -22px rgba(64, 48, 38, 0.3);
 }
 html[data-theme="dark"] .su-glass {
-  background: linear-gradient(155deg, rgba(74, 64, 57, var(--su-ad)) 0%, rgba(42, 37, 34, calc(var(--su-ad) - 0.08)) 52%, rgba(58, 50, 45, var(--su-ad)) 100%);
+  background: linear-gradient(155deg, rgba(80, 66, 55, var(--su-ad)) 0%, rgba(48, 39, 32, calc(var(--su-ad) - 0.08)) 52%, rgba(58, 50, 45, var(--su-ad)) 100%);
   border: 1px solid var(--su-border-d);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d)),
@@ -1606,7 +1616,7 @@ html[data-theme="dark"] .su-glass::before {
    konten di belakang berbaur blur lembut. */
 .su-dock {
   position: relative;
-  background: linear-gradient(165deg, rgba(52, 45, 40, var(--su-float-ad)) 0%, rgba(26, 22, 20, calc(var(--su-float-ad) - 0.06)) 100%);
+  background: linear-gradient(165deg, rgba(58, 47, 39, var(--su-float-ad)) 0%, rgba(30, 24, 20, calc(var(--su-float-ad) - 0.06)) 100%);
   -webkit-backdrop-filter: blur(var(--su-float-blur)) saturate(var(--su-sat));
   backdrop-filter: blur(var(--su-float-blur)) saturate(var(--su-sat));
   border: 1px solid var(--su-border-d);
@@ -1766,7 +1776,7 @@ html[data-glass="off"] .glass { background: var(--color-tk-panel); border-color:
 html[data-glass="off"] .tk-card-white { background: var(--color-tk-white-card); }
 html[data-glass="off"] .glass-strong { background: var(--color-tk-panel); border-color: var(--color-tk-line); }
 html[data-glass="off"] .su-glass { background: var(--color-tk-panel); border-color: var(--color-tk-line); }
-html[data-glass="off"] .su-dock { background: #211d1a; border-color: rgba(255, 255, 255, 0.06); }
+html[data-glass="off"] .su-dock { background: #241e19; border-color: rgba(255, 255, 255, 0.06); }
 html[data-glass="off"] .glass-strong::before,
 html[data-glass="off"] .su-glass::before,
 html[data-glass="off"] .su-dock::before,
