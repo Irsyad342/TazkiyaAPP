@@ -69,6 +69,10 @@ export const viewport: Viewport = {
   themeColor: "#1B1B1E",
   width: "device-width",
   initialScale: 1,
+  /* PWA ter-install: pinch dua jari adalah gesture aplikasi (tumpukan kartu),
+     bukan zoom halaman — matikan zoom viewport. */
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: "cover",
 };
 
@@ -77,7 +81,7 @@ export const viewport: Viewport = {
  * tema yang salah. Membaca langsung dari localStorage yang sama dengan
  * store Tazkiya; tanpa preferensi tersimpan → DARK (identitas v7).
  */
-const themeInitScript = `(function(){try{var r=localStorage.getItem("tazkiya-store-v1");if(!r)return;var s=JSON.parse(r).state&&JSON.parse(r).state.settings;if(!s)return;var t=s.theme||"dark";if(t==="system"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.dataset.theme=t;document.documentElement.dataset.anim=s.animations===false?"off":"on";document.documentElement.dataset.glass=s.glassEffects===false?"off":"on";if(s.glassEffects!==false){var gi=typeof s.glassIntensity==="number"?s.glassIntensity:50;var st=document.documentElement.style;st.setProperty("--su-blur",(8+gi*0.2).toFixed(1)+"px");st.setProperty("--su-sat",(1.2+gi*0.005).toFixed(3));st.setProperty("--su-a",(0.78-gi*0.0026).toFixed(3));st.setProperty("--su-ad",(0.94-gi*0.0018).toFixed(3));st.setProperty("--su-border","rgba(255,255,255,"+(0.7-gi*0.002).toFixed(3)+")");st.setProperty("--su-spec",(0.14+gi*0.0028).toFixed(3));st.setProperty("--su-spec-d",(0.05+gi*0.001).toFixed(3));st.setProperty("--su-inner",(0.9-gi*0.003).toFixed(3));st.setProperty("--su-inner-d",(0.2-gi*0.0008).toFixed(3));st.setProperty("--su-float-blur",(16+gi*0.16).toFixed(1)+"px");st.setProperty("--su-float-a",(0.92-gi*0.0014).toFixed(3));st.setProperty("--su-float-ad",(0.96-gi*0.001).toFixed(3));}var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#F2F2F4":"#1B1B1E");}catch(e){}})();`;
+const themeInitScript = `(function(){try{var r=localStorage.getItem("tazkiya-store-v1");if(!r)return;var s=JSON.parse(r).state&&JSON.parse(r).state.settings;if(!s)return;var t=s.theme||"dark";if(t==="system"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.dataset.theme=t;document.documentElement.dataset.anim=s.animations===false?"off":"on";document.documentElement.dataset.glass=s.glassEffects===false?"off":"on";var gl=s.glassLevel||(typeof s.glassIntensity==="number"?(s.glassIntensity<34?"subtle":s.glassIntensity<67?"balanced":"strong"):"balanced");document.documentElement.dataset.glassLevel=gl;var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#F2F2F4":"#1B1B1E");}catch(e){}})();`;
 
 export default function RootLayout({
   children,

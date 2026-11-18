@@ -30,6 +30,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
+import { Layers } from "lucide-react";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { DUR, EASE, SPRING, staggerChild, staggerParent } from "@/lib/motion/system";
 import { cn } from "@/lib/utils";
@@ -602,32 +603,68 @@ export function PinchStack({
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const dist0 = useRef<number | null>(null);
   const pinched = useRef(false);
+  /* Keadaan "menumpuk" yang MENETAP (tombol alternatif). Pinch hanya
+     pratinjau sementara: dilepas → kembali ke keadaan tombol. */
+  const [stacked, setStacked] = useState(false);
+  const stackedRef = useRef(false);
 
   /* Progres pinch mentah (mengikuti jari) + versi spring untuk display. */
   const rawProgress = useMotionValue(0);
   const displayProgress = useSpring(rawProgress, { stiffness: 500, damping: 38 });
 
-  /* Dua layer hantu "kartu remi" DI BELAKANG konten (render duluan). */
+  /* Blokir zoom/scroll browser HANYA saat dua+ jari menyentuh kartu —
+     listener non-passive agar preventDefault berlaku (pan-y tetap
+     mengizinkan scroll satu jari; zoom halaman kini juga dimatikan
+     lewat viewport meta untuk aplikasi ter-install). */
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const hold = (e: TouchEvent) => {
+      if (e.touches.length >= 2) e.preventDefault();
+    };
+    el.addEventListener("touchstart", hold, { passive: false });
+    el.addEventListener("touchmove", hold, { passive: false });
+    return () => {
+      el.removeEventListener("touchstart", hold);
+      el.removeEventListener("touchmove", hold);
+    };
+  }, []);
+
+  const toggleStack = () => {
+    const next = !stackedRef.current;
+    stackedRef.current = next;
+    setStacked(next);
+    rawProgress.set(next ? 1 : 0);
+  };
+
+  /* Dua layer hantu "kartu remi" DI BELAKANG konten (render duluan).
+     translateZ bertingkat → deck 3D nyata, bukan sekadar pergeseran 2D. */
   const ghostA = {
     x: useTransform(displayProgress, (p) => -p * 14),
     y: useTransform(displayProgress, (p) => -p * 10),
+    z: useTransform(displayProgress, (p) => -p * 34),
     rotate: useTransform(displayProgress, (p) => -p * 4),
     scale: useTransform(displayProgress, (p) => 1 - p * 0.03),
     opacity: useTransform(displayProgress, (p) => (p > 0.02 ? Math.min(0.9, p * 1.4) : 0)),
+    transformPerspective: 900,
   };
   const ghostB = {
     x: useTransform(displayProgress, (p) => p * 16),
     y: useTransform(displayProgress, (p) => -p * 18),
+    z: useTransform(displayProgress, (p) => -p * 62),
     rotate: useTransform(displayProgress, (p) => p * 5),
     scale: useTransform(displayProgress, (p) => 1 - p * 0.05),
     opacity: useTransform(displayProgress, (p) => (p > 0.02 ? Math.min(0.72, p * 1.1) : 0)),
+    transformPerspective: 900,
   };
 
-  /* Kartu asli sedikit terkompresi + tilt 3D saat menumpuk. */
+  /* Kartu asli terkompresi + tilt 3D + terangkat ke depan saat menumpuk. */
   const contentStyle = {
     scale: useTransform(displayProgress, (p) => 1 - p * 0.08),
     rotateX: useTransform(displayProgress, (p) => p * 7),
     y: useTransform(displayProgress, (p) => -p * 10),
+    z: useTransform(displayProgress, (p) => p * 30),
     rotate: useTransform(displayProgress, (p) => -p * 1.5),
     transformPerspective: 900,
   };
@@ -665,17 +702,19 @@ export function PinchStack({
     if (!pts.has(e.pointerId)) return;
     pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pts.size < 2) {
-      rawProgress.set(0);
+      rawProgress.set(stackedRef.current ? 1 : 0);
       return;
     }
     /* Baseline hilang (mis. salah satu dari tiga jari terangkat) → rekam ulang. */
     if (dist0.current == null) dist0.current = distFirstTwo();
-    const base = dist0.current;
-    if (base == null || base <= 0) return;
+    const base0 = dist0.current;
+    if (base0 == null || base0 <= 0) return;
     const dist = distFirstTwo();
     if (dist == null) return;
-    /* Jari MENDEKAT → progres naik (kartu terkompresi); MENJAUH → turun. */
-    const p = Math.min(Math.max((base - dist) / (base * 0.45), 0), 1);
+    /* Jari MENDEKAT → makin menumpuk; MENJAUH → membuka. Berangkat dari
+       keadaan tombol (0 terbuka / 1 menumpuk), pratinjau bergerak bolak-balik. */
+    const base = stackedRef.current ? 1 : 0;
+    const p = Math.min(Math.max(base + (base0 - dist) / (base0 * 0.45), 0), 1);
     rawProgress.set(p);
     if (p > 0.15) pinched.current = true;
   };
@@ -683,9 +722,9 @@ export function PinchStack({
   const removePointer = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!pointers.current.delete(e.pointerId)) return;
     if (rawProgress.get() > 0.15) pinched.current = true;
-    /* Salah satu jari hilang saat pinch → reset progres (spring ke 0). */
+    /* Jari berkurang → kembali HALUS ke keadaan menetap (spring). */
     dist0.current = null;
-    rawProgress.set(0);
+    rawProgress.set(stackedRef.current ? 1 : 0);
   };
 
   /* Ketukan sisa setelah pinch tidak boleh menavigasi kartu:
@@ -700,6 +739,7 @@ export function PinchStack({
 
   return (
     <div
+      ref={rootRef}
       className={cn("relative", className)}
       style={{ touchAction: "pan-y" }}
       onPointerDown={onPointerDown}
@@ -722,6 +762,21 @@ export function PinchStack({
       <m.div className="relative" style={contentStyle}>
         {children}
       </m.div>
+      {/* Kontrol alternatif tumpukan ( gesture multi-touch tetap didukung):
+          ikon kecil kartu bertumpuk di sudut kartu. */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleStack();
+        }}
+        aria-pressed={stacked}
+        aria-label={stacked ? "Buka kembali tumpukan kartu" : "Tampilkan sebagai tumpukan kartu"}
+        className="tap absolute right-2 top-2 z-20 flex h-7 w-7 items-center justify-center rounded-full border border-tk-line-soft bg-tk-panel-soft/85 text-tk-muted backdrop-blur transition-colors hover:text-tk-ink"
+      >
+        <Layers size={13} strokeWidth={2} />
+      </button>
     </div>
   );
 }

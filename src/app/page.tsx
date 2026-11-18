@@ -103,7 +103,7 @@ export default function Page() {
 
   const animations = useWorshipStore((s) => s.settings.animations);
   const glassEffects = useWorshipStore((s) => s.settings.glassEffects);
-  const glassIntensity = useWorshipStore((s) => s.settings.glassIntensity);
+  const glassLevel = useWorshipStore((s) => s.settings.glassLevel);
   const theme = useWorshipStore((s) => s.settings.theme);
   const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">("dark");
 
@@ -183,27 +183,12 @@ export default function Page() {
     document.documentElement.dataset.anim = animations ? "on" : "off";
   }, [animations]);
 
-  // Liquid Glass: intensitas diterapkan REAL-TIME ke seluruh halaman lewat
-  // CSS variables global (slider Pengaturan → semua material kaca ikut).
+  // Liquid Glass: preset diskrit diterapkan REAL-TIME ke seluruh halaman
+  // (data-glass-level → seluruh CSS variable material ikut berganti).
   useEffect(() => {
-    const root = document.documentElement;
-    root.dataset.glass = glassEffects ? "on" : "off";
-    if (!glassEffects) return;
-    const t = Math.min(100, Math.max(0, glassIntensity));
-    const set = (k: string, v: string) => root.style.setProperty(k, v);
-    set("--su-blur", `${(8 + t * 0.2).toFixed(1)}px`);
-    set("--su-sat", (1.2 + t * 0.005).toFixed(3));
-    set("--su-a", (0.78 - t * 0.0026).toFixed(3));
-    set("--su-ad", (0.94 - t * 0.0018).toFixed(3));
-    set("--su-border", `rgba(255, 255, 255, ${(0.7 - t * 0.002).toFixed(3)})`);
-    set("--su-spec", (0.14 + t * 0.0028).toFixed(3));
-    set("--su-spec-d", (0.05 + t * 0.001).toFixed(3));
-    set("--su-inner", (0.9 - t * 0.003).toFixed(3));
-    set("--su-inner-d", (0.2 - t * 0.0008).toFixed(3));
-    set("--su-float-blur", `${(16 + t * 0.16).toFixed(1)}px`);
-    set("--su-float-a", (0.92 - t * 0.0014).toFixed(3));
-    set("--su-float-ad", (0.96 - t * 0.001).toFixed(3));
-  }, [glassEffects, glassIntensity]);
+    document.documentElement.dataset.glass = glassEffects ? "on" : "off";
+    document.documentElement.dataset.glassLevel = glassLevel;
+  }, [glassEffects, glassLevel]);
 
   // Judul dokumen per tab / sub-halaman.
   useEffect(() => {

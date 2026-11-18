@@ -18,7 +18,6 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import type { CSSProperties } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { m } from "framer-motion";
@@ -55,6 +54,7 @@ import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { requestNotifyPermission, notifyPermission } from "@/lib/tazkiya/reminder-trigger";
 import { DEFAULT_FRIDAY_SETTINGS, type FridaySettings } from "@/lib/tazkiya/types";
+import type { GlassLevel } from "@/lib/tazkiya/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -90,6 +90,13 @@ import { SPRING } from "@/lib/motion/system";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { SuioMark } from "./brand";
 import { cn } from "@/lib/utils";
+
+/* Preset intensitas Liquid Glass — DISKRIT, tanpa nilai di antara ketiganya. */
+const GLASS_LEVELS: { id: GlassLevel; label: string; desc: string }[] = [
+  { id: "subtle", label: "Subtle", desc: "Blur halus, permukaan nyaris solid" },
+  { id: "balanced", label: "Balanced", desc: "Keseimbangan blur, highlight, dan depth" },
+  { id: "strong", label: "Strong", desc: "Blur dalam, highlight kuat, depth paling terasa" },
+];
 
 const THEME_OPTIONS: { id: ThemeMode; label: string; hint: string; bg: string; dot: string }[] = [
   { id: "light", label: "Terang", hint: "Kanvas putih", bg: "linear-gradient(140deg,#ffffff,#f0eeea)", dot: "#FF5A00" },
@@ -1281,33 +1288,42 @@ export function ProfilePage({
             />
           </RiseIn>
           <RiseIn i={1} y={12} className="flex items-start gap-3.5 px-4 pb-4 pt-0.5">
-            <Gauge size={18} strokeWidth={1.8} className="mt-1 shrink-0 text-tk-muted" />
+            <Gauge size={18} strokeWidth={1.8} className="mt-0.5 shrink-0 text-tk-muted" />
             <div className="min-w-0 flex-1">
-              <div className="flex items-baseline justify-between gap-2">
-                <p className="text-[14px] font-medium text-tk-ink">Intensitas Glass</p>
-                <p className="text-[10.5px] font-bold text-tk-violet">
-                  {settings.glassIntensity < 34 ? "Subtle" : settings.glassIntensity < 67 ? "Balanced" : "Strong"}
-                </p>
-              </div>
-              <input
-                type="range"
-                min={0}
-                max={100}
-                step={1}
-                value={settings.glassIntensity}
-                disabled={!settings.glassEffects}
-                onChange={(e) => updateSettings({ glassIntensity: Number(e.target.value) })}
+              <p className="text-[14px] font-medium text-tk-ink">Intensitas Glass</p>
+              {/* Segmented control TIGA preset — tidak ada nilai di antaranya:
+                  ketuk langsung berpindah preset, berlaku real-time global. */}
+              <div
+                role="radiogroup"
                 aria-label="Intensitas Liquid Glass"
-                className="su-glass-range mt-2.5 w-full"
-                style={{ "--su-range-p": `${settings.glassIntensity}%` } as CSSProperties}
-              />
-              <div className="mt-1 flex justify-between text-[9.5px] font-semibold uppercase tracking-[0.08em] text-tk-muted">
-                <span>Subtle</span>
-                <span>Balanced</span>
-                <span>Strong</span>
+                className={cn(
+                  "mt-2.5 grid grid-cols-3 gap-1.5 rounded-full bg-tk-panel-soft p-1.5 transition-opacity",
+                  !settings.glassEffects && "pointer-events-none opacity-40"
+                )}
+              >
+                {GLASS_LEVELS.map((l) => {
+                  const active = settings.glassLevel === l.id;
+                  return (
+                    <button
+                      key={l.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      onClick={() => updateSettings({ glassLevel: l.id })}
+                      className={cn(
+                        "tap flex h-9 items-center justify-center rounded-full text-[11.5px] font-bold transition-colors",
+                        active
+                          ? "gs-ink-btn shadow-[0_4px_12px_-4px_rgba(255,90,0,0.5)]"
+                          : "text-tk-muted hover:text-tk-ink"
+                      )}
+                    >
+                      {l.label}
+                    </button>
+                  );
+                })}
               </div>
-              <p className="mt-1.5 text-[10px] leading-relaxed text-tk-muted/80">
-                Perubahan langsung terasa di semua halaman. Efek transisi diatur lewat saklar &ldquo;Animasi transisi&rdquo;.
+              <p className="mt-2 text-[10px] leading-relaxed text-tk-muted/80">
+                {GLASS_LEVELS.find((l) => l.id === settings.glassLevel)?.desc} — langsung berlaku di semua halaman.
               </p>
             </div>
           </RiseIn>

@@ -106,7 +106,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
         whileTap={{ scale: 0.955 }}
         transition={{ type: "spring", stiffness: 500, damping: 26 }}
         aria-label={`Tambah hitungan, saat ini ${tasbih.count}`}
-        className={cn("relative mt-7 flex h-[248px] w-[248px] items-center justify-center rounded-full sm:h-[264px] sm:w-[264px]", reached && animations && "animate-tk-pulse")}
+        className={cn("relative mx-auto mt-7 flex h-[248px] w-[248px] items-center justify-center rounded-full sm:h-[264px] sm:w-[264px]", reached && animations && "animate-tk-pulse")}
       >
         <svg aria-hidden viewBox="0 0 280 280" className="absolute inset-0 h-full w-full -rotate-90">
           <circle cx="140" cy="140" r={R} fill="none" strokeWidth="7" className="stroke-tk-track" />
@@ -154,9 +154,15 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
         </m.span>
       </m.button>
 
-      {/* Kontrol simetris: kiri (kurangi · reset) — tengah (simpan) — kanan (layar penuh) */}
-      <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-        <div className="flex items-center gap-2.5 justify-self-start">
+      {/* Kontrol pada SATU parent w-fit terpusat (mx-auto): lebar parent mengikuti konten
+          terlebar sehingga kedua baris benar-benar di tengah viewport, bukan menyebar ke tepi.
+          Baris 1 — aksi utama, cermin sempurna: dua tombol samping sama lebar (w-11)
+          menempatkan Simpan Harian tepat di tengah matematis.
+          Baris 2 — manajemen hitungan: reset pill + target, sejajar tinggi h-9.
+          Semua jarak murni dari gap (2.5 / 2), tanpa margin manual antar tombol. */}
+      <div className="mt-6 mx-auto flex w-fit flex-col items-center gap-3">
+        {/* Baris 1 — aksi utama (− · Simpan Harian · layar penuh) */}
+        <div className="flex items-center justify-center gap-2.5">
           <button
             type="button"
             onClick={tasbihMinus}
@@ -168,27 +174,14 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
           <button
             type="button"
             onClick={() => {
-              tasbihReset();
-              toast.info("Hitungan tasbih direset");
+              const n = commitZikirToDay(todayKey(), "harian");
+              if (n === 0) toast.error("Hitungan masih 0, berzikir dulu ya");
+              else toast.success(`${n.toLocaleString("id-ID")} zikir ditambahkan ke catatan harian`);
             }}
-            aria-label="Reset hitungan tasbih"
-            className="tap flex h-11 w-11 items-center justify-center rounded-full bg-tk-panel-soft text-tk-muted"
+            className="tap flex h-11 items-center justify-center gap-2 rounded-full gs-ink-btn px-6 text-[13.5px] font-bold"
           >
-            <RotateCcw size={17} />
+            Simpan Harian
           </button>
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            const n = commitZikirToDay(todayKey(), "harian");
-            if (n === 0) toast.error("Hitungan masih 0, berzikir dulu ya");
-            else toast.success(`${n.toLocaleString("id-ID")} zikir ditambahkan ke catatan harian`);
-          }}
-          className="tap flex h-11 items-center justify-center gap-2 rounded-full gs-ink-btn px-6 text-[13.5px] font-bold"
-        >
-          Simpan Harian
-        </button>
-        <div className="flex items-center gap-2.5 justify-self-end">
           <button
             type="button"
             onClick={onOpenFull}
@@ -198,23 +191,35 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
             <Expand size={16} />
           </button>
         </div>
-      </div>
-
-      {/* Pemilihan target — rata tengah, lebar tombol seragam */}
-      <div className="mt-5 flex items-center justify-center gap-2" role="group" aria-label="Target hitungan">
-        {[33, 100, 500, 1000].map((n) => (
+        {/* Baris 2 — manajemen hitungan (reset pill + pemilihan target) */}
+        <div className="flex flex-wrap items-center justify-center gap-2">
           <button
-            key={n}
             type="button"
-            onClick={() => tasbihSetTarget(n)}
-            className={cn(
-              "tap su-card-shadow min-w-[64px] rounded-full py-1.5 text-center text-[11px] font-bold transition-all",
-              tasbih.target === n ? "gs-ink-btn" : "bg-tk-panel-soft text-tk-muted hover:text-tk-ink"
-            )}
+            onClick={() => {
+              tasbihReset();
+              toast.info("Hitungan tasbih direset");
+            }}
+            aria-label="Reset hitungan tasbih"
+            className="tap flex h-9 w-9 items-center justify-center rounded-full bg-tk-panel-soft text-tk-muted"
           >
-            {n}
+            <RotateCcw size={15} />
           </button>
-        ))}
+          <div className="flex items-center justify-center gap-2" role="group" aria-label="Target hitungan">
+            {[33, 100, 500, 1000].map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => tasbihSetTarget(n)}
+                className={cn(
+                  "tap su-card-shadow flex h-9 min-w-[64px] items-center justify-center rounded-full text-center text-[11px] font-bold transition-all",
+                  tasbih.target === n ? "gs-ink-btn" : "bg-tk-panel-soft text-tk-muted hover:text-tk-ink"
+                )}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
       <p className="mt-3 text-center text-[10.5px] leading-relaxed text-tk-muted/80">
         Ketuk lingkaran untuk berzikir · “Simpan Harian” mencatat ke riwayat

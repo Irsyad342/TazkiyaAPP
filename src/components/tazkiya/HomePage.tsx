@@ -684,6 +684,12 @@ function RingCard({ today, onNavigate }: { today: string; onNavigate: (tab: TabI
   );
   const done = statuses.filter((g) => g.done).length;
   const pct = statuses.length > 0 ? Math.round((done / statuses.length) * 100) : 0;
+  const complete = statuses.length > 0 && done === statuses.length;
+  const footerText = complete
+    ? "Semua target tercapai — mantap!"
+    : done === 0
+      ? "Mulai aktivitas pertamamu"
+      : `${statuses.length - done} aktivitas tersisa hari ini`;
 
   return (
     <TiltCard
@@ -693,34 +699,42 @@ function RingCard({ today, onNavigate }: { today: string; onNavigate: (tab: TabI
       className="tap su-glass rounded-[1.4rem] p-4"
       maxTilt={3.5}
     >
-      {/* h-full + items-center: saat kartu melar (grid stretch di baris
-          berdampingan dengan kartu Salat), konten tetap di tengah vertikal. */}
-      <div className="flex h-full items-center gap-3.5">
-        <div className="relative inline-flex shrink-0 items-center justify-center" style={{ width: 64, height: 64 }}>
-          <svg width={64} height={64} className="-rotate-90">
-            <circle cx={32} cy={32} r={27} fill="none" strokeWidth={6} className="stroke-tk-line-strong" />
-            <circle
-              cx={32}
-              cy={32}
-              r={27}
-              fill="none"
-              strokeWidth={6}
-              strokeLinecap="round"
-              className="stroke-tk-violet"
-              strokeDasharray={`${(Math.max(0, Math.min(100, pct)) / 100) * 2 * Math.PI * 27} ${2 * Math.PI * 27}`}
-              style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.22, 1, 0.36, 1)" }}
-            />
-          </svg>
-          <span className="gs-display absolute inset-0 flex items-center justify-center text-[15px] font-bold text-tk-ink">{pct}%</span>
+      {/* Komposisi dua bagian mengisi penuh tinggi kartu yang ter-stretch
+          (grid berdampingan dengan kartu Salat): ring besar + ringkasan di
+          atas, footer dinamis menempel di bawah — tanpa ruang kosong yang
+          membuat konten "mengambang". */}
+      <div className="flex h-full flex-col justify-between">
+        <div className="flex items-center gap-4">
+          <div className="relative inline-flex shrink-0 items-center justify-center" style={{ width: 92, height: 92 }}>
+            <svg width={92} height={92} viewBox="0 0 92 92" className="-rotate-90">
+              <circle cx={46} cy={46} r={40} fill="none" strokeWidth={8} className="stroke-tk-line-strong" />
+              <circle
+                cx={46}
+                cy={46}
+                r={40}
+                fill="none"
+                strokeWidth={8}
+                strokeLinecap="round"
+                className="stroke-tk-violet"
+                strokeDasharray={`${(Math.max(0, Math.min(100, pct)) / 100) * 2 * Math.PI * 40} ${2 * Math.PI * 40}`}
+                style={{ transition: "stroke-dasharray 0.8s cubic-bezier(0.22, 1, 0.36, 1)" }}
+              />
+            </svg>
+            <span className="gs-display tnum absolute inset-0 flex items-center justify-center text-[20px] font-extrabold text-tk-ink">{pct}%</span>
+          </div>
+          <span className="min-w-0 flex-1 leading-snug">
+            <span className="block text-[14px] font-bold text-tk-ink">Target Harian</span>
+            <span className="mt-1 block">
+              <span className="tnum text-[13px] font-extrabold text-tk-ink">{done}</span>
+              <span className="text-[12px] text-tk-muted"> / {statuses.length} selesai</span>
+            </span>
+            <span className="mt-1 block text-[10.5px] text-tk-muted">Aktivitas ibadah hari ini</span>
+          </span>
         </div>
-        <span className="min-w-0">
-          <span className="block text-[13px] font-bold text-tk-ink">Target Harian</span>
-          <span className="mt-0.5 block text-[11px] leading-snug text-tk-muted">
-            <span className="tnum font-bold text-tk-ink">
-              {done}/{statuses.length}
-            </span>{" "}
-            selesai hari ini
-          </span>        </span>
+        <div className="mt-3 flex items-center gap-1.5 border-t border-tk-line-soft pt-2.5 text-tk-deep">
+          <Sparkles size={12} className={complete ? "shrink-0 text-tk-accent" : "shrink-0"} aria-hidden />
+          <span className="min-w-0 text-[10.5px] font-semibold leading-snug text-tk-deep">{footerText}</span>
+        </div>
       </div>
     </TiltCard>
   );

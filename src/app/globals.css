@@ -311,29 +311,85 @@ html[data-theme="dark"] {
 }
 
 :root {
-  /* Liquid Glass intensitas (di-set real-time dari Pengaturan; default = Balanced) */
-  --su-blur: 18px;
+  /* Liquid Glass — TIGA PRESET DISKRIT (Subtle / Balanced / Strong).
+     Dipilih via segmented control Pengaturan → html[data-glass-level].
+     Setiap preset mengatur keseluruhan material: opacity, blur, border,
+     highlight, shadow, dan glow (bukan sekadar angka blur). */
+  --su-blur: 16px;
   --su-sat: 1.45;
-  --su-a: 0.65;
-  --su-ad: 0.85;
+  --su-a: 0.62;
+  --su-a2: 0.5;
+  --su-ad: 0.86;
   --su-border: rgba(255, 255, 255, 0.6);
-  --su-border-d: rgba(255, 255, 255, 0.1);
-  --su-spec: 0.28;
-  --su-spec-d: 0.1;
+  --su-border-d: rgba(255, 143, 92, 0.16);
+  --su-spec: 0.26;
+  --su-spec-d: 0.09;
   --su-inner: 0.75;
-  --su-inner-d: 0.16;
+  --su-inner-d: 0.14;
+  --su-glow: 0.1;
+  --su-shadow: 0 10px 30px -14px rgba(70, 52, 38, 0.25);
+  --su-shadow-d: 0 14px 34px -18px rgba(0, 0, 0, 0.5);
   --su-float-blur: 24px;
-  --su-float-a: 0.85;
-  --su-float-ad: 0.91;
+  --su-float-a: 0.84;
+  --su-float-a2: 0.78;
+  --su-float-ad: 0.9;
+}
+/* --- Preset SUBTLE: transparansi ringan, blur minimal, highlight lembut --- */
+html[data-glass-level="subtle"] {
+  --su-blur: 7px;
+  --su-sat: 1.15;
+  --su-a: 0.84;
+  --su-a2: 0.78;
+  --su-border: rgba(255, 255, 255, 0.5);
+  --su-spec: 0.12;
+  --su-inner: 0.9;
+  --su-shadow: 0 6px 18px -10px rgba(70, 52, 38, 0.16);
+  --su-float-blur: 12px;
+  --su-float-a: 0.93;
+  --su-float-a2: 0.9;
+}
+html[data-theme="dark"][data-glass-level="subtle"] {
+  --su-ad: 0.95;
+  --su-border-d: rgba(255, 143, 92, 0.1);
+  --su-inner-d: 0.12;
+  --su-glow: 0.05;
+  --su-spec-d: 0.05;
+  --su-float-ad: 0.96;
+}
+/* --- Preset STRONG: blur & transparansi terasa, highlight kuat, depth jelas --- */
+html[data-glass-level="strong"] {
+  --su-blur: 26px;
+  --su-sat: 1.7;
+  --su-a: 0.4;
+  --su-a2: 0.28;
+  --su-border: rgba(255, 255, 255, 0.75);
+  --su-spec: 0.4;
+  --su-inner: 0.6;
+  --su-shadow: 0 18px 44px -18px rgba(70, 52, 38, 0.32);
+  --su-float-blur: 30px;
+  --su-float-a: 0.7;
+  --su-float-a2: 0.6;
+}
+html[data-theme="dark"][data-glass-level="strong"] {
+  --su-ad: 0.64;
+  --su-border-d: rgba(255, 143, 92, 0.26);
+  --su-inner-d: 0.2;
+  --su-glow: 0.2;
+  --su-spec-d: 0.15;
+  --su-float-ad: 0.78;
 }
 @layer utilities {
   /* ---------- Permukaan dasar v7: kartu #242429, hairline halus ---------- */
   .glass {
-    background: linear-gradient(155deg, rgba(255, 255, 255, var(--su-a)) 0%, rgba(255, 255, 255, calc(var(--su-a) - 0.1)) 55%, rgba(255, 255, 255, var(--su-a)) 100%);
+    background: linear-gradient(155deg, rgba(255, 255, 255, var(--su-a)) 0%, rgba(255, 255, 255, var(--su-a2)) 55%, rgba(255, 255, 255, calc(var(--su-a2) + 0.06)) 100%);
     -webkit-backdrop-filter: blur(var(--su-blur)) saturate(var(--su-sat));
     backdrop-filter: blur(var(--su-blur)) saturate(var(--su-sat));
     border: 1px solid var(--su-border);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, var(--su-inner));
+    /* Multi-layer: inner highlight atas + pantulan bawah tipis + shadow natural */
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, var(--su-inner)),
+      inset 0 -1px 0 rgba(255, 255, 255, calc(var(--su-inner) * 0.25)),
+      var(--su-shadow);
   }
   /* Pagar: kelas kaca tidak boleh menimpa position:fixed milik konten dialog
      Radix (AlertDialog/Dialog/Sheet) — tanpa ini dialog jatuh ke alur dokumen
@@ -371,15 +427,25 @@ html[data-theme="dark"] {
      Dark tidak lagi datar satu warna: kartu mengkilap sedikit ke atas,
      lapisan mengambang lebih terang, kartu hero mengalir Primary → Burnt. */
   html[data-theme="dark"] .glass {
-    background: linear-gradient(180deg, rgba(45, 39, 35, var(--su-ad)) 0%, rgba(34, 30, 27, var(--su-ad)) 100%);
-    border: 1px solid var(--su-border-d);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d));
-  }
-  html[data-theme="dark"] .glass-strong {
-    background: linear-gradient(160deg, rgba(58, 50, 45, var(--su-float-ad)) 0%, rgba(40, 35, 32, var(--su-float-ad)) 100%);
+    /* Dark Luminous Glass: charcoal translusen berlapis, pantulan diagonal,
+       inner highlight, border luminous tipis, dan glow ambient oranye SUIO
+       yang terkontrol (aksen, bukan permukaan oranye penuh). */
+    background: linear-gradient(160deg, rgba(50, 44, 40, var(--su-ad)) 0%, rgba(36, 32, 29, calc(var(--su-ad) - 0.1)) 52%, rgba(46, 40, 36, var(--su-ad)) 100%);
     border: 1px solid var(--su-border-d);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d)),
+      inset 0 -1px 0 rgba(255, 106, 40, calc(var(--su-glow) * 0.9)),
+      inset 0 18px 28px -22px rgba(255, 122, 61, calc(var(--su-glow) * 0.55)),
+      0 0 28px -12px rgba(255, 106, 40, var(--su-glow)),
+      var(--su-shadow-d);
+  }
+  html[data-theme="dark"] .glass-strong {
+    background: linear-gradient(160deg, rgba(58, 50, 45, var(--su-float-ad)) 0%, rgba(40, 35, 32, calc(var(--su-float-ad) - 0.06)) 100%);
+    border: 1px solid var(--su-border-d);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, calc(var(--su-inner-d) + 0.06)),
+      inset 0 -1px 0 rgba(255, 106, 40, calc(var(--su-glow) * 0.9)),
+      0 0 32px -12px rgba(255, 106, 40, var(--su-glow)),
       0 28px 64px -26px rgba(0, 0, 0, 0.6);
   }
   html[data-theme="dark"] .glass-violet {
@@ -409,17 +475,24 @@ html[data-theme="dark"] {
   }
   /* Kartu PUTIH referensi (trio Beranda) — teks gelap di dalamnya */
   .tk-card-white {
-    background: linear-gradient(155deg, rgba(255, 255, 255, var(--su-a)) 0%, rgba(255, 255, 255, calc(var(--su-a) - 0.08)) 100%);
+    background: linear-gradient(155deg, rgba(255, 255, 255, var(--su-a)) 0%, rgba(255, 255, 255, var(--su-a2)) 100%);
     -webkit-backdrop-filter: blur(var(--su-blur)) saturate(var(--su-sat));
     backdrop-filter: blur(var(--su-blur)) saturate(var(--su-sat));
     border: none;
     color: #17171b;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, var(--su-inner));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, var(--su-inner)),
+      inset 0 -1px 0 rgba(255, 255, 255, calc(var(--su-inner) * 0.25)),
+      var(--su-shadow);
   }
   html[data-theme="dark"] .tk-card-white {
-    background: linear-gradient(155deg, rgba(45, 39, 35, var(--su-ad)) 0%, rgba(34, 30, 27, var(--su-ad)) 100%);
+    background: linear-gradient(155deg, rgba(50, 44, 40, var(--su-ad)) 0%, rgba(36, 32, 29, calc(var(--su-ad) - 0.08)) 100%);
     color: #f2efe9;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d)),
+      inset 0 -1px 0 rgba(255, 106, 40, calc(var(--su-glow) * 0.8)),
+      0 0 24px -12px rgba(255, 106, 40, calc(var(--su-glow) * 0.8)),
+      var(--su-shadow-d);
   }
   /* Kartu tugas abu terang referensi ("Today's Task") */
   .tk-card-light {
@@ -1508,11 +1581,12 @@ html[data-anim="off"] .tk-cloud {
     0 16px 40px -22px rgba(64, 48, 38, 0.3);
 }
 html[data-theme="dark"] .su-glass {
-  background: linear-gradient(155deg, rgba(74, 64, 57, var(--su-ad)) 0%, rgba(42, 37, 34, var(--su-ad)) 52%, rgba(58, 50, 45, var(--su-ad)) 100%);
+  background: linear-gradient(155deg, rgba(74, 64, 57, var(--su-ad)) 0%, rgba(42, 37, 34, calc(var(--su-ad) - 0.08)) 52%, rgba(58, 50, 45, var(--su-ad)) 100%);
   border: 1px solid var(--su-border-d);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d)),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 -1px 0 rgba(255, 106, 40, calc(var(--su-glow) * 0.8)),
+    0 0 26px -12px rgba(255, 106, 40, calc(var(--su-glow) * 0.9)),
     0 18px 44px -22px rgba(0, 0, 0, 0.55);
 }
 .su-glass::before {

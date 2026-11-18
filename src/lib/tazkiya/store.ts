@@ -646,6 +646,11 @@ export const useWorshipStore = create<WorshipStore>()(
         set((s) => {
           const base = createDefaultSettings();
           const settings = { ...base, ...(doc.settings ?? {}) };
+          /* Migrasi preset lama (glassIntensity 0..100) → preset diskrit glassLevel. */
+          const legacyGi = (doc.settings as Record<string, unknown> | undefined)?.glassIntensity;
+          if (typeof legacyGi === "number" && !(doc.settings as Record<string, unknown> | undefined)?.glassLevel) {
+            settings.glassLevel = legacyGi < 34 ? "subtle" : legacyGi < 67 ? "balanced" : "strong";
+          }
           settings.trackedExtras = sanitizeTrackedExtras(settings.trackedExtras);
           settings.prayerTimesAuto = true;
           if (settings.geo) settings.geo = { ...settings.geo, auto: true };
@@ -729,6 +734,11 @@ export const useWorshipStore = create<WorshipStore>()(
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<WorshipStore>;
         const settings = { ...current.settings, ...(p.settings ?? {}) };
+        /* Migrasi preset lama (glassIntensity 0..100) → preset diskrit glassLevel. */
+        const legacyGi = (p.settings as Record<string, unknown> | undefined)?.glassIntensity;
+        if (typeof legacyGi === "number" && !(p.settings as Record<string, unknown> | undefined)?.glassLevel) {
+          settings.glassLevel = legacyGi < 34 ? "subtle" : legacyGi < 67 ? "balanced" : "strong";
+        }
         // "Doa Harian" tidak lagi dilacak — bersihkan dari data lama tanpa
         // menghapus catatan aktivitas lainnya.
         settings.trackedExtras = sanitizeTrackedExtras(settings.trackedExtras);

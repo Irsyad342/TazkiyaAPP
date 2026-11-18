@@ -317,6 +317,9 @@ export interface FridayPrepData {
   updatedAt?: string; // ISO, terisi setelah perubahan berikutnya
 }
 
+/** Preset intensitas Liquid Glass (diskrit, tanpa nilai di antaranya). */
+export type GlassLevel = "subtle" | "balanced" | "strong";
+
 export interface Settings {
   name: string;
   /** Foto profil — data URL WebP kecil (±256px, hasil konversi otomatis; JPEG bila browser tak mendukung enkode WebP). */
@@ -343,8 +346,8 @@ export interface Settings {
   animations: boolean;
   /** Material Liquid Glass global (blur + translusi) — matikan untuk permukaan solid. */
   glassEffects: boolean;
-  /** Intensitas Liquid Glass 0..100 (0=Subtle, 50=Balanced, 100=Strong). */
-  glassIntensity: number;
+  /** Preset intensitas Liquid Glass — diskrit: subtle | balanced | strong. */
+  glassLevel: GlassLevel;
   vibration: boolean;
   showArabic: boolean;
   theme: ThemeMode;
@@ -628,7 +631,7 @@ export function createDefaultSettings(): Settings {
     },
     animations: true,
     glassEffects: true,
-    glassIntensity: 50,
+    glassLevel: "balanced",
     vibration: true,
     showArabic: true,
     theme: "dark",
