@@ -90,7 +90,7 @@ import { SuioMark } from "./brand";
 import { cn } from "@/lib/utils";
 
 const THEME_OPTIONS: { id: ThemeMode; label: string; hint: string; bg: string; dot: string }[] = [
-  { id: "light", label: "Terang", hint: "Kanvas putih", bg: "linear-gradient(140deg,#ffffff,#ececef)", dot: "#FA5200" },
+  { id: "light", label: "Terang", hint: "Kanvas putih", bg: "linear-gradient(140deg,#ffffff,#f0eeea)", dot: "#FF5A00" },
   { id: "dark", label: "Gelap", hint: "Arang hangat", bg: "linear-gradient(140deg,#39312d,#171717)", dot: "#FF5A00" },
   { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#171717 50%,#F7F5F2 50%)", dot: "#FF5A00" },
 ];

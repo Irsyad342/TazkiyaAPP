@@ -83,7 +83,7 @@
   --breakpoint-xl: 303rem;
   --breakpoint-2xl: 304rem;
   /* Nilai warna dark disampling ulang ke palet hangat v18 (Deep Charcoal
-     #1C1A1A, Charcoal #272321, Warm Dark Gray #352B27, Muted Brown #49372F,
+     #171717, Surface #24211F, Elevated #39312D, Warm Brown #32231A,
      Burnt Orange #D94B0A, Primary Orange #FF5A00, Soft Orange #FF9A52,
      Peach #EFC4A8, Warm Ivory #F5E8DC) — permukaan gelap bernuansa hangat
      dengan tetap satu identitas orange. */
@@ -208,7 +208,7 @@
 
 /* ---------- Mode gelap — PENGALAMAN UTAMA v18 ----------
    Palet hangat dari palet referensi pengguna: kanvas Deep Charcoal #1C1A1A,
-   kartu Charcoal #272321, input/pil Warm Dark Gray #352B27, blok brand
+   kartu Surface #24211F, input/pil Elevated #39312D, blok brand
    Muted Brown, aksen Primary Orange #FF5A00 + Soft Orange #FF9A52. */
 html[data-theme="dark"] {
   --background: #171717;
