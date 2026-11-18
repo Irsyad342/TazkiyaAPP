@@ -59,6 +59,8 @@ import {
   type SheetEntry,
 } from "./JournalCalendar";
 import { cn } from "@/lib/utils";
+import { DUR, EASE, SPRING } from "@/lib/motion/system";
+import { TapIcon } from "./motion-bits";
 
 /* ---------- Navigasi internal ---------- */
 
@@ -264,10 +266,10 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
         {view.name === "home" ? (
           <m.div
             key="home"
-            initial={motionOK ? { opacity: 0, y: 14 } : false}
-            animate={{ opacity: 1, y: 0 }}
-            exit={motionOK ? { opacity: 0, y: -10 } : { opacity: 0 }}
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            initial={motionOK ? { opacity: 0, y: 26, scale: 0.995 } : false}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={motionOK ? { opacity: 0, y: -12, scale: 0.995, transition: { duration: 0.24, ease: EASE.soft } } : { opacity: 0 }}
+            transition={{ duration: DUR.page, ease: EASE.out }}
             className="space-y-6"
           >
             <SubPageHeader
@@ -301,20 +303,20 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
         ) : view.name === "syukur" ? (
           <m.div
             key="syukur"
-            initial={motionOK ? { opacity: 0, y: 14 } : false}
-            animate={{ opacity: 1, y: 0 }}
-            exit={motionOK ? { opacity: 0, y: -10 } : { opacity: 0 }}
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            initial={motionOK ? { opacity: 0, y: 26, scale: 0.995 } : false}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={motionOK ? { opacity: 0, y: -12, scale: 0.995, transition: { duration: 0.24, ease: EASE.soft } } : { opacity: 0 }}
+            transition={{ duration: DUR.page, ease: EASE.out }}
           >
             <SyukurJournal onBack={backOf(view)} />
           </m.div>
         ) : view.name === "form" ? (
           <m.div
             key={`form-${view.cat}-${view.editDate ?? view.date}`}
-            initial={motionOK ? { opacity: 0, y: 14 } : false}
-            animate={{ opacity: 1, y: 0 }}
-            exit={motionOK ? { opacity: 0, y: -10 } : { opacity: 0 }}
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            initial={motionOK ? { opacity: 0, y: 26, scale: 0.995 } : false}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={motionOK ? { opacity: 0, y: -12, scale: 0.995, transition: { duration: 0.24, ease: EASE.soft } } : { opacity: 0 }}
+            transition={{ duration: DUR.page, ease: EASE.out }}
           >
             <JournalXForm
               cat={view.cat}
@@ -327,10 +329,10 @@ export function JurnalPage({ onBack }: { onBack: () => void }) {
         ) : (
           <m.div
             key={`detail-${view.cat}-${view.date}`}
-            initial={motionOK ? { opacity: 0, y: 14 } : false}
-            animate={{ opacity: 1, y: 0 }}
-            exit={motionOK ? { opacity: 0, y: -10 } : { opacity: 0 }}
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            initial={motionOK ? { opacity: 0, y: 26, scale: 0.995 } : false}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={motionOK ? { opacity: 0, y: -12, scale: 0.995, transition: { duration: 0.24, ease: EASE.soft } } : { opacity: 0 }}
+            transition={{ duration: DUR.page, ease: EASE.out }}
           >
             <JournalDetail
               cat={view.cat}
@@ -399,7 +401,7 @@ function JournalBanner({ motionOK }: { motionOK: boolean }) {
       <m.div
         initial={motionOK ? { opacity: 0, y: 16 } : false}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: DUR.card, ease: EASE.out }}
       >
         <GlassCard className={cn("overflow-hidden p-5", motionOK && "pr-float-soft")}>
           {/* Pendar dekoratif + parallax pada tanda kutip */}
@@ -417,7 +419,7 @@ function JournalBanner({ motionOK }: { motionOK: boolean }) {
           <m.p
             initial={motionOK ? { opacity: 0, y: 10 } : false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: motionOK ? 0.12 : 0 }}
+            transition={{ duration: DUR.card, ease: EASE.out, delay: motionOK ? 0.12 : 0 }}
             className="quran-arabic relative mt-3.5 text-right text-[21px] leading-[1.95] text-tk-ink"
           >
             {hadith.arabic}
@@ -425,7 +427,7 @@ function JournalBanner({ motionOK }: { motionOK: boolean }) {
           <m.p
             initial={motionOK ? { opacity: 0, y: 10 } : false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: motionOK ? 0.2 : 0 }}
+            transition={{ duration: DUR.card, ease: EASE.out, delay: motionOK ? 0.2 : 0 }}
             className="relative mt-3 text-[13px] leading-relaxed text-tk-ink/95"
           >
             &ldquo;{hadith.text}&rdquo;
@@ -433,7 +435,7 @@ function JournalBanner({ motionOK }: { motionOK: boolean }) {
           <m.div
             initial={motionOK ? { opacity: 0, y: 10 } : false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: motionOK ? 0.28 : 0 }}
+            transition={{ duration: DUR.card, ease: EASE.out, delay: motionOK ? 0.28 : 0 }}
             className="relative mt-3 flex flex-wrap items-center gap-1.5"
           >
             <Chip className="border-tk-violet/25 bg-tk-lavender/60 text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent">
@@ -543,10 +545,13 @@ function CalendarSection({
     return { y: d.getFullYear(), m: d.getMonth() };
   });
   const [selected, setSelected] = useState<string | null>(null);
+  /* Arah navigasi bulan terakhir (state motion saja) — menentukan slide-x kalender. */
+  const [dir, setDir] = useState<1 | -1>(1);
 
-  const shift = (dir: -1 | 1) => {
+  const shift = (d: -1 | 1) => {
+    setDir(d);
     setCursor((c) => {
-      const dt = new Date(c.y, c.m + dir, 1);
+      const dt = new Date(c.y, c.m + d, 1);
       return { y: dt.getFullYear(), m: dt.getMonth() };
     });
     setSelected(null);
@@ -554,6 +559,7 @@ function CalendarSection({
 
   const goToday = () => {
     const d = new Date();
+    setDir(d.getFullYear() * 12 + d.getMonth() <= cursor.y * 12 + cursor.m ? -1 : 1);
     setCursor({ y: d.getFullYear(), m: d.getMonth() });
     setSelected(today);
     onSelect(today);
@@ -567,6 +573,7 @@ function CalendarSection({
         notes={notes}
         selected={selected}
         motionOK={motionOK}
+        dir={dir}
         onShift={shift}
         onToday={goToday}
         onSelect={(d) => {
@@ -792,7 +799,7 @@ function JournalXForm({
                 <span className="text-[10px] font-semibold text-tk-muted">opsional</span>
               )}
             </span>
-            <m.span animate={{ rotate: motionOK ? (guideOpen ? 180 : 0) : 0 }} transition={{ duration: 0.25 }}>
+            <m.span animate={{ rotate: motionOK ? (guideOpen ? 180 : 0) : 0 }} transition={{ duration: DUR.item, ease: EASE.out }}>
               <ChevronDown size={15} className="text-tk-muted" />
             </m.span>
           </button>
@@ -802,7 +809,7 @@ function JournalXForm({
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: DUR.item, ease: EASE.out }}
                 className="overflow-hidden"
               >
                 <div className="space-y-3 px-4 py-3.5">
@@ -834,18 +841,20 @@ function JournalXForm({
         </div>
 
         {/* Simpan */}
-        <button
+        <m.button
           type="button"
           onClick={save}
           disabled={!filled || justSaved}
+          animate={motionOK && justSaved ? { scale: [1, 1.04, 1] } : { scale: 1 }}
+          transition={SPRING.pop}
           className={cn(
             "tap gs-ink-btn mt-5 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-full font-display text-[14.5px] font-bold transition-all",
             (!filled || justSaved) && "cursor-not-allowed opacity-40"
           )}
         >
-          {justSaved ? <Check size={16} /> : <PenLine size={15} />}
+          <TapIcon active={justSaved}>{justSaved ? <Check size={16} /> : <PenLine size={15} />}</TapIcon>
           {justSaved ? "Tersimpan" : isEdit ? "Simpan Perubahan" : "Simpan Jurnal"}
-        </button>
+        </m.button>
         <p className="mt-2.5 flex items-center justify-center gap-1.5 text-[10px] text-tk-muted/80">
           <Lock size={10} />
           {isEdit
@@ -927,7 +936,7 @@ function JournalDetail({
       <m.article
         initial={motionOK ? { opacity: 0, y: 16 } : false}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: DUR.card, ease: EASE.out }}
       >
         <GlassCard className="p-5 sm:p-6">
           <div className="flex flex-wrap items-center gap-1.5">
@@ -953,12 +962,18 @@ function JournalDetail({
           {isSyukur ? (
             <ul className="mt-4 space-y-3">
               {syukur!.items.filter(Boolean).map((it, i) => (
-                <li key={i} className="flex items-start gap-2.5 rounded-[1rem] border border-tk-line bg-tk-panel-soft p-3.5">
+                <m.li
+                  key={i}
+                  initial={motionOK ? { opacity: 0, y: 14 } : false}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: DUR.item, ease: EASE.out, delay: motionOK ? 0.08 + i * 0.064 : 0 }}
+                  className="flex items-start gap-2.5 rounded-[1rem] border border-tk-line bg-tk-panel-soft p-3.5"
+                >
                   <span className="tnum mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-tk-lavender text-[11px] font-bold text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent">
                     {i + 1}
                   </span>
                   <span className="text-[13.5px] leading-[1.8] text-tk-ink/95">{it}</span>
-                </li>
+                </m.li>
               ))}
             </ul>
           ) : (
@@ -1115,18 +1130,20 @@ function SyukurJournal({ onBack }: { onBack: () => void }) {
               ))}
             </div>
 
-            <button
+            <m.button
               type="button"
               onClick={save}
               disabled={!canSave}
+              animate={motionOK && justSavedToday ? { scale: [1, 1.04, 1] } : { scale: 1 }}
+              transition={SPRING.pop}
               className={cn(
                 "tap gs-ink-btn mt-5 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-full font-display text-[14.5px] font-bold transition-all",
                 !canSave && "cursor-not-allowed opacity-40"
               )}
             >
-              {justSavedToday ? <Check size={16} /> : <BookHeart size={16} />}
+              <TapIcon active={justSavedToday}>{justSavedToday ? <Check size={16} /> : <BookHeart size={16} />}</TapIcon>
               {justSavedToday ? "Tersimpan" : "Simpan Jurnal"}
-            </button>
+            </m.button>
             <p className="mt-2.5 flex items-center justify-center gap-1.5 text-[10px] text-tk-muted/80">
               <Lock size={10} />
               {savedAt ? "Tersimpan hari ini, kamu bisa mengeditnya kapan saja." : "Privat, hanya kamu yang bisa membacanya."}
@@ -1158,14 +1175,14 @@ function SyukurJournal({ onBack }: { onBack: () => void }) {
                         }}
                         initial={motionOK ? { opacity: 0, scale: 0.55, y: 8 } : false}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        transition={{ type: "spring", stiffness: 420, damping: 24, delay: motionOK ? order * 0.05 : 0 }}
+                        transition={{ ...SPRING.pop, delay: motionOK ? order * 0.05 : 0 }}
                         whileTap={motionOK ? { scale: 0.88 } : undefined}
                         className="tap flex w-[70px] shrink-0 flex-col items-center gap-2 rounded-2xl px-1 py-2"
                       >
                         <m.span
                           aria-hidden
                           animate={{ scale: motionOK && active ? 1.08 : 1 }}
-                          transition={{ type: "spring", stiffness: 420, damping: 20 }}
+                          transition={SPRING.pop}
                           className={cn(
                             "flex rounded-[25%] transition-[box-shadow] duration-300",
                             active
@@ -1246,7 +1263,14 @@ function SyukurJournal({ onBack }: { onBack: () => void }) {
                   const e = journal[d];
                   const editing = editingDate === d;
                   return (
-                    <li key={d} className="px-4 py-3.5">
+                    <m.li
+                      key={d}
+                      initial={motionOK ? { opacity: 0, y: 16 } : false}
+                      whileInView={motionOK ? { opacity: 1, y: 0 } : undefined}
+                      viewport={{ once: true, amount: 0.2 }}
+                      transition={{ duration: DUR.card, ease: EASE.out }}
+                      className="px-4 py-3.5"
+                    >
                       <div className="flex items-center justify-between gap-2">
                         <p className="flex min-w-0 items-center gap-2 font-display text-[13px] font-bold text-tk-ink">
                           <span className="truncate">{relativeDayLabel(d, today)}</span>
@@ -1383,7 +1407,7 @@ function SyukurJournal({ onBack }: { onBack: () => void }) {
                           ))}
                         </ul>
                       )}
-                    </li>
+                    </m.li>
                   );
                 })}
               </ul>

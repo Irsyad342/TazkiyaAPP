@@ -41,6 +41,8 @@ import { LazyMotion, MotionConfig, domAnimation, m } from "framer-motion";
 import { ArrowRight, ChevronLeft } from "lucide-react";
 import { SuioMark } from "@/components/tazkiya/brand";
 import { Star8 } from "@/components/tazkiya/ornaments";
+import { PressScale, useAnim } from "@/components/tazkiya/motion-bits";
+import { DUR, EASE } from "@/lib/motion/system";
 import {
   FinalArt,
   GoodnessArt,
@@ -53,7 +55,8 @@ import {
 } from "@/components/tazkiya/onboarding-art";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 
-const EASE = [0.22, 1, 0.36, 1] as const;
+/* EASE diimpor dari sistem motion global (src/lib/motion/system.ts) —
+   nilai identik dengan konstanta lokal sebelumnya, preset kini tunggal. */
 
 /** Warna kanvas per tema — sinkron dengan CANVAS di app/onboarding/page.tsx. */
 const CANVAS = { dark: "#171717", light: "#F7F5F2" } as const;
@@ -136,11 +139,11 @@ const textContainer = {
 };
 const wordRise = {
   hidden: { y: "118%" },
-  show: { y: "0%", transition: { duration: 0.6, ease: EASE } },
+  show: { y: "0%", transition: { duration: 0.6, ease: EASE.out } },
 };
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE.out } },
 };
 
 export function OnboardingFlow({
@@ -154,6 +157,8 @@ export function OnboardingFlow({
   const [index, setIndex] = useState(0);
   const [entered, setEntered] = useState(false);
   const [mode, setMode] = useState<ThemeModeOpt>(initialThemeMode);
+  /** Gerbang animasi global: setelan "Animasi" aplikasi + prefers-reduced-motion. */
+  const anim = useAnim();
 
   /* Resolusi tema: "system" mengikuti preferensi perangkat secara langsung. */
   const resolve = useCallback((mv: ThemeModeOpt) => {
@@ -361,7 +366,7 @@ export function OnboardingFlow({
             <m.header
               initial={{ opacity: 0, y: -10 }}
               animate={entered ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.55, ease: EASE }}
+              transition={{ duration: 0.55, ease: EASE.out }}
               className="relative z-10 flex items-center justify-between px-5 pt-[max(0.9rem,env(safe-area-inset-top))] min-[900px]:px-14 min-[900px]:pt-6"
             >
               <div className="flex items-center gap-2.5">
@@ -426,10 +431,21 @@ export function OnboardingFlow({
                       {/* Mobile: kolom visual + teks (urutan per slide); Desktop ≥900px:
                           wrapper "contents" → teks kiri (order-1), visual kanan (order-2). */}
                       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-1 min-[900px]:contents">
+                        {/* Wrapper entrance ilustrasi: fade + naik tipis +
+                            scale 0.99 (preset pageIn); slide nonaktif tetap
+                            diredam 0.35 dengan depth scale 0.99. */}
                         <m.div
-                          initial={{ opacity: 0 }}
-                          animate={active ? { opacity: 1 } : { opacity: 0.35 }}
-                          transition={{ duration: 0.5, ease: EASE }}
+                          initial={anim ? { opacity: 0, y: 14, scale: 0.99 } : false}
+                          animate={
+                            active
+                              ? anim
+                                ? { opacity: 1, y: 0, scale: 1 }
+                                : { opacity: 1 }
+                              : anim
+                                ? { opacity: 0.35, y: 0, scale: 0.99 }
+                                : { opacity: 0.35 }
+                          }
+                          transition={anim ? { duration: DUR.page, ease: EASE.out } : { duration: 0 }}
                           className={`w-full ${
                             isThemeSlide || isFinal
                               ? "flex min-h-0 flex-1 items-center justify-center"
@@ -456,7 +472,7 @@ export function OnboardingFlow({
             <m.footer
               initial={{ opacity: 0, y: 16 }}
               animate={entered ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.55, delay: 0.3, ease: EASE }}
+              transition={{ duration: 0.55, delay: 0.3, ease: EASE.out }}
               className="relative z-10 px-6 pb-[max(1rem,env(safe-area-inset-bottom))] min-[900px]:px-14 min-[900px]:pb-7"
             >
               <div className="min-[900px]:mx-auto min-[900px]:flex min-[900px]:w-full min-[900px]:max-w-[1080px] min-[900px]:items-center min-[900px]:justify-between min-[900px]:gap-8">
@@ -488,7 +504,7 @@ export function OnboardingFlow({
                       type="button"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3, ease: EASE }}
+                      transition={{ duration: 0.3, ease: EASE.out }}
                       onClick={() => go(index - 1)}
                       aria-label="Kembali"
                       className="tap flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border light:border-[#202020]/12 light:bg-white/80 light:text-[#202020] dark:border-white/[0.1] dark:bg-white/[0.05] dark:text-[#F7F3EF]"
@@ -497,27 +513,25 @@ export function OnboardingFlow({
                     </m.button>
                   )}
                   {last ? (
-                    <m.button
-                      type="button"
-                      whileTap={{ scale: 0.97 }}
+                    <PressScale
+                      as="button"
+                      press={0.97}
                       onClick={() => onDone("/auth?mode=register")}
-                      className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-full bg-[#FF5A00] font-display text-[14.5px] font-bold text-white"
-                      style={{ boxShadow: "0 18px 40px -16px rgba(255,90,0,0.55)" }}
+                      className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-full bg-[#FF5A00] font-display text-[14.5px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(255,90,0,0.55)]"
                     >
                       Mulai Sekarang
                       <ArrowRight size={17} />
-                    </m.button>
+                    </PressScale>
                   ) : (
-                    <m.button
-                      type="button"
-                      whileTap={{ scale: 0.97 }}
+                    <PressScale
+                      as="button"
+                      press={0.97}
                       onClick={() => go(index + 1)}
-                      className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-full bg-[#FF5A00] font-display text-[14.5px] font-bold text-white"
-                      style={{ boxShadow: "0 18px 40px -16px rgba(255,90,0,0.55)" }}
+                      className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-full bg-[#FF5A00] font-display text-[14.5px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(255,90,0,0.55)]"
                     >
                       Lanjut
                       <ArrowRight size={17} />
-                    </m.button>
+                    </PressScale>
                   )}
                 </div>
 
@@ -541,16 +555,15 @@ export function OnboardingFlow({
                       <ChevronLeft size={18} />
                     </button>
                   )}
-                  <m.button
-                    type="button"
-                    whileTap={{ scale: 0.97 }}
+                  <PressScale
+                    as="button"
+                    press={0.97}
                     onClick={() => (last ? onDone("/auth?mode=register") : go(index + 1))}
-                    className="flex h-[48px] w-[230px] items-center justify-center gap-2 rounded-full bg-[#FF5A00] font-display text-[14px] font-bold text-white"
-                    style={{ boxShadow: "0 18px 40px -16px rgba(255,90,0,0.55)" }}
+                    className="flex h-[48px] w-[230px] items-center justify-center gap-2 rounded-full bg-[#FF5A00] font-display text-[14px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(255,90,0,0.55)]"
                   >
                     {last ? "Mulai Sekarang" : "Lanjut"}
                     <ArrowRight size={16} />
-                  </m.button>
+                  </PressScale>
                 </div>
               </div>
 
@@ -560,7 +573,7 @@ export function OnboardingFlow({
                   <m.p
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, ease: EASE }}
+                    transition={{ duration: 0.4, ease: EASE.out }}
                     className="text-[12px] light:text-[#77716D] dark:text-[#B5AAA3]"
                   >
                     Sudah punya akun?{" "}

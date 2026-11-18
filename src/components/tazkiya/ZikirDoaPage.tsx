@@ -15,6 +15,7 @@ import { useMemo, useState } from "react";
 import { ChevronDown, CircleDot, Expand, HandHeart, History, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { m } from "framer-motion";
+import { Reveal } from "./motion-bits";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { DAILY_DUAS, duaOfTheDay, type DailyDua } from "@/lib/tazkiya/duas";
 import { DOA_HARIAN_IDS, DOA_KATEGORI, DOA_KOLEKSI, ZIKIR_SETS, type DoaItem, type ZikirSet } from "@/lib/tazkiya/zikir-doa";
@@ -84,7 +85,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
   const tipY = 140 + R * Math.sin(angle);
 
   return (
-    <section aria-label="Tasbih digital" className="animate-tk-fade-up flex flex-col items-center">
+    <Reveal className="flex flex-col items-center"><section aria-label="Tasbih digital">
       {/* Nama zikir + Arab */}
       <div className="text-center">
         <p className="gs-overline">Tasbih Digital</p>
@@ -213,7 +214,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
       <p className="mt-3 text-center text-[10.5px] leading-relaxed text-tk-muted/80">
         Ketuk lingkaran untuk berzikir · “Simpan Harian” mencatat ke riwayat
       </p>
-    </section>
+    </section></Reveal>
   );
 }
 
@@ -230,7 +231,7 @@ function ZikirPresetPicker() {
   const tasbihSetDhikr = useWorshipStore((s) => s.tasbihSetDhikr);
 
   return (
-    <section aria-label="Pilih zikir" className="animate-tk-fade-up">
+    <Reveal><section aria-label="Pilih zikir">
       <SectionHeader title="Pilih Zikir" caption="Ketuk bubble untuk memakai zikir pada penghitung" />
       <div className="flex flex-wrap gap-1.5" role="group" aria-label="Jenis zikir">
         {ZIKIR_PRESETS.map((z) => (
@@ -248,7 +249,7 @@ function ZikirPresetPicker() {
           </button>
         ))}
       </div>
-    </section>
+    </section></Reveal>
   );
 }
 

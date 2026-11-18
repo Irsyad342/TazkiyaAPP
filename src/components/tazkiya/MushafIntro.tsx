@@ -11,8 +11,11 @@
  */
 
 import { useEffect, useRef } from "react";
-import { motion, useAnimationControls } from "framer-motion";
+import { m, useAnimationControls } from "framer-motion";
 import { playPageFlip } from "@/lib/tazkiya/page-sound";
+import { useAnim } from "./motion-bits";
+import { DUR, EASE } from "@/lib/motion/system";
+import { cn } from "@/lib/utils";
 
 const DUR_COVER = 0.78; // sampul membuka
 const DUR_FADE = 0.3; // crossfade ke mushaf
@@ -30,6 +33,9 @@ export function MushafIntro({
 }) {
   const controls = useAnimationControls();
   const wrapControls = useAnimationControls();
+  // Gerbang motion global (setelan animasi + prefers-reduced-motion),
+  // digabung dengan flag `animated` dari pembaca.
+  const anim = useAnim() && animated;
   const doneRef = useRef(false);
   const finished = () => {
     if (!doneRef.current) {
@@ -41,13 +47,15 @@ export function MushafIntro({
   useEffect(() => {
     let alive = true;
     const run = async () => {
-      if (!animated) {
-        // Reduced motion: fade singkat tanpa animasi pembukaan.
+      if (!anim) {
+        // Reduced motion / animasi mati: fade singkat tanpa animasi pembukaan.
         await wrapControls.start({ opacity: [1, 0], transition: { duration: 0.24, ease: "easeOut" } });
         if (alive) finished();
         return;
       }
-      // Sampul muncul halus, lalu membuka seperti buku fisik.
+      // Intro masuk halus: fade + slide tipis (pageIn-like), lalu sampul muncul
+      // dan membuka seperti buku fisik.
+      await wrapControls.start({ opacity: 1, y: 0, transition: { duration: DUR.page, ease: EASE.out } });
       await controls.start({
         opacity: 1,
         scale: [0.965, 1],
@@ -68,22 +76,24 @@ export function MushafIntro({
   }, []);
 
   return (
-    <motion.div
+    <m.div
       className="mushaf-intro"
+      initial={anim ? { opacity: 0, y: 26 } : false}
       animate={wrapControls}
       onClick={finished}
       role="presentation"
       style={{ cursor: "pointer" }}
       aria-label="Membuka mushaf"
     >
-      {/* Panggung buku: dua halaman ivory (tampak saat sampul terbuka) */}
-      <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: animated ? 0.4 : 0 }} className="relative w-[min(88vw,560px)]">
-        <div className="relative mx-auto aspect-[1.42/1] w-full">
+      {/* Panggung buku: dua halaman ivory (tampak saat sampul terbuka);
+          float ambient CSS existing (translateY murni, hanya saat animasi ON) */}
+      <m.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: anim ? 0.4 : 0 }} className="relative w-[min(88vw,560px)]">
+        <div className={cn("relative mx-auto aspect-[1.42/1] w-full", anim && "tk-ob-float")}>
           <div className="absolute inset-y-2 left-[2px] right-1/2 rounded-l-xl border border-[#e2d7c3] bg-[#fbf8f0] shadow-[0_18px_44px_-20px_rgba(60,40,10,0.5)]" />
           <div className="absolute inset-y-2 left-1/2 right-[2px] rounded-r-xl border border-[#e2d7c3] bg-[#f7f3e9] shadow-[0_18px_44px_-20px_rgba(60,40,10,0.5)]" />
           <div aria-hidden className="absolute inset-y-2 left-1/2 w-6 -translate-x-1/2 bg-gradient-to-r from-transparent via-[rgba(70,52,20,0.16)] to-transparent" />
           {/* Sampul: membuka rotateY pada jilid kanan (buku Arab) */}
-          <motion.div
+          <m.div
             className="mushaf-intro-cover absolute inset-0"
             style={{ transformOrigin: "right center" }}
             initial={{ rotateY: 0, opacity: 0 }}
@@ -106,10 +116,10 @@ export function MushafIntro({
                 <span className="absolute bottom-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#b39d72]">{surahName}</span>
               ) : null}
             </div>
-          </motion.div>
+          </m.div>
         </div>
         <p className="mt-6 text-center text-[10.5px] font-medium text-tk-muted">Ketuk untuk melanjutkan…</p>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

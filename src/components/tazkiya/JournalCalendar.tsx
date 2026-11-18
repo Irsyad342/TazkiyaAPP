@@ -15,10 +15,11 @@
  */
 
 import { useMemo } from "react";
-import { AnimatePresence, m, useReducedMotion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { CalendarDays, ChevronLeft, ChevronRight, PenLine, X } from "lucide-react";
 import { calendarDayKeys, formatDayFull, todayKey } from "@/lib/tazkiya/dates";
 import { journalCatMeta, type JournalCat } from "@/lib/tazkiya/types";
+import { DUR, EASE, SPRING } from "@/lib/motion/system";
 import { cn } from "@/lib/utils";
 
 /* ---------- Identitas warna kategori (selaras aksen SUIO) ---------- */
@@ -77,6 +78,7 @@ export function JournalCalendar({
   onShift,
   onToday,
   motionOK,
+  dir = 1,
 }: {
   year: number;
   month: number;
@@ -86,12 +88,13 @@ export function JournalCalendar({
   onShift: (dir: -1 | 1) => void;
   onToday: () => void;
   motionOK: boolean;
+  /** Arah navigasi terakhir (prev/next) untuk slide-x transisi bulan. */
+  dir?: 1 | -1;
 }) {
   const today = todayKey();
   const cells = useMemo(() => calendarDayKeys(year, month), [year, month]);
   const sum = useMemo(() => monthSummary(year, month, notes), [year, month, notes]);
   const isThisMonth = year === parseInt(today.slice(0, 4), 10) && month === parseInt(today.slice(5, 7), 10) - 1;
-  const dir = (year * 12 + month) % 2 === 0 ? 1 : -1; // arah slide stabil per bulan
 
   const monthLabel = new Date(year, month, 1).toLocaleDateString("id-ID", {
     month: "long",
@@ -148,7 +151,7 @@ export function JournalCalendar({
         ))}
       </div>
 
-      {/* Grid tanggal — transisi horizontal antar bulan + stagger tipis */}
+      {/* Grid tanggal — transisi horizontal antar bulan (arah sesuai prev/next) + stagger tipis */}
       <div className="relative mt-1 overflow-hidden">
         <AnimatePresence mode="wait" initial={false}>
           <m.div
@@ -156,7 +159,7 @@ export function JournalCalendar({
             initial={motionOK ? { opacity: 0, x: 26 * dir } : false}
             animate={{ opacity: 1, x: 0 }}
             exit={motionOK ? { opacity: 0, x: -26 * dir } : { opacity: 0 }}
-            transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: DUR.item, ease: EASE.out }}
             className="grid grid-cols-7 gap-1"
             role="grid"
             aria-label={`Kalender ${monthLabel}`}
@@ -178,20 +181,28 @@ export function JournalCalendar({
                   onClick={() => onSelect(k)}
                   initial={motionOK ? { opacity: 0, y: 6 } : false}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.22, delay: motionOK ? Math.min(i * 0.012, 0.3) : 0 }}
+                  transition={{ duration: DUR.item, ease: EASE.out, delay: motionOK ? Math.min(i * 0.012, 0.3) : 0 }}
                   className={cn(
                     "tap relative flex h-[44px] flex-col items-center justify-center rounded-[0.85rem] text-[12.5px] font-semibold transition-colors",
-                    isSel
-                      ? "gs-ink-btn shadow-[0_8px_18px_-8px_rgba(255,90,0,0.6)]"
-                      : has
-                        ? "text-tk-ink hover:bg-tk-panel-soft"
-                        : "text-tk-muted hover:bg-tk-panel-soft"
+                    isSel ? "text-white" : has ? "text-tk-ink hover:bg-tk-panel-soft" : "text-tk-muted hover:bg-tk-panel-soft"
                   )}
                 >
-                  <span className={cn("tnum leading-none", isToday && !isSel && "font-bold text-tk-accent")}>{day}</span>
+                  {isSel ? (
+                    /* Sorotan sel terpilih MELUNCUR antar sel kalender: satu
+                       elemen latar dipindahkan via layout animation (hanya
+                       transform, pola BottomNav tk-nav-pill). Warna teks isi
+                       tetap putih agar kontras di atas pil yang meluncur. */
+                    <m.span
+                      layoutId="tk-cal-sel"
+                      aria-hidden
+                      transition={motionOK ? SPRING.glide : { duration: 0 }}
+                      className="gs-ink-btn absolute inset-0 rounded-[0.85rem] shadow-[0_8px_18px_-8px_rgba(255,90,0,0.6)]"
+                    />
+                  ) : null}
+                  <span className={cn("tnum relative z-10 leading-none", isToday && !isSel && "font-bold text-tk-accent")}>{day}</span>
                   {/* Indikator kategori: maksimal 4 titik (satu per kategori) */}
                   {has ? (
-                    <span className="mt-1 flex items-center gap-[3px]" aria-hidden>
+                    <span className="relative z-10 mt-1 flex items-center gap-[3px]" aria-hidden>
                       {n.cats.slice(0, 4).map((c) => (
                         <span
                           key={c}
@@ -258,7 +269,7 @@ export function DateDetailSheet({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.22 }}
+      transition={{ duration: 0.24 }}
       className="fixed inset-0 z-[72] flex items-end justify-center"
       role="dialog"
       aria-modal="true"
@@ -269,7 +280,7 @@ export function DateDetailSheet({
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
-        transition={{ type: "spring", stiffness: 380, damping: 38 }}
+        transition={SPRING.sheet}
         className="relative z-10 max-h-[82dvh] w-full max-w-[430px] overflow-y-auto rounded-t-[1.6rem] border border-tk-line bg-tk-stage px-5 pb-[max(1.4rem,env(safe-area-inset-bottom))] pt-3"
       >
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-tk-line-strong" aria-hidden />
@@ -309,7 +320,7 @@ export function DateDetailSheet({
                 key={`${e.cat}-${e.date}`}
                 initial={motionOK ? { opacity: 0, y: 14 } : false}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: motionOK ? i * 0.05 : 0 }}
+                transition={{ duration: DUR.item, ease: EASE.out, delay: motionOK ? i * 0.064 : 0 }}
                 className="rounded-[1.1rem] border border-tk-line bg-tk-panel p-3.5"
               >
                 <div className="flex items-center justify-between gap-2">
@@ -380,7 +391,7 @@ export function CategoryPickSheet({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.22 }}
+      transition={{ duration: 0.24 }}
       className="fixed inset-0 z-[73] flex items-end justify-center"
       role="dialog"
       aria-modal="true"
@@ -391,7 +402,7 @@ export function CategoryPickSheet({
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
-        transition={{ type: "spring", stiffness: 380, damping: 38 }}
+        transition={SPRING.sheet}
         className="relative z-10 w-full max-w-[430px] rounded-t-[1.6rem] border border-tk-line bg-tk-stage px-5 pb-[max(1.4rem,env(safe-area-inset-bottom))] pt-3"
       >
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-tk-line-strong" aria-hidden />
@@ -407,7 +418,7 @@ export function CategoryPickSheet({
               onClick={() => onPick(it.cat)}
               initial={motionOK ? { opacity: 0, y: 12 } : false}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.26, delay: motionOK ? i * 0.045 : 0 }}
+              transition={{ duration: DUR.item, ease: EASE.out, delay: motionOK ? i * 0.064 : 0 }}
               className="tap flex flex-col items-start gap-1 rounded-[1.1rem] border border-tk-line bg-tk-panel p-3 text-left transition-colors"
             >
               <span className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: `${CAT_DOT[it.cat]}1A` }}>

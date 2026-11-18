@@ -1444,6 +1444,39 @@ html[data-anim="off"] .tk-cloud {
 .pr-bird {
   animation: pr-bird var(--pr-dur, 38s) ease-in-out infinite alternate;
 }
+/* ================= GLOBAL MOTION — ambient presets ================= */
+/* Dua preset ambient SUIO: glow napas lambat & mengapung halus.
+   Hanya transform/opacity (GPU-composited), loop ~14-18 dtk, dan hanya
+   dipakai pada 1-2 elemen dekoratif per layar — komponen data TIDAK
+   beranimasi infinite. Mati total pada setelan animasi off & reduced
+   motion, mengikuti pola tk-*. */
+@keyframes su-glow-breathe {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.045); }
+}
+.su-ambient {
+  animation: su-glow-breathe 14s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+@keyframes su-float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+.su-float {
+  animation: su-float-y 6.5s ease-in-out infinite;
+  will-change: transform;
+}
+html[data-anim="off"] .su-ambient,
+html[data-anim="off"] .su-float {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html .su-ambient,
+  html .su-float {
+    animation: none !important;
+  }
+}
+
 /* ================= Salat Jumat (varian keluarga tiket, v3 minimalis) ================= */
 
 /* Kartu Jumat TIDAK melakukan override visual apa pun terhadap keluarga

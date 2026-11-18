@@ -213,6 +213,13 @@ export function TasbihFullscreen({
                 }}
               />
             ) : null}
+            {/* Ambient glow halus di belakang cakram — bernapas 14 dtk,
+                hanya transform/opacity, mati pada animasi off. */}
+            <span
+              aria-hidden
+              className="su-ambient pointer-events-none absolute inset-[30px] rounded-full"
+              style={{ background: "radial-gradient(circle, rgba(250,82,0,0.16) 0%, rgba(250,82,0,0) 70%)" }}
+            />
             <span aria-hidden className="tk-tasbih-disc absolute inset-[22px] rounded-full border border-tk-line" />
             <m.span
               key={tasbih.count}
@@ -227,14 +234,18 @@ export function TasbihFullscreen({
               <span className="tnum mt-2 text-[13px] font-semibold text-tk-muted">
                 {Math.min(tasbih.count, tasbih.target).toLocaleString("id-ID")} / {tasbih.target.toLocaleString("id-ID")}
               </span>
-              <span
+              <m.span
+                key={reached ? "reached" : "progress"}
+                initial={motionOK ? { scale: 0.82, opacity: 0.6 } : false}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 420, damping: 20 }}
                 className={cn(
                   "mt-2.5 rounded-full px-3 py-1 text-[10px] font-bold",
                   reached ? "bg-tk-lime text-tk-lime-ink" : "bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent"
                 )}
               >
                 {reached ? "Target tercapai" : `${pct}%`}
-              </span>
+              </m.span>
             </m.span>
           </m.button>
         </div>

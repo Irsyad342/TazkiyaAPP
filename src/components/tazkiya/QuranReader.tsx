@@ -35,6 +35,8 @@ import { todayKey } from "@/lib/tazkiya/dates";
 import { cn } from "@/lib/utils";
 import { MushafView, type MushafPosition } from "./QuranMushaf";
 import { MushafIntro } from "./MushafIntro";
+import { TapIcon, useAnim } from "./motion-bits";
+import { DUR, EASE, SPRING } from "@/lib/motion/system";
 
 const LINE_HEIGHTS = [1.7, 1.9, 2.2];
 
@@ -64,6 +66,8 @@ function TranslationView({
   const toggleAyahBookmark = useWorshipStore((s) => s.toggleAyahBookmark);
   const ayahBookmarks = useWorshipStore((s) => s.ayahBookmarks);
   const addQuranProgress = useWorshipStore((s) => s.addQuranProgress);
+  // Gerbang motion global untuk entrance konten ayat.
+  const anim = useAnim();
 
   const meta = getSurah(surah);
 
@@ -257,8 +261,14 @@ function TranslationView({
 
   return (
     <div ref={scrollRef} className="thin-scrollbar relative z-10 min-h-0 flex-1 overflow-y-auto px-3 pb-8 pt-4 sm:px-6">
-      {/* Kertas bacaan: PUTIH permanen di kedua tema */}
-      <div className="quran-paper mx-auto max-w-[720px] rounded-[1.5rem] border border-[#e8e2da] px-4 py-5 shadow-[0_10px_36px_-18px_rgba(60,40,10,0.3)] sm:px-6">
+      {/* Kertas bacaan: PUTIH permanen di kedua tema. Fade-rise tipis
+          (opacity + transform saja) pada pembukaan & pindah surah/ayat. */}
+      <m.div
+        initial={anim ? { opacity: 0, y: 16 } : false}
+        animate={anim ? { opacity: 1, y: 0 } : undefined}
+        transition={{ duration: DUR.page, ease: EASE.out }}
+        className="quran-paper mx-auto max-w-[720px] rounded-[1.5rem] border border-[#e8e2da] px-4 py-5 shadow-[0_10px_36px_-18px_rgba(60,40,10,0.3)] sm:px-6"
+      >
         {loading ? (
           <div className="flex flex-col items-center gap-3 py-20 text-center">
             <LoaderCircle size={30} className="animate-spin text-[#b45309]" />
@@ -348,7 +358,10 @@ function TranslationView({
                           : "border-[#e8e2da] bg-white text-[#8a8a8a] hover:text-[#c2410c]"
                       )}
                     >
-                      <BookmarkIcon size={13} />
+                      {/* Pop spring singkat saat penanda aktif/nonaktif berganti. */}
+                      <TapIcon active={bookmarkSet.has(ayah.number)}>
+                        <BookmarkIcon size={13} />
+                      </TapIcon>
                     </button>
                   </div>
                   <p
@@ -373,7 +386,7 @@ function TranslationView({
             </p>
           </>
         ) : null}
-      </div>
+      </m.div>
     </div>
   );
 }
@@ -394,6 +407,8 @@ export function QuranReader({
   const saveBookmark = useWorshipStore((s) => s.saveBookmark);
 
   const animated = settings.animations;
+  // Gerbang motion global: setelan animasi aplikasi + prefers-reduced-motion.
+  const anim = useAnim();
   const mode = settings.quranReadMode ?? "terjemahan";
   const pageSound = settings.quranPageSound ?? true;
 
@@ -458,14 +473,16 @@ export function QuranReader({
       {mode === "terjemahan" ? (
       <header className="glass-strong relative z-20 rounded-none border-0 border-b border-tk-line px-3 pb-2.5 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <div className="mx-auto flex max-w-[760px] items-center gap-2">
-          <button
+          <m.button
             type="button"
             onClick={onClose}
             aria-label="Kembali ke daftar surah"
+            whileTap={anim ? { scale: 0.9 } : undefined}
+            transition={SPRING.snappy}
             className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-ink transition-colors hover:border-tk-violet/40"
           >
             <X size={18} />
-          </button>
+          </m.button>
           <div className="min-w-0 flex-1 text-center">
             <p className="truncate font-display text-[15px] font-bold leading-tight tracking-[-0.01em] text-tk-ink">
               {meta?.latin}
@@ -475,7 +492,7 @@ export function QuranReader({
               Surah {activeSurah} · {meta?.verses} ayat · {meta?.place}
             </p>
           </div>
-          <button
+          <m.button
             type="button"
             onClick={() => {
               const pos = posRef.current;
@@ -483,22 +500,26 @@ export function QuranReader({
               toast.success(`Penanda disimpan: ${getSurah(pos.surah)?.latin ?? "Surah"} ayat ${pos.ayah}`);
             }}
             aria-label="Simpan penanda posisi ini"
+            whileTap={anim ? { scale: 0.9 } : undefined}
+            transition={SPRING.snappy}
             className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-violet transition-colors hover:border-tk-violet/50 dark:text-tk-accent"
           >
             <BookmarkIcon size={17} />
-          </button>
-          <button
+          </m.button>
+          <m.button
             type="button"
             onClick={() => setSettingsOpen((v) => !v)}
             aria-label="Pengaturan tampilan bacaan"
             aria-expanded={settingsOpen}
+            whileTap={anim ? { scale: 0.9 } : undefined}
+            transition={SPRING.snappy}
             className={cn(
               "tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors",
               settingsOpen ? "border-tk-violet/60 bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent" : "border-tk-line bg-tk-panel text-tk-ink"
             )}
           >
             <Settings2 size={17} />
-          </button>
+          </m.button>
         </div>
 
         {/* Saklar mode Terjemahan / Mushaf */}
@@ -516,12 +537,21 @@ export function QuranReader({
               aria-selected={mode === t.id}
               onClick={() => switchMode(t.id)}
               className={cn(
-                "tap flex min-h-[34px] flex-1 items-center justify-center gap-1.5 rounded-full text-[12px] font-bold transition-all",
-                mode === t.id ? "gs-ink-btn" : "text-tk-muted hover:text-tk-ink"
+                "tap relative flex min-h-[34px] flex-1 items-center justify-center gap-1.5 rounded-full text-[12px] font-bold transition-all",
+                mode === t.id ? (anim ? "text-white" : "gs-ink-btn") : "text-tk-muted hover:text-tk-ink"
               )}
             >
-              <t.icon size={14} />
-              {t.label}
+              {/* Pil aktif MELUNCUR antar mode via layout animation
+                  (hanya transform, bahasa pil BottomNav). */}
+              {mode === t.id && anim ? (
+                <m.span
+                  layoutId="quran-mode-pill"
+                  transition={SPRING.glide}
+                  className="gs-ink-btn absolute inset-0 rounded-full"
+                />
+              ) : null}
+              <t.icon size={14} className="relative z-10" />
+              <span className="relative z-10">{t.label}</span>
             </button>
           ))}
         </div>
@@ -654,18 +684,28 @@ export function QuranReader({
 
       {/* ---------- Isi sesuai mode ---------- */}
       {mode === "mushaf" ? (
-        <MushafView
+        <m.div
           key={`mushaf-${activeSurah}-${activeStartAyah}`}
-          surah={activeSurah}
-          startAyah={activeStartAyah}
-          animated={animated}
-          arabicSize={settings.readerArabicSize}
-          pageSound={pageSound}
-          onPosition={handleMushafPosition}
-          onJumpSurah={jumpSurahFromMushaf}
-          onExit={onClose}
-          onSwitchToTranslation={() => switchMode("terjemahan")}
-        />
+          initial={anim ? { opacity: 0, rotateY: 3.5, x: 18, transformPerspective: 900 } : false}
+          animate={anim ? { opacity: 1, rotateY: 0, x: 0 } : undefined}
+          transition={{ duration: DUR.page, ease: EASE.out }}
+          className="flex min-h-0 flex-1 flex-col"
+        >
+          {/* Page-turn 3D halus: kontainer halaman berputar tipis
+              (rotateY 3.5deg + offset → 0) sekali per pergantian lembar;
+              hanya transform + opacity, grid Arabic tidak tersentuh. */}
+          <MushafView
+            surah={activeSurah}
+            startAyah={activeStartAyah}
+            animated={animated}
+            arabicSize={settings.readerArabicSize}
+            pageSound={pageSound}
+            onPosition={handleMushafPosition}
+            onJumpSurah={jumpSurahFromMushaf}
+            onExit={onClose}
+            onSwitchToTranslation={() => switchMode("terjemahan")}
+          />
+        </m.div>
       ) : (
         <TranslationView
           key={`trans-${activeSurah}-${activeStartAyah}`}

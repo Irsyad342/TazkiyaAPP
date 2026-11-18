@@ -32,6 +32,9 @@ import { surahProgressOnDate } from "@/lib/tazkiya/stats";
 import { relativeDayLabel, lastNDays, todayKey, weekdayShort } from "@/lib/tazkiya/dates";
 import { Chip, ConfirmButton, EmptyState, GlassCard, SectionHeader, SegmentedTabs } from "./ui-bits";
 import { Star8, OrnamentDivider } from "./ornaments";
+import { RiseIn, useAnim } from "./motion-bits";
+import { DUR, EASE, SPRING } from "@/lib/motion/system";
+import { m } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const inputCls = "tk-field";
@@ -60,16 +63,23 @@ function SurahRow({
   showArabic,
   isLastRead,
   isBookmarked,
+  index = 0,
   onOpen,
 }: {
   surah: (typeof SURAH_LIST)[number];
   showArabic: boolean;
   isLastRead: boolean;
   isBookmarked: boolean;
+  index?: number;
   onOpen: () => void;
 }) {
+  const anim = useAnim();
   return (
-    <li>
+    <m.li
+      initial={anim ? { opacity: 0, y: 14 } : false}
+      animate={anim ? { opacity: 1, y: 0 } : undefined}
+      transition={{ duration: DUR.item, ease: EASE.out, delay: Math.min(index, 11) * 0.064 }}
+    >
       <button
         type="button"
         onClick={onOpen}
@@ -119,16 +129,21 @@ function SurahRow({
           <ChevronRight size={16} className="shrink-0 text-tk-muted/60" />
         )}
       </button>
-    </li>
+    </m.li>
   );
 }
 
 /** Baris juz ringkas. */
-function JuzRow({ juz, onOpen }: { juz: (typeof JUZ_RANGES)[number]; onOpen: () => void }) {
+function JuzRow({ juz, index = 0, onOpen }: { juz: (typeof JUZ_RANGES)[number]; index?: number; onOpen: () => void }) {
+  const anim = useAnim();
   const start = getSurah(juz.startSurah);
   const end = getSurah(juz.endSurah);
   return (
-    <li>
+    <m.li
+      initial={anim ? { opacity: 0, y: 14 } : false}
+      animate={anim ? { opacity: 1, y: 0 } : undefined}
+      transition={{ duration: DUR.item, ease: EASE.out, delay: Math.min(index, 11) * 0.064 }}
+    >
       <button
         type="button"
         onClick={onOpen}
@@ -148,7 +163,7 @@ function JuzRow({ juz, onOpen }: { juz: (typeof JUZ_RANGES)[number]; onOpen: () 
         </span>
         <ChevronRight size={16} className="shrink-0 text-tk-muted/60" />
       </button>
-    </li>
+    </m.li>
   );
 }
 
@@ -161,6 +176,8 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
   const readingHistory = useWorshipStore((s) => s.readingHistory);
   const addQuranProgress = useWorshipStore((s) => s.addQuranProgress);
   const deleteReadingEntry = useWorshipStore((s) => s.deleteReadingEntry);
+  // Gerbang motion global: setelan animasi aplikasi + prefers-reduced-motion.
+  const anim = useAnim();
 
   const today = todayKey();
   const log = logs[today] ?? {
@@ -322,19 +339,21 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
   return (
     <div className="space-y-6">
       {/* ---------- Judul halaman ---------- */}
-      <header className="animate-tk-fade-up pt-1">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-[28px] font-extrabold tracking-[-0.03em] text-tk-ink">Al-Qur&apos;an</h1>
-            <p className="mt-1 text-[12.5px] text-tk-muted">Temukan ketenangan dalam setiap ayat</p>
+      <RiseIn i={0} className="pt-1">
+        <header>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h1 className="text-[28px] font-extrabold tracking-[-0.03em] text-tk-ink">Al-Qur&apos;an</h1>
+              <p className="mt-1 text-[12.5px] text-tk-muted">Temukan ketenangan dalam setiap ayat</p>
+            </div>
+            {/* Aksen kaligrafi: nama kitab dalam naskh Amiri */}
+            <span aria-hidden className="quran-arabic shrink-0 pt-1 text-[21px] leading-none text-tk-accent/80">
+              القرآن الكريم
+            </span>
           </div>
-          {/* Aksen kaligrafi: nama kitab dalam naskh Amiri */}
-          <span aria-hidden className="quran-arabic shrink-0 pt-1 text-[21px] leading-none text-tk-accent/80">
-            القرآن الكريم
-          </span>
-        </div>
-        <OrnamentDivider className="mt-4" />
-      </header>
+          <OrnamentDivider className="mt-4" />
+        </header>
+      </RiseIn>
 
       <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
         {/* ---------- Hero lanjutkan bacaan (featured blok lavender lembut) ---------- */}
@@ -623,16 +642,29 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                       aria-pressed={placeFilter === f.id}
                       onClick={() => setPlaceFilter(f.id)}
                       className={cn(
-                        "tap shrink-0 rounded-full border px-3.5 py-1.5 text-[11.5px] font-semibold transition-all",
+                        "tap relative shrink-0 rounded-full border px-3.5 py-1.5 text-[11.5px] font-semibold transition-all",
                         placeFilter === f.id
-                          ? "gs-ink-btn"
+                          ? anim
+                            ? "text-white"
+                            : "gs-ink-btn"
                           : "border-tk-line bg-tk-panel-soft text-tk-muted hover:text-tk-ink"
                       )}
                     >
-                      {f.label}
-                      {f.id === "Makkiyah" ? ` · ${filterCounts.makkiyah}` : ""}
-                      {f.id === "Madaniyah" ? ` · ${filterCounts.madaniyah}` : ""}
-                      {f.id === "ditandai" ? ` · ${filterCounts.ditandai}` : ""}
+                      {/* Pil aktif MELUNCUR antar filter via layout animation
+                          (hanya transform, bahasa pil BottomNav). */}
+                      {placeFilter === f.id && anim ? (
+                        <m.span
+                          layoutId="quran-place-pill"
+                          transition={SPRING.glide}
+                          className="gs-ink-btn absolute inset-0 rounded-full"
+                        />
+                      ) : null}
+                      <span className="relative z-10">
+                        {f.label}
+                        {f.id === "Makkiyah" ? ` · ${filterCounts.makkiyah}` : ""}
+                        {f.id === "Madaniyah" ? ` · ${filterCounts.madaniyah}` : ""}
+                        {f.id === "ditandai" ? ` · ${filterCounts.ditandai}` : ""}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -647,11 +679,22 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                         aria-pressed={sortMode === s.id}
                         onClick={() => setSortMode(s.id)}
                         className={cn(
-                          "tap rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all",
-                          sortMode === s.id ? "bg-tk-lavender text-tk-violet dark:bg-tk-accent/20 dark:text-tk-accent" : "text-tk-muted hover:text-tk-ink"
+                          "tap relative rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all",
+                          sortMode === s.id
+                            ? anim
+                              ? "text-tk-violet dark:text-tk-accent"
+                              : "bg-tk-lavender text-tk-violet dark:bg-tk-accent/20 dark:text-tk-accent"
+                            : "text-tk-muted hover:text-tk-ink"
                         )}
                       >
-                        {s.label}
+                        {sortMode === s.id && anim ? (
+                          <m.span
+                            layoutId="quran-sort-pill"
+                            transition={SPRING.glide}
+                            className="absolute inset-0 rounded-full bg-tk-lavender dark:bg-tk-accent/20"
+                          />
+                        ) : null}
+                        <span className="relative z-10">{s.label}</span>
                       </button>
                     ))}
                   </div>
@@ -659,9 +702,10 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                 </div>
 
                 <ul className="tk-list-cv mt-2 divide-y divide-tk-line-soft sm:grid sm:grid-cols-2 sm:gap-x-4 sm:divide-y-0 lg:grid-cols-3">
-                  {filtered.map((s) => (
+                  {filtered.map((s, idx) => (
                     <SurahRow
                       key={s.number}
+                      index={idx}
                       surah={s}
                       showArabic={settings.showArabic}
                       isLastRead={lastRead?.surah === s.number}
@@ -682,8 +726,8 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                   {juzFiltered.length} dari {JUZ_RANGES.length} juz, sentuh untuk membuka dari awal juz.
                 </p>
                 <ul className="tk-list-cv mt-2 divide-y divide-tk-line-soft sm:grid sm:grid-cols-2 sm:gap-x-4 sm:divide-y-0 lg:grid-cols-3">
-                  {juzFiltered.map((j) => (
-                    <JuzRow key={j.juz} juz={j} onOpen={() => onOpenReader(j.startSurah, j.startAyah)} />
+                  {juzFiltered.map((j, idx) => (
+                    <JuzRow key={j.juz} index={idx} juz={j} onOpen={() => onOpenReader(j.startSurah, j.startAyah)} />
                   ))}
                 </ul>
                 {juzFiltered.length === 0 ? (

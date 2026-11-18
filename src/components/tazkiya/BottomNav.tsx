@@ -8,6 +8,7 @@
  */
 
 import { BookOpen, ChartColumn, CircleUserRound, House, MoonStar } from "lucide-react";
+import { m } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export type TabId = "beranda" | "quran" | "sholat" | "progress" | "profil";
@@ -40,35 +41,37 @@ export function BottomNav({
       <div className="flex items-center justify-between gap-1 rounded-full border border-white/5 bg-[#151110] p-2 shadow-[0_18px_44px_-14px_rgba(12,6,2,0.8)]">
         {TABS.map(({ id, label, icon: Icon }) => {
           const isActive = active === id;
-          if (isActive) {
-            /* Item aktif: pil ORANGE ikon + label — pop spring tiap pindah tab
-               (key mengandung `active` agar animasi diputar ulang). */
-            return (
-              <button
-                key={`aktif-${active}`}
-                type="button"
-                aria-current="page"
-                aria-label={`Buka menu ${label}`}
-                onClick={() => onChange(id)}
-                className="tap animate-tk-nav-pop flex h-[46px] shrink-0 items-center gap-2 rounded-full bg-tk-violet px-5 text-white shadow-[0_8px_20px_-6px_rgba(250,82,0,0.6)]"
-              >
-                <Icon size={19} strokeWidth={2.2} className="shrink-0" />
-                <span className="whitespace-nowrap text-[13px] font-bold leading-none">{label}</span>
-              </button>
-            );
-          }
-          /* Item lain: lingkaran gelap ikon saja */
           return (
             <button
               key={id}
               type="button"
+              aria-current={isActive ? "page" : undefined}
               aria-label={`Buka menu ${label}`}
               onClick={() => onChange(id)}
               className={cn(
-                "tap flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full text-tk-muted transition-colors duration-200 hover:text-tk-ink active:scale-95"
+                "tap relative flex h-[46px] shrink-0 items-center justify-center rounded-full transition-colors duration-200 active:scale-95",
+                isActive ? "gap-2 px-5" : "w-[46px] text-tk-muted hover:text-tk-ink"
               )}
             >
-              <Icon size={20} strokeWidth={1.8} />
+              {isActive ? (
+                /* Pil oranye MELUNCUR antar slot: satu elemen layar penuh
+                   dipindahkan via layout animation (hanya transform+width,
+                   dijalankan rAF — hemat CPU), persis bahasa motion
+                   referensi. Konten ikon+label pop singkat saat tiba. */
+                <m.span
+                  layoutId="tk-nav-pill"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  className="absolute inset-0 rounded-full bg-tk-violet shadow-[0_8px_20px_-6px_rgba(250,82,0,0.6)]"
+                />
+              ) : null}
+              <Icon
+                size={isActive ? 19 : 20}
+                strokeWidth={isActive ? 2.2 : 1.8}
+                className={cn("relative z-10 shrink-0", isActive && "animate-tk-nav-pop", !isActive && "transition-colors")}
+              />
+              {isActive ? (
+                <span className="animate-tk-nav-pop relative z-10 whitespace-nowrap text-[13px] font-bold leading-none text-white">{label}</span>
+              ) : null}
             </button>
           );
         })}

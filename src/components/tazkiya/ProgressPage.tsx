@@ -54,6 +54,7 @@ import { buildWeeklyReport, lastCompletedWeekStart, weekHasAnyRecord } from "@/l
 import { WeeklyReflectionCard, WeeklyReflectionSheet } from "./WeeklyReflection";
 import { Chip, GlassCard, ProgressBar, ProgressRing, SectionHeader, SegmentedTabs } from "./ui-bits";
 import { DayDetailSheet } from "./DayDetailSheet";
+import { RiseIn } from "./motion-bits";
 import { cn } from "@/lib/utils";
 
 type Period = "harian" | "mingguan" | "bulanan";
@@ -620,11 +621,13 @@ export function ProgressPage({ deferredForReminder = false }: { deferredForRemin
               { value: summary.activeDays, label: "Hari aktif" },
               { value: perfectN, label: "Hari lengkap" },
               { value: summary.quranPages.toLocaleString("id-ID"), label: "Hlm Qur'an" },
-            ].map(({ value, label }) => (
-              <GlassCard key={label} className="p-4 text-center">
-                <p className="tnum gs-display text-[24px] font-bold leading-none text-tk-ink">{value}</p>
-                <p className="mt-1.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-tk-muted">{label}</p>
-              </GlassCard>
+            ].map(({ value, label }, si) => (
+              <RiseIn key={label} i={si} y={14}>
+                <GlassCard className="p-4 text-center">
+                  <p className="tnum gs-display text-[24px] font-bold leading-none text-tk-ink">{value}</p>
+                  <p className="mt-1.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-tk-muted">{label}</p>
+                </GlassCard>
+              </RiseIn>
             ))}
           </div>
 

@@ -6,8 +6,11 @@
  */
 
 import { BookOpen, CalendarDays, CircleDot } from "lucide-react";
+import { m, type Variants } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useWorshipStore } from "@/lib/tazkiya/store";
+import { SPRING, staggerChild, staggerParent } from "@/lib/motion/system";
+import { CountUp, useAnim } from "./motion-bits";
 import {
   PRAYERS,
   SALAT_JUMAT,
@@ -33,7 +36,18 @@ export function prayerMetaFor(date: string, id: PrayerId, fridayAlt: boolean) {
   return PRAYERS.find((p) => p.id === id) ?? PRAYERS[0];
 }
 
+/**
+ * Baris salat yang "tercentang" (dilaksanakan) masuk dengan pop kecil —
+ * preset SPRING.pop ("Pop kecil: badge, checklist"). Baris lain memakai
+ * staggerChild biasa.
+ */
+const doneRowVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.85 },
+  show: { opacity: 1, scale: 1, transition: SPRING.pop },
+};
+
 export function DayDetailSheet({ date, onClose }: { date: string; onClose: () => void }) {
+  const anim = useAnim();
   const logs = useWorshipStore((s) => s.logs);
   const prayerDetails = useWorshipStore((s) => s.prayerDetails);
   const fridayZuhurAlt = useWorshipStore((s) => s.fridayZuhurAlt);
@@ -68,7 +82,12 @@ export function DayDetailSheet({ date, onClose }: { date: string; onClose: () =>
           </p>
         ) : (
           <>
-            <div className="space-y-1.5">
+            <m.div
+              className="space-y-1.5"
+              variants={staggerParent}
+              initial={anim ? "hidden" : false}
+              animate={anim ? "show" : undefined}
+            >
               <p className="text-[11px] font-semibold uppercase tracking-wide text-tk-muted">Salat wajib</p>
               {PRAYERS.map((p) => {
                 const meta = prayerMetaFor(date, p.id, !!fridayZuhurAlt?.[date]);
@@ -86,8 +105,9 @@ export function DayDetailSheet({ date, onClose }: { date: string; onClose: () =>
                         }`
                       : "Belum dicatat";
                 return (
-                  <div
+                  <m.div
                     key={p.id}
+                    variants={d.status === "done" ? doneRowVariants : staggerChild}
                     className="flex items-center justify-between gap-2 rounded-xl border border-tk-line bg-tk-panel-soft px-3 py-2"
                   >
                     <p className="min-w-0 truncate text-[12px] font-semibold text-tk-ink">{meta.label}</p>
@@ -103,10 +123,10 @@ export function DayDetailSheet({ date, onClose }: { date: string; onClose: () =>
                     >
                       {statusText}
                     </p>
-                  </div>
+                  </m.div>
                 );
               })}
-            </div>
+            </m.div>
             <div className="grid grid-cols-2 gap-2">
               <div className="rounded-xl border border-tk-line bg-tk-panel-soft p-2.5">
                 <p className="flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-wide text-tk-muted">
@@ -142,7 +162,9 @@ export function DayDetailSheet({ date, onClose }: { date: string; onClose: () =>
             {amalToday > 0 ? (
               <div className="rounded-xl border border-tk-line bg-tk-panel-soft p-2.5">
                 <p className="text-[10.5px] font-semibold uppercase tracking-wide text-tk-muted">Rizq &amp; Amal</p>
-                <p className="mt-1 text-[12px] font-semibold text-tk-ink">{amalToday} kebaikan tercatat</p>
+                <p className="mt-1 text-[12px] font-semibold text-tk-ink">
+                  <CountUp to={amalToday} /> kebaikan tercatat
+                </p>
               </div>
             ) : null}
           </>

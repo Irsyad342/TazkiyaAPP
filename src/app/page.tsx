@@ -16,7 +16,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, LazyMotion, domAnimation, m } from "framer-motion";
+import { AnimatePresence, LazyMotion, domMax, m } from "framer-motion";
 import { LoaderCircle } from "lucide-react";
 import { Toaster } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
@@ -24,6 +24,7 @@ import { isOnboarded, markOnboarded, clearOnboarded, subscribeOnboarding, getOnb
 import { useAuthStore } from "@/lib/auth/auth-store";
 import { initSyncBridge } from "@/lib/sync/cloud-sync";
 import { BottomNav, type SubPageId, type TabId } from "@/components/tazkiya/BottomNav";
+import { TAB_ENTER, TAB_EXIT } from "@/lib/motion/system";
 import { SuioMark } from "@/components/tazkiya/brand";
 import { AuthGate } from "@/components/tazkiya/AuthGate";
 import { HomePage } from "@/components/tazkiya/HomePage";
@@ -315,8 +316,8 @@ export default function Page() {
     );
   }
 
-  return (
-    <LazyMotion features={domAnimation} strict>
+    return (
+      <LazyMotion features={domMax} strict>
       {/* Panggung luar (terlihat hanya di layar lebar): rona lebih pekat dari
           kanvas aplikasi agar kolom HP terbingkai jelas, bukan tampak salah. */}
       <main className="relative min-h-dvh w-full bg-[#101013] light:bg-[#e8e8ec]" aria-label="Aplikasi SUIO">
@@ -339,12 +340,13 @@ export default function Page() {
                 key={subpage ?? tab}
                 initial={{ opacity: 0, y: 56 * (animations ? 1 : 0) }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: animations ? -14 : 0 }}
-                transition={
-                  animations
-                    ? { duration: 0.34, ease: [0.22, 1, 0.36, 1] }
-                    : { duration: 0 }
-                }
+                exit={{
+                  opacity: 0,
+                  y: animations ? -14 : 0,
+                  scale: animations ? 0.992 : 1,
+                  transition: animations ? TAB_EXIT : { duration: 0 },
+                }}
+                transition={animations ? TAB_ENTER : { duration: 0 }}
               >
                 {subpage === null && tab === "beranda" && (
                   <HomePage

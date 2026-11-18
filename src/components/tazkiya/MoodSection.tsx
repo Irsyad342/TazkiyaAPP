@@ -8,8 +8,9 @@
  * menekan berkali-kali hanya memperbarui pilihan hari itu. Pilihan lama
  * hari ini otomatis tampil terpilih. Bukan alat diagnosis.
  *
- * Interaksi premium (v6): tekan → tile mengecil sesaat (whileTap) lalu
- * pop spring dengan rotasi halus (scale 0.86→1.15→0.97→1.08); glow aktif
+ * Interaksi premium (v6, selaras motion system): tekan → ikon menyusut
+ * sesaat (PressScale press 0.92) lalu tile pop spring scale 0.8→1.08
+ * (SPRING.pop) dengan ayunan emot tipis ±4° (satu segmen spring); glow aktif
  * terdiri dari ring offset statis (transisi box-shadow 300ms), glow dalam
  * peach/orange di atas permukaan tile, ambient glow oranye di sekitar,
  * dan ripple halo sekali-jalan yang mengembang lalu memudar saat dipilih.
@@ -23,8 +24,10 @@
 import { useState } from "react";
 import { BookHeart, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
-import { m, useReducedMotion, type Transition } from "framer-motion";
+import { m, type Transition } from "framer-motion";
 import { useWorshipStore } from "@/lib/tazkiya/store";
+import { SPRING } from "@/lib/motion/system";
+import { PressScale, useAnim } from "./motion-bits";
 import { MOODS, moodLabel, type MoodId } from "@/lib/tazkiya/types";
 import { MoodFace } from "./MoodFace";
 import type { SubPageId } from "./BottomNav";
@@ -41,14 +44,14 @@ const REFLEKSI: Record<MoodId, string> = {
   "campur-aduk": "Bercampur itu wajar, tidak harus memilih satu.",
 };
 
-/** Keyframes pop tekan: mengecil → membesar → spring ke skala aktif 1.08. */
-const POP_SCALE = [0.86, 1.15, 0.97, 1.08];
-const POP_ROTATE = [-2.5, 2, -0.8, 0];
-const POP_TRANSITION: Transition = {
-  duration: 0.55,
-  times: [0, 0.38, 0.66, 1],
-  ease: ["easeOut", "easeInOut", "easeOut"],
-};
+/** Pop pilihan — preset system.ts: dip scale 0.8 → spring SPRING.pop ke
+ *  skala aktif 1.08 (dua nilai, satu segmen spring, overshoot alami). */
+const POP_SCALE = [0.8, 1.08];
+/** Ayunan tipis ±4° emot saat terpilih — satu segmen spring sehingga
+ *  berayun overshoot lalu menetap (bukan loop). */
+const SWAY_SPRING: Transition = { type: "spring", stiffness: 240, damping: 9 };
+const SWAY_LEFT = [-4, 0];
+const SWAY_RIGHT = [4, 0];
 
 /** Glow dalam di atas permukaan tile — menyatu dengan ilustrasi emoji. */
 function InnerGlow({ motionOK }: { motionOK: boolean }) {
@@ -75,9 +78,8 @@ export function MoodSection({
 }) {
   const moodToday = useWorshipStore((s) => s.moods[today]?.mood);
   const setMood = useWorshipStore((s) => s.setMood);
-  const animationsOn = useWorshipStore((s) => s.settings.animations);
-  const reduceMotion = useReducedMotion();
-  const motionOK = animationsOn && !reduceMotion;
+  /** Gerbang animasi global: setelan "Animasi" aplikasi + prefers-reduced-motion. */
+  const motionOK = useAnim();
 
   /** Emoji terakhir yang ditekan + penghitung, agar pop & ripple diputar ulang pada setiap tekan. */
   const [pulse, setPulse] = useState<{ id: MoodId; n: number } | null>(null);
@@ -114,7 +116,6 @@ export function MoodSection({
                   initial={motionOK ? { opacity: 0, scale: 0.55, y: 10, rotate: -3 } : false}
                   animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
                   transition={{ type: "spring", stiffness: 420, damping: 24, delay: motionOK ? 0.05 + order * 0.05 : 0 }}
-                  whileTap={motionOK ? { scale: 0.88, y: 1 } : undefined}
                   whileHover={
                     motionOK
                       ? { scale: 1.05, y: -2, transition: { type: "spring", stiffness: 400, damping: 18 } }
@@ -127,12 +128,12 @@ export function MoodSection({
                     initial={false}
                     animate={
                       popping && motionOK
-                        ? { scale: POP_SCALE, rotate: POP_ROTATE }
-                        : { scale: motionOK && active ? 1.08 : 1, rotate: 0 }
+                        ? { scale: POP_SCALE }
+                        : { scale: motionOK && active ? 1.08 : 1 }
                     }
                     transition={
                       popping && motionOK
-                        ? POP_TRANSITION
+                        ? { scale: SPRING.pop }
                         : { type: "spring", stiffness: 420, damping: 20 }
                     }
                     className={cn(
@@ -142,7 +143,28 @@ export function MoodSection({
                         : "light:shadow-[0_6px_14px_-6px_rgba(119,113,109,0.42)] light:ring-1 light:ring-[#2a2320]/[0.06] dark:shadow-[0_10px_22px_-12px_rgba(12,6,2,0.6)] dark:ring-1 dark:ring-[#F5E8DC]/[0.07]"
                     )}
                   >
-                    <MoodFace id={mo.id} className="h-16 w-16" />
+                    {/* Ikon merespon tekan: menyusut 0.92 sesaat lalu spring
+                        kembali (PressScale, press 0.92). */}
+                    <PressScale press={0.92} className="flex">
+                      {/* Emot berayun tipis ±4° (satu segmen spring) saat
+                          terpilih; arah bergantian tiap tekan agar terasa baru. */}
+                      <m.span
+                        aria-hidden
+                        className="relative flex"
+                        initial={false}
+                        animate={{
+                          rotate:
+                            popping && motionOK
+                              ? (pulse?.n ?? 0) % 2 === 0
+                                ? SWAY_LEFT
+                                : SWAY_RIGHT
+                              : 0,
+                        }}
+                        transition={popping && motionOK ? SWAY_SPRING : { type: "spring", stiffness: 420, damping: 20 }}
+                      >
+                        <MoodFace id={mo.id} className="h-16 w-16" />
+                      </m.span>
+                    </PressScale>
                     {active ? <InnerGlow motionOK={motionOK} /> : null}
                     {/* Ripple halo sekali-jalan: outline oranye mengembang lalu memudar saat dipilih */}
                     {motionOK && active ? (

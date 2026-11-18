@@ -55,7 +55,7 @@ import {
   Search,
 } from "lucide-react";
 import { toast } from "sonner";
-import { animate, motion, useMotionValue, useTransform } from "framer-motion";
+import { animate, m as motion, useMotionValue, useTransform } from "framer-motion";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import {
   fetchMsiSurah,

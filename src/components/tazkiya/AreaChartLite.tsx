@@ -12,6 +12,9 @@
  */
 
 import { useEffect, useId, useRef, useState } from "react";
+import { m } from "framer-motion";
+import { DUR, EASE } from "@/lib/motion/system";
+import { useAnim } from "./motion-bits";
 import { cn } from "@/lib/utils";
 
 export type AreaPoint = { label: string; pct: number; date: string };
@@ -69,6 +72,26 @@ export function AreaChartLite({
   ariaLabel: string;
 }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  /* Gambar-diri grafik: mulai sekali saat kartu masuk viewport (IO ringan,
+     langsung disconnect — tidak ada listener yang menggantung). */
+  const animOK = useAnim();
+  const [draw, setDraw] = useState(!animOK);
+  useEffect(() => {
+    if (!animOK) return;
+    const el = wrapRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setDraw(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [animOK]);
   const [width, setWidth] = useState(0);
   const [hover, setHover] = useState<number | null>(null);
   const uid = useId().replace(/:/g, "");
@@ -170,22 +193,51 @@ export function AreaChartLite({
             );
           })}
 
-          {/* Area + garis */}
-          <path d={areaD} fill={`url(#tzArea-${uid})`} />
-          <path
-            d={lineD}
-            fill="none"
-            stroke={lineColor}
-            strokeWidth={2.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            style={{ filter: "drop-shadow(0 4px 10px rgba(255,90,0,0.35))" }}
-          />
+          {/* Area + garis — garis "menggambar diri" sekali saat kartu
+              terlihat (pathLength, tanpa layout), titik menyusul pop kecil. */}
+          <path d={areaD} fill={`url(#tzArea-${uid})`} style={{ opacity: draw ? 1 : 0, transition: `opacity ${DUR.page}s ease` }} />
+          {draw ? (
+            <m.path
+              d={lineD}
+              fill="none"
+              stroke={lineColor}
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 1.1, ease: EASE.inOut }}
+              style={{ filter: "drop-shadow(0 4px 10px rgba(255,90,0,0.35))" }}
+            />
+          ) : (
+            <path
+              d={lineD}
+              fill="none"
+              stroke={lineColor}
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ filter: "drop-shadow(0 4px 10px rgba(255,90,0,0.35))" }}
+            />
+          )}
 
           {/* Titik data (mingguan) */}
           {n <= 10
             ? xy.map((p, i) => (
-                <circle key={`d-${i}`} cx={p.x} cy={p.y} r={3} fill={dotFill} strokeWidth={0} />
+                <circle
+                  key={`d-${i}`}
+                  cx={p.x}
+                  cy={p.y}
+                  r={3}
+                  fill={dotFill}
+                  strokeWidth={0}
+                  style={{
+                    opacity: draw ? 1 : 0,
+                    transform: draw ? "scale(1)" : "scale(0.3)",
+                    transformOrigin: `${p.x}px ${p.y}px`,
+                    transition: `opacity 0.3s ease ${0.55 + i * 0.07}s, transform 0.4s cubic-bezier(0.22,1,0.36,1) ${0.55 + i * 0.07}s`,
+                  }}
+                />
               ))
             : null}
 

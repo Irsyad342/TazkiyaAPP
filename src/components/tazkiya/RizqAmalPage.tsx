@@ -30,6 +30,7 @@ import { DEFAULT_AMAL_GOALS } from "@/lib/tazkiya/types";
 import { formatDayFull, lastNDays, relativeDayLabel, todayKey, weekdayShort } from "@/lib/tazkiya/dates";
 import { Chip, ConfirmButton, EmptyState, GlassCard, SectionHeader } from "./ui-bits";
 import { SubPageHeader } from "./SubPageHeader";
+import { Reveal } from "./motion-bits";
 import { cn } from "@/lib/utils";
 
 const inputCls = "tk-field";
@@ -86,7 +87,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
       <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
         <div className="space-y-6 lg:col-span-7">
           {/* ---------- Hero tracker: blok statistik angka besar ---------- */}
-          <section aria-label="Ringkasan kebaikan" className="animate-tk-fade-up">
+          <Reveal><section aria-label="Ringkasan kebaikan">
             <div className="glass rounded-[1.75rem] p-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
@@ -120,10 +121,10 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                 ))}
               </div>
             </div>
-          </section>
+          </section></Reveal>
 
           {/* ---------- Target kebaikan ---------- */}
-          <section aria-label="Target kebaikan harian" className="animate-tk-fade-up">
+          <Reveal><section aria-label="Target kebaikan harian">
             <SectionHeader
               title="Target Kebaikan"
               caption="Pilih salah satu untuk dicatat cepat, bisa diatur sesuai preferensimu"
@@ -205,10 +206,10 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                 </div>
               ) : null}
             </GlassCard>
-          </section>
+          </section></Reveal>
 
           {/* ---------- Catat amal ---------- */}
-          <section aria-label="Catat amal kebaikan" className="animate-tk-fade-up">
+          <Reveal><section aria-label="Catat amal kebaikan">
             <SectionHeader title="Catat Amal Hari Ini" caption="Sedekah, bantuan, silaturahmi, semua sama berharganya" />
             <GlassCard className="space-y-3 p-4 sm:p-5">
               <div>
@@ -263,10 +264,10 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                 Tidak ada penilaian atas jumlah atau nilai, setiap kebaikan dicatat setara, untuk kesadaranmu sendiri.
               </p>
             </GlassCard>
-          </section>
+          </section></Reveal>
 
           {/* ---------- Hari ini ---------- */}
-          <section aria-label="Amal hari ini" className="animate-tk-fade-up">
+          <Reveal><section aria-label="Amal hari ini">
             <SectionHeader title="Hari Ini" caption={`${todayEntries.length} kebaikan tercatat`} />
             {todayEntries.length === 0 ? (
               <EmptyState
@@ -307,11 +308,11 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                 })}
               </div>
             )}
-          </section>
+          </section></Reveal>
         </div>
 
         {/* ---------- Riwayat ---------- */}
-        <section aria-label="Riwayat amal" className="animate-tk-fade-up mt-6 lg:col-span-5 lg:mt-0">
+        <Reveal className="mt-6 lg:col-span-5 lg:mt-0"><section aria-label="Riwayat amal">
           <SectionHeader title="Riwayat Kebaikan" caption={`${amalEntries.length} catatan tersimpan`} />
           {amalEntries.length === 0 ? (
             <EmptyState icon={<HandCoins size={18} />} title="Riwayat masih kosong" caption="Catatan amal akan muncul di sini." />
@@ -352,7 +353,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
           <p className="mt-4 text-center text-[10px] leading-relaxed text-tk-muted/60">
             Rizq &amp; Amal membantu membangun kebiasaan, bukan kompetisi, bukan pengukuran keimanan. {formatDayFull(today)}.
           </p>
-        </section>
+        </section></Reveal>
       </div>
     </div>
   );

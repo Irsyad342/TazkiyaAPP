@@ -17,6 +17,8 @@ import { toast } from "sonner";
 import { m } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { useWorshipStore } from "@/lib/tazkiya/store";
+import { DUR, EASE, SPRING, sheetVariants, staggerChild, staggerParent } from "@/lib/motion/system";
+import { CountUp, useAnim } from "./motion-bits";
 import { EXTRAS, PRAYER_IDS, PRAYERS, selectPrayerDetail, type ExtraId, type QuranTargetType } from "@/lib/tazkiya/types";
 import { SURAHS } from "@/lib/tazkiya/surahs";
 import { todayKey } from "@/lib/tazkiya/dates";
@@ -31,8 +33,8 @@ const UNIT_OPTIONS: { id: QuranTargetType; label: string }[] = [
 const saveBtn =
   "tap flex min-h-[42px] shrink-0 items-center justify-center gap-1.5 rounded-full gs-ink-btn px-4 text-[12.5px] font-bold";
 
-/** Statistik kecil pada blok ringkasan. */
-function MiniStat({ label, value, tone }: { label: string; value: string; tone?: "ok" | "sisa" }) {
+/** Statistik kecil pada blok ringkasan — angka mengalir naik via CountUp. */
+function MiniStat({ label, value, tone }: { label: string; value: number; tone?: "ok" | "sisa" }) {
   return (
     <div className="flex min-w-0 flex-1 flex-col items-center rounded-[1.1rem] border border-tk-line bg-tk-panel-soft px-2 py-2.5">
       <span
@@ -41,20 +43,25 @@ function MiniStat({ label, value, tone }: { label: string; value: string; tone?:
           tone === "ok" ? "text-tk-lime-ink dark:text-tk-lime" : tone === "sisa" ? "text-tk-muted" : "text-tk-ink"
         )}
       >
-        {value}
+        <CountUp to={value} />
       </span>
       <span className="mt-1.5 text-center text-[9.5px] font-semibold uppercase tracking-[0.08em] text-tk-muted">{label}</span>
     </div>
   );
 }
 
-/** Bar progres horizontal gaya SUIO (track tipis, fill lavender/oranye). */
+/** Bar progres horizontal gaya SUIO — lebar dianimasikan via scaleX
+ *  (transform-origin kiri) pada elemen bar kecil, bukan animasi width. */
 function ProgressBar({ pct, done }: { pct: number; done?: boolean }) {
+  const anim = useAnim();
+  const clamped = Math.min(100, Math.max(0, pct));
   return (
     <div className="h-1.5 w-full overflow-hidden rounded-full bg-tk-track">
-      <div
-        className={cn("h-full rounded-full transition-[width] duration-500", done ? "bg-tk-lime" : "bg-tk-violet dark:bg-tk-accent")}
-        style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
+      <m.div
+        className={cn("h-full w-full origin-left rounded-full", done ? "bg-tk-lime" : "bg-tk-violet dark:bg-tk-accent")}
+        initial={anim ? { scaleX: 0 } : false}
+        animate={{ scaleX: clamped / 100 }}
+        transition={{ duration: DUR.card, ease: EASE.out }}
       />
     </div>
   );
@@ -86,8 +93,9 @@ function TargetCard({
   detail?: boolean;
   detailContent?: ReactNode;
 }) {
+  const anim = useAnim();
   return (
-    <div className="glass rounded-[1.5rem] p-4">
+    <m.div variants={staggerChild} className="glass rounded-[1.5rem] p-4">
       <div className="flex items-start gap-3">
         <span
           className={cn(
@@ -136,10 +144,25 @@ function TargetCard({
           >
             {detailOpen ? "Tutup Detail" : "Lihat Detail"} <ChevronDown size={14} className={cn("transition-transform", detailOpen && "rotate-180")} />
           </button>
-          {detailOpen ? <div className="mt-3 rounded-[1.1rem] border border-tk-line bg-tk-panel-soft p-3">{detailContent}</div> : null}
+          {detailOpen ? (
+            anim ? (
+              /* Panel detail ekspand via framer height:auto (pola app) —
+                 hanya konten dalam sheet, gerbang useAnim(). */
+              <m.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                transition={{ duration: DUR.item, ease: EASE.out }}
+                className="overflow-hidden"
+              >
+                <div className="mt-3 rounded-[1.1rem] border border-tk-line bg-tk-panel-soft p-3">{detailContent}</div>
+              </m.div>
+            ) : (
+              <div className="mt-3 rounded-[1.1rem] border border-tk-line bg-tk-panel-soft p-3">{detailContent}</div>
+            )
+          ) : null}
         </>
       ) : null}
-    </div>
+    </m.div>
   );
 }
 
@@ -164,6 +187,7 @@ function SectionLabel({ children }: { children: ReactNode }) {
  * draf terinisialisasi sekali dari store terkini — tanpa efek samping.
  */
 export function TargetSheet({ onClose }: { onClose: () => void }) {
+  const anim = useAnim();
   const settings = useWorshipStore((s) => s.settings);
   const logs = useWorshipStore((s) => s.logs);
   const prayerDetails = useWorshipStore((s) => s.prayerDetails);
@@ -436,7 +460,13 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
                     {recorded ? "Tercatat hari ini" : e.caption}
                   </p>
                 </div>
-                <Switch checked={active} onCheckedChange={(v) => toggleTracked(e.id, v)} aria-label={`Lacak ${e.label}`} />
+                <m.span
+                  className="inline-flex shrink-0"
+                  animate={anim ? { scale: active ? [1, 1.16, 1] : 1 } : undefined}
+                  transition={SPRING.pop}
+                >
+                  <Switch checked={active} onCheckedChange={(v) => toggleTracked(e.id, v)} aria-label={`Lacak ${e.label}`} />
+                </m.span>
               </div>
             );
           })}
@@ -451,10 +481,12 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
 
   return (
     <m.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 24 }}
-      transition={{ duration: 0.22, ease: "easeOut" }}
+      /* Sheet layar penuh masuk lewat preset sheetVariants (spring naik dari
+         bawah, keluar turun) — gerbang useAnim(): animasi mati → statis. */
+      variants={sheetVariants}
+      initial={anim ? "hidden" : false}
+      animate={anim ? "visible" : undefined}
+      exit={anim ? "exit" : { opacity: 0 }}
       className="fixed inset-0 z-40 mx-auto flex w-full max-w-[430px] flex-col overflow-hidden bg-tk-stage"
       role="dialog"
       aria-modal="true"
@@ -498,19 +530,23 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
                   strokeLinecap="round"
                   className={cn(summaryPct >= 100 ? "stroke-tk-lime" : "stroke-tk-violet dark:stroke-tk-accent")}
                   strokeDasharray={`${dash} ${CIRC}`}
-                  /* linecap round pada busur nol persen merender titik — sembunyikan */
-                  style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.22, 1, 0.36, 1)", opacity: summaryPct > 0 ? 1 : 0 }}
+                  /* linecap round pada busur nol persen merender titik — sembunyikan.
+                     Busur SVG kecil: transisi atribut stroke-dasharray memakai
+                     kurva & durasi preset system (EASE.out, DUR.hero). */
+                  style={{ transition: `stroke-dasharray ${DUR.hero}s cubic-bezier(${EASE.out.join(", ")})`, opacity: summaryPct > 0 ? 1 : 0 }}
                 />
               </svg>
               <span className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="tnum font-display text-[20px] font-extrabold leading-none text-tk-ink">{summaryPct}%</span>
+                <span className="tnum font-display text-[20px] font-extrabold leading-none text-tk-ink">
+                  <CountUp to={summaryPct} suffix="%" />
+                </span>
                 <span className="mt-1 text-[8.5px] font-semibold uppercase tracking-[0.08em] text-tk-muted">Tercapai</span>
               </span>
             </div>
             <div className="flex min-w-0 flex-1 gap-2">
-              <MiniStat label="Total target" value={String(counted.length)} />
-              <MiniStat label="Tercapai" value={String(achievedCount)} tone="ok" />
-              <MiniStat label="Berjalan" value={String(counted.length - achievedCount)} tone="sisa" />
+              <MiniStat label="Total target" value={counted.length} />
+              <MiniStat label="Tercapai" value={achievedCount} tone="ok" />
+              <MiniStat label="Berjalan" value={counted.length - achievedCount} tone="sisa" />
             </div>
           </div>
           <p className="mt-2.5 border-t border-tk-line-soft pt-2 text-[10.5px] leading-relaxed text-tk-muted">
@@ -521,22 +557,30 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
 
         {/* ---------- DAFTAR TARGET ---------- */}
         <section aria-label="Daftar target ibadah" className="space-y-3">
-          {targets.map((t) => (
-            <TargetCard
-              key={t.id}
-              icon={t.icon}
-              name={t.name}
-              desc={t.desc}
-              targetText={t.targetText}
-              progressText={t.progressText}
-              pct={t.pct}
-              achieved={t.achieved}
-              detail={t.detail}
-              detailOpen={openDetail === t.id}
-              onToggleDetail={() => setOpenDetail((v) => (v === t.id ? null : t.id))}
-              detailContent={detailContent[t.id]}
-            />
-          ))}
+          {/* Stagger entrance kartu target (~64 ms antar kartu, preset system) */}
+          <m.div
+            className="space-y-3"
+            variants={staggerParent}
+            initial={anim ? "hidden" : false}
+            animate={anim ? "show" : undefined}
+          >
+            {targets.map((t) => (
+              <TargetCard
+                key={t.id}
+                icon={t.icon}
+                name={t.name}
+                desc={t.desc}
+                targetText={t.targetText}
+                progressText={t.progressText}
+                pct={t.pct}
+                achieved={t.achieved}
+                detail={t.detail}
+                detailOpen={openDetail === t.id}
+                onToggleDetail={() => setOpenDetail((v) => (v === t.id ? null : t.id))}
+                detailContent={detailContent[t.id]}
+              />
+            ))}
+          </m.div>
         </section>
       </div>
     </m.div>

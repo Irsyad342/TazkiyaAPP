@@ -10,6 +10,7 @@
  */
 
 import { useState } from "react";
+import { AnimatePresence, m } from "framer-motion";
 import { CalendarDays, Check, CircleDashed, CircleMinus, CheckCircle2, User, Users } from "lucide-react";
 import {
   Dialog,
@@ -28,6 +29,8 @@ import {
 } from "@/lib/tazkiya/types";
 import { formatDayFull } from "@/lib/tazkiya/dates";
 import { cn } from "@/lib/utils";
+import { DUR, EASE, SPRING } from "@/lib/motion/system";
+import { useAnim } from "./motion-bits";
 
 const STATUS_OPTIONS: { id: PrayerStatus; label: string; caption: string; icon: typeof CheckCircle2 }[] = [
   { id: "done", label: "Sudah dilaksanakan", caption: "Catat sebagai selesai", icon: CheckCircle2 },
@@ -62,6 +65,7 @@ export function PrayerRecordDialog({
   const [reason, setReason] = useState(detail.reason);
   const [reasonText, setReasonText] = useState(detail.reasonText ?? "");
   const [addToQada, setAddToQada] = useState(false);
+  const anim = useAnim();
 
   const save = () => {
     if (status === "done") {
@@ -136,7 +140,15 @@ export function PrayerRecordDialog({
                     active ? "bg-tk-violet text-white" : "border border-tk-line bg-tk-panel text-tk-muted"
                   )}
                 >
-                  <Icon size={16} />
+                  <m.span
+                    key={active ? "on" : "off"}
+                    className="inline-flex"
+                    initial={anim ? { scale: 0.78, rotate: -7 } : false}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={SPRING.pop}
+                  >
+                    <Icon size={16} />
+                  </m.span>
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[13.5px] font-semibold text-tk-ink">{label}</span>
@@ -149,7 +161,14 @@ export function PrayerRecordDialog({
                     active ? "border-tk-violet" : "border-tk-line-strong"
                   )}
                 >
-                  {active ? <span className="h-2 w-2 rounded-full bg-tk-violet" /> : null}
+                  {active ? (
+                    <m.span
+                      initial={anim ? { scale: 0 } : false}
+                      animate={{ scale: 1 }}
+                      transition={SPRING.pop}
+                      className="block h-2 w-2 rounded-full bg-tk-violet"
+                    />
+                  ) : null}
                 </span>
               </button>
             );
@@ -157,8 +176,16 @@ export function PrayerRecordDialog({
         </div>
 
         {/* ---------- Jenis pelaksanaan (sudah dilaksanakan) ---------- */}
+        <AnimatePresence initial={false}>
         {status === "done" ? (
-          <div className="rounded-[1.1rem] border border-tk-line bg-tk-panel-soft p-3">
+          <m.div
+            key="kind"
+            initial={anim ? { opacity: 0, y: 10 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: DUR.item, ease: EASE.out }}
+            className="rounded-[1.1rem] border border-tk-line bg-tk-panel-soft p-3"
+          >
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-tk-muted">Jenis pelaksanaan</p>
             {isJumat ? (
               <div className="flex items-center gap-2.5 rounded-xl border border-tk-violet/40 bg-tk-lavender/50 px-3 py-2.5 dark:bg-tk-accent/10">
@@ -199,12 +226,21 @@ export function PrayerRecordDialog({
                 })}
               </div>
             )}
-          </div>
+          </m.div>
         ) : null}
+        </AnimatePresence>
 
         {/* ---------- Alasan (tidak dilaksanakan) ---------- */}
+        <AnimatePresence initial={false}>
         {status === "missed" ? (
-          <div className="rounded-[1.1rem] border border-tk-line bg-tk-panel-soft p-3">
+          <m.div
+            key="reason"
+            initial={anim ? { opacity: 0, y: 10 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: DUR.item, ease: EASE.out }}
+            className="rounded-[1.1rem] border border-tk-line bg-tk-panel-soft p-3"
+          >
             <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-tk-muted">Alasan</p>
             <p className="mb-2.5 text-[10.5px] leading-relaxed text-tk-muted">
               Catatan ini hanya untuk introspeksi dan evaluasi kebiasaan, bukan untuk menyalahkan diri sendiri.
@@ -261,7 +297,15 @@ export function PrayerRecordDialog({
                   addToQada ? "border-tk-ink gs-ink-btn" : "border-tk-line-strong text-transparent"
                 )}
               >
-                <Check size={12} strokeWidth={3.4} />
+                <m.span
+                  key={addToQada ? "qada-on" : "qada-off"}
+                  className="inline-flex"
+                  initial={anim ? { scale: 0.6 } : false}
+                  animate={{ scale: 1 }}
+                  transition={SPRING.pop}
+                >
+                  <Check size={12} strokeWidth={3.4} />
+                </m.span>
               </span>
               <span className="min-w-0">
                 <span className="block text-[12px] font-semibold text-tk-ink">Masukkan ke daftar Qada</span>
@@ -270,8 +314,9 @@ export function PrayerRecordDialog({
                 </span>
               </span>
             </button>
-          </div>
+          </m.div>
         ) : null}
+        </AnimatePresence>
 
         <DialogFooter className="gap-2">
           <button

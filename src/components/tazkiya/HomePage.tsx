@@ -31,6 +31,7 @@ import {
   Sparkles,
   Trash2,
 } from "lucide-react";
+import { m } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
@@ -49,6 +50,7 @@ import { JelajahiAktivitas } from "./JelajahiAktivitas";
 import { DayDetailSheet } from "./DayDetailSheet";
 import { OrnamentDivider } from "./ornaments";
 import type { SubPageId, TabId } from "./BottomNav";
+import { RiseIn, TiltCard } from "./motion-bits";
 import { cn } from "@/lib/utils";
 
 const PRAYER_ORDER: { id: PrayerId; label: string }[] = [
@@ -107,7 +109,7 @@ function CircleDateStrip({ today }: { today: string }) {
   }, [logs, today]);
 
   return (
-    <section aria-label="Pilih tanggal pekan ini" className="animate-tk-fade-up">
+    <section aria-label="Pilih tanggal pekan ini">
       <div className="no-scrollbar flex items-stretch justify-between gap-1 overflow-x-auto" role="group">
         {week.map(({ key, dayNum, label, count, isToday, isFuture }) => (
           <button
@@ -118,21 +120,30 @@ function CircleDateStrip({ today }: { today: string }) {
             aria-pressed={isToday}
             onClick={() => !isFuture && setSelected(key)}
             className={cn(
-              "tap flex aspect-square w-full max-w-[52px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-full transition-colors",
-              isToday ? "bg-tk-violet" : "bg-tk-panel",
+              "tap relative flex aspect-square w-full max-w-[52px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-full transition-colors",
+              isToday ? "" : "bg-tk-panel",
               isFuture ? "opacity-40" : "cursor-pointer"
             )}
           >
-            <span className={cn("gs-display text-[17px] font-bold leading-none", isToday ? "text-white" : "text-tk-ink")}>
+            {isToday ? (
+              /* Sorotan hari ini MELUNCUR antar lingkaran saat pekan
+                 berganti — satu elemen dipindahkan layout animation. */
+              <m.span
+                layoutId="tk-date-highlight"
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                className="absolute inset-0 rounded-full bg-tk-violet"
+              />
+            ) : null}
+            <span className={cn("gs-display relative z-10 text-[17px] font-bold leading-none", isToday ? "text-white" : "text-tk-ink")}>
               {dayNum}
             </span>
-            <span className={cn("text-[9.5px] font-medium leading-none", isToday ? "text-white/85" : "text-tk-muted")}>
+            <span className={cn("relative z-10 text-[9.5px] font-medium leading-none", isToday ? "text-white/85" : "text-tk-muted")}>
               {label}
             </span>
             <span
               aria-hidden
               className={cn(
-                "h-[4px] w-[4px] rounded-full",
+                "relative z-10 h-[4px] w-[4px] rounded-full",
                 isToday ? "bg-white/90" : count > 0 ? "bg-tk-green" : "bg-transparent"
               )}
             />
@@ -584,11 +595,12 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
   const nextLabel = prayerLabelForDate(state.next, today);
 
   return (
-    <button
-      type="button"
+    <TiltCard
+      as="button"
       onClick={() => onNavigate("sholat")}
-      aria-label="Salat lima waktu, buka halaman Sholat"
-      className="tap tk-card-white block w-full rounded-[1.4rem] p-4 text-left"
+      ariaLabel="Salat lima waktu, buka halaman Sholat"
+      className="tap tk-card-white rounded-[1.4rem] p-4"
+      maxTilt={3.5}
     >
       <p className="text-[13.5px] font-bold tracking-[-0.01em] text-[#17171B]">Salat Lima Waktu</p>
       <ul className="mt-2.5 space-y-2" role="group" aria-label="Status salat hari ini">
@@ -628,7 +640,7 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
         <Bell size={10} className="shrink-0" />
         Berikutnya · {nextLabel} {state.nextTime}
       </p>
-    </button>
+    </TiltCard>
   );
 }
 
@@ -658,11 +670,12 @@ function RingCard({ today, onNavigate }: { today: string; onNavigate: (tab: TabI
   const pct = statuses.length > 0 ? Math.round((done / statuses.length) * 100) : 0;
 
   return (
-    <button
-      type="button"
+    <TiltCard
+      as="button"
       onClick={() => onNavigate("progress")}
-      aria-label={`Target harian ${done} dari ${statuses.length} selesai, buka analitik`}
-      className="tap glass block w-full rounded-[1.4rem] p-4 text-left"
+      ariaLabel={`Target harian ${done} dari ${statuses.length} selesai, buka analitik`}
+      className="tap glass rounded-[1.4rem] p-4"
+      maxTilt={3.5}
     >
       <div className="flex items-center gap-3.5">
         <div className="relative inline-flex shrink-0 items-center justify-center" style={{ width: 64, height: 64 }}>
@@ -691,7 +704,7 @@ function RingCard({ today, onNavigate }: { today: string; onNavigate: (tab: TabI
             selesai hari ini
           </span>        </span>
       </div>
-    </button>
+    </TiltCard>
   );
 }
 
@@ -849,7 +862,7 @@ function TodayTasks({ today }: { today: string }) {
   const visible = expanded ? statuses : statuses.slice(0, 3);
 
   return (
-    <section aria-label="Tugas hari ini" className="animate-tk-fade-up">
+    <section aria-label="Tugas hari ini">
       <div className="mb-3 flex items-end justify-between gap-3 px-0.5">
         <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Tugas Hari Ini</h2>
         <button
@@ -1005,7 +1018,7 @@ function TodayTasks({ today }: { today: string }) {
 function DoaCompact() {
   const dua = duaOfTheDay(todayKey());
   return (
-    <section aria-label="Doa hari ini" className="animate-tk-fade-up glass rounded-[1.4rem] p-4.5">
+    <section aria-label="Doa hari ini" className="glass rounded-[1.4rem] p-4.5">
       <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-tk-accent">Doa Hari Ini</p>
       {dua.title ? <p className="mt-2 text-[14.5px] font-bold tracking-[-0.01em] text-tk-ink">{dua.title}</p> : null}
       {dua.arabic ? <p className="quran-arabic mt-3 text-right text-[22px] leading-[2] text-tk-ink">{dua.arabic}</p> : null}
@@ -1090,7 +1103,7 @@ export function HomePage({
   return (
     <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
       {/* ---------- A. Header: avatar / sapaan + nama / lonceng ---------- */}
-      <header className="animate-tk-fade-up pt-1 lg:col-span-12">
+      <RiseIn i={0} className="pt-1 lg:col-span-12">
         <div className="grid grid-cols-[52px_1fr_44px] items-center gap-3">
           <button type="button" aria-label="Buka profil" onClick={() => onNavigate("profil")} className="tap relative shrink-0">
             {settings.avatarDataUrl ? (
@@ -1131,10 +1144,10 @@ export function HomePage({
             </>
           ) : null}
         </p>
-      </header>
+      </RiseIn>
 
       {/* ---------- B. Bar pencarian ---------- */}
-      <div className="mt-4 lg:col-span-12">
+      <RiseIn i={1} className="mt-4 lg:col-span-12">
         <button
           type="button"
           aria-label="Buka pencarian"
@@ -1144,10 +1157,10 @@ export function HomePage({
           <Search size={17} className="shrink-0 text-tk-muted" />
           <span className="text-[13.5px] text-tk-deep">Cari surah, aktivitas, catatan…</span>
         </button>
-      </div>
+      </RiseIn>
 
       {/* ---------- C. Jadwal Anda + dropdown bulan + pil bulat ---------- */}
-      <div className="mt-6 lg:col-span-12">
+      <RiseIn i={2} className="mt-6 lg:col-span-12">
         <div className="mb-3.5 flex items-center justify-between gap-3 px-0.5">
           <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Jadwal Anda</h2>
           <button
@@ -1161,41 +1174,41 @@ export function HomePage({
           </button>
         </div>
         <CircleDateStrip today={today} />
-      </div>
+      </RiseIn>
 
       {/* ---------- D. Trio kartu: putih+cincin | orange ---------- */}
-      <div className="mt-6 grid grid-cols-2 gap-3 lg:col-span-12">
+      <RiseIn i={3} className="mt-6 grid grid-cols-2 gap-3 lg:col-span-12">
         <div className="flex flex-col gap-3">
           <SalatCheckCard today={today} onNavigate={onNavigate} />
           <RingCard today={today} onNavigate={onNavigate} />
         </div>
         <KebaikanCard today={today} onNavigate={onNavigate} onOpenSubpage={onOpenSubpage} />
-      </div>
+      </RiseIn>
 
       {/* ---------- E. Tugas Hari Ini ---------- */}
-      <div className="mt-8 lg:col-span-12">
+      <RiseIn i={4} className="mt-8 lg:col-span-12">
         <TodayTasks today={today} />
-      </div>
+      </RiseIn>
 
       {/* ---------- F. Mood check-in ---------- */}
-      <div className="mt-8 lg:col-span-12">
+      <RiseIn i={5} className="mt-8 lg:col-span-12">
         <MoodSection today={today} onOpenSubpage={onOpenSubpage} />
-      </div>
+      </RiseIn>
 
       {/* ---------- G. Jelajahi aktivitas ---------- */}
-      <div className="mt-8 lg:col-span-12">
+      <RiseIn i={6} className="mt-8 lg:col-span-12">
         <JelajahiAktivitas today={today} onOpen={onOpenSubpage} />
-      </div>
+      </RiseIn>
 
       {/* ---------- H. Doa hari ini ---------- */}
-      <div className="mt-8 lg:col-span-12">
+      <RiseIn i={7} className="mt-8 lg:col-span-12">
         <DoaCompact />
-      </div>
+      </RiseIn>
 
       {/* ---------- I. Daily Barakah ---------- */}
-      <div className="mt-8 lg:col-span-12">
+      <RiseIn i={8} className="mt-8 lg:col-span-12">
         <DailyBarakah />
-      </div>
+      </RiseIn>
 
       {/* ---------- Sheets ---------- */}
       {reminderOpen ? <ReminderSheet today={today} onClose={() => setReminderOpen(false)} /> : null}

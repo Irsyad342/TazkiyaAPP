@@ -20,6 +20,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { m } from "framer-motion";
 import {
   BadgeCheck,
   Bell,
@@ -82,6 +83,8 @@ import { convertImageToWebp, formatBytes } from "@/lib/tazkiya/image";
 import { recordedDateList, reviewActivityDays } from "@/lib/tazkiya/stats";
 import { formatGregorian, isFriday, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
 import { Chip, GroupList, GroupRow, SectionHeader } from "./ui-bits";
+import { CountUp, Reveal, RiseIn, TapIcon } from "./motion-bits";
+import { SPRING } from "@/lib/motion/system";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { SuioMark } from "./brand";
 import { cn } from "@/lib/utils";
@@ -567,24 +570,28 @@ export function ProfilePage({
 
       {/* ---------- Statistik personal, TANPA kartu ----------
           Grid 3 kolom sama lebar; angka & label dipusatkan horizontal,
-          jarak vertikal angka→label seragam (gap tetap), baseline konsisten. */}
+          jarak vertikal angka→label seragam (gap tetap), baseline konsisten.
+          Entrance bertingkat (RiseIn i=0..2) + angka mengalir via CountUp. */}
       <section aria-label="Statistik personal" className="animate-tk-fade-up">
         <div className="grid grid-cols-3">
           {[
-            { value: recorded.length, label: "Hari aktif" },
-            { value: `${focusDone}/5`, label: "Salat hari ini" },
-            { value: todayZikir.toLocaleString("id-ID"), label: "Zikir hari ini" },
-          ].map(({ value, label }, i) => (
-            <div
+            { to: recorded.length, suffix: "", label: "Hari aktif" },
+            { to: focusDone, suffix: "/5", label: "Salat hari ini" },
+            { to: todayZikir, suffix: "", label: "Zikir hari ini" },
+          ].map(({ to, suffix, label }, i) => (
+            <RiseIn
               key={label}
+              i={i}
               className={cn(
                 "flex min-w-0 flex-col items-center gap-2 px-1.5 py-0.5 border-l",
                 i > 0 ? "border-tk-line" : "border-transparent"
               )}
             >
-              <p className="gs-display tnum text-center text-[27px] font-extrabold leading-none text-tk-ink">{value}</p>
+              <p className="gs-display tnum text-center text-[27px] font-extrabold leading-none text-tk-ink">
+                <CountUp to={to} suffix={suffix} />
+              </p>
               <p className="text-center text-[10.5px] font-semibold leading-[1.3] tracking-[0.02em] text-tk-muted">{label}</p>
-            </div>
+            </RiseIn>
           ))}
         </div>
       </section>
@@ -592,6 +599,7 @@ export function ProfilePage({
       {/* ---------- Ringkasan pencapaian ---------- */}
       <section aria-label="Ringkasan pencapaian" className="animate-tk-fade-up">
         <SectionHeader title="Ringkasan Pencapaian" caption="Langkah kecil untuk menjaga istiqamah setiap hari." />
+        <Reveal y={18}>
         <div className="glass rounded-[1.5rem] p-5">
           <p className="text-[13.5px] font-bold text-tk-ink">Progres Sholat Hari Ini</p>
           <p className="mt-0.5 text-[11.5px] leading-snug text-tk-muted">
@@ -686,6 +694,7 @@ export function ProfilePage({
             <ChevronRight size={15} aria-hidden />
           </button>
         </div>
+        </Reveal>
       </section>
 
       {/* ---------- Grouped list: Akun ---------- */}
@@ -1201,7 +1210,7 @@ export function ProfilePage({
         <SectionHeader title="Preferensi" caption="Sesuaikan tampilan dan interaksi" />
         <GroupList ariaLabel="Preferensi tampilan">
           {/* Tema, pilihan inline dalam satu baris */}
-          <div className="px-4 py-4">
+          <RiseIn y={14} className="px-4 py-4">
             <div className="flex items-center gap-3.5">
               <Droplets size={18} strokeWidth={1.8} className="shrink-0 text-tk-muted" />
               <span className="flex-1 text-[14px] font-medium text-tk-ink">Tema tampilan</span>
@@ -1218,25 +1227,37 @@ export function ProfilePage({
                     toast.success(t.id === "dark" ? "Tema gelap aktif" : t.id === "light" ? "Tema terang aktif" : "Mengikuti setelan sistem");
                   }}
                   className={cn(
-                    "tap rounded-2xl p-2 text-left transition-all",
-                    settings.theme === t.id ? "bg-tk-lavender ring-2 ring-tk-violet" : "bg-tk-panel-soft hover:ring-1 hover:ring-tk-line-strong"
+                    "tap relative rounded-2xl p-2 text-left transition-all",
+                    settings.theme === t.id ? "ring-2 ring-tk-violet" : "bg-tk-panel-soft hover:ring-1 hover:ring-tk-line-strong"
                   )}
                 >
-                  <span aria-hidden className="mb-1.5 block h-11 w-full rounded-lg" style={{ background: t.bg }}>
+                  {/* Highlight terpilih MELUNCUR antar pil via layout animation
+                      (pola BottomNav, domMax aktif) — digambar di bawah isi pil. */}
+                  {settings.theme === t.id ? (
+                    <m.span
+                      layoutId="tk-theme-sel"
+                      aria-hidden
+                      transition={SPRING.glide}
+                      className="absolute inset-0 rounded-2xl bg-tk-lavender"
+                    />
+                  ) : null}
+                  <span aria-hidden className="relative mb-1.5 block h-11 w-full rounded-lg" style={{ background: t.bg }}>
                     <span className="block h-full w-full rounded-lg p-1.5">
                       <span className="block h-3 w-7 rounded-md bg-white/25" />
                       <span className="mt-1 block h-1.5 w-10 rounded-full" style={{ background: t.dot, opacity: 0.9 }} />
                     </span>
                   </span>
-                  <span className="flex items-center gap-1 text-[12px] font-semibold text-tk-ink">
-                    {settings.theme === t.id ? <Check size={12} className="text-tk-violet" /> : null}
+                  <span className="relative flex items-center gap-1 text-[12px] font-semibold text-tk-ink">
+                    <TapIcon active={settings.theme === t.id}>
+                      {settings.theme === t.id ? <Check size={12} className="text-tk-violet" /> : null}
+                    </TapIcon>
                     {t.label}
                   </span>
-                  <span className="block text-[9.5px] text-tk-muted">{t.hint}</span>
+                  <span className="relative block text-[9.5px] text-tk-muted">{t.hint}</span>
                 </button>
               ))}
             </div>
-          </div>
+          </RiseIn>
         </GroupList>
 
         <GroupList className="mt-3" ariaLabel="Saklar preferensi">
@@ -1259,8 +1280,8 @@ export function ProfilePage({
               caption: "Tampilkan tulisan Arab pada daftar surah",
               key: "showArabic" as const,
             },
-          ].map(({ icon: Icon, title, caption, key }) => (
-            <div key={key} className="flex items-center gap-3.5 px-4 py-3.5">
+          ].map(({ icon: Icon, title, caption, key }, i) => (
+            <RiseIn key={key} i={i} y={12} className="flex items-center gap-3.5 px-4 py-3.5">
               <Icon size={18} strokeWidth={1.8} className="shrink-0 text-tk-muted" />
               <div className="min-w-0 flex-1">
                 <p className="text-[14px] font-medium text-tk-ink">{title}</p>
@@ -1271,9 +1292,9 @@ export function ProfilePage({
                 onCheckedChange={(v) => updateSettings({ [key]: v })}
                 aria-label={title}
               />
-            </div>
+            </RiseIn>
           ))}
-          <div className="flex items-center gap-3.5 px-4 py-3.5">
+          <RiseIn i={3} y={12} className="flex items-center gap-3.5 px-4 py-3.5">
             <span aria-hidden className="flex h-[18px] w-[18px] items-center justify-center text-[9px] font-bold text-tk-muted">
               ID
             </span>
@@ -1282,7 +1303,7 @@ export function ProfilePage({
               <p className="text-[11px] text-tk-muted">Bahasa Indonesia (tetap)</p>
             </div>
             <Chip>Bahasa Indonesia</Chip>
-          </div>
+          </RiseIn>
         </GroupList>
       </section>
 

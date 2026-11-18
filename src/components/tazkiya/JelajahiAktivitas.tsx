@@ -14,6 +14,7 @@
 
 import { ArrowUpRight, ChevronRight } from "lucide-react";
 import { useWorshipStore } from "@/lib/tazkiya/store";
+import { Stagger, StaggerItem, TiltCard } from "./motion-bits";
 import type { SubPageId } from "./BottomNav";
 import { cn } from "@/lib/utils";
 
@@ -37,14 +38,17 @@ export function JelajahiAktivitas({
         <p className="mt-1 text-[12px] leading-snug text-tk-muted">Ruang refleksi dan kebaikan di luar tracker utama.</p>
       </div>
 
-      <div className="flex flex-1 flex-col gap-5">
+      {/* Entrance stagger ~64 ms antar kartu (Stagger/StaggerItem). */}
+      <Stagger className="flex flex-1 flex-col gap-5">
         {/* 1. Jurnal Syukur, baris editorial tanpa kartu */}
-        <button
-          type="button"
-          onClick={() => onOpen("jurnal")}
-          aria-label="Buka halaman Jurnal Syukur"
-          className="tap group block w-full border-t border-tk-line pt-4 text-left"
-        >
+        <StaggerItem>
+          <TiltCard
+            as="button"
+            maxTilt={3}
+            onClick={() => onOpen("jurnal")}
+            ariaLabel="Buka halaman Jurnal Syukur"
+            className="tap group block w-full border-t border-tk-line pt-4 text-left"
+          >
           <span className="flex items-start gap-3.5">
             <span aria-hidden className="gs-display select-none text-[38px] font-extrabold leading-[0.8] text-tk-lav-deco">
               &ldquo;
@@ -59,15 +63,18 @@ export function JelajahiAktivitas({
               </span>
             </span>
           </span>
-        </button>
+          </TiltCard>
+        </StaggerItem>
 
         {/* 2. Zikir & Doa, kartu ORANGE pekat + widget cincin */}
-        <button
-          type="button"
-          onClick={() => onOpen("zikir-doa")}
-          aria-label="Buka halaman Zikir & Doa"
-          className="tap glass-hero flex items-center gap-4 rounded-[1.5rem] p-4 text-left"
-        >
+        <StaggerItem>
+          <TiltCard
+            as="button"
+            maxTilt={3}
+            onClick={() => onOpen("zikir-doa")}
+            ariaLabel="Buka halaman Zikir & Doa"
+            className="tap glass-hero flex items-center gap-4 rounded-[1.5rem] p-4 text-left"
+          >
           <span className="min-w-0 flex-1">
             <span className="block text-[14.5px] font-bold text-white">Zikir &amp; Doa</span>
             <span className="mt-0.5 block text-[11.5px] leading-relaxed text-white/75">
@@ -94,15 +101,18 @@ export function JelajahiAktivitas({
             </svg>
             <span className="tnum text-[12px] font-bold text-white">{zikirCount > 999 ? "999+" : zikirCount}</span>
           </span>
-        </button>
+          </TiltCard>
+        </StaggerItem>
 
         {/* 3. Rizq & Amal, blok statistik: angka besar + aksen lime */}
-        <button
-          type="button"
-          onClick={() => onOpen("rizq-amal")}
-          aria-label="Buka halaman Rizq & Amal"
-          className="tap flex items-center gap-4 rounded-[1.5rem] bg-tk-panel-soft p-4 text-left"
-        >
+        <StaggerItem>
+          <TiltCard
+            as="button"
+            maxTilt={3}
+            onClick={() => onOpen("rizq-amal")}
+            ariaLabel="Buka halaman Rizq & Amal"
+            className="tap flex items-center gap-4 rounded-[1.5rem] bg-tk-panel-soft p-4 text-left"
+          >
           <span aria-hidden className="h-12 w-[3px] shrink-0 rounded-full bg-tk-lime" />
           <span className="min-w-0 flex-1">
             <span className="block text-[14.5px] font-bold text-tk-ink">Rizq &amp; Amal</span>
@@ -112,8 +122,9 @@ export function JelajahiAktivitas({
             <span className="gs-display text-[30px] font-extrabold leading-none text-tk-ink">{amalCount}</span>
             <ArrowUpRight size={16} className="text-tk-muted" />
           </span>
-        </button>
-      </div>
+          </TiltCard>
+        </StaggerItem>
+      </Stagger>
     </section>
   );
 }
