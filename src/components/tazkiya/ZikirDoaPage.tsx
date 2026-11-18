@@ -203,7 +203,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
             type="button"
             onClick={() => tasbihSetTarget(n)}
             className={cn(
-              "tap rounded-full px-3 py-1.5 text-[11px] font-bold transition-all",
+              "tap su-card-shadow rounded-full px-3.5 py-1.5 text-[11px] font-bold transition-all",
               tasbih.target === n ? "gs-ink-btn" : "bg-tk-panel-soft text-tk-muted hover:text-tk-ink"
             )}
           >
@@ -241,7 +241,7 @@ function ZikirPresetPicker() {
             aria-pressed={tasbih.dhikr === z}
             onClick={() => tasbihSetDhikr(z)}
             className={cn(
-              "tap shrink-0 rounded-full px-3.5 py-1.5 text-[11.5px] font-semibold transition-all",
+              "tap su-card-shadow shrink-0 rounded-full px-3.5 py-1.5 text-[11.5px] font-semibold transition-all",
               tasbih.dhikr === z ? "gs-ink-btn" : "bg-tk-panel-soft text-tk-muted hover:text-tk-ink"
             )}
           >
@@ -418,7 +418,8 @@ export function ZikirDoaPage({
           {/* Doa Hari Ini, blok editorial lavender */}
           <div className="lg:col-span-5">
             <SectionHeader title="Doa Hari Ini" caption={dua.title} />
-            <div className="rounded-[1.75rem] bg-tk-lavender p-5">
+            {/* Radius 1.6rem — sejajar dengan blok fitur lavender di QuranPage */}
+            <div className="rounded-[1.6rem] bg-tk-lavender p-5">
               {dua.arabic ? <p className="quran-arabic text-right text-[22px] leading-[1.95] text-tk-ink">{dua.arabic}</p> : null}
               {dua.transliteration ? <p className="mt-3 text-[11.5px] italic leading-relaxed text-tk-muted">&ldquo;{dua.transliteration}&rdquo;</p> : null}
               <p className="mt-2.5 text-[12.5px] leading-relaxed text-tk-ink/95">{dua.meaning}</p>
@@ -437,7 +438,7 @@ export function ZikirDoaPage({
                   aria-pressed={cat === k.id}
                   onClick={() => setCat(k.id)}
                   className={cn(
-                    "tap shrink-0 rounded-full px-3.5 py-1.5 text-[11.5px] font-semibold transition-all",
+                    "tap su-card-shadow shrink-0 rounded-full px-3.5 py-1.5 text-[11.5px] font-semibold transition-all",
                     cat === k.id ? "gs-ink-btn" : "bg-tk-panel-soft text-tk-muted hover:text-tk-ink"
                   )}
                 >

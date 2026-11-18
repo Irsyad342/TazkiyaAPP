@@ -28,6 +28,7 @@ import {
   useMotionValue,
   useReducedMotion,
   useSpring,
+  useTransform,
 } from "framer-motion";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { DUR, EASE, SPRING, staggerChild, staggerParent } from "@/lib/motion/system";
@@ -199,38 +200,51 @@ export function TiltCard({
   const sry = useSpring(ry, SPRING.settle);
   const stx = useSpring(tx, SPRING.settle);
   const slift = useSpring(lift, { stiffness: 380, damping: 26 });
+  /* Shadow merespons kemiringan: makin miring, makin terangkat. */
+  const [lifted, setLifted] = useState(false);
 
   const reset = () => {
     rx.set(0);
     ry.set(0);
     tx.set(0);
     lift.set(0);
+    setLifted(false);
   };
 
   const onMove = (e: React.PointerEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const px = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1) - 0.5;
     const py = Math.min(Math.max((e.clientY - rect.top) / rect.height, 0), 1) - 0.5;
-    const range = e.pointerType === "mouse" || e.pointerType === "pen" ? 1 : 0.5;
+    /* Sentuh tetap terlihat jelas (0.8) — bukan sekadar mouse-only. */
+    const range = e.pointerType === "mouse" || e.pointerType === "pen" ? 1 : 0.8;
     ry.set(px * maxTilt * range);
     rx.set(-py * (maxTilt * 0.62) * range);
-    tx.set(px * 3 * range);
+    tx.set(px * 3.2 * range);
   };
 
   /* Gaya motion diterapkan pada elemen LUAR — permukaan kartu (latar,
-     border, shadow) ikut miring sebagai satu bidang. */
+     border, shadow) ikut miring sebagai satu bidang. touchAction pan-y
+     menjaga scroll vertikal halaman tetap alami di HP. */
   const motionStyle = {
     ...style,
+    touchAction: "pan-y",
     ...(anim
       ? ({ rotateX: srx, rotateY: sry, x: stx, y: slift, transformPerspective: 900 } as unknown as CSSProperties)
       : {}),
   };
 
   const interaction = {
+    "data-lifted": lifted ? "true" : "false",
     onPointerMove: anim ? onMove : undefined,
+    onPointerEnter: anim ? () => setLifted(true) : undefined,
     onPointerLeave: anim ? reset : undefined,
     onPointerCancel: anim ? reset : undefined,
-    onPointerDown: anim ? () => lift.set(-maxLift) : undefined,
+    onPointerDown: anim
+      ? () => {
+          lift.set(-maxLift);
+          setLifted(true);
+        }
+      : undefined,
     onPointerUp: anim ? reset : undefined,
   };
 
@@ -240,7 +254,7 @@ export function TiltCard({
         type="button"
         aria-label={ariaLabel}
         onClick={onClick}
-        className={cn("block w-full cursor-pointer text-left", className)}
+        className={cn("su-interactive block w-full cursor-pointer text-left", className)}
         style={motionStyle}
         {...interaction}
       >
@@ -265,7 +279,7 @@ export function TiltCard({
             }
           : undefined
       }
-      className={cn(clickable && "cursor-pointer", className)}
+      className={cn("su-interactive", clickable && "cursor-pointer", className)}
       style={motionStyle}
       {...interaction}
     >
@@ -419,5 +433,90 @@ export function TapIcon({
         {children}
       </m.span>
     </AnimatePresence>
+  );
+}
+
+
+/* ------------------------------------------------------------------ */
+/* DragCard — kartu yang bisa DISENTAK: mengikuti jari/pointer, naik,  */
+/* miring tipis, bayangan membesar, lalu kembali dengan spring.        */
+/* Drag dibatasi sumbu-X (drag="x") + touchAction pan-y sehingga scroll */
+/* vertikal halaman TIDAK terganggu — sesuai aturan proteksi gesture.  */
+/* ------------------------------------------------------------------ */
+
+export function DragCard({
+  children,
+  className,
+  onClick,
+  ariaLabel,
+  maxTilt = 4,
+}: {
+  children: ReactNode;
+  className?: string;
+  onClick?: () => void;
+  ariaLabel?: string;
+  maxTilt?: number;
+}) {
+  const anim = useAnim();
+  const x = useMotionValue(0);
+  const rotate = useSpring(useTransform(x, [-110, 110], [-maxTilt, maxTilt]), {
+    stiffness: 260,
+    damping: 22,
+  });
+  const [dragging, setDragging] = useState(false);
+
+  if (!anim) {
+    return (
+      <div
+        role={onClick ? "button" : undefined}
+        tabIndex={onClick ? 0 : undefined}
+        aria-label={ariaLabel}
+        onClick={onClick}
+        onKeyDown={
+          onClick
+            ? (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onClick();
+                }
+              }
+            : undefined
+        }
+        className={cn("su-interactive cursor-pointer", onClick && "cursor-pointer", className)}
+        data-lifted="false"
+      >
+        {children}
+      </div>
+    );
+  }
+  return (
+    <m.div
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      aria-label={ariaLabel}
+      onClick={onClick}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
+      drag="x"
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.22}
+      dragTransition={{ bounceStiffness: 320, bounceDamping: 26 }}
+      onDragStart={() => setDragging(true)}
+      onDragEnd={() => setDragging(false)}
+      whileDrag={{ scale: 1.035, y: -7 }}
+      style={{ x, rotate, touchAction: "pan-y", transformPerspective: 900 }}
+      data-lifted={dragging ? "true" : "false"}
+      className={cn("su-interactive cursor-grab active:cursor-grabbing", className)}
+    >
+      {children}
+    </m.div>
   );
 }

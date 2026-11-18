@@ -102,7 +102,7 @@ export function JournalCalendar({
   });
 
   return (
-    <div className="rounded-[1.4rem] border border-tk-line bg-tk-panel p-4 light:shadow-[0_14px_34px_-24px_rgba(23,23,26,0.25)] dark:shadow-[0_14px_34px_-24px_rgba(12,6,2,0.7)]">
+    <div className="su-card-shadow rounded-[1.4rem] border border-tk-line bg-tk-panel p-4">
       {/* Kepala: bulan + navigasi + ringkasan pojok */}
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">

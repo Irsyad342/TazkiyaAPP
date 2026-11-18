@@ -196,6 +196,7 @@ export function FridayCard({
         <m.div
           className={cn(
             "tk-tkt tk-tkt--jumat tk-tkt--motion tap relative block cursor-pointer text-left",
+            phase !== "active" && "su-card-shadow",
             phase === "active" && "tk-tkt--active",
             isDone && "tk-tkt--done",
             isMissed && "tk-tkt--missed",

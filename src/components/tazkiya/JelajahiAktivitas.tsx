@@ -111,7 +111,7 @@ export function JelajahiAktivitas({
             maxTilt={3}
             onClick={() => onOpen("rizq-amal")}
             ariaLabel="Buka halaman Rizq & Amal"
-            className="tap flex items-center gap-4 rounded-[1.5rem] bg-tk-panel-soft p-4 text-left"
+            className="tap su-card-shadow flex items-center gap-4 rounded-[1.5rem] bg-tk-panel-soft p-4 text-left"
           >
           <span aria-hidden className="h-12 w-[3px] shrink-0 rounded-full bg-tk-lime" />
           <span className="min-w-0 flex-1">

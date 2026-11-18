@@ -144,10 +144,11 @@ function JuzRow({ juz, index = 0, onOpen }: { juz: (typeof JUZ_RANGES)[number]; 
       animate={anim ? { opacity: 1, y: 0 } : undefined}
       transition={{ duration: DUR.item, ease: EASE.out, delay: Math.min(index, 11) * 0.064 }}
     >
+      {/* Kelas baris identik dengan SurahRow (radius, padding, gap) */}
       <button
         type="button"
         onClick={onOpen}
-        className="tap flex w-full items-center gap-3.5 rounded-2xl px-2.5 py-3 text-left transition-colors hover:bg-tk-panel-soft"
+        className="tap group flex w-full items-center gap-3.5 rounded-2xl px-2.5 py-3 text-left transition-colors hover:bg-tk-panel-soft"
         aria-label={`Buka Juz ${juz.juz} dari ${start?.latin}`}
       >
         <span aria-hidden className="relative flex h-10 w-10 shrink-0 items-center justify-center">
@@ -358,7 +359,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
       <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
         {/* ---------- Hero lanjutkan bacaan (featured blok lavender lembut) ---------- */}
         <section aria-label="Lanjutkan bacaan" className="animate-tk-fade-up lg:col-span-7">
-          <div className="relative flex h-full flex-col justify-between overflow-hidden rounded-[1.6rem] bg-tk-lavender p-5 sm:p-6">
+          <div className="relative flex h-full flex-col justify-between overflow-hidden rounded-[1.6rem] bg-tk-lavender p-5 su-card-shadow sm:p-6">
             {/* Ornamen latar: kisi khatam samar di sudut kanan atas */}
             <div
               aria-hidden
@@ -412,7 +413,8 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
 
         {/* ---------- Target bacaan hari ini (kartu putih ringkas + ring) ---------- */}
         <section aria-label="Target bacaan harian" className="animate-tk-fade-up mt-6 lg:col-span-5 lg:mt-0">
-          <div className="glass flex h-full items-center gap-5 rounded-[1.5rem] p-5">
+          {/* Radius dipadatkan ke 1.6rem — sama dengan kartu hero di sebelahnya */}
+          <div className="glass flex h-full items-center gap-5 rounded-[1.6rem] p-5">
             <div className="relative inline-flex shrink-0 items-center justify-center" style={{ width: 92, height: 92 }}>
               <svg width={92} height={92} className="-rotate-90">
                 <circle cx={46} cy={46} r={40} fill="none" strokeWidth={8} className="stroke-tk-track" />

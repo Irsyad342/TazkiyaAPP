@@ -95,7 +95,7 @@ function TargetCard({
 }) {
   const anim = useAnim();
   return (
-    <m.div variants={staggerChild} className="glass rounded-[1.5rem] p-4">
+    <m.div variants={staggerChild} className="glass su-card-shadow rounded-[1.5rem] p-4">
       <div className="flex items-start gap-3">
         <span
           className={cn(
@@ -516,7 +516,7 @@ export function TargetSheet({ onClose }: { onClose: () => void }) {
         className="thin-scrollbar relative z-10 flex-1 space-y-3 overflow-y-auto px-4 pb-[max(1.75rem,calc(env(safe-area-inset-bottom)+1rem))] pt-2"
       >
         {/* ---------- RINGKASAN PROGRES ---------- */}
-        <section aria-label="Ringkasan progres target" className="glass rounded-[1.5rem] p-4">
+        <section aria-label="Ringkasan progres target" className="glass su-card-shadow rounded-[1.5rem] p-4">
           <div className="flex items-center gap-4">
             <div className="relative h-[96px] w-[96px] shrink-0">
               <svg aria-hidden viewBox="0 0 120 120" className="h-full w-full -rotate-90">

@@ -304,11 +304,11 @@ export default function Page() {
 
   if (!hydrated || !onboarded) {
     return (
-      <main className="flex min-h-dvh items-center justify-center bg-[#101013] light:bg-[#e8e8ec]" aria-label="Memuat SUIO">
+      <main className="flex min-h-dvh items-center justify-center bg-[#141414] light:bg-[#edebe7]" aria-label="Memuat SUIO">
         <div className="flex flex-col items-center gap-4">
           <SuioMark size={56} glow className="animate-tk-pulse" />
           <div className="text-center">
-            <p className="text-[15px] font-bold tracking-[0.06em] text-white light:text-[#17171b]">SUIO</p>
+            <p className="text-[15px] font-bold tracking-[0.06em] text-white light:text-[#202020]">SUIO</p>
             <p className="gs-overline mt-1.5">Sujud in Order</p>
           </div>
         </div>
@@ -320,7 +320,7 @@ export default function Page() {
       <LazyMotion features={domMax} strict>
       {/* Panggung luar (terlihat hanya di layar lebar): rona lebih pekat dari
           kanvas aplikasi agar kolom HP terbingkai jelas, bukan tampak salah. */}
-      <main className="relative min-h-dvh w-full bg-[#101013] light:bg-[#e8e8ec]" aria-label="Aplikasi SUIO">
+      <main className="relative min-h-dvh w-full bg-[#141414] light:bg-[#edebe7]" aria-label="Aplikasi SUIO">
         {/* Kolom aplikasi, selalu selebar HP, di tengah, semua viewport. */}
         <div className="relative mx-auto min-h-dvh w-full max-w-[430px] bg-tk-stage desktop:shadow-[0_0_0_1px_var(--color-tk-line),0_40px_90px_-40px_rgba(0,0,0,0.6)]">
           <div
@@ -446,7 +446,7 @@ export default function Page() {
               : {
                   duration: 2600,
                   style: {
-                    background: "#2e2825",
+                    background: "#302925",
                     border: "1px solid #473c34",
                     color: "#F6EEE3",
                     borderRadius: "999px",

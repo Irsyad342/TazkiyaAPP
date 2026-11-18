@@ -644,6 +644,7 @@ function PrayerTickets({
               ariaLabel={`Catat ${p.label}, mulai ${time.replace(":", ".")}, batas akhir ${w.endLabel} ${w.end ? w.end.replace(":", ".") : "tidak tersedia"}`}
               className={cn(
                 "tk-tkt",
+                !isActive && "su-card-shadow",
                 isActive && "tk-tkt--active",
                 isDone && "tk-tkt--done",
                 isMissed && "tk-tkt--missed",
@@ -1142,7 +1143,9 @@ export function PrayerPage({
     <div className="space-y-6">
       <header className="animate-tk-fade-up pt-1">
         <h1 className="text-[28px] font-bold tracking-[-0.03em] text-tk-ink">Sholat</h1>
-        <p className="mt-1 text-[12.5px] text-tk-muted">Catat lima waktu salat dan kelola qada dengan tenang</p>
+        <p className="mt-1.5 max-w-[42ch] text-[12.5px] leading-relaxed text-tk-muted">
+          Catat lima waktu salat dan kelola qada dengan tenang
+        </p>
       </header>
 
       <SegmentedTabs

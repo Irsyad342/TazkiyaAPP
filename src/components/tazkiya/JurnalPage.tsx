@@ -60,7 +60,7 @@ import {
 } from "./JournalCalendar";
 import { cn } from "@/lib/utils";
 import { DUR, EASE, SPRING } from "@/lib/motion/system";
-import { TapIcon } from "./motion-bits";
+import { DragCard, TapIcon } from "./motion-bits";
 
 /* ---------- Navigasi internal ---------- */
 
@@ -403,7 +403,11 @@ function JournalBanner({ motionOK }: { motionOK: boolean }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: DUR.card, ease: EASE.out }}
       >
-        <GlassCard className={cn("overflow-hidden p-5", motionOK && "pr-float-soft")}>
+        {/* Kartu promo/header: bisa DISENTAK horizontal lalu kembali spring
+            (DragCard, sumbu-X + touchAction pan-y — scroll aman). Satu-satunya
+            kartu drag di halaman ini; form & kalender tidak disentak. */}
+        <DragCard className="rounded-[1.4rem]">
+          <GlassCard className={cn("overflow-hidden p-5 su-card-shadow", motionOK && "pr-float-soft")}>
           {/* Pendar dekoratif + parallax pada tanda kutip */}
           <span aria-hidden className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-tk-lavender/70 blur-2xl dark:bg-tk-accent/10" />
           <m.span
@@ -450,7 +454,8 @@ function JournalBanner({ motionOK }: { motionOK: boolean }) {
               <Share2 size={12} /> Bagikan
             </button>
           </m.div>
-        </GlassCard>
+          </GlassCard>
+        </DragCard>
       </m.div>
     </section>
   );
@@ -494,7 +499,7 @@ function CategoryCards({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 22, delay: motionOK ? i * 0.07 : 0 }}
               whileTap={motionOK ? { y: -4, scale: 1.02 } : undefined}
-              className="tap group relative flex flex-col overflow-hidden rounded-[1.35rem] border border-tk-line bg-tk-panel p-4 text-left light:shadow-[0_12px_28px_-20px_rgba(23,23,26,0.3)] dark:shadow-[0_12px_28px_-20px_rgba(12,6,2,0.75)]"
+              className="tap su-card-shadow group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-tk-line bg-tk-panel p-4 text-left"
             >
               {/* Aksen lembut berbeda per kartu (variasi terkontrol) */}
               <span
@@ -707,7 +712,7 @@ function JournalXForm({
         }
       />
 
-      <GlassCard className="p-5 sm:p-6">
+      <GlassCard className="su-card-shadow p-5 sm:p-6">
         {/* Judul + tanggal */}
         <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
           <label className="block">
@@ -938,7 +943,7 @@ function JournalDetail({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: DUR.card, ease: EASE.out }}
       >
-        <GlassCard className="p-5 sm:p-6">
+        <GlassCard className="su-card-shadow p-5 sm:p-6">
           <div className="flex flex-wrap items-center gap-1.5">
             <span
               className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.06em]"
@@ -1091,7 +1096,7 @@ function SyukurJournal({ onBack }: { onBack: () => void }) {
       <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
         {/* ---------- A. Refleksi hari ini ---------- */}
         <section aria-label="Jurnal hari ini" className="animate-tk-fade-up lg:col-span-7">
-          <GlassCard className="p-5 sm:p-6">
+          <GlassCard className="su-card-shadow p-5 sm:p-6">
             <div className="flex items-baseline justify-between gap-2">
               <p className="font-display text-[19px] font-bold tracking-[-0.015em] text-tk-ink">
                 Hal apa yang kamu syukuri hari ini?
@@ -1154,7 +1159,7 @@ function SyukurJournal({ onBack }: { onBack: () => void }) {
         {/* ---------- B. Mood check-in ---------- */}
         <section aria-label="Mood check-in" className="animate-tk-fade-up mt-6 lg:col-span-5 lg:mt-0">
           <SectionHeader title="Mood Check-in" caption="Pilihanmu sepenuhnya milikmu" />
-          <GlassCard className="p-4">
+          <GlassCard className="su-card-shadow p-4">
             <div role="radiogroup" aria-label="Pilih mood hari ini" className="flex flex-col gap-2.5">
               {/* Baris 4 + 3 simetris di tengah — selaras dengan mood check-in Beranda; item 70px agar pas di kartu */}
               {[MOODS.slice(0, 4), MOODS.slice(4)].map((row, r) => (
@@ -1213,7 +1218,7 @@ function SyukurJournal({ onBack }: { onBack: () => void }) {
             title="Hadith for Your Heart"
             caption={activeMood ? `Selaras dengan mood "${moodLabel(activeMood)}"` : "Pengingat untuk hatimu hari ini"}
           />
-          <GlassCard className="p-5">
+          <GlassCard className="su-card-shadow p-5">
             <span aria-hidden className="pointer-events-none absolute right-4 top-1 font-display text-[52px] leading-none text-tk-lavender select-none">
               &rdquo;
             </span>
@@ -1257,7 +1262,7 @@ function SyukurJournal({ onBack }: { onBack: () => void }) {
               caption="Jurnal yang kamu simpan akan muncul di sini dan tetap ada setelah logout-login."
             />
           ) : (
-            <GlassCard className="thin-scrollbar max-h-[26rem] overflow-y-auto">
+            <GlassCard className="su-card-shadow thin-scrollbar max-h-[26rem] overflow-y-auto">
               <ul className="divide-y divide-tk-line-soft">
                 {historyDates.map((d) => {
                   const e = journal[d];

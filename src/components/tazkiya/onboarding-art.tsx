@@ -249,7 +249,7 @@ function PhoneMockup({
       className={`relative will-change-transform ${className}`}
       style={{ width: w, height: h }}
     >
-      <div className="absolute inset-0 rounded-[13%_/_6.3%] bg-gradient-to-b from-[#4a4038] via-[#191411] to-[#332a24] p-[6.5px]">
+      <div className="absolute inset-0 rounded-[13%_/_6.3%] bg-gradient-to-b from-[#463d36] via-[#171412] to-[#2c2622] p-[6.5px]">
         <div className={`relative h-full w-full overflow-hidden rounded-[11.5%_/_5.6%] ${SCREEN}`}>
           {/* Dynamic island */}
           <div className="absolute left-1/2 top-[6.5px] z-30 h-[13px] w-[58px] -translate-x-1/2 rounded-full bg-[#0b0908]">
@@ -313,7 +313,7 @@ function HomeScreen() {
             <span key={s.n} className="flex items-center gap-[5px]">
               <span
                 className={`flex h-[9px] w-[9px] items-center justify-center rounded-full ${
-                  s.done ? "bg-[#17171B] dark:bg-[#FF5A00]" : "border-[1.2px] border-[#c9c2bb] dark:border-[#4a4038]"
+                  s.done ? "bg-[#202020] dark:bg-[#FF5A00]" : "border-[1.2px] border-[#c9c2bb] dark:border-[#463d36]"
                 }`}
               >
                 {s.done && <Check size={6} strokeWidth={3.5} className="text-white" />}

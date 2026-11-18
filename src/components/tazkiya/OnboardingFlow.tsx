@@ -268,7 +268,7 @@ export function OnboardingFlow({
       className="flex w-full flex-col items-center text-center min-[900px]:items-start min-[900px]:text-left"
     >
       <h1
-        className={`font-display font-extrabold tracking-[-0.03em] light:text-[#202020] dark:text-[#F7F3EF] transition-colors duration-500 ${
+        className={`font-display font-extrabold tracking-[-0.03em] text-tk-ink transition-colors duration-500 ${
           s.kind === "final"
             ? "text-[27px] leading-[1.14] min-[900px]:text-[40px]"
             : "text-[26px] leading-[1.16] min-[900px]:text-[38px] min-[900px]:leading-[1.08]"
@@ -276,7 +276,7 @@ export function OnboardingFlow({
       >
         {s.segs.map((seg, si) => (
           <span key={si} className="inline-block overflow-hidden pb-[0.1em] align-bottom">
-            <m.span variants={wordRise} className={`inline-block ${seg.a ? "text-[#FF5A00]" : ""}`}>
+            <m.span variants={wordRise} className={`inline-block ${seg.a ? "text-tk-violet" : ""}`}>
               {seg.t}
               {si < s.segs.length - 1 ? "\u00A0" : ""}
             </m.span>
@@ -285,7 +285,7 @@ export function OnboardingFlow({
       </h1>
       <m.p
         variants={fadeUp}
-        className="mt-3.5 max-w-[310px] text-[13px] leading-[1.75] light:text-[#77716D] dark:text-[#B5AAA3] transition-colors duration-500 min-[900px]:max-w-[400px] min-[900px]:text-[14.5px]"
+        className="mt-3.5 max-w-[310px] text-[13px] leading-[1.75] text-tk-muted transition-colors duration-500 min-[900px]:max-w-[400px] min-[900px]:text-[14.5px]"
       >
         {s.description}
       </m.p>
@@ -352,14 +352,14 @@ export function OnboardingFlow({
               <div className="tk-ob-pattern absolute inset-x-0 top-0 h-[240px] opacity-[0.045] dark:opacity-[0.06]" />
               <Star8
                 size={19}
-                className="tk-ob-float absolute left-[8%] top-[13%] text-[#FF5A00]/30 dark:text-[#FF9A52]/40"
+                className="tk-ob-float absolute left-[8%] top-[13%] text-tk-violet/30 dark:text-tk-accent/40"
               />
               <Star8
                 size={12}
-                className="tk-ob-float tk-ob-float-delay absolute right-[10%] top-[36%] text-[#FF5A00]/25 dark:text-[#FF9A52]/30"
+                className="tk-ob-float tk-ob-float-delay absolute right-[10%] top-[36%] text-tk-violet/25 dark:text-tk-accent/30"
               />
-              <span className="tk-ob-float tk-ob-float-delay absolute bottom-[20%] right-[19%] h-2.5 w-2.5 rounded-full border-[1.5px] border-[#FF5A00]/30 dark:border-[#FF9A52]/35" />
-              <span className="tk-ob-float absolute bottom-[30%] left-[12%] h-2 w-2 rounded-full bg-[#FF5A00]/25 dark:bg-[#FF9A52]/30" />
+              <span className="tk-ob-float tk-ob-float-delay absolute bottom-[20%] right-[19%] h-2.5 w-2.5 rounded-full border-[1.5px] border-tk-violet/30 dark:border-tk-accent/35" />
+              <span className="tk-ob-float absolute bottom-[30%] left-[12%] h-2 w-2 rounded-full bg-tk-violet/25 dark:bg-tk-accent/30" />
             </div>
 
             {/* ---------- Kepala: branding + Lewati ---------- */}
@@ -380,10 +380,10 @@ export function OnboardingFlow({
                   <SuioMark size={36} />
                 </m.span>
                 <div>
-                  <p className="font-display text-[15px] font-extrabold leading-none tracking-[0.06em] light:text-[#202020] dark:text-[#F7F3EF] transition-colors duration-500">
+                  <p className="font-display text-[15px] font-extrabold leading-none tracking-[0.06em] text-tk-ink transition-colors duration-500">
                     SUIO
                   </p>
-                  <p className="mt-[5px] text-[8px] font-semibold uppercase leading-none tracking-[0.2em] light:text-[#77716D] dark:text-[#B5AAA3]">
+                  <p className="mt-[5px] text-[8px] font-semibold uppercase leading-none tracking-[0.2em] text-tk-muted">
                     Sujud in Order
                   </p>
                 </div>
@@ -392,7 +392,7 @@ export function OnboardingFlow({
                 <button
                   type="button"
                   onClick={() => onDone("/auth")}
-                  className="tap rounded-full border px-3.5 py-2 text-[11.5px] font-bold transition-colors light:border-[#202020]/10 light:bg-white/70 light:text-[#77716D] dark:border-white/[0.09] dark:bg-white/[0.04] dark:text-[#B5AAA3] light:hover:text-[#202020] dark:hover:text-[#F7F3EF]"
+                  className="tap rounded-full border px-3.5 py-2 text-[11.5px] font-bold transition-colors light:border-[#202020]/10 light:bg-white/70 text-tk-muted dark:border-white/[0.09] dark:bg-white/[0.04] hover:text-tk-ink"
                 >
                   Lewati
                 </button>
@@ -490,7 +490,7 @@ export function OnboardingFlow({
                     >
                       <span
                         className={`block h-[6px] rounded-full transition-all duration-300 ease-out ${
-                          i === index ? "w-[26px] bg-[#FF5A00]" : "w-[6px] light:bg-[#202020]/15 dark:bg-white/[0.14]"
+                          i === index ? "w-[26px] bg-tk-violet" : "w-[6px] light:bg-[#202020]/15 dark:bg-white/[0.14]"
                         }`}
                       />
                     </button>
@@ -507,7 +507,7 @@ export function OnboardingFlow({
                       transition={{ duration: 0.3, ease: EASE.out }}
                       onClick={() => go(index - 1)}
                       aria-label="Kembali"
-                      className="tap flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border light:border-[#202020]/12 light:bg-white/80 light:text-[#202020] dark:border-white/[0.1] dark:bg-white/[0.05] dark:text-[#F7F3EF]"
+                      className="tap flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border text-tk-ink light:border-[#202020]/12 light:bg-white/80 dark:border-white/[0.1] dark:bg-white/[0.05]"
                     >
                       <ChevronLeft size={19} />
                     </m.button>
@@ -517,7 +517,7 @@ export function OnboardingFlow({
                       as="button"
                       press={0.97}
                       onClick={() => onDone("/auth?mode=register")}
-                      className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-full bg-[#FF5A00] font-display text-[14.5px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(255,90,0,0.55)]"
+                      className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-full bg-tk-violet font-display text-[14.5px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(255,90,0,0.55)]"
                     >
                       Mulai Sekarang
                       <ArrowRight size={17} />
@@ -527,7 +527,7 @@ export function OnboardingFlow({
                       as="button"
                       press={0.97}
                       onClick={() => go(index + 1)}
-                      className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-full bg-[#FF5A00] font-display text-[14.5px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(255,90,0,0.55)]"
+                      className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-full bg-tk-violet font-display text-[14.5px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(255,90,0,0.55)]"
                     >
                       Lanjut
                       <ArrowRight size={17} />
@@ -538,9 +538,9 @@ export function OnboardingFlow({
                 {/* Navigasi desktop: Kembali + CTA + Masuk di kanan */}
                 <div className="hidden items-center gap-3 min-[900px]:flex">
                   {!last && (
-                    <p className="mr-2 text-[12.5px] light:text-[#77716D] dark:text-[#B5AAA3]">
+                    <p className="mr-2 text-[12.5px] text-tk-muted">
                       Sudah punya akun?{" "}
-                      <button type="button" onClick={() => onDone("/auth")} className="tap font-bold text-[#FF5A00]">
+                      <button type="button" onClick={() => onDone("/auth")} className="tap font-bold text-tk-violet">
                         Masuk
                       </button>
                     </p>
@@ -550,7 +550,7 @@ export function OnboardingFlow({
                       type="button"
                       onClick={() => go(index - 1)}
                       aria-label="Kembali"
-                      className="tap flex h-[48px] w-[48px] items-center justify-center rounded-full border light:border-[#202020]/12 light:bg-white/80 light:text-[#202020] dark:border-white/[0.1] dark:bg-white/[0.05] dark:text-[#F7F3EF]"
+                      className="tap flex h-[48px] w-[48px] items-center justify-center rounded-full border text-tk-ink light:border-[#202020]/12 light:bg-white/80 dark:border-white/[0.1] dark:bg-white/[0.05]"
                     >
                       <ChevronLeft size={18} />
                     </button>
@@ -559,7 +559,7 @@ export function OnboardingFlow({
                     as="button"
                     press={0.97}
                     onClick={() => (last ? onDone("/auth?mode=register") : go(index + 1))}
-                    className="flex h-[48px] w-[230px] items-center justify-center gap-2 rounded-full bg-[#FF5A00] font-display text-[14px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(255,90,0,0.55)]"
+                    className="flex h-[48px] w-[230px] items-center justify-center gap-2 rounded-full bg-tk-violet font-display text-[14px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(255,90,0,0.55)]"
                   >
                     {last ? "Mulai Sekarang" : "Lanjut"}
                     <ArrowRight size={16} />
@@ -574,10 +574,10 @@ export function OnboardingFlow({
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, ease: EASE.out }}
-                    className="text-[12px] light:text-[#77716D] dark:text-[#B5AAA3]"
+                    className="text-[12px] text-tk-muted"
                   >
                     Sudah punya akun?{" "}
-                    <button type="button" onClick={() => onDone("/auth")} className="tap font-bold text-[#FF5A00]">
+                    <button type="button" onClick={() => onDone("/auth")} className="tap font-bold text-tk-violet">
                       Masuk
                     </button>
                   </m.p>

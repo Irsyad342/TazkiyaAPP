@@ -83,7 +83,7 @@ import { convertImageToWebp, formatBytes } from "@/lib/tazkiya/image";
 import { recordedDateList, reviewActivityDays } from "@/lib/tazkiya/stats";
 import { formatGregorian, isFriday, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
 import { Chip, GroupList, GroupRow, SectionHeader } from "./ui-bits";
-import { CountUp, Reveal, RiseIn, TapIcon } from "./motion-bits";
+import { CountUp, DragCard, Reveal, RiseIn, TapIcon } from "./motion-bits";
 import { SPRING } from "@/lib/motion/system";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { SuioMark } from "./brand";
@@ -91,8 +91,8 @@ import { cn } from "@/lib/utils";
 
 const THEME_OPTIONS: { id: ThemeMode; label: string; hint: string; bg: string; dot: string }[] = [
   { id: "light", label: "Terang", hint: "Kanvas putih", bg: "linear-gradient(140deg,#ffffff,#ececef)", dot: "#FA5200" },
-  { id: "dark", label: "Gelap", hint: "Arang hangat", bg: "linear-gradient(140deg,#372e29,#1c1a1a)", dot: "#FF5A00" },
-  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#1c1a1a 50%,#F2F2F4 50%)", dot: "#FA5200" },
+  { id: "dark", label: "Gelap", hint: "Arang hangat", bg: "linear-gradient(140deg,#39312d,#171717)", dot: "#FF5A00" },
+  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#171717 50%,#F7F5F2 50%)", dot: "#FF5A00" },
 ];
 
 /** Jam perangkat HH:mm — aksen kanan-atas kepala profil. */
@@ -493,10 +493,10 @@ export function ProfilePage({
               <img
                 src={settings.avatarDataUrl}
                 alt={`Foto profil ${settings.name}`}
-                className="h-[84px] w-[84px] rounded-full object-cover ring-4 ring-tk-lavender"
+                className="h-[84px] w-[84px] rounded-full object-cover ring-4 ring-tk-lavender ring-offset-2 ring-offset-tk-stage"
               />
             ) : (
-              <div className="flex h-[84px] w-[84px] items-center justify-center rounded-full bg-tk-lavender text-[30px] font-bold text-tk-violet ring-4 ring-tk-lavender">
+              <div className="flex h-[84px] w-[84px] items-center justify-center rounded-full bg-tk-lavender text-[30px] font-bold text-tk-violet ring-4 ring-tk-lavender ring-offset-2 ring-offset-tk-stage">
                 {settings.name.trim().charAt(0).toUpperCase() || "T"}
               </div>
             )}
@@ -543,7 +543,7 @@ export function ProfilePage({
               </div>
             ) : (
               <div className="flex items-center gap-1.5">
-                <p className="truncate text-[24px] font-extrabold tracking-[-0.025em] text-tk-ink">{settings.name}</p>
+                <p className="truncate font-display text-[26px] font-extrabold leading-tight tracking-[-0.03em] text-tk-ink">{settings.name}</p>
                 <BadgeCheck size={17} className="shrink-0 text-tk-violet" aria-label="Anggota SUIO" />
                 <button
                   type="button"
@@ -561,7 +561,7 @@ export function ProfilePage({
             <p className="mt-0.5 truncate text-[12.5px] text-tk-muted">
               {authStatus === "signedIn" && authUser ? authUser.email : "Belum masuk akun · data di perangkat"}
             </p>
-            <p className="mt-1 text-[11.5px] font-medium text-tk-violet">
+            <p className="mt-1.5 text-[11.5px] font-semibold text-tk-violet dark:text-tk-accent">
               {memberSince ? `Aktif sejak ${shortDate(memberSince)}` : "Mulai perjalananmu hari ini"}
             </p>
           </div>
@@ -600,7 +600,11 @@ export function ProfilePage({
       <section aria-label="Ringkasan pencapaian" className="animate-tk-fade-up">
         <SectionHeader title="Ringkasan Pencapaian" caption="Langkah kecil untuk menjaga istiqamah setiap hari." />
         <Reveal y={18}>
-        <div className="glass rounded-[1.5rem] p-5">
+        {/* Kartu ringkasan stat bisa DISENTAK horizontal lalu kembali spring
+            (DragCard, sumbu-X + pan-y). Tombol "Lanjutkan Tracker" di dalamnya
+            tidak diubah. */}
+        <DragCard className="rounded-[1.5rem]">
+        <div className="glass su-card-shadow rounded-[1.5rem] p-5">
           <p className="text-[13.5px] font-bold text-tk-ink">Progres Sholat Hari Ini</p>
           <p className="mt-0.5 text-[11.5px] leading-snug text-tk-muted">
             {focusRecorded === 0
@@ -694,13 +698,14 @@ export function ProfilePage({
             <ChevronRight size={15} aria-hidden />
           </button>
         </div>
+        </DragCard>
         </Reveal>
       </section>
 
       {/* ---------- Grouped list: Akun ---------- */}
       <section aria-label="Akun" className="animate-tk-fade-up">
         <SectionHeader title="Akun" caption="Sinkronkan data ibadah di semua perangkat" />
-        <GroupList ariaLabel="Pengaturan akun">
+        <GroupList ariaLabel="Pengaturan akun" className="su-card-shadow">
           {authStatus === "loading" ? (
             <div className="flex items-center gap-3 px-4 py-4" aria-busy="true">
               <LoaderCircle size={18} className="animate-spin text-tk-muted" />
@@ -821,7 +826,7 @@ export function ProfilePage({
       {/* ---------- Grouped list: Ibadah & Target ---------- */}
       <section aria-label="Ibadah dan target" className="animate-tk-fade-up">
         <SectionHeader title="Ibadah & Target" />
-        <GroupList ariaLabel="Pengaturan ibadah">
+        <GroupList ariaLabel="Pengaturan ibadah" className="su-card-shadow">
           <GroupRow
             icon={Target}
             title="Target Ibadah"
@@ -1208,7 +1213,7 @@ export function ProfilePage({
       {/* ---------- Grouped list: Preferensi ---------- */}
       <section id="tazkiya-preferensi" aria-label="Preferensi aplikasi" className="animate-tk-fade-up">
         <SectionHeader title="Preferensi" caption="Sesuaikan tampilan dan interaksi" />
-        <GroupList ariaLabel="Preferensi tampilan">
+        <GroupList ariaLabel="Preferensi tampilan" className="su-card-shadow">
           {/* Tema, pilihan inline dalam satu baris */}
           <RiseIn y={14} className="px-4 py-4">
             <div className="flex items-center gap-3.5">
@@ -1260,7 +1265,7 @@ export function ProfilePage({
           </RiseIn>
         </GroupList>
 
-        <GroupList className="mt-3" ariaLabel="Saklar preferensi">
+        <GroupList className="mt-3 su-card-shadow" ariaLabel="Saklar preferensi">
           {[
             {
               icon: Sparkles,
@@ -1310,7 +1315,7 @@ export function ProfilePage({
       {/* ---------- Tentang ---------- */}
       <section aria-label="Tentang aplikasi" className="animate-tk-fade-up pb-2">
         <SectionHeader title="Tentang" />
-        <GroupList ariaLabel="Tentang aplikasi">
+        <GroupList ariaLabel="Tentang aplikasi" className="su-card-shadow">
           <div className="px-4 py-4">
             <div className="flex items-center gap-3.5">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center"><SuioMark size={40} /></span>

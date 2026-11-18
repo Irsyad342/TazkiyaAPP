@@ -88,7 +88,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
         <div className="space-y-6 lg:col-span-7">
           {/* ---------- Hero tracker: blok statistik angka besar ---------- */}
           <Reveal><section aria-label="Ringkasan kebaikan">
-            <div className="glass rounded-[1.75rem] p-5">
+            <div className="glass su-card-shadow rounded-[1.5rem] p-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <p className="gs-overline">Kebaikan hari ini</p>
@@ -139,7 +139,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
                 </button>
               }
             />
-            <GlassCard className="p-4">
+            <GlassCard className="su-card-shadow p-4">
               <div className="flex flex-wrap gap-1.5">
                 {amalGoals.map((g) => (
                   <button
@@ -211,7 +211,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
           {/* ---------- Catat amal ---------- */}
           <Reveal><section aria-label="Catat amal kebaikan">
             <SectionHeader title="Catat Amal Hari Ini" caption="Sedekah, bantuan, silaturahmi, semua sama berharganya" />
-            <GlassCard className="space-y-3 p-4 sm:p-5">
+            <GlassCard className="su-card-shadow space-y-3 p-4 sm:p-5">
               <div>
                 <p className="gs-overline mb-1.5 block">Jenis kebaikan</p>
                 <div className="flex flex-wrap gap-1.5">
@@ -317,7 +317,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
           {amalEntries.length === 0 ? (
             <EmptyState icon={<HandCoins size={18} />} title="Riwayat masih kosong" caption="Catatan amal akan muncul di sini." />
           ) : (
-            <GlassCard className="thin-scrollbar max-h-[36rem] overflow-y-auto">
+            <GlassCard className="su-card-shadow thin-scrollbar max-h-[36rem] overflow-y-auto">
               <ul className="divide-y divide-tk-line-soft">
                 {amalEntries.slice(0, 30).map((e) => {
                   const Icon = AMAL_ICONS[e.kind] ?? Sparkles;

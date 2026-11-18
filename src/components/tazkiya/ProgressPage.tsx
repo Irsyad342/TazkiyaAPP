@@ -54,7 +54,7 @@ import { buildWeeklyReport, lastCompletedWeekStart, weekHasAnyRecord } from "@/l
 import { WeeklyReflectionCard, WeeklyReflectionSheet } from "./WeeklyReflection";
 import { Chip, GlassCard, ProgressBar, ProgressRing, SectionHeader, SegmentedTabs } from "./ui-bits";
 import { DayDetailSheet } from "./DayDetailSheet";
-import { RiseIn } from "./motion-bits";
+import { DragCard, RiseIn } from "./motion-bits";
 import { cn } from "@/lib/utils";
 
 type Period = "harian" | "mingguan" | "bulanan";
@@ -317,14 +317,22 @@ export function ProgressPage({ deferredForReminder = false }: { deferredForRemin
 
   return (
     <div className="space-y-5">
-      {/* ---------- Judul ---------- */}
-      <header className="animate-tk-fade-up pt-1">
-        <h1 className="text-[28px] font-extrabold tracking-[-0.03em] text-tk-ink">Progress</h1>
-        <p className="mt-1 text-[12.5px] text-tk-muted">Perjalanan ibadahmu, satu langkah kecil setiap hari</p>
-      </header>
+      {/* ---------- Judul: hierarki seragam dengan halaman lain (judul + subjudul,
+          entrance lewat gerbang useAnim seperti QuranPage) ---------- */}
+      <RiseIn i={0} y={14} className="pt-1">
+        <header>
+          <h1 className="text-[28px] font-extrabold leading-tight tracking-[-0.03em] text-tk-ink">Progress</h1>
+          <p className="mt-1 text-[12.5px] text-tk-muted">Perjalanan ibadahmu, satu langkah kecil setiap hari</p>
+        </header>
+      </RiseIn>
 
       {/* ================= KARTU WEEKLY REFLECTION ================= */}
-      <WeeklyReflectionCard onOpen={() => setReflectionWeek(mondayOf(today))} />
+      {/* Kartu ringkasan bisa DISENTAK horizontal: DragCard mengunci sumbu-X
+          (touchAction pan-y, scroll vertikal aman) lalu kembali dengan spring.
+          Tombol/aksi di dalam kartu tidak berubah. */}
+      <DragCard>
+        <WeeklyReflectionCard onOpen={() => setReflectionWeek(mondayOf(today))} />
+      </DragCard>
 
       {/* Tab garis periode (indikator menggeser) */}
       <SegmentedTabs
@@ -341,8 +349,8 @@ export function ProgressPage({ deferredForReminder = false }: { deferredForRemin
       {/* ================= HARI INI ================= */}
       {period === "harian" ? (
         <div key="harian" className="tk-stagger space-y-4">
-          {/* Kartu utama: cincin + tiga statistik bersekat */}
-          <GlassCard className="p-5">
+          {/* Kartu utama: cincin + tiga statistik bersekat (elevasi 3.0) */}
+          <GlassCard className="su-card-shadow p-5">
             <div className="flex items-center gap-5">
               <ProgressRing value={barsIn ? todayPct : 0} size={116} stroke={10} className="shrink-0">
                 <span className="tnum gs-display text-[27px] font-bold leading-none text-tk-ink">{todayPct}%</span>
@@ -545,7 +553,7 @@ export function ProgressPage({ deferredForReminder = false }: { deferredForRemin
                 </div>
               }
             />
-            <GlassCard className="p-4">
+            <GlassCard className="su-card-shadow p-4">
               <div className="grid grid-cols-7 gap-1.5">
                 {weekDays.map((d) => {
                   const dotCls = !d.hasData
@@ -658,7 +666,7 @@ export function ProgressPage({ deferredForReminder = false }: { deferredForRemin
                 </div>
               }
             />
-            <GlassCard className="p-4">
+            <GlassCard className="su-card-shadow p-4">
               {/* Heatmap pil: skala orange + cincin hari ini */}
               <div className="grid grid-cols-7 gap-x-1 gap-y-2 text-center">
                 {DAY_LABELS.map((d) => (

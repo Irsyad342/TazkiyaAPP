@@ -50,7 +50,7 @@ import { JelajahiAktivitas } from "./JelajahiAktivitas";
 import { DayDetailSheet } from "./DayDetailSheet";
 import { OrnamentDivider } from "./ornaments";
 import type { SubPageId, TabId } from "./BottomNav";
-import { RiseIn, TiltCard } from "./motion-bits";
+import { DragCard, RiseIn, TiltCard } from "./motion-bits";
 import { cn } from "@/lib/utils";
 
 const PRAYER_ORDER: { id: PrayerId; label: string }[] = [
@@ -599,7 +599,7 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
       as="button"
       onClick={() => onNavigate("sholat")}
       ariaLabel="Salat lima waktu, buka halaman Sholat"
-      className="tap tk-card-white rounded-[1.4rem] p-4"
+      className="tap tk-card-white su-card-shadow rounded-[1.4rem] p-4"
       maxTilt={3.5}
     >
       <p className="text-[13.5px] font-bold tracking-[-0.01em] text-[#17171B]">Salat Lima Waktu</p>
@@ -674,7 +674,7 @@ function RingCard({ today, onNavigate }: { today: string; onNavigate: (tab: TabI
       as="button"
       onClick={() => onNavigate("progress")}
       ariaLabel={`Target harian ${done} dari ${statuses.length} selesai, buka analitik`}
-      className="tap glass rounded-[1.4rem] p-4"
+      className="tap glass su-card-shadow rounded-[1.4rem] p-4"
       maxTilt={3.5}
     >
       <div className="flex items-center gap-3.5">
@@ -1119,10 +1119,10 @@ export function HomePage({
             )}
           </button>
           <div className="min-w-0 text-center">
-            <p className="truncate text-[12px] font-medium text-tk-muted">
+            <p className="gs-overline truncate">
               Assalamu&apos;alaikum, {greeting.toLowerCase()}
             </p>
-            <h1 className="truncate text-[19px] font-bold leading-tight tracking-[-0.02em] text-tk-ink">
+            <h1 className="mt-1.5 truncate text-[21px] font-bold leading-tight tracking-[-0.02em] text-tk-ink">
               {settings.name || "Sahabat SUIO"}
             </h1>
           </div>
@@ -1135,7 +1135,7 @@ export function HomePage({
             <Bell size={19} strokeWidth={1.9} className="animate-tk-bell-swing" />
           </button>
         </div>
-        <p className="mt-2.5 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 text-[11px] font-medium text-tk-muted">
+        <p className="mt-2.5 flex items-center justify-center gap-x-1.5 whitespace-nowrap text-[11px] font-medium text-tk-muted">
           <span>{formatGregorian(now)}</span>
           {hijri ? (
             <>
@@ -1152,7 +1152,7 @@ export function HomePage({
           type="button"
           aria-label="Buka pencarian"
           onClick={() => setSearchOpen(true)}
-          className="tap flex w-full items-center gap-3 rounded-full bg-tk-panel-strong px-4.5 py-3.5 text-left"
+          className="tap flex w-full items-center gap-3 rounded-full border border-tk-line-soft bg-tk-panel-strong px-4.5 py-3.5 text-left"
         >
           <Search size={17} className="shrink-0 text-tk-muted" />
           <span className="text-[13.5px] text-tk-deep">Cari surah, aktivitas, catatan…</span>
@@ -1182,7 +1182,13 @@ export function HomePage({
           <SalatCheckCard today={today} onNavigate={onNavigate} />
           <RingCard today={today} onNavigate={onNavigate} />
         </div>
-        <KebaikanCard today={today} onNavigate={onNavigate} onOpenSubpage={onOpenSubpage} />
+        {/* Kartu promo ORANGE dibungkus DragCard: bisa disentak horizontal dan
+            kembali dengan spring. Wrapper di luar section — seluruh tombol di
+            dalamnya tetap berfungsi; radius mengikuti kartu agar bayangan
+            terangkat data-lifted tidak kotak. */}
+        <DragCard className="rounded-[1.4rem]">
+          <KebaikanCard today={today} onNavigate={onNavigate} onOpenSubpage={onOpenSubpage} />
+        </DragCard>
       </RiseIn>
 
       {/* ---------- E. Tugas Hari Ini ---------- */}

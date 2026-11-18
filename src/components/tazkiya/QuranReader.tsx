@@ -502,7 +502,7 @@ export function QuranReader({
             aria-label="Simpan penanda posisi ini"
             whileTap={anim ? { scale: 0.9 } : undefined}
             transition={SPRING.snappy}
-            className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-violet transition-colors hover:border-tk-violet/50 dark:text-tk-accent"
+            className="tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-tk-line bg-tk-panel text-tk-violet transition-colors hover:border-tk-violet/40 dark:text-tk-accent"
           >
             <BookmarkIcon size={17} />
           </m.button>
@@ -515,7 +515,7 @@ export function QuranReader({
             transition={SPRING.snappy}
             className={cn(
               "tap flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors",
-              settingsOpen ? "border-tk-violet/60 bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent" : "border-tk-line bg-tk-panel text-tk-ink"
+              settingsOpen ? "border-tk-violet/60 bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent" : "border-tk-line bg-tk-panel text-tk-ink hover:border-tk-violet/40"
             )}
           >
             <Settings2 size={17} />
