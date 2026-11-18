@@ -28,11 +28,15 @@ export function MoodFace({
   id,
   className,
   fx = "none",
+  idle = false,
 }: {
   id: MoodId;
   className?: string;
   /** Animasi ambient opsional: "breathe" | "float" | "none" (default). */
   fx?: "breathe" | "float" | "none";
+  /** Karakter idle khas per mood (jump/float/sway/droop/shiver/wobble) —
+      hanya saat fx "none"; gerakan transform kecil yang tetap di dalam tile. */
+  idle?: boolean;
 }) {
   return (
     <span
@@ -41,6 +45,7 @@ export function MoodFace({
         "relative inline-block select-none",
         fx === "breathe" && "su-breathe",
         fx === "float" && "su-float",
+        fx === "none" && idle && `su-mood-idle-${id}`,
         className
       )}
     >

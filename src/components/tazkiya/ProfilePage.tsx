@@ -54,6 +54,7 @@ import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { requestNotifyPermission, notifyPermission } from "@/lib/tazkiya/reminder-trigger";
 import { DEFAULT_FRIDAY_SETTINGS, type FridaySettings } from "@/lib/tazkiya/types";
+import type { CSSProperties } from "react";
 import type { GlassLevel } from "@/lib/tazkiya/types";
 import {
   AlertDialog,
@@ -85,7 +86,7 @@ import { convertImageToWebp, formatBytes } from "@/lib/tazkiya/image";
 import { recordedDateList, reviewActivityDays } from "@/lib/tazkiya/stats";
 import { formatGregorian, isFriday, relativeDayLabel, todayKey } from "@/lib/tazkiya/dates";
 import { Chip, GroupList, GroupRow, SectionHeader } from "./ui-bits";
-import { CountUp, DragCard, Reveal, RiseIn, TapIcon } from "./motion-bits";
+import { CountUp, DragCard, Reveal, RiseIn, TapIcon, useAnim } from "./motion-bits";
 import { SPRING } from "@/lib/motion/system";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { SuioMark } from "./brand";
@@ -96,6 +97,48 @@ const GLASS_LEVELS: { id: GlassLevel; label: string; desc: string }[] = [
   { id: "subtle", label: "Subtle", desc: "Blur halus, permukaan nyaris solid" },
   { id: "balanced", label: "Balanced", desc: "Keseimbangan blur, highlight, dan depth" },
   { id: "strong", label: "Strong", desc: "Blur dalam, highlight kuat, depth paling terasa" },
+];
+
+/* Nilai CSS variable material per preset — kartu PRATINJAU memakai material
+   .glass yang sama sehingga perbedaan terlihat nyata sebelum memilih.
+   Harus sinkron dengan blok html[data-glass-level] di globals.css. */
+const GLASS_PREVIEW: Record<string, string>[] = [
+  {
+    "--su-blur": "5px",
+    "--su-a": "0.88",
+    "--su-a2": "0.83",
+    "--su-border": "rgba(255, 255, 255, 0.45)",
+    "--su-spec": "0.08",
+    "--su-inner": "0.92",
+    "--su-ad": "0.97",
+    "--su-border-d": "rgba(255, 143, 92, 0.07)",
+    "--su-inner-d": "0.1",
+    "--su-glow": "0.03",
+  },
+  {
+    "--su-blur": "16px",
+    "--su-a": "0.62",
+    "--su-a2": "0.5",
+    "--su-border": "rgba(255, 255, 255, 0.6)",
+    "--su-spec": "0.26",
+    "--su-inner": "0.75",
+    "--su-ad": "0.86",
+    "--su-border-d": "rgba(255, 143, 92, 0.16)",
+    "--su-inner-d": "0.14",
+    "--su-glow": "0.1",
+  },
+  {
+    "--su-blur": "30px",
+    "--su-a": "0.32",
+    "--su-a2": "0.2",
+    "--su-border": "rgba(255, 255, 255, 0.85)",
+    "--su-spec": "0.5",
+    "--su-inner": "0.5",
+    "--su-ad": "0.52",
+    "--su-border-d": "rgba(255, 143, 92, 0.34)",
+    "--su-inner-d": "0.26",
+    "--su-glow": "0.3",
+  },
 ];
 
 const THEME_OPTIONS: { id: ThemeMode; label: string; hint: string; bg: string; dot: string }[] = [
@@ -285,6 +328,99 @@ function FridaySettingsPanel() {
 }
 
 type Panel = "riwayat" | "pengingat" | "jumat" | "lokasi" | null;
+
+/* Pikcer intensitas glass: TIGA posisi tetap. Ketuk = langsung pilih;
+   geser (pointer) = indikator mengikuti segmen terdekat, saat dilepas
+   di-SNAP ke posisi — tidak pernah berhenti di antara dua pilihan. */
+function GlassLevelPicker({
+  value,
+  disabled,
+  onChange,
+}: {
+  value: GlassLevel;
+  disabled?: boolean;
+  onChange: (lv: GlassLevel) => void;
+}) {
+  const motionOK = useAnim();
+  /* Index yang sedang "ditunjuk" saat drag (0..2) — null = tidak drag. */
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  const idxFromValue = GLASS_LEVELS.findIndex((l) => l.id === value);
+  const shownIdx = dragIdx ?? idxFromValue;
+
+  const idxFromClientX = (clientX: number): number => {
+    const el = rootRef.current;
+    if (!el) return idxFromValue;
+    const r = el.getBoundingClientRect();
+    const col = (r.width - 12) / 3; /* padding p-1.5 = 6px tiap sisi */
+    return Math.min(2, Math.max(0, Math.floor((clientX - r.left - 6) / col)));
+  };
+
+  return (
+    <div
+      ref={rootRef}
+      role="radiogroup"
+      aria-label="Intensitas Liquid Glass"
+      className={cn(
+        "mt-2.5 grid grid-cols-3 gap-1.5 rounded-full bg-tk-panel-soft p-1.5 transition-opacity",
+        disabled && "pointer-events-none opacity-40"
+      )}
+      style={{ touchAction: "pan-y" }}
+      onPointerDown={(e) => {
+        if (disabled) return;
+        /* Capture menjamin pointermove tetap dilacak walau jari keluar dari
+           kontrol; beberapa lingkungan menolak capture — jangan sampai
+           kegagalan itu mematikan drag. */
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          /* abaikan — drag tetap bekerja selama pointer di atas kontrol */
+        }
+        setDragIdx(idxFromClientX(e.clientX));
+      }}
+      onPointerMove={(e) => {
+        if (disabled || dragIdx === null) return;
+        setDragIdx(idxFromClientX(e.clientX));
+      }}
+      onPointerUp={(e) => {
+        if (disabled || dragIdx === null) return;
+        const idx = idxFromClientX(e.clientX);
+        setDragIdx(null);
+        const lv = GLASS_LEVELS[idx]?.id;
+        if (lv) onChange(lv);
+      }}
+      onPointerCancel={() => setDragIdx(null)}
+    >
+      {GLASS_LEVELS.map((l, i) => {
+        const active = shownIdx === i;
+        return (
+          <button
+            key={l.id}
+            type="button"
+            role="radio"
+            aria-checked={value === l.id}
+            onClick={() => !disabled && onChange(l.id)}
+            className="tap relative flex h-9 items-center justify-center rounded-full text-[11.5px] font-bold"
+          >
+            {active ? (
+              motionOK ? (
+                <m.span
+                  layoutId="su-glass-pill"
+                  className="absolute inset-0 rounded-full gs-ink-btn shadow-[0_4px_12px_-4px_rgba(255,90,0,0.5)]"
+                  transition={{ type: "spring", stiffness: 520, damping: 38 }}
+                />
+              ) : (
+                <span className="absolute inset-0 rounded-full gs-ink-btn shadow-[0_4px_12px_-4px_rgba(255,90,0,0.5)]" />
+              )
+            ) : null}
+            <span className={cn("relative z-10", active ? "text-tk-panel" : "text-tk-muted")}>{l.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 export function ProfilePage({
   onOpenTargets,
@@ -1291,40 +1427,37 @@ export function ProfilePage({
             <Gauge size={18} strokeWidth={1.8} className="mt-0.5 shrink-0 text-tk-muted" />
             <div className="min-w-0 flex-1">
               <p className="text-[14px] font-medium text-tk-ink">Intensitas Glass</p>
-              {/* Segmented control TIGA preset — tidak ada nilai di antaranya:
-                  ketuk langsung berpindah preset, berlaku real-time global. */}
-              <div
-                role="radiogroup"
-                aria-label="Intensitas Liquid Glass"
-                className={cn(
-                  "mt-2.5 grid grid-cols-3 gap-1.5 rounded-full bg-tk-panel-soft p-1.5 transition-opacity",
-                  !settings.glassEffects && "pointer-events-none opacity-40"
-                )}
-              >
-                {GLASS_LEVELS.map((l) => {
-                  const active = settings.glassLevel === l.id;
-                  return (
-                    <button
-                      key={l.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={active}
-                      onClick={() => updateSettings({ glassLevel: l.id })}
-                      className={cn(
-                        "tap flex h-9 items-center justify-center rounded-full text-[11.5px] font-bold transition-colors",
-                        active
-                          ? "gs-ink-btn shadow-[0_4px_12px_-4px_rgba(255,90,0,0.5)]"
-                          : "text-tk-muted hover:text-tk-ink"
-                      )}
-                    >
-                      {l.label}
-                    </button>
-                  );
-                })}
-              </div>
+              {/* Segmented control TIGA preset dengan SNAP: ketuk langsung
+                  berpindah; geser pun di-snap ke salah satu dari TIGA posisi
+                  (tidak pernah berhenti di antara). Indikator pil meluncur
+                  dengan spring. Berlaku real-time global. */}
+              <GlassLevelPicker
+                value={settings.glassLevel}
+                disabled={!settings.glassEffects}
+                onChange={(lv) => updateSettings({ glassLevel: lv })}
+              />
               <p className="mt-2 text-[10px] leading-relaxed text-tk-muted/80">
                 {GLASS_LEVELS.find((l) => l.id === settings.glassLevel)?.desc} — langsung berlaku di semua halaman.
               </p>
+              {/* Pratinjau material: kartu .glass sungguhan dengan variabel
+                  preset masing-masing — perbedaan Subtle/Balanced/Strong
+                  terlihat sebelum dipilih. Dekoratif (aria-hidden). */}
+              <div aria-hidden className="mt-3 grid grid-cols-3 gap-1.5">
+                {GLASS_LEVELS.map((l, i) => (
+                  <span
+                    key={l.id}
+                    className="glass relative flex h-14 flex-col justify-center gap-1 overflow-hidden rounded-[0.8rem] px-2"
+                    style={GLASS_PREVIEW[i] as CSSProperties}
+                  >
+                    <span className="h-1.5 w-8 rounded-full bg-tk-ink/60" />
+                    <span className="h-1.5 w-12 rounded-full bg-tk-ink/30" />
+                    <span className="h-1.5 w-6 rounded-full bg-tk-ink/20" />
+                    <span className="absolute right-1.5 bottom-1 text-[8px] font-bold uppercase tracking-wide text-tk-muted">
+                      {l.label}
+                    </span>
+                  </span>
+                ))}
+              </div>
             </div>
           </RiseIn>
         </GroupList>

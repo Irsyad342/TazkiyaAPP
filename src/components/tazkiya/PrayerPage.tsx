@@ -14,7 +14,7 @@
  * (formulir + CTA orange) dipertahankan dengan logika utuh.
  */
 
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
   AnimatePresence,
   m,
@@ -32,6 +32,7 @@ import {
   CloudSun,
   HandCoins,
   Info,
+  Layers,
   Moon,
   MoonStar,
   Plus,
@@ -251,16 +252,16 @@ function TodayTab({
 
   const [y, m, d] = today.split("-").map((v) => parseInt(v, 10));
   const dateLabel = new Date(y, (m ?? 1) - 1, d ?? 1).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+  const dayName = new Date(y, (m ?? 1) - 1, d ?? 1).toLocaleDateString("id-ID", { weekday: "long" });
   const hijriLabel = formatHijri(new Date());
 
   return (
     <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
       <div className="space-y-7 lg:col-span-7">
-        {/* Header premium: satu kartu glass — hierarki tanggal di kiri
-            (overline "Hari Ini", tanggal besar, baris hijriah), dua chip
-            statistik vertikal di kanan mengikuti bahasa visual kartu salat,
-            progress bar token di dasar kartu. Kartu jadwal di bawah tidak
-            tersentuh. */}
+        {/* Header premium: satu kartu glass — hierarki jelas: kiri chip aksen
+            hari + tanggal besar dengan satu garis aksen tipis, kanan dua chip
+            statistik (existing), bawah baris hijriah kecil + progress bar
+            token full width. Kartu jadwal di bawah tidak tersentuh. */}
         <header className="animate-tk-fade-up">
           <section
             aria-label="Ringkasan tanggal dan progres salat hari ini"
@@ -271,16 +272,14 @@ function TodayTab({
               aria-hidden
               className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-tk-accent/10 blur-2xl"
             />
-            <div className="relative flex items-center justify-between gap-3">
+            <div className="relative flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="gs-overline">Hari Ini</p>
-                <h2 className="mt-1.5 text-[24px] font-bold leading-tight tracking-[-0.02em] text-tk-ink">{dateLabel}</h2>
-                {hijriLabel ? (
-                  <p className="mt-1.5 flex min-w-0 items-center gap-1.5 text-[12px] text-tk-muted">
-                    <MoonStar size={12.5} className="shrink-0 text-tk-accent" aria-hidden />
-                    <span className="truncate">{hijriLabel}</span>
-                  </p>
-                ) : null}
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-tk-accent/12 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-tk-accent">
+                  <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-tk-accent" />
+                  Hari ini · {dayName}
+                </span>
+                <h2 className="mt-2 text-[24px] font-bold leading-tight tracking-[-0.02em] text-tk-ink">{dateLabel}</h2>
+                <span aria-hidden className="mt-1.5 block h-1 w-7 rounded-full bg-tk-accent/70" />
               </div>
               <div className="flex shrink-0 items-stretch gap-2" role="group" aria-label="Ringkasan salat hari ini">
                 <div className="flex flex-col items-center rounded-[0.9rem] bg-tk-lavender px-3 py-2">
@@ -293,6 +292,13 @@ function TodayTab({
                 </div>
               </div>
             </div>
+            {/* Baris hijriah kecil — baris kedua di bawah blok tanggal */}
+            {hijriLabel ? (
+              <p className="relative mt-3 flex min-w-0 items-center gap-1.5 text-[12px] text-tk-muted">
+                <MoonStar size={12.5} className="shrink-0 text-tk-accent" aria-hidden />
+                <span className="truncate">{hijriLabel}</span>
+              </p>
+            ) : null}
             {/* Progres pencatatan salat hari ini — bar token di dalam kartu */}
             <div
               className="relative mt-4 h-2 w-full rounded-full bg-tk-line-soft"
@@ -416,6 +422,10 @@ function SunnahToggle({
  * "Berikutnya" dan "Waktu Selesai" adalah penanda WAKTU — status pelaksanaan
  * tetap sepenuhnya mengikuti catatan pengguna (tidak pernah dianggap otomatis).
  * Seluruh kartu bisa diketuk dan membuka dialog pencatatan yang sama.
+ * DECK DOMPET (hanya motionOK): kelima tiket mulai TERTUMPUK ala dompet —
+ * kartu belakang hanya mengintip ~14px di atas — tombol "Buka Tumpukan"
+ * meluncurkan kartu berurutan (spring + stagger) ke susunan vertikal rapi,
+ * "Tutup" mengembalikan PERSIS ke tumpukan. Tanpa motion → alur statis lama.
  */
 
 function formatDurCompact(min: number): string {
@@ -564,6 +574,22 @@ function PrayerTickets({
   const reduceMotion = useReducedMotion();
   const motionOK = animationsOn && !reduceMotion;
 
+  /* ---- Deck dompet (wallet-style) ----
+     deckOpen default FALSE → halaman dibuka dalam keadaan TERTUMPUK. Tinggi
+     tiap tiket diukur lewat refs karena berubah saat countdown/note/panel
+     persiapan muncul-hilang; hasil ukuran disimpan di state heights. */
+  const [deckOpen, setDeckOpen] = useState(false);
+  const [heights, setHeights] = useState<number[]>([]);
+  const slotRefs = useRef<Array<HTMLLIElement | null>>([]);
+
+  useLayoutEffect(() => {
+    const hs: number[] = [];
+    for (let i = 0; i < prayers.length; i++) {
+      hs.push(slotRefs.current[i]?.offsetHeight ?? 0);
+    }
+    setHeights(hs);
+  }, [prayers, now, motionOK, deckOpen, fridayOpenSignal]);
+
   /** Slot pertama yang belum masuk waktunya — penerima penanda "Berikutnya". */
   const nowTotal = nowTotalMinutes(now);
   const nextIdx = (() => {
@@ -589,166 +615,303 @@ function PrayerTickets({
     return idx;
   })();
 
+  /* ---- Geometri deck ----
+     PEEK: jarak intip antar kartu saat tertutup; GAP: jarak antar kartu saat
+     terbuka. Asal koordinat digeser turun (topPad) supaya intipan kartu
+     belakang tetap DI DALAM container — tidak meluber ke baris kendali atas. */
+  const PEEK = 14;
+  const GAP = 10;
+  const STAGGER = 0.045;
+
+  /** Slot yang benar-benar dirender (memiliki jendela waktu). */
+  const renderedIdx = prayers.map((p, i) => (windows[p.id] ? i : -1)).filter((i) => i >= 0);
+
+  /** Deck aktif hanya bila motionOK dan SEMUA tinggi tiket sudah terukur;
+      selama belum terukur render alur statis biasa (container jangan 0px). */
+  const deck = motionOK && renderedIdx.length > 0 && renderedIdx.every((i) => (heights[i] ?? 0) > 0);
+
+  const nSlots = renderedIdx.length;
+  const topPad = Math.max(0, (nSlots - 1) * PEEK);
+  const stackH = topPad + Math.max(...renderedIdx.map((i) => heights[i] ?? 0), 0);
+  const openH =
+    renderedIdx.reduce((acc, i) => acc + (heights[i] ?? 0), 0) + Math.max(0, nSlots - 1) * GAP;
+
+  /** Kartu depan saat tertutup: tiket berfase aktif, fallback "Berikutnya",
+      fallback slot pertama. */
+  const frontIdx = (() => {
+    for (const i of renderedIdx) {
+      const w = windows[prayers[i].id];
+      if (!w) continue;
+      const [fh, fm] = w.start.split(":").map((v) => parseInt(v, 10) || 0);
+      if (!w.end) {
+        if (nowTotal >= fh * 60 + fm && i === lastStarted) return i;
+      } else if (windowClock(w, now).phase === "active") {
+        return i;
+      }
+    }
+    return nextIdx >= 0 ? nextIdx : 0;
+  })();
+
+  /** Peringkat tumpukan tertutup: [depan, ...sisanya urutan kronologis]. */
+  const stackRank = new Map<number, number>();
+  let rankCursor = 0;
+  if (renderedIdx.includes(frontIdx)) stackRank.set(frontIdx, rankCursor++);
+  for (const i of renderedIdx) {
+    if (!stackRank.has(i)) stackRank.set(i, rankCursor++);
+  }
+
+  /** Posisi y saat TERBUKA: urutan kronologis, jumlah tinggi tiket di atasnya + gap. */
+  const openY = new Map<number, number>();
+  let accH = 0;
+  renderedIdx.forEach((i, j) => {
+    openY.set(i, accH + j * GAP);
+    accH += heights[i] ?? 0;
+  });
+
+  /** Bungkus isi satu tiket. Mode deck: m.li absolute (left/right/top 0)
+      dengan animate y — kartu belakang tetap di DOM (tanpa aria-hidden /
+      pointer-events-none) supaya TiltWrap & klik tetap berfungsi. Mode statis:
+      li persis seperti sebelumnya. Ref terpasang di kedua mode untuk ukur
+      tinggi ulang. */
+  const wrapSlot = (p: PrayerMeta, i: number, isActive: boolean, inner: ReactNode): ReactNode => {
+    if (deck) {
+      const r = stackRank.get(i) ?? 0;
+      const chronoJ = renderedIdx.indexOf(i);
+      const yDeck = deckOpen ? (openY.get(i) ?? 0) : topPad - r * PEEK;
+      return (
+        <m.li
+          key={p.id}
+          ref={(el) => {
+            slotRefs.current[i] = el;
+          }}
+          className="tk-tkt-slot"
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: 0,
+            margin: 0,
+            animation: "none",
+            zIndex: deckOpen ? 10 - chronoJ : 50 - r,
+            willChange: "transform",
+          }}
+          initial={false}
+          animate={{ y: yDeck }}
+          transition={{
+            type: "spring",
+            stiffness: 460,
+            damping: 34,
+            delay: (deckOpen ? chronoJ : r) * STAGGER,
+          }}
+        >
+          {inner}
+        </m.li>
+      );
+    }
+    return (
+      <li
+        key={p.id}
+        ref={(el) => {
+          slotRefs.current[i] = el;
+        }}
+        className="tk-tkt-slot"
+        style={{ zIndex: isActive ? 30 : 20 - i, "--i": i } as CSSProperties}
+      >
+        {inner}
+      </li>
+    );
+  };
+
+  const items = prayers.map((p, i) => {
+    const w = windows[p.id];
+    if (!w) return null;
+    const time = w.start;
+    const detail = detailOf(p.id);
+    const isDone = detail.status === "done";
+    const isMissed = detail.status === "missed";
+    const timing = prayerTiming(detail, time, today);
+    const clock = windowClock(w, now);
+    /** Fase final: jendela tanpa batas akhir mengikuti urutan slot — aktif
+        hanya bila ia slot terakhir yang sudah masuk waktunya. */
+    const [sh, sm] = w.start.split(":").map((v) => parseInt(v, 10) || 0);
+    const phase: "active" | "past" | "future" = !w.end
+      ? nowTotal < sh * 60 + sm
+        ? "future"
+        : i === lastStarted
+          ? "active"
+          : "past"
+      : clock.phase;
+    const isActive = phase === "active";
+    const isNext = i === nextIdx && !isActive;
+    const Icon = p.label === "Salat Jumat" ? Users : PRAYER_ICONS[p.id] ?? Sun;
+
+    const recText = isDone
+      ? detail.kind === "berjamaah"
+        ? "Berjamaah"
+        : timing === "late"
+          ? "Terlambat"
+          : timing === "ontime"
+            ? "Tepat waktu"
+            : "Dilaksanakan"
+      : isMissed
+        ? "Tidak dilaksanakan"
+        : phase === "future"
+          ? "Akan datang"
+          : "Belum dicatat";
+
+    const showNote = !w.end || isActive || w.endNote?.startsWith("Batas akhir Isya");
+
+    /* Slot Salat Jumat (pengganti Zuhur pada hari Jumat): kartu spesial
+       dengan desain, interaksi 3D, countdown, dan panel persiapan sendiri.
+       Pencatatan tetap lewat onRecord → dialog existing. Ikut deck apa adanya. */
+    if (p.label === "Salat Jumat") {
+      return wrapSlot(
+        p,
+        i,
+        isActive,
+        <FridayCard
+          today={today}
+          w={w}
+          detail={detail}
+          now={now}
+          motionOK={motionOK}
+          phase={phase}
+          isNext={isNext}
+          nextLabel={prayers[i + 1]?.label}
+          nextTime={prayers[i + 1] ? windows[prayers[i + 1].id]?.start ?? undefined : undefined}
+          onRecord={onRecord}
+          openSignal={fridayOpenSignal}
+        />
+      );
+    }
+
+    return wrapSlot(
+      p,
+      i,
+      isActive,
+      <TiltWrap
+        motionOK={motionOK}
+        active={isActive}
+        onClick={() => onRecord(p)}
+        ariaLabel={`Catat ${p.label}, mulai ${time.replace(":", ".")}, batas akhir ${w.endLabel} ${w.end ? w.end.replace(":", ".") : "tidak tersedia"}`}
+        className={cn(
+          "tk-tkt",
+          !isActive && "su-card-shadow",
+          isActive && "tk-tkt--active",
+          isDone && "tk-tkt--done",
+          isMissed && "tk-tkt--missed",
+          isNext && "tk-tkt--next"
+        )}
+      >
+        {/* Baris utama tiket: mulai — durasi — batas akhir */}
+        <span className="tk-tkt-row">
+          <span className="tk-tkt-side tk-tkt-side--l">
+            <span className="tk-tkt-name">
+              <span className="tk-tkt-ic" aria-hidden>
+                <Icon size={12} strokeWidth={2.1} />
+              </span>
+              {p.label}
+            </span>
+            <span className="tk-tkt-time tnum">{time.replace(":", ".")}</span>
+          </span>
+          <span className="tk-tkt-mid" aria-hidden>
+            <span className="tk-tkt-dash" />
+            {w.durationMin !== null ? (
+              <span className="tk-tkt-dur tnum">{formatDurCompact(w.durationMin)}</span>
+            ) : null}
+          </span>
+          <span className="tk-tkt-side tk-tkt-side--r">
+            <span className="tk-tkt-name tk-tkt-name--end">{w.endLabel}</span>
+            <span className="tk-tkt-time tk-tkt-time--end tnum">
+              {w.end ? w.end.replace(":", ".") : "—"}
+            </span>
+          </span>
+        </span>
+
+        {/* Perforasi ber-notch + sisi status tiket */}
+        <span className="tk-tkt-perf" aria-hidden />
+        <span className="tk-tkt-foot">
+          <span
+            className={cn(
+              "tk-tkt-status",
+              isDone && "tk-tkt-status--done",
+              isMissed && "tk-tkt-status--missed"
+            )}
+          >
+            <span className="tk-tkt-dot" aria-hidden />
+            {recText}
+          </span>
+          {isActive ? (
+            <span className="tk-tkt-badge tk-tkt-badge--live">Sedang Berlangsung</span>
+          ) : isNext ? (
+            <span className="tk-tkt-badge tk-tkt-badge--next">Berikutnya</span>
+          ) : phase === "past" ? (
+            <span className="tk-tkt-badge tk-tkt-badge--past">Waktu Selesai</span>
+          ) : null}
+        </span>
+
+        {/* Countdown + progress — dihitung dari waktu perangkat vs jadwal */}
+        {isActive && clock.secondsLeft > 0 ? (
+          <span className="tk-tkt-live">
+            <span className="tk-tkt-count">
+              Berakhir dalam {formatDurFull(clock.secondsLeft / 60)}
+            </span>
+            <span className="tk-tkt-bar">
+              <span
+                className="tk-tkt-bar-fill"
+                style={{ width: `${Math.round(clock.progress * 100)}%` }}
+              />
+            </span>
+          </span>
+        ) : null}
+
+        {/* Keterangan batas akhir — wajib untuk Isya (metode) & data kosong */}
+        {showNote && w.endNote ? (
+          <span className={cn("tk-tkt-note", isActive && "tk-tkt-note--onbrand")}>
+            {w.endNote}
+          </span>
+        ) : null}
+      </TiltWrap>
+    );
+  });
+
+  if (deck) {
+    return (
+      <div>
+        {/* Baris kendali deck dompet: label kecil + tombol buka/tutup tumpukan */}
+        <div className="mb-2 flex items-center justify-between px-1">
+          <span className="text-[10.5px] font-bold uppercase tracking-[0.08em] text-tk-muted">
+            Lima Waktu Salat
+          </span>
+          <button
+            type="button"
+            onClick={() => setDeckOpen((o) => !o)}
+            aria-expanded={deckOpen}
+            aria-controls="su-deck-stack"
+            className="tap flex h-8 items-center gap-1.5 rounded-full border border-tk-line-soft bg-tk-panel-soft px-3 text-[10.5px] font-bold text-tk-deep"
+          >
+            <Layers size={13} aria-hidden />
+            {deckOpen ? "Tutup" : "Buka Tumpukan"}
+          </button>
+        </div>
+        <m.ul
+          id="su-deck-stack"
+          className="tk-tkt-stack su-deck"
+          style={{ position: "relative" }}
+          initial={false}
+          animate={{ height: deckOpen ? openH : stackH }}
+          transition={{ type: "spring", stiffness: 420, damping: 36 }}
+          aria-label="Kartu jadwal salat"
+        >
+          {items}
+        </m.ul>
+      </div>
+    );
+  }
+
   return (
     <ul className="tk-tkt-stack" aria-label="Kartu jadwal salat">
-      {prayers.map((p, i) => {
-        const w = windows[p.id];
-        if (!w) return null;
-        const time = w.start;
-        const detail = detailOf(p.id);
-        const isDone = detail.status === "done";
-        const isMissed = detail.status === "missed";
-        const timing = prayerTiming(detail, time, today);
-        const clock = windowClock(w, now);
-        /** Fase final: jendela tanpa batas akhir mengikuti urutan slot — aktif
-            hanya bila ia slot terakhir yang sudah masuk waktunya. */
-        const [sh, sm] = w.start.split(":").map((v) => parseInt(v, 10) || 0);
-        const phase: "active" | "past" | "future" = !w.end
-          ? nowTotal < sh * 60 + sm
-            ? "future"
-            : i === lastStarted
-              ? "active"
-              : "past"
-          : clock.phase;
-        const isActive = phase === "active";
-        const isNext = i === nextIdx && !isActive;
-        const Icon = p.label === "Salat Jumat" ? Users : PRAYER_ICONS[p.id] ?? Sun;
-
-        const recText = isDone
-          ? detail.kind === "berjamaah"
-            ? "Berjamaah"
-            : timing === "late"
-              ? "Terlambat"
-              : timing === "ontime"
-                ? "Tepat waktu"
-                : "Dilaksanakan"
-          : isMissed
-            ? "Tidak dilaksanakan"
-            : phase === "future"
-              ? "Akan datang"
-              : "Belum dicatat";
-
-        const showNote = !w.end || isActive || w.endNote?.startsWith("Batas akhir Isya");
-
-        /* Slot Salat Jumat (pengganti Zuhur pada hari Jumat): kartu spesial
-           dengan desain, interaksi 3D, countdown, dan panel persiapan sendiri.
-           Pencatatan tetap lewat onRecord → dialog existing. */
-        if (p.label === "Salat Jumat") {
-          return (
-            <li
-              key={p.id}
-              className="tk-tkt-slot"
-              style={{ zIndex: isActive ? 30 : 20 - i, "--i": i } as CSSProperties}
-            >
-              <FridayCard
-                today={today}
-                w={w}
-                detail={detail}
-                now={now}
-                motionOK={motionOK}
-                phase={phase}
-                isNext={isNext}
-                nextLabel={prayers[i + 1]?.label}
-                nextTime={prayers[i + 1] ? windows[prayers[i + 1].id]?.start ?? undefined : undefined}
-                onRecord={onRecord}
-                openSignal={fridayOpenSignal}
-              />
-            </li>
-          );
-        }
-
-        return (
-          <li
-            key={p.id}
-            className="tk-tkt-slot"
-            style={{ zIndex: isActive ? 30 : 20 - i, "--i": i } as CSSProperties}
-          >
-            <TiltWrap
-              motionOK={motionOK}
-              active={isActive}
-              onClick={() => onRecord(p)}
-              ariaLabel={`Catat ${p.label}, mulai ${time.replace(":", ".")}, batas akhir ${w.endLabel} ${w.end ? w.end.replace(":", ".") : "tidak tersedia"}`}
-              className={cn(
-                "tk-tkt",
-                !isActive && "su-card-shadow",
-                isActive && "tk-tkt--active",
-                isDone && "tk-tkt--done",
-                isMissed && "tk-tkt--missed",
-                isNext && "tk-tkt--next"
-              )}
-            >
-              {/* Baris utama tiket: mulai — durasi — batas akhir */}
-              <span className="tk-tkt-row">
-                <span className="tk-tkt-side tk-tkt-side--l">
-                  <span className="tk-tkt-name">
-                    <span className="tk-tkt-ic" aria-hidden>
-                      <Icon size={12} strokeWidth={2.1} />
-                    </span>
-                    {p.label}
-                  </span>
-                  <span className="tk-tkt-time tnum">{time.replace(":", ".")}</span>
-                </span>
-                <span className="tk-tkt-mid" aria-hidden>
-                  <span className="tk-tkt-dash" />
-                  {w.durationMin !== null ? (
-                    <span className="tk-tkt-dur tnum">{formatDurCompact(w.durationMin)}</span>
-                  ) : null}
-                </span>
-                <span className="tk-tkt-side tk-tkt-side--r">
-                  <span className="tk-tkt-name tk-tkt-name--end">{w.endLabel}</span>
-                  <span className="tk-tkt-time tk-tkt-time--end tnum">
-                    {w.end ? w.end.replace(":", ".") : "—"}
-                  </span>
-                </span>
-              </span>
-
-              {/* Perforasi ber-notch + sisi status tiket */}
-              <span className="tk-tkt-perf" aria-hidden />
-              <span className="tk-tkt-foot">
-                <span
-                  className={cn(
-                    "tk-tkt-status",
-                    isDone && "tk-tkt-status--done",
-                    isMissed && "tk-tkt-status--missed"
-                  )}
-                >
-                  <span className="tk-tkt-dot" aria-hidden />
-                  {recText}
-                </span>
-                {isActive ? (
-                  <span className="tk-tkt-badge tk-tkt-badge--live">Sedang Berlangsung</span>
-                ) : isNext ? (
-                  <span className="tk-tkt-badge tk-tkt-badge--next">Berikutnya</span>
-                ) : phase === "past" ? (
-                  <span className="tk-tkt-badge tk-tkt-badge--past">Waktu Selesai</span>
-                ) : null}
-              </span>
-
-              {/* Countdown + progress — dihitung dari waktu perangkat vs jadwal */}
-              {isActive && clock.secondsLeft > 0 ? (
-                <span className="tk-tkt-live">
-                  <span className="tk-tkt-count">
-                    Berakhir dalam {formatDurFull(clock.secondsLeft / 60)}
-                  </span>
-                  <span className="tk-tkt-bar">
-                    <span
-                      className="tk-tkt-bar-fill"
-                      style={{ width: `${Math.round(clock.progress * 100)}%` }}
-                    />
-                  </span>
-                </span>
-              ) : null}
-
-              {/* Keterangan batas akhir — wajib untuk Isya (metode) & data kosong */}
-              {showNote && w.endNote ? (
-                <span className={cn("tk-tkt-note", isActive && "tk-tkt-note--onbrand")}>
-                  {w.endNote}
-                </span>
-              ) : null}
-            </TiltWrap>
-          </li>
-        );
-      })}
+      {items}
     </ul>
   );
 }

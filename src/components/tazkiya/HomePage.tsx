@@ -660,7 +660,7 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
   );
 }
 
-/* ---------------- D2. Kartu cincin gelap — ringkasan target ---------------- */
+/* ---------------- D2. Kartu progress bar gelap — ringkasan target ---------------- */
 
 function RingCard({ today, onNavigate }: { today: string; onNavigate: (tab: TabId) => void }) {
   const dailyGoals = useWorshipStore((s) => s.dailyGoals);
@@ -699,41 +699,48 @@ function RingCard({ today, onNavigate }: { today: string; onNavigate: (tab: TabI
       className="tap su-glass rounded-[1.4rem] p-4"
       maxTilt={3.5}
     >
-      {/* Komposisi dua bagian mengisi penuh tinggi kartu yang ter-stretch
-          (grid berdampingan dengan kartu Salat): ring besar + ringkasan di
-          atas, footer dinamis menempel di bawah — tanpa ruang kosong yang
-          membuat konten "mengambang". */}
-      <div className="flex h-full flex-col justify-between">
-        <div className="flex items-center gap-4">
-          <div className="relative inline-flex shrink-0 items-center justify-center" style={{ width: 92, height: 92 }}>
-            <svg width={92} height={92} viewBox="0 0 92 92" className="-rotate-90">
-              <circle cx={46} cy={46} r={40} fill="none" strokeWidth={8} className="stroke-tk-line-strong" />
-              <circle
-                cx={46}
-                cy={46}
-                r={40}
-                fill="none"
-                strokeWidth={8}
-                strokeLinecap="round"
-                className="stroke-tk-violet"
-                strokeDasharray={`${(Math.max(0, Math.min(100, pct)) / 100) * 2 * Math.PI * 40} ${2 * Math.PI * 40}`}
-                style={{ transition: "stroke-dasharray 0.8s cubic-bezier(0.22, 1, 0.36, 1)" }}
-              />
-            </svg>
-            <span className="gs-display tnum absolute inset-0 flex items-center justify-center text-[20px] font-extrabold text-tk-ink">{pct}%</span>
-          </div>
-          <span className="min-w-0 flex-1 leading-snug">
-            <span className="block text-[14px] font-bold text-tk-ink">Target Harian</span>
-            <span className="mt-1 block">
-              <span className="tnum text-[13px] font-extrabold text-tk-ink">{done}</span>
-              <span className="text-[12px] text-tk-muted"> / {statuses.length} selesai</span>
+      {/* Komposisi horizontal tiga bagian mengisi penuh tinggi kartu yang
+          ter-stretch (grid berdampingan dengan kartu Salat): judul + persen
+          besar di atas, progress bar horizontal di tengah, footer dinamis
+          menempel di bawah — tanpa ring lingkaran dan tanpa ruang kosong
+          yang membuat konten "mengambang". */}
+      <div className="flex h-full flex-col justify-between gap-3">
+        {/* ATAS — judul + jumlah selesai di kiri, persen besar di kanan */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <span className="block text-[13px] font-bold text-tk-ink">Target Harian</span>
+            <span className="mt-1 block leading-snug">
+              <span className="tnum text-[15px] font-extrabold text-tk-ink">{done}</span>
+              <span className="text-[11px] text-tk-muted">/{statuses.length} aktivitas selesai</span>
             </span>
-            <span className="mt-1 block text-[10.5px] text-tk-muted">Aktivitas ibadah hari ini</span>
-          </span>
+          </div>
+          <div className="shrink-0 text-right">
+            <span className={cn("gs-display tnum block text-[28px] font-extrabold leading-none", complete ? "text-tk-accent" : "text-tk-ink")}>
+              {pct}%
+            </span>
+            <span className="mt-1.5 block text-[10px] text-tk-muted">progres hari ini</span>
+          </div>
         </div>
-        <div className="mt-3 flex items-center gap-1.5 border-t border-tk-line-soft pt-2.5 text-tk-deep">
-          <Sparkles size={12} className={complete ? "shrink-0 text-tk-accent" : "shrink-0"} aria-hidden />
-          <span className="min-w-0 text-[10.5px] font-semibold leading-snug text-tk-deep">{footerText}</span>
+        {/* TENGAH — progress bar horizontal (bukan ring) dengan animasi width */}
+        <div
+          role="img"
+          aria-label={`Progres target harian ${pct} persen`}
+          className="h-2.5 w-full overflow-hidden rounded-full bg-tk-line-soft"
+        >
+          <span
+            className="block h-full rounded-full bg-gradient-to-r from-tk-accent to-[#FF9A52]"
+            style={{ width: `${pct}%`, transition: "width 800ms cubic-bezier(0.22, 1, 0.36, 1)" }}
+          />
+        </div>
+        {/* BAWAH — footer dinamis menempel di dasar kartu */}
+        <div
+          className={cn(
+            "flex items-center gap-1.5 border-t border-tk-line-soft pt-2.5 text-[10.5px] font-semibold",
+            complete ? "text-tk-accent" : "text-tk-deep"
+          )}
+        >
+          <Sparkles size={12} className="shrink-0" aria-hidden />
+          <span className="min-w-0 leading-snug">{footerText}</span>
         </div>
       </div>
     </TiltCard>
