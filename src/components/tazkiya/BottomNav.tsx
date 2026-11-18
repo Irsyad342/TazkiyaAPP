@@ -38,7 +38,7 @@ export function BottomNav({
       className="pointer-events-auto fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[430px] px-5 pb-[max(1.1rem,env(safe-area-inset-bottom))]"
     >
       {/* Bar hitam-arang hangat kapsul, seperti bottom bar referensi */}
-      <div className="flex items-center justify-between gap-1 rounded-full border border-white/[0.06] bg-[#211d1a] p-2 shadow-[0_18px_44px_-14px_rgba(20,10,4,0.85)]">
+      <div className="flex items-center justify-between gap-1 rounded-full border su-dock p-2">
         {TABS.map(({ id, label, icon: Icon }) => {
           const isActive = active === id;
           return (

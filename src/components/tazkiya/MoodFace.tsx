@@ -15,14 +15,35 @@
  * hanya warna yang di-remap (scripts/recolor_mood.py). Ukuran
  * dikendalikan lewat className dari pemanggil. Dipakai di Beranda
  * (MoodSection), Jurnal, dan chip onboarding.
+ *
+ * Prop opsional `fx` menambah animasi ambient dari utilitas su-*:
+ * "breathe" = puls skala halus (su-breathe), "float" = mengapung
+ * (su-float); default "none" — gambar/logika img tidak berubah.
  */
 
 import { cn } from "@/lib/utils";
 import type { MoodId } from "@/lib/tazkiya/types";
 
-export function MoodFace({ id, className }: { id: MoodId; className?: string }) {
+export function MoodFace({
+  id,
+  className,
+  fx = "none",
+}: {
+  id: MoodId;
+  className?: string;
+  /** Animasi ambient opsional: "breathe" | "float" | "none" (default). */
+  fx?: "breathe" | "float" | "none";
+}) {
   return (
-    <span aria-hidden className={cn("relative inline-block select-none", className)}>
+    <span
+      aria-hidden
+      className={cn(
+        "relative inline-block select-none",
+        fx === "breathe" && "su-breathe",
+        fx === "float" && "su-float",
+        className
+      )}
+    >
       <img
         src={`/mood/${id}.png`}
         alt=""

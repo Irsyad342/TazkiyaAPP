@@ -2,7 +2,8 @@
 
 /**
  * Tazkiya v5 — Zikir & Doa sebagai minimalist digital tasbih.
- * KOMPOSISI: pemilihan zikir berupa bubble pill ringkas; penghitung lingkaran
+ * KOMPOSISI: pemilihan zikir berupa GRID KARTU SIMETRIS dua kolom (tinggi,
+ * padding, dan radius identik; indikator titik meluncur antar kartu); penghitung lingkaran
  * besar menjadi fokus visual halaman — nama zikir, Arab (bila tersedia),
  * cincin progres lavender dengan ujung lime, angka Manrope raksasa, tombol
  * hitung lingkaran besar dengan animasi tekan, reset, pemilihan target, dan
@@ -15,7 +16,7 @@ import { useMemo, useState } from "react";
 import { ChevronDown, CircleDot, Expand, HandHeart, History, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { m } from "framer-motion";
-import { Reveal } from "./motion-bits";
+import { Reveal, useAnim } from "./motion-bits";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { DAILY_DUAS, duaOfTheDay, type DailyDua } from "@/lib/tazkiya/duas";
 import { DOA_HARIAN_IDS, DOA_KATEGORI, DOA_KOLEKSI, ZIKIR_SETS, type DoaItem, type ZikirSet } from "@/lib/tazkiya/zikir-doa";
@@ -39,7 +40,7 @@ export const PRESET_ARABIC: Record<string, { arabic: string; meaning: string }> 
   "Alhamdulillah": { arabic: "اَلْحَمْدُ لِلّٰهِ", meaning: "Segala puji bagi Allah" },
   "Allahu Akbar": { arabic: "اَللهُ أَكْبَرُ", meaning: "Allah Mahabesar" },
   "Laa ilaaha illallah": { arabic: "لَا إِلٰهَ إِلَّا الله", meaning: "Tiada tuhan selain Allah" },
-  "Astagfirullah": { arabic: "أَسْتَغْفِرُ اللهَ", meaning: "Aku memohon ampun kepada Allah" },
+  "Astaghfirullah": { arabic: "أَسْتَغْفِرُ اللهَ", meaning: "Aku memohon ampun kepada Allah" },
   "Laa haula wa laa quwwata illaa billah": {
     arabic: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِالله",
     meaning: "Tiada daya dan kekuatan kecuali dengan pertolongan Allah",
@@ -221,33 +222,65 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
 /* ================= Pilihan zikir di halaman utama ================= */
 
 /**
- * Pemilihan jenis zikir SEBELUM berzikir, berbentuk bubble pill ringkas —
- * bukan kartu besar. Ketuk bubble → menjadi zikir aktif pada penghitung
+ * Pemilihan jenis zikir SEBELUM berzikir, berbentuk GRID KARTU SIMETRIS dua
+ * kolom — tinggi, padding, dan radius identik semua kartu (bukan pill bulat
+ * lebar bervariasi). Baris 1 nama Latin satu baris, baris 2 Arab dari
+ * pemetaan PRESET_ARABIC. Ketuk kartu → menjadi zikir aktif pada penghitung
  * (satu state tasbih yang sama, tanpa sistem counter kedua); Arab dan arti
- * zikir aktif ditampilkan penghitung.
+ * zikir aktif ditampilkan penghitung. Indikator terpilih berupa titik kecil
+ * `layoutId` yang MELUNCUR antar kartu saat pilihan berganti (hanya saat
+ * animasi aktif; statis bila mati).
  */
 function ZikirPresetPicker() {
   const tasbih = useWorshipStore((s) => s.tasbih);
   const tasbihSetDhikr = useWorshipStore((s) => s.tasbihSetDhikr);
+  const anim = useAnim();
 
   return (
     <Reveal><section aria-label="Pilih zikir">
       <SectionHeader title="Pilih Zikir" caption="Ketuk bubble untuk memakai zikir pada penghitung" />
-      <div className="flex flex-wrap gap-1.5" role="group" aria-label="Jenis zikir">
-        {ZIKIR_PRESETS.map((z) => (
-          <button
-            key={z}
-            type="button"
-            aria-pressed={tasbih.dhikr === z}
-            onClick={() => tasbihSetDhikr(z)}
-            className={cn(
-              "tap su-card-shadow shrink-0 rounded-full px-3.5 py-1.5 text-[11.5px] font-semibold transition-all",
-              tasbih.dhikr === z ? "gs-ink-btn" : "bg-tk-panel-soft text-tk-muted hover:text-tk-ink"
-            )}
-          >
-            {z}
-          </button>
-        ))}
+      <div className="grid grid-cols-2 gap-2" role="group" aria-label="Jenis zikir">
+        {ZIKIR_PRESETS.map((z) => {
+          const sel = tasbih.dhikr === z;
+          const ar = PRESET_ARABIC[z];
+          return (
+            <m.button
+              key={z}
+              type="button"
+              aria-pressed={sel}
+              onClick={() => tasbihSetDhikr(z)}
+              whileTap={anim ? { scale: 0.96 } : undefined}
+              transition={{ type: "spring", stiffness: 500, damping: 28 }}
+              className={cn(
+                "su-card-shadow relative flex min-h-[64px] flex-col items-start justify-center gap-0.5 rounded-[1.1rem] border border-transparent px-3.5 py-3 text-left transition-colors",
+                sel ? "gs-ink-btn" : "bg-tk-panel-soft text-tk-ink"
+              )}
+            >
+              <span className="w-full text-[12.5px] font-bold leading-tight line-clamp-1">{z}</span>
+              {ar ? (
+                <span
+                  className={cn(
+                    "quran-arabic w-full truncate text-[15px] leading-snug",
+                    sel ? "text-white/85" : "text-tk-muted"
+                  )}
+                >
+                  {ar.arabic}
+                </span>
+              ) : null}
+              {sel ? (
+                anim ? (
+                  <m.span
+                    layoutId="zikir-sel-dot"
+                    transition={{ type: "spring", stiffness: 500, damping: 32 }}
+                    className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-white"
+                  />
+                ) : (
+                  <span className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-white" />
+                )
+              ) : null}
+            </m.button>
+          );
+        })}
       </div>
     </section></Reveal>
   );
@@ -262,7 +295,7 @@ function ZikirPresetPicker() {
 function ZikirSetCard({ set }: { set: ZikirSet }) {
   const [open, setOpen] = useState(set.id === "zikir-pagi");
   return (
-    <div className="glass overflow-hidden rounded-[1.5rem]">
+    <div className="glass overflow-hidden rounded-[1.4rem]">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -307,8 +340,8 @@ function DoaCard({ title, arabic, transliteration, meaning, source }: {
   source: string;
 }) {
   return (
-    <div className="glass rounded-[1.5rem] p-4">
-      <p className="text-[13.5px] font-bold text-tk-ink">{title}</p>
+    <div className="glass rounded-[1.4rem] p-4">
+      <p className="truncate text-[13.5px] font-bold text-tk-ink">{title}</p>
       {arabic ? <p className="quran-arabic mt-2.5 text-right text-[20px] leading-[1.95] text-tk-ink">{arabic}</p> : null}
       {transliteration ? <p className="mt-2 text-[11.5px] italic leading-relaxed text-tk-muted">&ldquo;{transliteration}&rdquo;</p> : null}
       <p className="mt-1.5 text-[12px] leading-relaxed text-tk-ink/90">{meaning}</p>
@@ -367,7 +400,7 @@ export function ZikirDoaPage({
 
       {tab === "zikir" ? (
         <div key="zikir" className="tk-fade-in lg:grid lg:grid-cols-12 lg:gap-x-8">
-          <div className="space-y-9 lg:col-span-5">
+          <div className="space-y-7 lg:col-span-5">
             {/* Pilihan zikir dulu, lalu penghitung sebagai fokus visual */}
             <ZikirPresetPicker />
             <TasbihCounter onOpenFull={onOpenTasbihFull} />
@@ -382,7 +415,7 @@ export function ZikirDoaPage({
                   caption="Berzikir lewat penghitung di atas, lalu tekan Simpan Harian, sesi akan tercatat di sini."
                 />
               ) : (
-                <div className="glass thin-scrollbar max-h-80 overflow-y-auto rounded-[1.5rem]">
+                <div className="glass thin-scrollbar max-h-80 overflow-y-auto rounded-[1.4rem]">
                   <ul className="divide-y divide-tk-line-soft">
                     {zikirSessions.slice(0, 25).map((s) => (
                       <li key={s.id} className="flex items-center gap-3 px-4 py-3">
@@ -406,7 +439,7 @@ export function ZikirDoaPage({
           </div>
 
           {/* Set zikir — hanya bacaan, tanpa opsi tasbih */}
-          <section aria-label="Set zikir" className="mt-9 space-y-3 lg:col-span-7 lg:mt-0">
+          <section aria-label="Set zikir" className="mt-7 space-y-3 lg:col-span-7 lg:mt-0">
             <SectionHeader title="Set Zikir" caption="Bacaan masyhur dengan sumber, dilipat agar ringan di layar" />
             {ZIKIR_SETS.map((set) => (
               <ZikirSetCard key={set.id} set={set} />
@@ -418,17 +451,17 @@ export function ZikirDoaPage({
           {/* Doa Hari Ini, blok editorial lavender */}
           <div className="lg:col-span-5">
             <SectionHeader title="Doa Hari Ini" caption={dua.title} />
-            {/* Radius 1.6rem — sejajar dengan blok fitur lavender di QuranPage */}
-            <div className="rounded-[1.6rem] bg-tk-lavender p-5">
+            {/* Padding & radius 1.4rem — sejajar dengan kartu lain di halaman ini */}
+            <div className="rounded-[1.4rem] bg-tk-lavender p-4">
               {dua.arabic ? <p className="quran-arabic text-right text-[22px] leading-[1.95] text-tk-ink">{dua.arabic}</p> : null}
               {dua.transliteration ? <p className="mt-3 text-[11.5px] italic leading-relaxed text-tk-muted">&ldquo;{dua.transliteration}&rdquo;</p> : null}
               <p className="mt-2.5 text-[12.5px] leading-relaxed text-tk-ink/95">{dua.meaning}</p>
-              {dua.source ? <p className="mt-3 text-[11px] font-semibold text-tk-violet">{dua.source}</p> : null}
+              {dua.source ? <p className="mt-3 truncate text-[11px] font-semibold text-tk-violet">{dua.source}</p> : null}
             </div>
           </div>
 
           {/* Kategori + daftar doa */}
-          <div className="mt-9 lg:col-span-7 lg:mt-0">
+          <div className="mt-7 lg:col-span-7 lg:mt-0">
             <SectionHeader title="Kumpulan Doa" caption={DOA_KATEGORI.find((k) => k.id === cat)?.caption} />
             <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5" role="group" aria-label="Kategori doa">
               {DOA_KATEGORI.map((k) => (
@@ -449,7 +482,7 @@ export function ZikirDoaPage({
 
             <div className="mt-3 space-y-3 sm:grid sm:grid-cols-2 sm:gap-3 sm:space-y-0">
               {doaList.length === 0 ? (
-                <p className="rounded-[1.5rem] bg-tk-panel-soft px-4 py-5 text-center text-[12.5px] text-tk-muted sm:col-span-2">
+                <p className="rounded-[1.4rem] bg-tk-panel-soft px-4 py-5 text-center text-[12.5px] text-tk-muted sm:col-span-2">
                   Belum ada doa pada kategori ini.
                 </p>
               ) : (

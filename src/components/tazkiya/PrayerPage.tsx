@@ -11,11 +11,23 @@
  * tanpa menyalaksan status pelaksanaan yang tetap mengikuti catatan pengguna.
  * Batas akhir Subuh = terbit; batas akhir Isya mengikuti metode perhitungan
  * (lihat lib/tazkiya/prayerWindows). Tab Bulanan (kalender lima titik) dan Qada
- * (formulir + CTA orange) dipertahankan dengan logika utuh.
+ * (formulir + CTA orange) dipertahankan dengan logika utuh. Di atas daftar
+ * tiket ada kartu fokus geser (SwipePrayerFocus) — tambalan interaktif yang
+ * memakai data, jadwal, dan handler pencatatan yang sama dengan tiket.
  */
 
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
-import { AnimatePresence, m, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  AnimatePresence,
+  m,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+  type PanInfo,
+  type Variants,
+} from "framer-motion";
 import {
   BookMarked,
   Check,
@@ -58,6 +70,7 @@ import { nowTotalMinutes, resolvePrayerWindows, windowClock, type PrayerWindows 
 import { HADITH_QADA } from "@/lib/tazkiya/hadith";
 import { RAWATIB_MUAKKADAH, SUNNAH_GUIDE_FOOTNOTE, SUNNAH_LAINNYA, type SunnahGuideEntry } from "@/lib/tazkiya/sunnahGuide";
 import { ConfirmButton, GlassCard, SectionHeader, SegmentedTabs } from "./ui-bits";
+import { useAnim } from "./motion-bits";
 import { FridayCard } from "./FridayCard";
 import { PrayerRecordDialog } from "./PrayerRecordDialog";
 import { DayDetailSheet, prayerMetaFor } from "./DayDetailSheet";
@@ -283,6 +296,18 @@ function TodayTab({
             <div className="tk-beam-fill" style={{ width: `${(doneCount / 5) * 100}%` }} />
           </div>
         </header>
+
+        {/* Kartu fokus geser (SwipePrayerFocus) — tambalan interaktif di atas
+            daftar tiket: daftar salat, jadwal, status, dan handler pencatatan
+            SAMA dengan tiket di bawah. Bukan pengganti, bukan duplikasi data. */}
+        <SwipePrayerFocus
+          today={today}
+          prayers={prayersToday}
+          windows={windows}
+          detailOf={detailOf}
+          now={now}
+          onRecord={onRecord}
+        />
 
         {/* Daftar salat — kartu tiket bertumpuk, ketuk untuk mencatat */}
         <section aria-label="Salat hari ini" className="animate-tk-fade-up">
@@ -724,6 +749,357 @@ function PrayerTickets({
         );
       })}
     </ul>
+  );
+}
+
+/* ================= SwipePrayerFocus ================= */
+
+/**
+ * Kartu fokus salat yang BISA DIGESER (swipe) — tambalan interaktif di atas
+ * daftar tiket, BUKAN penggantinya. Sumber data & handler sama persis dengan
+ * kartu tiket: daftar salat dari prayersForDate (lewat props), waktu dari
+ * windows, status dari detailOf (selectPrayerDetail) yang sama, dan aksi
+ * "Catat"/ketuk kartu memanggil onRecord yang sama → dialog pencatatan existing.
+ *
+ * Gestur (Fase 3.5):
+ * - drag="x", dragConstraints {left:0,right:0}, dragElastic 0.35,
+ *   dragTransition {bounceStiffness:400, bounceDamping:30}, touchAction pan-y
+ *   → scroll vertikal halaman TIDAK terganggu.
+ * - onDragEnd: offset.x ≤ -70 → mundur 1 item (salat sebelumnya);
+ *   ≥ +70 → maju 1 item (salat berikutnya); selain itu kartu memantul kembali.
+ * - Perpindahan item: AnimatePresence mode="popLayout" key=index — konten
+ *   keluar x ±24 mengikuti arah jari, item baru masuk dari sisi berlawanan
+ *   (x ∓24 → 0), spring {stiffness:380, damping:30}.
+ * - Parallax nyata saat digeser: motion value x kartu diturunkan via
+ *   useTransform — ikon x*0.35, teks x*0.2, latar gradien x*0.1, plus rotateY
+ *   kecil (x / -24°) ber-spring dengan transformPerspective 800. Semuanya
+ *   merespons jari per-frame tanpa state/re-render React.
+ * - Indikator: pil titik aktif 16px meluncur (layoutId "swipe-dot"), chevron
+ *   tipis di tepi (makin terang saat digeser ke arahnya), hint teks yang
+ *   fade-out permanen setelah geser pertama.
+ *
+ * Gating: seluruh gestur & animasi hanya aktif bila useAnim() true; bila
+ * tidak, kartu dirender statis tanpa drag — info + tombol catat tetap utuh.
+ */
+
+const FOCUS_SPRING = { type: "spring", stiffness: 380, damping: 30 } as const;
+
+/** Variants crossfade+slide konten kartu fokus. `d` = arah perpindahan index
+    (+1 maju / salat berikutnya, -1 mundur / salat sebelumnya): konten keluar
+    mengikuti arah geser jari, item baru masuk dari sisi berlawanan. */
+const focusContentVariants: Variants = {
+  enter: (d: 1 | -1) => ({ x: d === 1 ? -24 : 24, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (d: 1 | -1) => ({ x: d === 1 ? 24 : -24, opacity: 0 }),
+};
+
+/** Index awal fokus = salat aktif/berikutnya hari itu — logika slot yang sama
+    dengan daftar tiket: slot pertama yang belum masuk waktunya ("Berikutnya");
+    bila semuanya sudah dimulai, slot terakhir yang sedang berlangsung. */
+function initialFocusIndex(prayers: PrayerMeta[], windows: PrayerWindows, now: Date): number {
+  const nowTotal = nowTotalMinutes(now);
+  let started = 0;
+  for (let i = 0; i < prayers.length; i++) {
+    const w = windows[prayers[i].id];
+    if (!w) continue;
+    const [h, mm] = w.start.split(":").map((v) => parseInt(v, 10) || 0);
+    if (h * 60 + mm > nowTotal) return i;
+    started = i;
+  }
+  return started;
+}
+
+function SwipePrayerFocus({
+  today,
+  prayers,
+  windows,
+  detailOf,
+  now,
+  onRecord,
+}: {
+  today: string;
+  prayers: PrayerMeta[];
+  windows: PrayerWindows;
+  detailOf: (id: PrayerId) => PrayerDetail;
+  now: Date;
+  onRecord: (meta: PrayerMeta) => void;
+}) {
+  const anim = useAnim();
+  const [idx, setIdx] = useState(() => initialFocusIndex(prayers, windows, now));
+  const [dir, setDir] = useState<1 | -1>(1);
+  const [hasSwiped, setHasSwiped] = useState(false);
+  /** Pengaman klik-setelah-drag: framer sudah memblok klik otomatis setelah
+      drag; ref ini menahan kasus drag sempit agar dialog tak terbuka. */
+  const didDragRef = useRef(false);
+
+  /* Reset ke salat aktif/berikutnya saat tanggal berubah (deps: today saja —
+     daftar & jadwal lain dalam sehari dianggap stabil). */
+  useEffect(() => {
+    setIdx(initialFocusIndex(prayers, windows, now));
+    setDir(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [today]);
+
+  const clampIdx = (v: number) => Math.min(prayers.length - 1, Math.max(0, v));
+  const go = (d: 1 | -1) => {
+    setDir(d);
+    setIdx((v) => clampIdx(v + d));
+  };
+  const jump = (i: number) => {
+    if (i === idx) return;
+    setDir(i > idx ? 1 : -1);
+    setIdx(i);
+  };
+
+  /* === Motion values parallax — diturunkan dari x hasil drag, tanpa state === */
+  const x = useMotionValue(0);
+  const iconX = useTransform(x, (v) => v * 0.35);
+  const textX = useTransform(x, (v) => v * 0.2);
+  const bgX = useTransform(x, (v) => v * 0.1);
+  const rotateY = useSpring(useTransform(x, (v) => v / -24), { stiffness: 320, damping: 28 });
+  /* Chevron tepi ikut merespons geseran: makin terang saat kartu ke arahnya. */
+  const chevLOpacity = useTransform(x, [-110, -26, 0], [0.95, 0.4, 0.4]);
+  const chevROpacity = useTransform(x, [0, 26, 110], [0.4, 0.4, 0.95]);
+
+  const handleDragEnd = (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const ox = info.offset.x;
+    if (Math.abs(ox) > 30) setHasSwiped(true);
+    if (ox <= -70) go(-1);
+    else if (ox >= 70) go(1);
+  };
+
+  /* === Konten item saat ini — sumber & helper yang sama dengan kartu tiket === */
+  const safeIdx = clampIdx(idx);
+  const current = prayers[safeIdx];
+  const w = current ? windows[current.id] : undefined;
+  if (!current || !w) return null;
+
+  const detail = detailOf(current.id);
+  const timing = prayerTiming(detail, w.start, today);
+  const [sh, sm] = w.start.split(":").map((v) => parseInt(v, 10) || 0);
+  const isFuture = sh * 60 + sm > nowTotalMinutes(now);
+  const recText =
+    detail.status === "done"
+      ? detail.kind === "berjamaah"
+        ? "Berjamaah"
+        : timing === "late"
+          ? "Terlambat"
+          : timing === "ontime"
+            ? "Tepat waktu"
+            : "Dilaksanakan"
+      : detail.status === "missed"
+        ? "Tidak dilaksanakan"
+        : isFuture
+          ? "Akan datang"
+          : "Belum dicatat";
+
+  const Icon = current.label === "Salat Jumat" ? Users : PRAYER_ICONS[current.id] ?? Sun;
+  const ariaLabel = `Fokus ${current.label}, mulai ${w.start.replace(":", ".")}${
+    w.end ? `, batas akhir ${w.end.replace(":", ".")}` : ""
+  }. Geser untuk salat lain, ketuk untuk mencatat.`;
+
+  const pillCls = cn(
+    "flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold",
+    detail.status === "done"
+      ? "bg-tk-violet/12 text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent"
+      : detail.status === "missed"
+        ? "bg-tk-amber-soft text-tk-amber"
+        : "bg-tk-panel-soft text-tk-muted"
+  );
+  const chipCls =
+    "flex h-12 w-12 shrink-0 items-center justify-center rounded-[0.95rem] bg-tk-accent/15 text-tk-accent";
+
+  /** Isi kartu — dipakai cabang anim & statis; parallax hanya saat anim aktif. */
+  const body = (
+    <>
+      <div className="flex items-center gap-3.5">
+        <m.span aria-hidden style={anim ? { x: iconX } : undefined} className={chipCls}>
+          <Icon size={22} strokeWidth={1.9} />
+        </m.span>
+        <m.div style={anim ? { x: textX } : undefined} className="min-w-0 flex-1">
+          <p className="font-display text-[19px] font-bold leading-tight tracking-[-0.01em] text-tk-ink">
+            {current.label}
+          </p>
+          <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+            <span className="tnum text-[18px] font-extrabold leading-none text-tk-accent">
+              {w.start.replace(":", ".")}
+            </span>
+            <span className="tnum text-[10.5px] font-medium text-tk-muted">
+              {w.end ? `Batas ${w.end.replace(":", ".")}` : w.endLabel}
+            </span>
+          </p>
+        </m.div>
+      </div>
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <span className={pillCls}>
+          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-current" />
+          {recText}
+        </span>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRecord(current);
+          }}
+          className="tap flex shrink-0 items-center gap-1 rounded-full bg-tk-accent px-3.5 py-1.5 text-[11px] font-bold text-white shadow-[0_8px_18px_-8px_rgba(250,82,0,0.55)]"
+        >
+          <Plus size={12} strokeWidth={2.6} aria-hidden /> Catat
+        </button>
+      </div>
+    </>
+  );
+
+  /** Lapisan dalam kartu: gradien parallax + konten swap + chevron tepi. */
+  const inner = (
+    <>
+      {/* Latar gradien ber-parallax (x*0.1) — melebihi tepi agar tak bolong */}
+      <m.div
+        aria-hidden
+        className="pointer-events-none absolute -inset-[16%] rounded-[inherit] bg-gradient-to-br from-tk-accent/15 via-tk-accent/5 to-transparent"
+        style={anim ? { x: bgX } : undefined}
+      />
+      <div className="relative z-[1]">
+        {anim ? (
+          <AnimatePresence mode="popLayout" custom={dir} initial={false}>
+            <m.div
+              key={safeIdx}
+              custom={dir}
+              variants={focusContentVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={FOCUS_SPRING}
+            >
+              {body}
+            </m.div>
+          </AnimatePresence>
+        ) : (
+          <div>{body}</div>
+        )}
+      </div>
+      {/* Chevron tipis di tepi — indikator bisa digeser */}
+      <m.span
+        aria-hidden
+        className="pointer-events-none absolute left-2 top-1/2 z-[1] -translate-y-1/2 text-tk-ink"
+        style={anim ? { opacity: chevLOpacity } : { opacity: 0.4 }}
+      >
+        <ChevronLeft size={17} strokeWidth={2} />
+      </m.span>
+      <m.span
+        aria-hidden
+        className="pointer-events-none absolute right-2 top-1/2 z-[1] -translate-y-1/2 text-tk-ink"
+        style={anim ? { opacity: chevROpacity } : { opacity: 0.4 }}
+      >
+        <ChevronRight size={17} strokeWidth={2} />
+      </m.span>
+    </>
+  );
+
+  return (
+    <div className="animate-tk-fade-up">
+      {anim ? (
+        <m.div
+          role="button"
+          tabIndex={0}
+          aria-label={ariaLabel}
+          onClick={() => {
+            if (didDragRef.current) {
+              didDragRef.current = false;
+              return;
+            }
+            onRecord(current);
+          }}
+          onKeyDown={(e) => {
+            if (e.target !== e.currentTarget) return;
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onRecord(current);
+            } else if (e.key === "ArrowLeft") {
+              e.preventDefault();
+              go(-1);
+            } else if (e.key === "ArrowRight") {
+              e.preventDefault();
+              go(1);
+            }
+          }}
+          onPointerDown={() => {
+            didDragRef.current = false;
+          }}
+          onDragStart={() => {
+            didDragRef.current = true;
+          }}
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.35}
+          dragTransition={{ bounceStiffness: 400, bounceDamping: 30 }}
+          onDragEnd={handleDragEnd}
+          whileDrag={{ scale: 1.02 }}
+          style={{ x, rotateY, transformPerspective: 800, touchAction: "pan-y" }}
+          className="su-glass relative min-h-[150px] cursor-grab select-none overflow-hidden rounded-[1.4rem] p-5 text-left active:cursor-grabbing"
+        >
+          {inner}
+        </m.div>
+      ) : (
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={ariaLabel}
+          onClick={() => onRecord(current)}
+          onKeyDown={(e) => {
+            if (e.target !== e.currentTarget) return;
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onRecord(current);
+            }
+          }}
+          className="su-glass relative min-h-[150px] overflow-hidden rounded-[1.4rem] p-5"
+        >
+          {inner}
+        </div>
+      )}
+
+      {/* Deretan titik — pil aktif 16px meluncur via layoutId="swipe-dot" */}
+      <div className="mt-3 flex items-center justify-center gap-1">
+        {prayers.map((p, i) => (
+          <button
+            key={p.id}
+            type="button"
+            aria-label={`Tampilkan ${p.label}`}
+            aria-current={i === safeIdx || undefined}
+            onClick={() => jump(i)}
+            className="tap relative flex h-5 w-5 items-center justify-center"
+          >
+            {i === safeIdx ? (
+              anim ? (
+                <m.span
+                  layoutId="swipe-dot"
+                  className="h-1.5 w-4 rounded-full bg-tk-accent"
+                  transition={{ type: "spring", stiffness: 520, damping: 36 }}
+                />
+              ) : (
+                <span className="h-1.5 w-4 rounded-full bg-tk-accent" />
+              )
+            ) : (
+              <span className="h-1.5 w-1.5 rounded-full bg-tk-track" />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Hint geser — fade-out permanen setelah geser pertama */}
+      {anim ? (
+        <m.p
+          aria-hidden={hasSwiped || undefined}
+          initial={false}
+          animate={{ opacity: hasSwiped ? 0 : 1 }}
+          className="pointer-events-none mt-1.5 text-center text-[10px] text-tk-deep"
+        >
+          Geser untuk lihat salat lain
+        </m.p>
+      ) : hasSwiped ? null : (
+        <p className="mt-1.5 text-center text-[10px] text-tk-deep">Geser untuk lihat salat lain</p>
+      )}
+    </div>
   );
 }
 

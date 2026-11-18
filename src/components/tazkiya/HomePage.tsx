@@ -50,7 +50,7 @@ import { JelajahiAktivitas } from "./JelajahiAktivitas";
 import { DayDetailSheet } from "./DayDetailSheet";
 import { OrnamentDivider } from "./ornaments";
 import type { SubPageId, TabId } from "./BottomNav";
-import { DragCard, RiseIn, TiltCard } from "./motion-bits";
+import { AmbientParticles, DragCard, RiseIn, TiltCard } from "./motion-bits";
 import { cn } from "@/lib/utils";
 
 const PRAYER_ORDER: { id: PrayerId; label: string }[] = [
@@ -622,8 +622,8 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
               >
                 {done ? <Check size={10} strokeWidth={3.2} className="text-white" /> : null}
               </span>
-              <span className={cn("flex min-w-0 flex-1 items-center gap-1.5 truncate text-[12px]", done ? "font-semibold text-[#17171B]" : "font-medium text-[#55555C]")}>
-                <span className="truncate">{displayLabel}</span>
+              <span className={cn("flex min-w-0 flex-1 items-center gap-1.5 text-[12px]", done ? "font-semibold text-[#17171B]" : "font-medium text-[#55555C]")}>
+                <span className="line-clamp-2 min-w-0">{displayLabel}</span>
                 {isJumatSlot ? (
                   <span className="shrink-0 rounded-full bg-[#FA5200]/10 px-1.5 py-px text-[8px] font-extrabold uppercase tracking-[0.08em] text-[#FA5200]">
                     Jumat
@@ -674,7 +674,7 @@ function RingCard({ today, onNavigate }: { today: string; onNavigate: (tab: TabI
       as="button"
       onClick={() => onNavigate("progress")}
       ariaLabel={`Target harian ${done} dari ${statuses.length} selesai, buka analitik`}
-      className="tap glass su-card-shadow rounded-[1.4rem] p-4"
+      className="tap su-glass rounded-[1.4rem] p-4"
       maxTilt={3.5}
     >
       <div className="flex items-center gap-3.5">
@@ -769,7 +769,10 @@ function KebaikanCard({
         : `${doneCount} dari ${rows.length} sudah tercatat, lanjutkan yang lain.`;
 
   return (
-    <section aria-label="Ibadah pendukung hari ini" className="glass-hero flex h-full flex-col rounded-[1.4rem] p-4">
+    <section aria-label="Ibadah pendukung hari ini" className="glass-hero flex h-full flex-col rounded-[1.4rem] p-4.5">
+      {/* Butiran cahaya Liquid Glass di atas permukaan orange — dekoratif,
+          pointer-events-none, tidak menghalangi klik tombol di dalamnya. */}
+      <AmbientParticles count={6} />
       <div className="flex items-center justify-between gap-2">
         <p className="whitespace-nowrap text-[12.5px] font-bold tracking-[-0.01em] text-white">Kebaikan Hari Ini</p>
         <span className="tnum shrink-0 rounded-full bg-white/18 px-2 py-0.5 text-[9px] font-bold text-white">
@@ -783,7 +786,7 @@ function KebaikanCard({
               type="button"
               onClick={go}
               aria-label={`${label}: ${value}, ${caption}. Ketuk untuk mencatat.`}
-              className="tap flex w-full items-center gap-2.5 py-2.5 text-left"
+              className="tap flex w-full items-center gap-2.5 py-3 text-left"
             >
               <span
                 aria-hidden
@@ -796,10 +799,10 @@ function KebaikanCard({
               </span>
               <span className="min-w-0 flex-1">
                 <span className="flex items-baseline justify-between gap-2">
-                  <span className="truncate text-[12.5px] font-bold text-white">{label}</span>
+                  <span className="line-clamp-1 min-w-0 flex-1 text-[12.5px] font-bold text-white">{label}</span>
                   <span className="tnum shrink-0 whitespace-nowrap text-[10px] font-bold text-white/90">{value}</span>
                 </span>
-                <span className="mt-px block truncate text-[10px] leading-snug text-white/70">{caption}</span>
+                <span className="mt-px block line-clamp-2 text-[10px] leading-snug text-white/70">{caption}</span>
               </span>
               <ChevronRight size={14} className="shrink-0 text-white/55" aria-hidden />
             </button>
@@ -808,7 +811,7 @@ function KebaikanCard({
       </ul>
       <div className="mt-1 border-t border-white/20 pt-2.5">
         <p className="flex items-center gap-1.5 text-[10.5px] font-medium leading-snug text-white/90">
-          <Sparkles size={11} className="shrink-0" aria-hidden />
+          <Sparkles size={11} className="su-breathe shrink-0" aria-hidden />
           {insight}
         </p>
         <div className="mt-2 flex justify-end">
@@ -944,7 +947,7 @@ function TodayTasks({ today }: { today: string }) {
                     )}
                   />
                 </button>
-                <span className={cn("min-w-0 flex-1 truncate text-[12.5px]", g.enabled ? "text-tk-ink" : "text-tk-muted line-through")}>
+                <span className={cn("line-clamp-2 min-w-0 flex-1 text-[12.5px]", g.enabled ? "text-tk-ink" : "text-tk-muted line-through")}>
                   {g.label}
                 </span>
                 {g.custom ? (
@@ -1122,7 +1125,7 @@ export function HomePage({
             <p className="gs-overline truncate">
               Assalamu&apos;alaikum, {greeting.toLowerCase()}
             </p>
-            <h1 className="mt-1.5 truncate text-[21px] font-bold leading-tight tracking-[-0.02em] text-tk-ink">
+            <h1 className="mt-1.5 line-clamp-2 break-words text-[21px] font-bold leading-tight tracking-[-0.02em] text-tk-ink">
               {settings.name || "Sahabat SUIO"}
             </h1>
           </div>
@@ -1177,7 +1180,7 @@ export function HomePage({
       </RiseIn>
 
       {/* ---------- D. Trio kartu: putih+cincin | orange ---------- */}
-      <RiseIn i={3} className="mt-6 grid grid-cols-2 gap-3 lg:col-span-12">
+      <RiseIn i={3} className="mt-6 grid grid-cols-2 items-stretch gap-3 lg:col-span-12">
         <div className="flex flex-col gap-3">
           <SalatCheckCard today={today} onNavigate={onNavigate} />
           <RingCard today={today} onNavigate={onNavigate} />

@@ -520,3 +520,45 @@ export function DragCard({
     </m.div>
   );
 }
+
+
+/* ------------------------------------------------------------------ */
+/* AmbientParticles — butiran cahaya mengapung untuk kartu hero.       */
+/* Transform+opacity saja, jarak fase lebar agar tidak seragam;        */
+/* mati total pada animasi-off & reduced-motion (via useAnim).         */
+/* ------------------------------------------------------------------ */
+
+export function AmbientParticles({
+  count = 6,
+  className,
+}: {
+  count?: number;
+  className?: string;
+}) {
+  const anim = useAnim();
+  if (!anim) return null;
+  return (
+    <span aria-hidden className={cn("pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]", className)}>
+      {Array.from({ length: count }).map((_, i) => (
+        <m.span
+          key={i}
+          className="absolute block rounded-full bg-white"
+          style={{
+            left: `${7 + ((i * 37) % 84)}%`,
+            top: `${10 + ((i * 53) % 72)}%`,
+            width: i % 3 === 0 ? 5 : 3,
+            height: i % 3 === 0 ? 5 : 3,
+            opacity: 0.22,
+          }}
+          animate={{ y: [0, -16, 0], opacity: [0.16, 0.55, 0.16], scale: [1, 1.25, 1] }}
+          transition={{
+            duration: 5.5 + (i % 4) * 1.4,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: i * 0.65,
+          }}
+        />
+      ))}
+    </span>
+  );
+}

@@ -18,7 +18,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { Minus, RotateCcw, Save, Vibrate, X } from "lucide-react";
 import { toast } from "sonner";
-import { m, useReducedMotion } from "framer-motion";
+import { m } from "framer-motion";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +31,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useWorshipStore } from "@/lib/tazkiya/store";
+import { useAnim } from "./motion-bits";
 import { PRESET_ARABIC } from "./ZikirDoaPage";
 import { todayKey } from "@/lib/tazkiya/dates";
 import type { ZikirSlot } from "@/lib/tazkiya/types";
@@ -53,9 +54,8 @@ export function TasbihFullscreen({
   const commitZikirToDay = useWorshipStore((s) => s.commitZikirToDay);
   const vibration = useWorshipStore((s) => s.settings.vibration);
   const updateSettings = useWorshipStore((s) => s.updateSettings);
-  const animationsOn = useWorshipStore((s) => s.settings.animations);
-  const reduceMotion = useReducedMotion();
-  const motionOK = animationsOn && !reduceMotion;
+  /* Gerbang animasi manual: setelan aplikasi + prefers-reduced-motion. */
+  const motionOK = useAnim();
 
   const stageRef = useRef<HTMLDivElement>(null);
   /* Overlay hanya dirender setelah interaksi pengguna (client), jadi deteksi
@@ -118,10 +118,10 @@ export function TasbihFullscreen({
   return (
     <m.div
       ref={stageRef}
-      initial={motionOK ? { opacity: 0, scale: 0.94, y: 24 } : false}
+      initial={motionOK ? { opacity: 0, scale: 0.92, y: 24 } : false}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={motionOK ? { opacity: 0, scale: 0.96, y: 24 } : { opacity: 0 }}
-      transition={{ type: "spring", stiffness: 320, damping: 30 }}
+      transition={{ type: "spring", stiffness: 460, damping: 30 }}
       className="fixed inset-0 z-[45] flex flex-col overflow-hidden bg-tk-stage"
       role="dialog"
       aria-modal="true"
@@ -165,10 +165,24 @@ export function TasbihFullscreen({
 
         {/* ---------- Zikir aktif: nama, Arab besar, transliterasi, arti ---------- */}
         <div className="relative z-10 px-6 pt-3 text-center">
-          <p className="font-display text-[16px] font-bold tracking-[-0.01em] text-tk-ink">{tasbih.dhikr}</p>
+          <m.span
+            initial={motionOK ? { opacity: 0, y: 6 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="block font-display text-[16px] font-bold tracking-[-0.01em] text-tk-ink"
+          >
+            {tasbih.dhikr}
+          </m.span>
           {meta ? (
             <>
-              <p className="quran-arabic mt-3 text-[38px] leading-[1.6] text-tk-ink">{meta.arabic}</p>
+              <m.span
+                initial={motionOK ? { opacity: 0, y: 6 } : false}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, ease: "easeOut", delay: 0.05 }}
+                className="quran-arabic mt-3 block text-[38px] leading-[1.6] text-tk-ink"
+              >
+                {meta.arabic}
+              </m.span>
               <p className="mt-1.5 text-[12.5px] font-semibold italic text-tk-muted">{tasbih.dhikr}</p>
               <p className="mt-1 text-[11.5px] leading-relaxed text-tk-muted">{meta.meaning}</p>
             </>
@@ -185,7 +199,7 @@ export function TasbihFullscreen({
             aria-label={`Tambah hitungan, saat ini ${tasbih.count}`}
             className={cn(
               "relative flex h-[min(72vw,300px)] w-[min(72vw,300px)] items-center justify-center rounded-full",
-              reached && animationsOn && "animate-tk-pulse"
+              reached && motionOK && "animate-tk-pulse"
             )}
           >
             <svg aria-hidden viewBox="0 0 340 340" className="absolute inset-0 h-full w-full -rotate-90">

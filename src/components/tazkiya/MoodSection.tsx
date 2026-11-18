@@ -162,7 +162,7 @@ export function MoodSection({
                         }}
                         transition={popping && motionOK ? SWAY_SPRING : { type: "spring", stiffness: 420, damping: 20 }}
                       >
-                        <MoodFace id={mo.id} className="h-16 w-16" />
+                        <MoodFace id={mo.id} fx={active ? "float" : "none"} className="h-16 w-16" />
                       </m.span>
                     </PressScale>
                     {active ? <InnerGlow motionOK={motionOK} /> : null}

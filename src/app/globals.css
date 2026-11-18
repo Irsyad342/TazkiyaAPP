@@ -328,18 +328,39 @@ html[data-theme="dark"] {
   /* Lapisan mengambang (dialog, sheet, popover): satu-satunya yang boleh
      berbayang — permukaan lebih terang + bayangan dalam. */
   .glass-strong {
-    background: var(--color-tk-panel);
-    border: 1px solid var(--color-tk-line);
-    box-shadow: var(--tk-float-shadow);
+    position: relative;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.82) 100%);
+    -webkit-backdrop-filter: blur(26px) saturate(1.6);
+    backdrop-filter: blur(26px) saturate(1.6);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      0 28px 64px -26px rgba(64, 48, 38, 0.4);
   }
-  /* ---------- Kedalaman permukaan dark v18: gradasi hangat tipis ----------
+  /* Specular Liquid Glass: kilau diagonal halus di permukaan mengambang */
+  .glass-strong::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(115deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.05) 40%, transparent 62%);
+  }
+  html[data-theme="dark"] .glass-strong::before {
+    background: linear-gradient(115deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 40%, transparent 62%);
+  }
+  /* ---------- Kedalaman permukaan dark v18: gradasi hangat tipis ---------- */
      Dark tidak lagi datar satu warna: kartu mengkilap sedikit ke atas,
      lapisan mengambang lebih terang, kartu hero mengalir Primary → Burnt. */
   html[data-theme="dark"] .glass {
     background: linear-gradient(180deg, #262220 0%, #221e1c 100%);
   }
   html[data-theme="dark"] .glass-strong {
-    background: linear-gradient(180deg, #332b27 0%, #2c2622 100%);
+    background: linear-gradient(160deg, rgba(58, 50, 45, 0.92) 0%, rgba(40, 35, 32, 0.9) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 28px 64px -26px rgba(0, 0, 0, 0.6);
   }
   html[data-theme="dark"] .glass-violet {
     background: linear-gradient(180deg, #3a2a1e 0%, #32241a 100%);
@@ -1444,6 +1465,87 @@ html[data-anim="off"] .tk-cloud {
 .pr-bird {
   animation: pr-bird var(--pr-dur, 38s) ease-in-out infinite alternate;
 }
+/* ================= SUIO 3.5 — Liquid Glass material ================= */
+/* Kartu glass terpilih: translusen + blur konten di belakang, kilau
+   diagonal (specular), inner glow tepi atas — depth berlapis. */
+.su-glass {
+  position: relative;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 255, 255, 0.52) 52%, rgba(255, 255, 255, 0.62) 100%);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.16),
+    0 16px 40px -22px rgba(64, 48, 38, 0.3);
+}
+html[data-theme="dark"] .su-glass {
+  background: linear-gradient(155deg, rgba(74, 64, 57, 0.58) 0%, rgba(42, 37, 34, 0.5) 52%, rgba(58, 50, 45, 0.55) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+    0 18px 44px -22px rgba(0, 0, 0, 0.55);
+}
+.su-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.06) 40%, transparent 62%);
+}
+html[data-theme="dark"] .su-glass::before {
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0.03) 40%, transparent 62%);
+}
+/* Dock navigasi: kapsul gelap Liquid Glass di KEDUA tema (identitas),
+   konten di belakang berbaur blur lembut. */
+.su-dock {
+  position: relative;
+  background: linear-gradient(165deg, rgba(52, 45, 40, 0.78) 0%, rgba(26, 22, 20, 0.72) 100%);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  backdrop-filter: blur(22px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+    0 18px 44px -14px rgba(20, 10, 4, 0.85);
+}
+.su-dock::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 38%, transparent 60%);
+}
+/* Pernafasan skala halus untuk emotikon/ikon hero (transform saja) */
+@keyframes su-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+.su-breathe {
+  animation: su-breathe 3.8s ease-in-out infinite;
+  will-change: transform;
+}
+html[data-anim="off"] .su-breathe {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html .su-breathe {
+    animation: none !important;
+  }
+}
+/* Transisi tema halus: warna permukaan & teks melembut saat ganti tema */
+body,
+.glass,
+.glass-strong,
+.su-glass {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.45s;
+  transition-timing-function: ease;
+}
+
 /* ================= SUIO 3.0 — elevasi & shadow dinamis ================= */
 /* Kartu terangkat: bayangan lembut hangat dua lapis (ambient + kontak).
    Hanya paint cost sekali — tanpa animasi berkelanjutan. */
