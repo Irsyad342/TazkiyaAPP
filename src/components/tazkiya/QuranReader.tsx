@@ -164,11 +164,14 @@ function TranslationView({
 
   const commitLastRead = useCallback(() => {
     const ayah = lastReadRef.current;
+    // Posisi hidup dilaporkan ke shell SETIAP siklus — bukan hanya saat nilai
+    // store berubah — agar saklar mode Mushaf selalu punya posisi terbaru.
+    onPosition({ surah, ayah });
     const saved = lastSavedRef.current;
     if (saved && saved.surah === surah && saved.ayah === ayah) return;
     lastSavedRef.current = { surah, ayah };
     setLastRead(surah, ayah);
-  }, [surah, setLastRead]);
+  }, [surah, setLastRead, onPosition]);
 
   /**
    * Tutup sesi: simpan posisi terakhir, pindahkan penanda otomatis, dan
@@ -451,6 +454,14 @@ export function QuranReader({
       setStatusAyah(null);
     }
     if (next === "mushaf") {
+      // Lanjutkan dari posisi terjemahan yang sedang dibaca: TranslationView
+      // melaporkan posisi hidup (ayat teratas yang terlihat) lewat onPosition,
+      // sehingga pindah mode TIDAK mengembalikan bacaan ke ayat pembuka.
+      const pos = posRef.current;
+      if (pos?.surah) {
+        setActiveSurah(pos.surah);
+        setActiveStartAyah(Math.max(1, pos.ayah));
+      }
       setStatusAyah(null);
       setMushafIntro(true);
     }

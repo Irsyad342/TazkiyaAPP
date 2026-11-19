@@ -66,6 +66,12 @@ export function formatDayFull(key: string): string {
   return `${DAY_FULL[d.getDay()]}, ${d.getDate()} ${MONTH_FULL[d.getMonth()]}`;
 }
 
+/** "Kamis, 19 November 2026" — lengkap dengan tahun (Catatan & Riwayat bacaan). */
+export function formatDayFullWithYear(key: string): string {
+  const d = keyToDate(key);
+  return `${DAY_FULL[d.getDay()]}, ${d.getDate()} ${MONTH_FULL[d.getMonth()]} ${d.getFullYear()}`;
+}
+
 /** Label relatif: Hari Ini / Kemarin / tanggal. */
 export function relativeDayLabel(key: string, today: string = todayKey()): string {
   if (key === today) return "Hari Ini";

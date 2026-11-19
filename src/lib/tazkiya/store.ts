@@ -56,9 +56,11 @@ interface WorshipActions {
   toggleExtra: (date: string, id: ExtraId) => void;
   addQuranProgress: (
     date: string,
-    data: { pages: number; verses: number; surah?: number; ayahFrom?: number; ayahTo?: number; markBookmark?: boolean; auto?: boolean }
+    data: { pages: number; verses: number; surah?: number; ayahFrom?: number; ayahTo?: number; markBookmark?: boolean; auto?: boolean; note?: string }
   ) => void;
   deleteReadingEntry: (id: string) => void;
+  /** Perbaiki catatan bacaan: rentang ayat & catatan pribadi (counter log ikut disesuaikan). */
+  updateReadingEntry: (id: string, patch: { ayahFrom?: number; ayahTo?: number; note?: string }) => void;
   saveBookmark: (b: QuranBookmark) => void;
   deleteBookmark: () => void;
   setLastRead: (surah: number, ayah: number) => void;
@@ -78,6 +80,8 @@ interface WorshipActions {
   addQada: (prayer: PrayerId, missedDate: string, note?: string) => QadaRecord | null;
   completeQada: (id: string) => void;
   reopenQada: (id: string) => void;
+  /** Hapus PERMANEN: catatan dibuang dan id-nya dicatat sebagai batu nisan agar
+   *  sinkronisasi cloud TIDAK PERNAH menghidupkannya kembali. */
   deleteQada: (id: string) => void;
   /* ---- Jurnal Syukur & Mood ---- */
   saveJournal: (date: string, items: [string, string, string], mood?: MoodId) => void;
@@ -131,6 +135,12 @@ export type WorshipStore = {
   readingHistory: ReadingEntry[];
   /** Batu nisan penghapusan riwayat — membuat penghapusan permanen lintas sinkronisasi. */
   deletedReadings: DeletedReading[];
+  /**
+   * Batu nisan penghapusan catatan qada — pola sama dengan deletedReadings:
+   * penghapusan qada BERSIFAT PERMANEN lintas perangkat & sesi login; dokumen
+   * akun yang masih memuat catatan lama tidak boleh menghidupkannya kembali.
+   */
+  deletedQada: DeletedReading[];
   tasbih: TasbihState;
   fridayZuhurAlt: Record<string, boolean>;
   /** Daftar qada — paling baru dibuat di depan. */
@@ -166,6 +176,7 @@ export type WorshipStore = {
 
 /** Batu nisan penghapusan disimpan terbatas (cukup untuk mencegah kebangkitan). */
 const MAX_DELETED_READINGS = 1000;
+const MAX_DELETED_QADA = 1000;
 
 function upsertLog(
   logs: Record<string, DailyLog>,
@@ -197,6 +208,7 @@ export const useWorshipStore = create<WorshipStore>()(
       lastRead: null,
       readingHistory: [],
       deletedReadings: [],
+      deletedQada: [],
       tasbih: { count: 0, target: 100, dhikr: DEFAULT_ZIKIR_DHIKR },
       fridayZuhurAlt: {},
       qadaRecords: [],
@@ -275,6 +287,7 @@ export const useWorshipStore = create<WorshipStore>()(
             ayahTo: data.ayahTo,
             savedAt: new Date().toISOString(),
             auto: data.auto,
+            note: data.note?.trim() || undefined,
           };
           const bookmarks = data.markBookmark && data.surah
             ? [
@@ -324,6 +337,41 @@ export const useWorshipStore = create<WorshipStore>()(
           return {
             readingHistory: s.readingHistory.filter((e) => e.id !== id),
             deletedReadings,
+            logs,
+          };
+        }),
+
+      updateReadingEntry: (id, patch) =>
+        set((s) => {
+          const entry = s.readingHistory.find((e) => e.id === id);
+          if (!entry) return s;
+          // Rentang baru divalidasi: 1 <= ayahFrom <= ayahTo.
+          const ayahFrom = Math.max(1, Math.round(patch.ayahFrom ?? entry.ayahFrom ?? 1));
+          const ayahTo = Math.max(ayahFrom, Math.round(patch.ayahTo ?? entry.ayahTo ?? ayahFrom));
+          const verses = ayahTo - ayahFrom + 1;
+          const delta = verses - (entry.verses ?? 0);
+          // Counter ayat pada log harian tanggal catatan ikut disesuaikan —
+          // statistik harian tetap sama dengan isi riwayat (tidak menggembung).
+          const logs = { ...s.logs };
+          const dayLog = logs[entry.date];
+          if (dayLog && delta !== 0) {
+            logs[entry.date] = {
+              ...dayLog,
+              quranVerses: Math.max(0, dayLog.quranVerses + delta),
+            };
+          }
+          return {
+            readingHistory: s.readingHistory.map((e) =>
+              e.id === id
+                ? {
+                    ...e,
+                    ayahFrom,
+                    ayahTo,
+                    verses,
+                    note: patch.note !== undefined ? patch.note.trim() || undefined : e.note,
+                  }
+                : e
+            ),
             logs,
           };
         }),
@@ -437,8 +485,27 @@ export const useWorshipStore = create<WorshipStore>()(
           ),
         })),
 
+      /**
+       * Hapus catatan qada secara PERMANEN di sumber data (bukan sekadar
+       * menyembunyikan dari tampilan):
+       * 1. catatan dibuang dari qadaRecords,
+       * 2. id dicatat sebagai batu nisan (deletedQada) yang ikut tersinkron ke
+       *    dokumen akun — penggabungan perangkat ↔ akun, hidrasi login, dan
+       *    dorongan berkala SEMUA membuang catatan ber-id ini, sehingga catatan
+       *    yang sudah dihapus tidak muncul kembali.
+       */
       deleteQada: (id) =>
-        set((s) => ({ qadaRecords: s.qadaRecords.filter((q) => q.id !== id) })),
+        set((s) => {
+          if (!s.qadaRecords.some((q) => q.id === id)) return s;
+          const deletedQada = [
+            { id, deletedAt: new Date().toISOString() },
+            ...s.deletedQada.filter((d) => d.id !== id),
+          ].slice(0, MAX_DELETED_QADA);
+          return {
+            qadaRecords: s.qadaRecords.filter((q) => q.id !== id),
+            deletedQada,
+          };
+        }),
 
       /* ---------- Jurnal Syukur & Mood ---------- */
       saveJournal: (date, items, mood) =>
@@ -620,6 +687,7 @@ export const useWorshipStore = create<WorshipStore>()(
           lastRead: null,
           readingHistory: [],
           deletedReadings: [],
+          deletedQada: [],
           tasbih: { count: 0, target: 100, dhikr: DEFAULT_ZIKIR_DHIKR },
           fridayZuhurAlt: {},
           qadaRecords: [],
@@ -660,6 +728,12 @@ export const useWorshipStore = create<WorshipStore>()(
             ...s.deletedReadings.map((d) => d.id),
             ...(doc.deletedReadings ?? []).map((d) => d.id),
           ]);
+          // Batu nisan qada: gabungan perangkat + dokumen akun — catatan yang
+          // pernah dihapus di perangkat mana pun tidak pernah dimuat kembali.
+          const tombQada = new Set([
+            ...s.deletedQada.map((d) => d.id),
+            ...(doc.deletedQada ?? []).map((d) => d.id),
+          ]);
           return {
             settings,
             logs: doc.logs ?? {},
@@ -671,7 +745,8 @@ export const useWorshipStore = create<WorshipStore>()(
             readingHistory: (doc.readingHistory ?? []).filter((e) => !tombIds.has(e.id)),
             deletedReadings: mergeDeletedReadings(s.deletedReadings, doc.deletedReadings ?? []),
             tasbih: doc.tasbih ?? { count: 0, target: 100, dhikr: DEFAULT_ZIKIR_DHIKR },
-            qadaRecords: doc.qadaRecords ?? [],
+            qadaRecords: (doc.qadaRecords ?? []).filter((q) => !tombQada.has(q.id)),
+            deletedQada: mergeDeletedReadings(s.deletedQada, doc.deletedQada ?? []),
             journal: doc.journal ?? {},
             journalX: doc.journalX ?? EMPTY_JOURNAL_X,
             fridayPrep: doc.fridayPrep ?? {},
@@ -705,6 +780,7 @@ export const useWorshipStore = create<WorshipStore>()(
           // data akun yang masih memuat catatan lama tidak boleh
           // menghidupkan kembali riwayat yang sudah dihapus pengguna.
           deletedReadings: s.deletedReadings,
+          deletedQada: s.deletedQada,
           tasbih: { ...s.tasbih, count: 0 },
           qadaRecords: [],
           journal: {},
@@ -774,6 +850,7 @@ export const useWorshipStore = create<WorshipStore>()(
         lastRead: s.lastRead,
         readingHistory: s.readingHistory,
         deletedReadings: s.deletedReadings,
+        deletedQada: s.deletedQada,
         tasbih: s.tasbih,
         fridayZuhurAlt: s.fridayZuhurAlt,
         qadaRecords: s.qadaRecords,

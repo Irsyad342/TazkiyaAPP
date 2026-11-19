@@ -32,6 +32,11 @@ let activeUid: string | null = null;
 let pushTimer: ReturnType<typeof setTimeout> | null = null;
 let unsubStore: (() => void) | null = null;
 let bridgeStarted = false;
+let flushOnHide: (() => void) | null = null;
+
+function onVisChange() {
+  if (document.visibilityState === "hidden") flushOnHide?.();
+}
 
 function setPhase(p: SyncPhase) {
   useAuthStore.getState().setSyncPhase(p);
@@ -96,6 +101,7 @@ function subscribeStore() {
     "lastRead",
     "readingHistory",
     "deletedReadings",
+    "deletedQada",
     "tasbih",
     "qadaRecords",
     "journal",
@@ -120,6 +126,18 @@ function subscribeStore() {
     if (useAuthStore.getState().syncPhase !== "active") return; // jangan dorong sebelum keputusan data
     schedulePush();
   });
+  // Flush dorongan saat halaman disembunyikan/ditutup: tanpa ini, penghapusan
+  // (mis. catatan qada) yang terjadi <1,8 dtk sebelum aplikasi ditutup tidak
+  // pernah sampai ke akun — dokumen akun yang masih memuat catatan lama
+  // kemudian menghidupkannya kembali saat penggabungan berikutnya.
+  flushOnHide = () => {
+    if (!pushTimer) return;
+    clearTimeout(pushTimer);
+    pushTimer = null;
+    void pushNow();
+  };
+  window.addEventListener("pagehide", flushOnHide);
+  window.addEventListener("visibilitychange", onVisChange);
   // Coba ulang dorongan saat koneksi kembali.
   window.addEventListener("online", () => {
     if (useAuthStore.getState().syncPhase === "active") schedulePush();
@@ -132,6 +150,11 @@ function unsubscribeStore() {
   if (pushTimer) {
     clearTimeout(pushTimer);
     pushTimer = null;
+  }
+  if (flushOnHide) {
+    window.removeEventListener("pagehide", flushOnHide);
+    window.removeEventListener("visibilitychange", onVisChange);
+    flushOnHide = null;
   }
 }
 

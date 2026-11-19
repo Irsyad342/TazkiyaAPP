@@ -200,6 +200,8 @@ export interface ReadingEntry {
   savedAt: string; // ISO
   /** true = direkam otomatis oleh pembaca (dari ayat awal sampai ayat akhir yang terbaca). */
   auto?: boolean;
+  /** Catatan pribadi opsional yang ditulis pengguna pada catatan bacaan ini. */
+  note?: string;
 }
 
 /* ---------- Weekly Reflection (Refleksi Ibadah Mingguan) ---------- */
@@ -357,6 +359,8 @@ export interface Settings {
   readerShowTranslation: boolean;
   /** Mode pembaca Al-Qur'an: "terjemahan" (kartu ayat) atau "mushaf" (halaman). */
   quranReadMode?: QuranReadMode;
+  /** Preferensi tampilan daftar surah: "list" (baris) atau "grid" (kartu 2 kolom). */
+  quranListView?: "list" | "grid";
   /** Efek suara kertas saat halaman mushaf berhasil dibalik (default aktif). */
   quranPageSound?: boolean;
   /** Tampilkan terjemahan di bawah ayat pada Mode Mushaf (default nonaktif). */
@@ -640,6 +644,7 @@ export function createDefaultSettings(): Settings {
     readerLineHeight: 1.9,
     readerShowTranslation: true,
     quranReadMode: "terjemahan",
+    quranListView: "list",
     quranPageSound: true,
     quranMushafTranslation: false,
     fullscreenReminder: true,

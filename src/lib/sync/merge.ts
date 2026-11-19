@@ -236,7 +236,14 @@ export function mergeDocs(local: CloudDoc, cloud: CloudDoc, opts: MergeOptions):
     opts.settingsFrom === "cloud" ? cloud.settings ?? local.settings : local.settings ?? cloud.settings;
 
   /* ---------- Perluasan Nūr Companion ---------- */
-  const qadaRecords = mergeById(local.qadaRecords ?? [], cloud.qadaRecords ?? [], (q) => q.createdAt ?? "");
+  // Qada: gabung per id LALU buang semua id yang pernah dihapus (batu nisan
+  // deletedQada dari perangkat mana pun) — dokumen akun yang masih memuat
+  // catatan lama TIDAK BOLEH menghidupkan kembali catatan yang sudah dihapus.
+  const deletedQada = mergeDeletedReadings(local.deletedQada ?? [], cloud.deletedQada ?? []);
+  const deadQada = new Set(deletedQada.map((d) => d.id));
+  const qadaRecords = mergeById(local.qadaRecords ?? [], cloud.qadaRecords ?? [], (q) => q.createdAt ?? "").filter(
+    (q) => !deadQada.has(q.id)
+  );
   const amalEntries = mergeById(local.amalEntries ?? [], cloud.amalEntries ?? [], (e) => e.savedAt ?? "");
   const zikirSessions = mergeById(local.zikirSessions ?? [], cloud.zikirSessions ?? [], (z) => z.savedAt ?? "").slice(0, 500);
   const journal = mergeJournal(local.journal ?? {}, cloud.journal ?? {});
@@ -264,6 +271,7 @@ export function mergeDocs(local: CloudDoc, cloud: CloudDoc, opts: MergeOptions):
     lastRead,
     readingHistory,
     deletedReadings,
+    deletedQada,
     tasbih,
     qadaRecords,
     journal,

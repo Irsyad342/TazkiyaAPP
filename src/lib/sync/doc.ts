@@ -48,6 +48,8 @@ export interface CloudDoc {
   readingHistory?: ReadingEntry[];
   /** Batu nisan penghapusan riwayat — penghapusan permanen lintas perangkat. */
   deletedReadings?: DeletedReading[];
+  /** Batu nisan penghapusan catatan qada — penghapusan permanen lintas perangkat. */
+  deletedQada?: DeletedReading[];
   tasbih?: TasbihState;
   /* ---- Perluasan Nūr Companion (opsional — dokumen lama tetap terbaca) ---- */
   qadaRecords?: QadaRecord[];
@@ -81,6 +83,7 @@ export function extractFullDoc(state: {
   lastRead: LastRead | null;
   readingHistory: ReadingEntry[];
   deletedReadings: DeletedReading[];
+  deletedQada: DeletedReading[];
   tasbih: TasbihState;
   qadaRecords: QadaRecord[];
   journal: Record<string, JournalEntry>;
@@ -107,6 +110,7 @@ export function extractFullDoc(state: {
     lastRead: state.lastRead,
     readingHistory: state.readingHistory,
     deletedReadings: state.deletedReadings,
+    deletedQada: state.deletedQada,
     tasbih: state.tasbih,
     qadaRecords: state.qadaRecords,
     journal: state.journal,
