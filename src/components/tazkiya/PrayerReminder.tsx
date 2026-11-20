@@ -735,7 +735,7 @@ export function PrayerReminder({
             <button
               type="button"
               onClick={onGoRecord}
-              className="tap min-h-[50px] w-full rounded-full bg-[#FF5A00] font-display text-[14.5px] font-bold text-white shadow-[0_14px_34px_-12px_rgba(255,90,0,0.6)] transition-transform active:scale-[0.985]"
+              className="tap min-h-[50px] w-full rounded-full bg-[var(--tk-brand)] font-display text-[14.5px] font-bold text-white shadow-[0_14px_34px_-12px_rgba(var(--tk-brand-rgb),0.6)] transition-transform active:scale-[0.985]"
             >
               Catat Salat
             </button>

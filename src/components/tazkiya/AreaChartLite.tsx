@@ -207,7 +207,7 @@ export function AreaChartLite({
               initial={{ pathLength: 0 }}
               animate={{ pathLength: 1 }}
               transition={{ duration: 1.1, ease: EASE.inOut }}
-              style={{ filter: "drop-shadow(0 4px 10px rgba(255,90,0,0.35))" }}
+              style={{ filter: "drop-shadow(0 4px 10px rgba(var(--tk-brand-rgb),0.35))" }}
             />
           ) : (
             <path
@@ -217,7 +217,7 @@ export function AreaChartLite({
               strokeWidth={2.5}
               strokeLinecap="round"
               strokeLinejoin="round"
-              style={{ filter: "drop-shadow(0 4px 10px rgba(255,90,0,0.35))" }}
+              style={{ filter: "drop-shadow(0 4px 10px rgba(var(--tk-brand-rgb),0.35))" }}
             />
           )}
 
@@ -256,7 +256,7 @@ export function AreaChartLite({
         <div
           className={cn(
             "pointer-events-none absolute z-10 rounded-xl border px-2.5 py-1.5 text-[11px] leading-snug shadow-lg",
-            isLight ? "border-[rgba(255,90,0,0.3)] bg-white/95 text-[#1A1A1E]" : "border-[rgba(255,90,0,0.35)] bg-[rgba(59,52,47,0.95)] text-white"
+            isLight ? "border-[rgba(var(--tk-brand-rgb),0.3)] bg-white/95 text-[#1A1A1E]" : "border-[rgba(var(--tk-brand-rgb),0.35)] bg-[rgba(59,52,47,0.95)] text-white"
           )}
           style={{ left: tipLeft, top: Math.max(-6, tipY - 58) }}
         >

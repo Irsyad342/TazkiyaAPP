@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 /* ---------- Identitas warna kategori (selaras aksen SUIO) ---------- */
 
 export const CAT_DOT: Record<JournalCat | "syukur", string> = {
-  refleksi: "#FF5A00", // orange — Refleksi Diri
+  refleksi: "var(--tk-brand)", // orange — Refleksi Diri
   emosi: "#FFB38A", // peach — Emosi & Penerimaan
   syukur: "#E19A3C", // warm amber — Syukur
   harapan: "#C2410C", // burnt orange — Harapan & Ikhtiar
@@ -196,7 +196,7 @@ export function JournalCalendar({
                       layoutId="tk-cal-sel"
                       aria-hidden
                       transition={motionOK ? SPRING.glide : { duration: 0 }}
-                      className="gs-ink-btn absolute inset-0 rounded-[0.85rem] shadow-[0_8px_18px_-8px_rgba(255,90,0,0.6)]"
+                      className="gs-ink-btn absolute inset-0 rounded-[0.85rem] shadow-[0_8px_18px_-8px_rgba(var(--tk-brand-rgb),0.6)]"
                     />
                   ) : null}
                   <span className={cn("tnum relative z-10 leading-none", isToday && !isSel && "font-bold text-tk-accent")}>{day}</span>

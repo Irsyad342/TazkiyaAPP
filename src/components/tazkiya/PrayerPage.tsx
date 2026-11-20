@@ -490,7 +490,7 @@ function TiltWrap({
   const sshY = useSpring(shY, spring);
 
   const neutral = useMotionTemplate`0 ${sshY}px 32px -20px rgba(23,23,26,0.32)`;
-  const orange = useMotionTemplate`0 ${sshY}px 44px -18px rgba(250,82,0,0.5)`;
+  const orange = useMotionTemplate`0 ${sshY}px 44px -18px rgba(var(--tk-brand-rgb),0.5)`;
 
   const reset = () => {
     rx.set(0);
@@ -1249,7 +1249,7 @@ function QadaTab({ today }: { today: string }) {
             <button
               type="button"
               onClick={submit}
-              className="tap gs-ink-btn flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full text-[14px] font-bold shadow-[0_10px_24px_-10px_rgba(250,82,0,0.55)]"
+              className="tap gs-ink-btn flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full text-[14px] font-bold shadow-[0_10px_24px_-10px_rgba(var(--tk-brand-rgb),0.55)]"
             >
               <Plus size={16} /> Tambah ke Daftar Qada
             </button>

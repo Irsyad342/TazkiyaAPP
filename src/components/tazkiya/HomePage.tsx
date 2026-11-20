@@ -671,10 +671,10 @@ function QuoteCard({ today }: { today: string }) {
   const quote = useMemo(() => quoteForDate(today), [today]);
   return (
     <div
-      className="su-card-shadow relative flex h-full min-h-[172px] flex-col overflow-hidden rounded-[1.4rem] border border-tk-line-soft bg-tk-panel light:bg-[linear-gradient(150deg,#FFFDFB_0%,#FFF6EC_58%,#FFEFDF_100%)] dark:bg-[linear-gradient(150deg,#463D36_0%,#3B342F_55%,#342D28_100%)]"
+      className="su-card-shadow relative flex h-full min-h-[172px] flex-col overflow-hidden rounded-[1.4rem] border border-tk-line-soft bg-tk-panel light:bg-[linear-gradient(150deg,#FFFDFB_0%,var(--tk-tint-b)_58%,var(--tk-tint-c)_100%)] dark:bg-[linear-gradient(150deg,var(--color-tk-white-card)_0%,var(--color-tk-panel)_55%,var(--color-tk-panel-soft)_100%)]"
     >
       {/* Kilau hangat di dua pojok — peach (light) / copper (dark) */}
-      <span aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-[#FFE3C9]/60 blur-2xl dark:bg-[#FF9A52]/10" />
+      <span aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-[#FFE3C9]/60 blur-2xl dark:bg-[var(--tk-brand-soft)]/10" />
       <span aria-hidden className="pointer-events-none absolute -bottom-14 -left-10 h-32 w-32 rounded-full bg-[#FFD9B8]/45 blur-2xl dark:bg-[#D9A05B]/10" />
 
       {/* Overline: ornamen bintang segi-8 (geometris Islami) + kategori */}

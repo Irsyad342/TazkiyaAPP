@@ -130,8 +130,8 @@ const CAT_META_EXT: Record<
     short: "Refleksi Diri",
     desc: "Lihat kembali perjalananmu dan temukan pelajaran dari setiap pengalaman.",
     icon: Compass,
-    tint: "#FF650A",
-    ring: "rgba(255,90,0,0.18)",
+    tint: "var(--tk-brand)",
+    ring: "rgba(var(--tk-brand-rgb),0.18)",
   },
   emosi: {
     label: "Jurnal Emosi & Penerimaan Diri",
@@ -760,8 +760,8 @@ function JournalXForm({
                     className={cn(
                       "tap rounded-[25%] p-0.5 transition-[box-shadow] duration-200",
                       active
-                        ? "ring-2 ring-tk-accent light:shadow-[0_8px_16px_-8px_rgba(255,90,0,0.45)] dark:shadow-[0_8px_18px_-10px_rgba(255,90,0,0.4)]"
-                        : "light:ring-1 light:ring-[#2a2320]/[0.08] dark:ring-1 dark:ring-white/[0.06]"
+                        ? "ring-2 ring-tk-accent light:shadow-[0_8px_16px_-8px_rgba(var(--tk-brand-rgb),0.45)] dark:shadow-[0_8px_18px_-10px_rgba(var(--tk-brand-rgb),0.4)]"
+                        : "light:ring-1 light:ring-[var(--tk-ring-ink)]/[0.08] dark:ring-1 dark:ring-white/[0.06]"
                     )}
                   >
                     <MoodFace id={mo.id} className="h-9 w-9" />
@@ -1191,8 +1191,8 @@ function SyukurJournal({ onBack }: { onBack: () => void }) {
                           className={cn(
                             "flex rounded-[25%] transition-[box-shadow] duration-300",
                             active
-                              ? "ring-2 ring-tk-accent ring-offset-2 ring-offset-tk-panel light:shadow-[0_10px_22px_-8px_rgba(255,90,0,0.45)] dark:shadow-[0_10px_24px_-10px_rgba(217,75,10,0.45)]"
-                              : "light:shadow-[0_6px_14px_-6px_rgba(119,113,109,0.42)] light:ring-1 light:ring-[#2a2320]/[0.06] dark:shadow-[0_10px_22px_-12px_rgba(12,6,2,0.6)] dark:ring-1 dark:ring-[#F5E8DC]/[0.07]"
+                              ? "ring-2 ring-tk-accent ring-offset-2 ring-offset-tk-panel light:shadow-[0_10px_22px_-8px_rgba(var(--tk-brand-rgb),0.45)] dark:shadow-[0_10px_24px_-10px_rgba(var(--tk-brand-rgb),0.45)]"
+                              : "light:shadow-[0_6px_14px_-6px_rgba(119,113,109,0.42)] light:ring-1 light:ring-[var(--tk-ring-ink)]/[0.06] dark:shadow-[0_10px_22px_-12px_rgba(12,6,2,0.6)] dark:ring-1 dark:ring-[var(--tk-hint)]/[0.07]"
                           )}
                         >
                           <MoodFace id={mo.id} className="h-14 w-14" />
@@ -1370,8 +1370,8 @@ function SyukurJournal({ onBack }: { onBack: () => void }) {
                                     className={cn(
                                       "tap rounded-[25%] p-0.5 transition-[box-shadow] duration-200",
                                       active
-                                        ? "ring-2 ring-tk-accent light:shadow-[0_8px_16px_-8px_rgba(255,90,0,0.45)] dark:shadow-[0_8px_18px_-10px_rgba(255,90,0,0.4)]"
-                                        : "light:ring-1 light:ring-[#2a2320]/[0.08] dark:ring-1 dark:ring-white/[0.06]"
+                                        ? "ring-2 ring-tk-accent light:shadow-[0_8px_16px_-8px_rgba(var(--tk-brand-rgb),0.45)] dark:shadow-[0_8px_18px_-10px_rgba(var(--tk-brand-rgb),0.4)]"
+                                        : "light:ring-1 light:ring-[var(--tk-ring-ink)]/[0.08] dark:ring-1 dark:ring-white/[0.06]"
                                     )}
                                   >
                                     <MoodFace id={mo.id} className="h-8 w-8" />

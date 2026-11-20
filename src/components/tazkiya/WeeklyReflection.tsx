@@ -58,8 +58,8 @@ function MiniStat({ icon: Icon, label, value }: { icon: typeof MoonStar; label: 
   return (
     <div className="flex min-w-0 items-center gap-1.5 rounded-full bg-white/55 px-2.5 py-1.5 dark:bg-white/8">
       <Icon size={12} className="shrink-0 text-tk-accent" aria-hidden />
-      <span className="tnum truncate text-[10.5px] font-bold text-[#4A3A28] dark:text-[#E8D8C4]">{value}</span>
-      <span className="truncate text-[9.5px] font-medium text-[#4A3A28]/60 dark:text-[#E8D8C4]/55">{label}</span>
+      <span className="tnum truncate text-[10.5px] font-bold text-[#4A3A28] dark:text-[var(--tk-d-ink-soft)]">{value}</span>
+      <span className="truncate text-[9.5px] font-medium text-[#4A3A28]/60 dark:text-[var(--tk-d-ink-soft)]/55">{label}</span>
     </div>
   );
 }
@@ -90,7 +90,7 @@ export function WeeklyReflectionCard({ onOpen }: { onOpen: () => void }) {
       style={{ borderColor: "rgba(255,122,40,0.25)" }}
     >
       {/* Dasar warm ivory / warm charcoal */}
-      <div className="absolute inset-0 bg-[#FFF8EE] dark:bg-[#3F3830]" aria-hidden />
+      <div className="absolute inset-0 bg-[#FFF8EE] dark:bg-[var(--color-tk-light-card)]" aria-hidden />
       {/* Polesan hangat + ornamen geometris minimalis */}
       <div
         aria-hidden
@@ -101,18 +101,18 @@ export function WeeklyReflectionCard({ onOpen }: { onOpen: () => void }) {
         }}
       />
       <div aria-hidden className="tk-geo-pattern absolute -right-10 -top-10 h-44 w-44 opacity-[0.10]" />
-      <span aria-hidden className="tk-octagram absolute -bottom-7 -left-7 h-32 w-32 bg-[#FF8A3C]/10 dark:bg-[#FF9A52]/10" />
+      <span aria-hidden className="tk-octagram absolute -bottom-7 -left-7 h-32 w-32 bg-[#FF8A3C]/10 dark:bg-[var(--tk-brand-soft)]/10" />
 
       <div className="relative p-5">
         {/* Kepala: lencana + status */}
         <div className="flex items-start justify-between gap-3">
           <span className="relative flex h-12 w-12 shrink-0 items-center justify-center">
-            <span aria-hidden className="tk-octagram absolute inset-0 bg-[#FF8A3C]/25 dark:bg-[#FF9A52]/20" />
+            <span aria-hidden className="tk-octagram absolute inset-0 bg-[#FF8A3C]/25 dark:bg-[var(--tk-brand-soft)]/20" />
             <span aria-hidden className="tk-octagram absolute inset-[2px] bg-gradient-to-br from-[#FF8A3C] to-[#E04E00]" />
             <Award size={20} className="relative text-white" aria-hidden />
           </span>
           <div className="flex flex-col items-end gap-1.5">
-            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#C65A10] dark:text-[#FF9A52]">
+            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#C65A10] dark:text-[var(--tk-brand-soft)]">
               Weekly Reflection
             </span>
             {isNew ? (
@@ -124,10 +124,10 @@ export function WeeklyReflectionCard({ onOpen }: { onOpen: () => void }) {
         </div>
 
         {/* Headline + subheadline */}
-        <h2 className="gs-display mt-3.5 text-[21px] font-bold leading-tight tracking-[-0.02em] text-[#33261A] dark:text-[#F6EEE3]">
+        <h2 className="gs-display mt-3.5 text-[21px] font-bold leading-tight tracking-[-0.02em] text-[#33261A] dark:text-[var(--tk-d-ink-hi)]">
           Perjalanan Baikmu Minggu Ini
         </h2>
-        <p className="mt-1.5 max-w-[300px] text-[11.5px] leading-relaxed text-[#6B5442] dark:text-[#B8A795]">
+        <p className="mt-1.5 max-w-[300px] text-[11.5px] leading-relaxed text-[#6B5442] dark:text-[var(--tk-d-ink-mid)]">
           Setiap usaha kecil layak dihargai. Mari lihat perjalanan ibadahmu selama tujuh hari terakhir.
         </p>
 
@@ -154,11 +154,11 @@ export function WeeklyReflectionCard({ onOpen }: { onOpen: () => void }) {
             })}
           </div>
           <div className="shrink-0 text-right">
-            <p className="tnum gs-display text-[24px] font-bold leading-none text-[#33261A] dark:text-[#F6EEE3]">{pct}%</p>
-            <p className="text-[8.5px] font-bold uppercase tracking-[0.12em] text-[#6B5442]/70 dark:text-[#B8A795]/70">salat terlaksana</p>
+            <p className="tnum gs-display text-[24px] font-bold leading-none text-[#33261A] dark:text-[var(--tk-d-ink-hi)]">{pct}%</p>
+            <p className="text-[8.5px] font-bold uppercase tracking-[0.12em] text-[#6B5442]/70 dark:text-[var(--tk-d-ink-mid)]/70">salat terlaksana</p>
           </div>
         </div>
-        <p className="mt-1 text-[9.5px] font-medium text-[#6B5442]/70 dark:text-[#B8A795]/70">
+        <p className="mt-1 text-[9.5px] font-medium text-[#6B5442]/70 dark:text-[var(--tk-d-ink-mid)]/70">
           {weekRangeLabel(weekStart)} · batang = salat terlaksana per hari
         </p>
 
@@ -173,7 +173,7 @@ export function WeeklyReflectionCard({ onOpen }: { onOpen: () => void }) {
           <MiniStat icon={BookHeart} label="jurnal" value={`${report.journalCount} hari`} />
         </div>
 
-        <p className="mt-3.5 flex items-center gap-1 text-[10.5px] font-bold text-[#C65A10] dark:text-[#FF9A52]">
+        <p className="mt-3.5 flex items-center gap-1 text-[10.5px] font-bold text-[#C65A10] dark:text-[var(--tk-brand-soft)]">
           <ChevronRight size={12} aria-hidden />
           Ketuk untuk membuka refleksi mingguan
         </p>
@@ -362,29 +362,29 @@ export function WeeklyReflectionSheet({
             animate={{ rotateY: motionOK ? -108 : 0, opacity: motionOK ? [1, 1, 0.9, 0] : 0 }}
             transition={motionOK ? { duration: 1.0, times: [0, 0.55, 0.85, 1], ease: [0.45, 0, 0.2, 1] } : { duration: 0.01 }}
             onAnimationComplete={() => setCoverGone(true)}
-            className="absolute inset-0 z-20 origin-left bg-[#FFF8EE] dark:bg-[#3F3830]"
+            className="absolute inset-0 z-20 origin-left bg-[#FFF8EE] dark:bg-[var(--color-tk-light-card)]"
             style={{ backfaceVisibility: "hidden" }}
             aria-hidden
           >
             <div aria-hidden className="tk-geo-pattern absolute inset-0 opacity-[0.08]" />
-            <span aria-hidden className="tk-octagram absolute -right-10 top-24 h-44 w-44 bg-[#FF8A3C]/15 dark:bg-[#FF9A52]/10" />
-            <span aria-hidden className="tk-octagram absolute -left-8 bottom-24 h-36 w-36 bg-[#FF8A3C]/10 dark:bg-[#FF9A52]/10" />
+            <span aria-hidden className="tk-octagram absolute -right-10 top-24 h-44 w-44 bg-[#FF8A3C]/15 dark:bg-[var(--tk-brand-soft)]/10" />
+            <span aria-hidden className="tk-octagram absolute -left-8 bottom-24 h-36 w-36 bg-[#FF8A3C]/10 dark:bg-[var(--tk-brand-soft)]/10" />
             <div className="flex h-full flex-col items-center justify-center gap-4 px-8 text-center">
               <span className="relative flex h-16 w-16 items-center justify-center">
-                <span aria-hidden className="tk-octagram absolute inset-0 bg-[#FF8A3C]/25 dark:bg-[#FF9A52]/20" />
+                <span aria-hidden className="tk-octagram absolute inset-0 bg-[#FF8A3C]/25 dark:bg-[var(--tk-brand-soft)]/20" />
                 <span aria-hidden className="tk-octagram absolute inset-[2.5px] bg-gradient-to-br from-[#FF8A3C] to-[#E04E00]" />
                 <Award size={26} className="relative text-white" />
               </span>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#C65A10] dark:text-[#FF9A52]">Weekly Reflection</p>
-                <p className="gs-display mt-2 text-[24px] font-bold tracking-[-0.02em] text-[#33261A] dark:text-[#F6EEE3]">
+                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#C65A10] dark:text-[var(--tk-brand-soft)]">Weekly Reflection</p>
+                <p className="gs-display mt-2 text-[24px] font-bold tracking-[-0.02em] text-[#33261A] dark:text-[var(--tk-d-ink-hi)]">
                   Refleksi Mingguan
                 </p>
-                <p className="mt-1.5 text-[12px] font-medium text-[#6B5442] dark:text-[#B8A795]">
+                <p className="mt-1.5 text-[12px] font-medium text-[#6B5442] dark:text-[var(--tk-d-ink-mid)]">
                   {weekRangeLabel(selected)}
                 </p>
               </div>
-              <span className="mt-2 flex h-0.5 w-14 rounded-full bg-[#E04E00]/60 dark:bg-[#FF9A52]/50" />
+              <span className="mt-2 flex h-0.5 w-14 rounded-full bg-[#E04E00]/60 dark:bg-[var(--tk-brand-soft)]/50" />
             </div>
           </m.div>
         ) : null}
@@ -506,7 +506,7 @@ export function WeeklyReflectionSheet({
             {report.bestHabit ? (
               <div className="mt-2.5 flex items-start gap-3">
                 <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
-                  <span aria-hidden className="tk-octagram absolute inset-0 bg-[#FF8A3C]/20 dark:bg-[#FF9A52]/15" />
+                  <span aria-hidden className="tk-octagram absolute inset-0 bg-[#FF8A3C]/20 dark:bg-[var(--tk-brand-soft)]/15" />
                   <span aria-hidden className="tk-octagram absolute inset-[2px] bg-gradient-to-br from-[#FF8A3C] to-[#E04E00]" />
                   <Award size={16} className="relative text-white" />
                 </span>
@@ -569,7 +569,7 @@ export function WeeklyReflectionSheet({
 
           {/* 6. WEEKLY MOTIVATION */}
           <m.section variants={itemV(motionOK)} className="relative overflow-hidden rounded-[1.4rem] p-4">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FF8A3C]/12 to-transparent dark:from-[#FF9A52]/10" aria-hidden />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FF8A3C]/12 to-transparent dark:from-[var(--tk-brand-soft)]/10" aria-hidden />
             <div className="relative">
               <SectionTitle>Weekly Motivation</SectionTitle>
               <p className="mt-2 text-[13px] leading-relaxed text-tk-ink/90">&ldquo;{report.motivation}&rdquo;</p>

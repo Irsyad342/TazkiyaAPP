@@ -43,6 +43,7 @@ import {
   MapPin,
   Minus,
   MoonStar,
+  Palette,
   Pencil,
   ListChecks,
   Gauge,
@@ -52,6 +53,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { COLOR_THEMES, findColorTheme } from "@/lib/tazkiya/colorThemes";
+import type { ColorThemeId } from "@/lib/tazkiya/types";
 import { requestNotifyPermission, notifyPermission } from "@/lib/tazkiya/reminder-trigger";
 import { DEFAULT_FRIDAY_SETTINGS, type FridaySettings } from "@/lib/tazkiya/types";
 import type { CSSProperties } from "react";
@@ -142,9 +146,9 @@ const GLASS_PREVIEW: Record<string, string>[] = [
 ];
 
 const THEME_OPTIONS: { id: ThemeMode; label: string; hint: string; bg: string; dot: string }[] = [
-  { id: "light", label: "Terang", hint: "Kanvas putih", bg: "linear-gradient(140deg,#ffffff,#f0eeea)", dot: "#FF5A00" },
-  { id: "dark", label: "Gelap", hint: "Arang hangat", bg: "linear-gradient(140deg,#51463D,#292522)", dot: "#FF650A" },
-  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#292522 50%,#F6F2EB 50%)", dot: "#FF650A" },
+  { id: "light", label: "Terang", hint: "Kanvas putih", bg: "linear-gradient(140deg,#ffffff,#f0eeea)", dot: "var(--tk-brand)" },
+  { id: "dark", label: "Gelap", hint: "Arang hangat", bg: "linear-gradient(140deg,var(--color-tk-panel-strong),var(--tk-shell-bg))", dot: "var(--tk-brand)" },
+  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,var(--tk-shell-bg) 50%,#F6F2EB 50%)", dot: "var(--tk-brand)" },
 ];
 
 /** Jam perangkat HH:mm — aksen kanan-atas kepala profil. */
@@ -407,11 +411,11 @@ function GlassLevelPicker({
               motionOK ? (
                 <m.span
                   layoutId="su-glass-pill"
-                  className="absolute inset-0 rounded-full gs-ink-btn shadow-[0_4px_12px_-4px_rgba(255,90,0,0.5)]"
+                  className="absolute inset-0 rounded-full gs-ink-btn shadow-[0_4px_12px_-4px_rgba(var(--tk-brand-rgb),0.5)]"
                   transition={{ type: "spring", stiffness: 520, damping: 38 }}
                 />
               ) : (
-                <span className="absolute inset-0 rounded-full gs-ink-btn shadow-[0_4px_12px_-4px_rgba(255,90,0,0.5)]" />
+                <span className="absolute inset-0 rounded-full gs-ink-btn shadow-[0_4px_12px_-4px_rgba(var(--tk-brand-rgb),0.5)]" />
               )
             ) : null}
             <span className={cn("relative z-10", active ? "text-tk-panel" : "text-tk-muted")}>{l.label}</span>
@@ -449,6 +453,9 @@ export function ProfilePage({
   const [expandedDay, setExpandedDay] = useState<string | null>(null);
   const [editingPrayer, setEditingPrayer] = useState<{ date: string; meta: PrayerMeta } | null>(null);
   const [openPanel, setOpenPanel] = useState<Panel>(null);
+  /** Theme Gallery: dialog terbuka + paket yang sedang DIPRATINJAU (belum disimpan). */
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [previewId, setPreviewId] = useState<ColorThemeId | null>(null);
 
   const today = todayKey();
   /** Lokasi aktif = izin pernah diberikan & koordinat tersimpan. */
@@ -1409,6 +1416,148 @@ export function ProfilePage({
             </div>
           </RiseIn>
         </GroupList>
+        {/* ---------- Theme Gallery — paket palet lengkap ---------- */}
+        <GroupList className="mt-3 su-card-shadow" ariaLabel="Tema aplikasi (Theme Gallery)">
+          <RiseIn i={0} y={12}>
+            <button
+              type="button"
+              onClick={() => setGalleryOpen(true)}
+              aria-haspopup="dialog"
+              className="tap flex w-full items-center gap-3.5 px-4 py-3.5 text-left"
+            >
+              <Palette size={18} strokeWidth={1.8} className="shrink-0 text-tk-muted" />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[14px] font-medium text-tk-ink">Tema Aplikasi</span>
+                <span className="block truncate text-[11px] text-tk-muted">
+                  {findColorTheme(settings.colorTheme).name} — satu paket palet lengkap dari Galeri Tema
+                </span>
+              </span>
+              <span aria-hidden className="flex shrink-0 items-center gap-1">
+                {findColorTheme(settings.colorTheme).swatches.slice(0, 4).map((c) => (
+                  <span key={c} className="h-3.5 w-3.5 rounded-full border border-black/10" style={{ background: c }} />
+                ))}
+                <ChevronRight size={16} className="ml-1 text-tk-deep" />
+              </span>
+            </button>
+          </RiseIn>
+        </GroupList>
+        {/* Dialog Galeri Tema — menutup = pratinjau yang belum disimpan dikembalikan */}
+        <Dialog
+          open={galleryOpen}
+          onOpenChange={(o) => {
+            setGalleryOpen(o);
+            if (!o && previewId) {
+              document.documentElement.dataset.color = settings.colorTheme ?? "classic";
+              setPreviewId(null);
+            }
+          }}
+        >
+          <DialogContent className="max-h-[86dvh] overflow-y-auto rounded-[1.6rem] border-tk-line bg-tk-panel p-0 sm:max-w-[430px]">
+            <div className="px-5 pb-2 pt-5">
+              <DialogTitle className="text-[17px] font-bold tracking-tight text-tk-ink">Galeri Tema</DialogTitle>
+              <DialogDescription className="mt-1 text-[12px] leading-relaxed text-tk-muted">
+                Satu kartu = satu paket palet lengkap untuk seluruh aplikasi. Mode Terang/Gelap tetap dipilih di
+                "Tema tampilan" dan ikut menyesuaikan paket yang aktif.
+              </DialogDescription>
+            </div>
+            <div className="flex flex-col gap-3 px-4 pb-5 pt-1">
+              {COLOR_THEMES.map((t) => {
+                const active = (settings.colorTheme ?? "classic") === t.id;
+                const previewing = previewId === t.id;
+                return (
+                  <div
+                    key={t.id}
+                    className={cn(
+                      "rounded-2xl border p-4 transition-shadow",
+                      active ? "border-tk-violet bg-tk-lavender shadow-[0_0_0_1px_var(--color-tk-violet)]" : "border-tk-line bg-tk-panel-soft"
+                    )}
+                  >
+                    <div className="flex items-start gap-3.5">
+                      {/* Mini ilustrasi antarmuka — warna statis milik tema ini */}
+                      <div aria-hidden className="relative h-[104px] w-[84px] shrink-0 overflow-hidden rounded-xl border" style={{ borderColor: t.mock.line, background: t.mock.shell }}>
+                        <div className="flex h-full w-full flex-col gap-1 p-1.5">
+                          <div className="flex items-center gap-1">
+                            <span className="h-2.5 w-2.5 rounded-full" style={{ background: t.mock.accent }} />
+                            <span className="h-1 w-9 rounded-full" style={{ background: t.mock.navy, opacity: 0.25 }} />
+                          </div>
+                          <div className="rounded-md p-1.5" style={{ background: `linear-gradient(140deg, ${t.mock.heroA}, ${t.mock.heroB})` }}>
+                            <span className="block text-[5.5px] font-bold leading-tight" style={{ color: t.mock.heroInk }}>
+                              Assalamu&apos;alaikum
+                            </span>
+                            <span className="mt-1 block h-1 w-7 rounded-full" style={{ background: "rgba(255,255,255,0.55)" }} />
+                          </div>
+                          <div className="flex gap-1">
+                            <div className="flex-1 rounded-md p-1" style={{ background: t.mock.card }}>
+                              <span className="mb-0.5 block h-1 w-4 rounded-full" style={{ background: t.mock.accent }} />
+                              <span className="block h-1 w-6 rounded-full" style={{ background: t.mock.cardSub, opacity: 0.55 }} />
+                            </div>
+                            <div className="flex-1 rounded-md p-1" style={{ background: t.mock.neon }}>
+                              <span className="block text-[5px] font-bold leading-none" style={{ color: t.mock.neonInk }}>
+                                Hari ini
+                              </span>
+                              <span className="mt-1 block h-1 w-5 rounded-full" style={{ background: t.mock.navy, opacity: 0.3 }} />
+                            </div>
+                          </div>
+                          <div className="mx-auto mt-auto h-2.5 w-12 rounded-full" style={{ background: t.mock.navy }} />
+                        </div>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[15px] font-bold text-tk-ink">{t.name}</span>
+                          {active ? (
+                            <span className="flex items-center gap-1 rounded-full bg-tk-violet px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                              <Check size={10} strokeWidth={3} /> Aktif
+                            </span>
+                          ) : previewing ? (
+                            <span className="rounded-full border border-tk-violet px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-tk-violet">
+                              Pratinjau
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="mt-0.5 text-[11.5px] font-semibold text-tk-muted">{t.tagline}</p>
+                        <div className="mt-2 flex items-center gap-1.5">
+                          {t.swatches.map((c) => (
+                            <span key={c} className="h-5 w-5 rounded-full border border-black/10 shadow-sm" style={{ background: c }} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <p className="mt-3 text-[12px] leading-relaxed text-tk-muted">{t.description}</p>
+                    <div className="mt-3.5 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          document.documentElement.dataset.color = t.id;
+                          setPreviewId(t.id);
+                        }}
+                        className="tap flex h-10 min-h-10 items-center justify-center gap-1.5 rounded-full border border-tk-line-strong bg-tk-panel px-4 text-[13px] font-bold text-tk-ink transition-transform active:scale-[0.98]"
+                      >
+                        <Sparkles size={14} className="text-tk-violet" /> Pratinjau
+                      </button>
+                      <button
+                        type="button"
+                        disabled={active}
+                        onClick={() => {
+                          updateSettings({ colorTheme: t.id });
+                          document.documentElement.dataset.color = t.id;
+                          setPreviewId(null);
+                          toast.success(`Tema "${t.name}" diterapkan ke seluruh aplikasi`);
+                        }}
+                        className={cn(
+                          "tap flex h-10 min-h-10 flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-[13px] font-bold text-white transition-transform active:scale-[0.98]",
+                          active ? "cursor-default bg-tk-panel-strong text-tk-muted" : "bg-[var(--tk-brand)] shadow-[0_10px_24px_-10px_rgba(var(--tk-brand-rgb),0.55)]"
+                        )}
+                      >
+                        {active ? <Check size={14} /> : <Palette size={14} />}
+                        {active ? "Tema Aktif" : "Terapkan Tema"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </DialogContent>
+        </Dialog>
         {/* ---------- Liquid Glass Appearance ---------- */}
         <GroupList className="mt-3 su-card-shadow" ariaLabel="Tampilan Liquid Glass">
           <RiseIn i={0} y={12} className="flex items-center gap-3.5 px-4 py-3.5">

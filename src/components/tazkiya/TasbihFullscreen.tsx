@@ -232,7 +232,7 @@ export function TasbihFullscreen({
             <span
               aria-hidden
               className="su-ambient pointer-events-none absolute inset-[30px] rounded-full"
-              style={{ background: "radial-gradient(circle, rgba(250,82,0,0.16) 0%, rgba(250,82,0,0) 70%)" }}
+              style={{ background: "radial-gradient(circle, rgba(var(--tk-brand-rgb),0.16) 0%, rgba(var(--tk-brand-rgb),0) 70%)" }}
             />
             <span aria-hidden className="tk-tasbih-disc absolute inset-[22px] rounded-full border border-tk-line" />
             <m.span

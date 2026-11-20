@@ -179,6 +179,14 @@ export interface LastRead {
 
 export type ThemeMode = "dark" | "light" | "system";
 
+/**
+ * Tema warna aplikasi (Theme Gallery) — satu paket palet lengkap, bukan
+ * pilihan warna per elemen. "classic" = identitas SUIO hangat (oranye),
+ * bawaan aplikasi. Tema baru ditambahkan dengan menambah blok token
+ * html[data-color="<id>"] di globals.css + entri di lib/tazkiya/colorThemes.ts.
+ */
+export type ColorThemeId = "classic" | "electric";
+
 /** Lokasi perangkat (GPS) — hanya disimpan lokal, tanpa server. */
 export interface DeviceGeo {
   auto: boolean; // perbarui otomatis saat pengguna berpindah
@@ -353,6 +361,8 @@ export interface Settings {
   vibration: boolean;
   showArabic: boolean;
   theme: ThemeMode;
+  /** Paket tema warna aktif dari Theme Gallery (default: classic). */
+  colorTheme?: ColorThemeId;
   readerArabicSize: number; // px 20..46
   readerTransSize: number; // px 11..20
   readerLineHeight: number; // 1.7 | 1.9 | 2.2

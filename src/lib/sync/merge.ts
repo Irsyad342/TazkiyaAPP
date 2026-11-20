@@ -232,8 +232,17 @@ export function mergeDocs(local: CloudDoc, cloud: CloudDoc, opts: MergeOptions):
     dhikr: lt?.dhikr ?? ct?.dhikr ?? "Subhanallah",
   };
 
-  const settings: Settings | undefined =
-    opts.settingsFrom === "cloud" ? cloud.settings ?? local.settings : local.settings ?? cloud.settings;
+  const settings: Settings | undefined = (() => {
+    const win = opts.settingsFrom === "cloud" ? cloud.settings : local.settings;
+    const other = opts.settingsFrom === "cloud" ? local.settings : cloud.settings;
+    if (!win) return other ?? win;
+    if (!other) return win;
+    // Pemenang tetap menang untuk setiap field yang ada di keduanya; field
+    // yang HANYA ada di sisi satunya dipertahankan — mis. preferensi baru
+    // (Theme Gallery colorTheme) pada perangkat yang belum pernah push,
+    // agar tidak hilang saat dokumen akun yang lebih lama menimpa lokal.
+    return { ...other, ...win } as Settings;
+  })();
 
   /* ---------- Perluasan Nūr Companion ---------- */
   // Qada: gabung per id LALU buang semua id yang pernah dihapus (batu nisan

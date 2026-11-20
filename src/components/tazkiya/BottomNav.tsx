@@ -61,7 +61,7 @@ export function BottomNav({
                 <m.span
                   layoutId="tk-nav-pill"
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  className="absolute inset-0 rounded-full bg-tk-violet shadow-[0_8px_20px_-6px_rgba(250,82,0,0.6)]"
+                  className="absolute inset-0 rounded-full bg-tk-violet shadow-[0_8px_20px_-6px_rgba(var(--tk-brand-rgb),0.6)]"
                 />
               ) : null}
               <Icon

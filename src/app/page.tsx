@@ -20,6 +20,7 @@ import { AnimatePresence, LazyMotion, domMax, m } from "framer-motion";
 import { LoaderCircle } from "lucide-react";
 import { Toaster } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
+import { metaColorFor } from "@/lib/tazkiya/colorThemes";
 import { isOnboarded, markOnboarded, clearOnboarded, subscribeOnboarding, getOnboardedSnapshot, getOnboardedServerSnapshot } from "@/lib/tazkiya/onboarding";
 import { useAuthStore } from "@/lib/auth/auth-store";
 import { initSyncBridge } from "@/lib/sync/cloud-sync";
@@ -105,6 +106,7 @@ export default function Page() {
   const glassEffects = useWorshipStore((s) => s.settings.glassEffects);
   const glassLevel = useWorshipStore((s) => s.settings.glassLevel);
   const theme = useWorshipStore((s) => s.settings.theme);
+  const colorTheme = useWorshipStore((s) => s.settings.colorTheme);
   const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">("dark");
 
   const readerRef = useRef<{ surah: number; ayah?: number } | null>(null);
@@ -164,18 +166,20 @@ export default function Page() {
     const apply = () => {
       const resolved = theme === "system" ? (mq.matches ? "light" : "dark") : theme;
       html.dataset.theme = resolved;
+      // Paket warna Theme Gallery — ikut berubah saat tersinkron antar perangkat.
+      html.dataset.color = colorTheme ?? "classic";
       setResolvedTheme(resolved);
       // Warna bilah status/URL browser mengikuti tema aktif.
       document
         .querySelector('meta[name="theme-color"]')
-        ?.setAttribute("content", resolved === "light" ? "#F2F2F4" : "#292522");
+        ?.setAttribute("content", metaColorFor(resolved, colorTheme));
     };
     apply();
     if (theme === "system") {
       mq.addEventListener("change", apply);
       return () => mq.removeEventListener("change", apply);
     }
-  }, [theme]);
+  }, [theme, colorTheme]);
 
   // Saklar "Animasi transisi" juga menghentikan animasi CSS dekoratif
   // agar perangkat lambat tetap ringan bila pengguna mematikan animasi.
@@ -313,7 +317,7 @@ export default function Page() {
 
   if (!hydrated || !onboarded) {
     return (
-      <main className="flex min-h-dvh items-center justify-center bg-[#292522] light:bg-[#edebe7]" aria-label="Memuat SUIO">
+      <main className="flex min-h-dvh items-center justify-center bg-[var(--tk-shell-bg)]" aria-label="Memuat SUIO">
         <div className="flex flex-col items-center gap-4">
           <SuioMark size={56} glow className="animate-tk-pulse" />
           <div className="text-center">
@@ -329,7 +333,7 @@ export default function Page() {
       <LazyMotion features={domMax} strict>
       {/* Panggung luar (terlihat hanya di layar lebar): rona lebih pekat dari
           kanvas aplikasi agar kolom HP terbingkai jelas, bukan tampak salah. */}
-      <main className="relative min-h-dvh w-full bg-[#292522] light:bg-[#edebe7]" aria-label="Aplikasi SUIO">
+      <main className="relative min-h-dvh w-full bg-[var(--tk-shell-bg)]" aria-label="Aplikasi SUIO">
         {/* Kolom aplikasi, selalu selebar HP, di tengah, semua viewport. */}
         <div className="relative mx-auto min-h-dvh w-full max-w-[430px] bg-tk-stage desktop:shadow-[0_0_0_1px_var(--color-tk-line),0_40px_90px_-40px_rgba(0,0,0,0.6)]">
           <div
@@ -457,7 +461,7 @@ export default function Page() {
                   style: {
                     background: "#302925",
                     border: "1px solid #473c34",
-                    color: "#F6EEE3",
+                    color: "var(--tk-d-ink-hi)",
                     borderRadius: "999px",
                     fontSize: "13px",
                     fontWeight: 600,

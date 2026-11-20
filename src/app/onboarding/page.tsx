@@ -19,8 +19,17 @@ import { useAuthStore } from "@/lib/auth/auth-store";
 import { initSyncBridge } from "@/lib/sync/cloud-sync";
 import { isOnboarded, markOnboarded } from "@/lib/tazkiya/onboarding";
 
-/** Kanvas onboarding per tema — harus sinkron dengan bg OnboardingFlow (v15). */
-const CANVAS = { dark: "#171717", light: "#F7F5F2" } as const;
+/** Kanvas onboarding per (mode × paket tema) — sinkron bg OnboardingFlow. */
+const CANVAS = { dark: "#292522", light: "#F6F2EB" } as const;
+const CANVAS_ELECTRIC = { dark: "#1D2136", light: "#F0F2FC" } as const;
+
+function resolveStoredColorTheme(): string {
+  try {
+    return JSON.parse(localStorage.getItem("tazkiya-store-v1") || "{}")?.state?.settings?.colorTheme || "classic";
+  } catch {
+    return "classic";
+  }
+}
 
 function resolveStoredTheme(): "dark" | "light" {
   try {
@@ -72,7 +81,9 @@ export default function OnboardingPage() {
     const prev = meta?.getAttribute("content") ?? null;
     const theme = resolveStoredTheme();
     document.documentElement.dataset.theme = theme;
-    meta?.setAttribute("content", CANVAS[theme]);
+    const ct = resolveStoredColorTheme();
+    if (ct === "electric") document.documentElement.dataset.color = "electric";
+    meta?.setAttribute("content", (ct === "electric" ? CANVAS_ELECTRIC : CANVAS)[theme]);
     return () => {
       if (prev) meta?.setAttribute("content", prev);
     };

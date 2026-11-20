@@ -22,6 +22,7 @@
  */
 
 import { cn } from "@/lib/utils";
+import { useWorshipStore } from "@/lib/tazkiya/store";
 import type { MoodId } from "@/lib/tazkiya/types";
 
 export function MoodFace({
@@ -38,6 +39,7 @@ export function MoodFace({
       hanya saat fx "none"; gerakan transform kecil yang tetap di dalam tile. */
   idle?: boolean;
 }) {
+  const colorTheme = useWorshipStore((st) => st.settings.colorTheme);
   return (
     <span
       aria-hidden
@@ -50,13 +52,13 @@ export function MoodFace({
       )}
     >
       <img
-        src={`/mood/${id}.png`}
+        src={colorTheme === "electric" ? `/mood/electric/${id}.png` : `/mood/${id}.png`}
         alt=""
         draggable={false}
         className="h-full w-full object-contain light:block dark:hidden"
       />
       <img
-        src={`/mood/dark/${id}.png`}
+        src={colorTheme === "electric" ? `/mood/electric-dark/${id}.png` : `/mood/dark/${id}.png`}
         alt=""
         draggable={false}
         className="hidden h-full w-full object-contain dark:block light:hidden"

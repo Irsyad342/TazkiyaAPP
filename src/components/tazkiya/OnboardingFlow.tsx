@@ -7,7 +7,7 @@
  * Gaya: mockup smartphone besar berisi pratinjau antarmuka asli, kartu
  * antarmuka melayang berlapis, tipografi editorial besar dengan kata
  * beraksen oranye, whitespace terukur, pola geometri Islami samar.
- * Palet resmi v15 — light #F7F5F2/#FFFFFF/#FF5A00/peach #FFE0CC,
+ * Palet resmi v15 — light #F7F5F2/#FFFFFF/#FF5A00/peach var(--tk-tint-a),
  * dark #171717/#24211F/#302925/#FF5A00/peach #EFC4A8 (bukan inversi;
  * permukaan hangat charcoal-brown dengan sorotan oranye terkendali).
  *
@@ -54,12 +54,14 @@ import {
   type ThemeModeOpt,
 } from "@/components/tazkiya/onboarding-art";
 import { useWorshipStore } from "@/lib/tazkiya/store";
+import { canvasColorFor } from "@/lib/tazkiya/colorThemes";
 
 /* EASE diimpor dari sistem motion global (src/lib/motion/system.ts) —
    nilai identik dengan konstanta lokal sebelumnya, preset kini tunggal. */
 
-/** Warna kanvas per tema — sinkron dengan CANVAS di app/onboarding/page.tsx. */
-const CANVAS = { dark: "#292522", light: "#F6F2EB" } as const;
+/** Warna kanvas onboarding per (mode × paket tema) — sumber: colorThemes. */
+const canvasFor = (r: "dark" | "light") =>
+  canvasColorFor(r, useWorshipStore.getState().settings.colorTheme);
 
 /** Segmen judul editorial: a = kata beraksen oranye. */
 type Seg = { t: string; a?: boolean };
@@ -189,7 +191,7 @@ export function OnboardingFlow({
       const r = resolve(mv);
       setResolved(r);
       document.documentElement.dataset.theme = r;
-      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", CANVAS[r]);
+      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", canvasFor(r));
       useWorshipStore.getState().updateSettings({ theme: mv });
     },
     [resolve]
@@ -310,7 +312,7 @@ export function OnboardingFlow({
     <MotionConfig reducedMotion="user">
       <LazyMotion features={domAnimation} strict>
         <main
-          className="relative h-dvh w-full overflow-hidden bg-[#F6F2EB] transition-colors duration-500 dark:bg-[#292522]"
+          className="relative h-dvh w-full overflow-hidden bg-[var(--tk-canvas-bg)] transition-colors duration-500"
           aria-label="Perkenalan SUIO"
         >
           <div className="relative mx-auto flex h-full w-full max-w-[430px] flex-col overflow-hidden transition-colors duration-500 min-[900px]:h-full min-[900px]:max-w-[1180px]">
@@ -328,7 +330,7 @@ export function OnboardingFlow({
               <div
                 className="absolute -bottom-[86px] -left-[94px] h-[270px] w-[270px] rounded-full will-change-transform"
                 style={{
-                  background: "radial-gradient(circle, rgba(255,90,0,0.13), transparent 66%)",
+                  background: "radial-gradient(circle, rgba(var(--tk-brand-rgb),0.13), transparent 66%)",
                   transform: `translateX(${index * 22}px)`,
                   transition: "transform 0.75s cubic-bezier(0.22, 1, 0.36, 1)",
                 }}
@@ -517,7 +519,7 @@ export function OnboardingFlow({
                       as="button"
                       press={0.97}
                       onClick={() => onDone("/auth?mode=register")}
-                      className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-full bg-tk-violet font-display text-[14.5px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(255,90,0,0.55)]"
+                      className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-full bg-tk-violet font-display text-[14.5px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(var(--tk-brand-rgb),0.55)]"
                     >
                       Mulai Sekarang
                       <ArrowRight size={17} />
@@ -527,7 +529,7 @@ export function OnboardingFlow({
                       as="button"
                       press={0.97}
                       onClick={() => go(index + 1)}
-                      className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-full bg-tk-violet font-display text-[14.5px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(255,90,0,0.55)]"
+                      className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-full bg-tk-violet font-display text-[14.5px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(var(--tk-brand-rgb),0.55)]"
                     >
                       Lanjut
                       <ArrowRight size={17} />
@@ -559,7 +561,7 @@ export function OnboardingFlow({
                     as="button"
                     press={0.97}
                     onClick={() => (last ? onDone("/auth?mode=register") : go(index + 1))}
-                    className="flex h-[48px] w-[230px] items-center justify-center gap-2 rounded-full bg-tk-violet font-display text-[14px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(255,90,0,0.55)]"
+                    className="flex h-[48px] w-[230px] items-center justify-center gap-2 rounded-full bg-tk-violet font-display text-[14px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(var(--tk-brand-rgb),0.55)]"
                   >
                     {last ? "Mulai Sekarang" : "Lanjut"}
                     <ArrowRight size={16} />
