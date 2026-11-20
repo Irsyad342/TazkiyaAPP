@@ -515,14 +515,14 @@ function HistoryEntryRow({
         className="tap w-full rounded-xl px-2 py-2.5 text-left transition-colors hover:bg-tk-panel-soft"
       >
         <span className="flex items-center gap-2">
-          <span className="tnum w-10 shrink-0 text-[11px] font-bold text-tk-muted">{timeLabel(entry.savedAt) || "—"}</span>
+          <span className="tnum w-11 shrink-0 pt-[3px] text-[11.5px] font-semibold text-tk-muted">{timeLabel(entry.savedAt) || "—"}</span>
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-[12.5px] font-semibold text-tk-ink">
+            <span className="block truncate text-[13.5px] font-bold tracking-[-0.01em] text-tk-ink">
               {meta?.latin ?? "Bacaan umum"}
-              {from > 0 ? <span className="tnum font-normal text-tk-muted"> · ayat {from}{to > from ? `–${to}` : ""}</span> : null}
-              {entry.pages > 0 && !entry.surah ? <span className="font-normal text-tk-muted"> · {entry.pages} halaman</span> : null}
+              {from > 0 ? <span className="tnum text-[12px] font-medium text-tk-muted/90"> · ayat {from}{to > from ? `–${to}` : ""}</span> : null}
+              {entry.pages > 0 && !entry.surah ? <span className="text-[12px] font-medium text-tk-muted/90"> · {entry.pages} halaman</span> : null}
             </span>
-            <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[10px] text-tk-muted">
+            <span className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[10.5px] text-tk-muted">
               <span>{relativeDayLabel(entry.date, today)}</span>
               {entry.verses > 0 ? <span className="tnum">{entry.verses.toLocaleString("id-ID")} ayat</span> : null}
               {entry.pages > 0 && entry.surah ? <span className="tnum">{entry.pages} hal.</span> : null}
@@ -542,22 +542,24 @@ function HistoryEntryRow({
         </span>
       </button>
       {expanded ? (
-        <div className="tk-fade-in mb-2 ml-12 rounded-xl border border-tk-line bg-tk-panel p-3">
-          <p className="text-[11px] leading-relaxed text-tk-muted">
+        <div className="tk-fade-in mb-2 ml-12 rounded-xl border border-tk-line bg-tk-panel p-3.5">
+          <p className="text-[12px] leading-[1.55] text-tk-muted">
             {meta ? `${meta.latin} (${meta.meaning}) · ${meta.place}` : "Catatan halaman tanpa surah"}
             {meta ? ` · ${meta.verses} ayat` : ""}
           </p>
-          <p className="tnum mt-1 text-[11px] leading-relaxed text-tk-muted">
-            {formatDayFullWithYear(entry.date)}{timeLabel(entry.savedAt) ? ` · pukul ${timeLabel(entry.savedAt)}` : ""}
-            {entry.pages > 0 ? ` · ${entry.pages.toLocaleString("id-ID")} halaman` : ""}
-            {entry.verses > 0 ? ` · ${entry.verses.toLocaleString("id-ID")} ayat` : ""}
-          </p>
+          <div className="tnum mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px] leading-snug text-tk-muted">
+            <span className="font-medium text-tk-ink/85">
+              {formatDayFullWithYear(entry.date)}{timeLabel(entry.savedAt) ? ` · pukul ${timeLabel(entry.savedAt)}` : ""}
+            </span>
+            {entry.pages > 0 ? <span>{entry.pages.toLocaleString("id-ID")} halaman</span> : null}
+            {entry.verses > 0 ? <span>{entry.verses.toLocaleString("id-ID")} ayat</span> : null}
+          </div>
           {entry.note ? (
-            <p className="mt-1.5 rounded-lg bg-tk-panel-soft px-2.5 py-1.5 text-[11.5px] italic leading-relaxed text-tk-ink/85">
+            <p className="mt-2 rounded-lg bg-tk-panel-soft px-2.5 py-1.5 text-[12px] italic leading-relaxed text-tk-ink/85">
               &ldquo;{entry.note}&rdquo;
             </p>
           ) : null}
-          <div className="mt-2.5 flex gap-2">
+          <div className="mt-3 flex items-center gap-2">
             {entry.surah ? (
               (() => {
                 const nextA = meta && to >= meta.verses ? 1 : to + 1;
@@ -565,9 +567,9 @@ function HistoryEntryRow({
                   <button
                     type="button"
                     onClick={onContinue}
-                    className="tap flex min-h-[36px] items-center gap-1.5 rounded-full bg-tk-lavender px-3.5 text-[11.5px] font-bold text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent"
+                    className="tap flex min-h-[38px] min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-tk-lavender px-4 text-[12px] font-bold text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent"
                   >
-                    <Play size={12} /> {nextA === 1 ? "Baca ulang dari ayat 1" : `Lanjutkan ayat ${nextA}`}
+                    <Play size={13} className="shrink-0" /> {nextA === 1 ? "Baca ulang ayat 1" : `Lanjutkan ayat ${nextA}`}
                   </button>
                 );
               })()
@@ -577,9 +579,9 @@ function HistoryEntryRow({
               title="Hapus catatan bacaan ini?"
               description="Catatan ini akan dikeluarkan dari riwayat bacaan. Penanda ayat dan posisi terakhir tidak terpengaruh."
               onConfirm={onDelete}
-              className="tap flex min-h-[36px] items-center gap-1.5 rounded-full border border-tk-line px-3.5 text-[11.5px] font-semibold text-tk-muted transition-colors hover:border-[#E5484D]/40 hover:text-[#E5484D]"
+              className="tap flex min-h-[38px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-tk-line px-4 text-[12px] font-semibold text-tk-muted transition-colors hover:border-[#E5484D]/40 hover:text-[#E5484D]"
             >
-              <Trash2 size={12} /> Hapus
+              <Trash2 size={13} /> Hapus
             </ConfirmButton>
           </div>
         </div>
@@ -1429,14 +1431,16 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
               { value: histSummary.surahs.toLocaleString("id-ID"), label: "Surah dibaca" },
               { value: histSummary.verses.toLocaleString("id-ID"), label: "Ayat tercatat" },
             ].map(({ value, label }, i) => (
-              <div key={label} className={cn("min-w-0 px-4", i === 0 && "pl-0", i > 0 && "border-l border-tk-line")}>
+              <div key={label} className={cn("min-w-0 px-3.5", i === 0 && "pl-0", i > 0 && "border-l border-tk-line")}>
                 <p className="flex items-start gap-1.5">
-                  <span className="gs-display truncate text-[24px] font-extrabold leading-none text-tk-ink sm:text-[28px]">
+                  <span className="gs-display truncate text-[21px] font-extrabold leading-none text-tk-ink sm:text-[24px]">
                     {value}
                   </span>
-                  <Star8 size={9} className="mt-1 shrink-0 text-tk-accent/65" />
+                  <Star8 size={8} className="mt-1 shrink-0 text-tk-accent/65" />
                 </p>
-                <p className="gs-overline mt-2">{label}</p>
+                <p className="mt-1.5 text-[9px] font-semibold uppercase leading-[1.5] tracking-[0.16em] text-tk-muted">
+                  {label}
+                </p>
               </div>
             ))}
           </div>

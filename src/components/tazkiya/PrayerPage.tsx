@@ -14,7 +14,7 @@
  * (formulir + CTA orange) dipertahankan dengan logika utuh.
  */
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
   AnimatePresence,
   m,
@@ -582,13 +582,20 @@ function PrayerTickets({
   const [heights, setHeights] = useState<number[]>([]);
   const slotRefs = useRef<Array<HTMLLIElement | null>>([]);
 
-  useLayoutEffect(() => {
+  /** Ukur tinggi semua tiket dari slot yang terpasang. Identitas stabil
+      (dependensi kosong) agar efek pengamat tidak pasang-bongkar terus;
+      setHeights didedupe supaya nilai sama tidak memicu render berulang. */
+  const measureHeights = useCallback(() => {
     const hs: number[] = [];
-    for (let i = 0; i < prayers.length; i++) {
+    for (let i = 0; i < slotRefs.current.length; i++) {
       hs.push(slotRefs.current[i]?.offsetHeight ?? 0);
     }
-    setHeights(hs);
-  }, [prayers, now, motionOK, deckOpen, fridayOpenSignal]);
+    setHeights((prev) => (prev.length === hs.length && prev.every((v, j) => v === hs[j]) ? prev : hs));
+  }, []);
+
+  useLayoutEffect(() => {
+    measureHeights();
+  }, [measureHeights, now, motionOK, deckOpen, fridayOpenSignal]);
 
   /** Slot pertama yang belum masuk waktunya — penerima penanda "Berikutnya". */
   const nowTotal = nowTotalMinutes(now);
@@ -629,6 +636,24 @@ function PrayerTickets({
   /** Deck aktif hanya bila motionOK dan SEMUA tinggi tiket sudah terukur;
       selama belum terukur render alur statis biasa (container jangan 0px). */
   const deck = motionOK && renderedIdx.length > 0 && renderedIdx.every((i) => (heights[i] ?? 0) > 0);
+
+  /** AKAR PERBAIKAN dompet kartu: tinggi tiket juga berubah DARI DALAM slot —
+      panel "Persiapan Jumat" pada kartu Jumat membuka/menutup, badge dan
+      baris countdown muncul-hilang. useLayoutEffect di atas TIDAK melihat
+      perubahan state internal komponen kartu, sehingga openH/stackH menjadi
+      basi: container deck tetap pendek, panel meluber dan tertimpa oleh
+      section "Panduan Salat Sunnah" di bawahnya. ResizeObserver pada tiap
+      slot menutup celah itu — setiap perubahan tinggi langsung diukur ulang
+      dan tinggi container dianimasikan mengikuti, sehingga komponen di bawah
+      kartu terdorong secara normal saat kartu bertambah tinggi. */
+  useEffect(() => {
+    if (!deck) return;
+    const ro = new ResizeObserver(measureHeights);
+    for (const el of slotRefs.current) {
+      if (el) ro.observe(el);
+    }
+    return () => ro.disconnect();
+  }, [deck, measureHeights, prayers.length]);
 
   const nSlots = renderedIdx.length;
   const topPad = Math.max(0, (nSlots - 1) * PEEK);
