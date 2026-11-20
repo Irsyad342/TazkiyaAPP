@@ -82,53 +82,54 @@
   --breakpoint-lg: 302rem;
   --breakpoint-xl: 303rem;
   --breakpoint-2xl: 304rem;
-  /* Nilai warna dark disampling ulang ke palet hangat v18 (Deep Charcoal
-     #191411, Surface #26201B, Elevated #3E332B, Warm Brown #32231A,
-     Burnt Orange #D94B0A, Primary Orange #FF5A00, Soft Orange #FF9A52,
-     Peach #EFC4A8, Warm Ivory #F5E8DC) — permukaan gelap bernuansa hangat
-     dengan tetap satu identitas orange. */
-  --color-tk-ink: #f7f3ef;
-  --color-tk-muted: #b5aaa3;
-  --color-tk-deep: #8c827b;
-  --color-tk-violet: #ff5a00; /* BRAND FILL — Primary Orange palet v18 */
-  --color-tk-lavender: #32231a; /* permukaan hangat (soft brand block) */
-  --color-tk-lav-deco: #41301f; /* lapisan hangat lebih pekat */
-  --color-tk-line: #322c28;
-  --color-tk-accent: #ff9a52; /* Soft Orange untuk teks/ikon kecil di dark */
+  /* Nilai warna dark disampling ulang ke Soft Warm Dark v19 (palet referensi
+     pengguna): kanvas #292522, alternatif #302B27, kartu utama #3B342F,
+     kartu sekunder #463D36, elevated #51463D, panel interaktif #5A4B40,
+     Primary Orange #FF650A + Soft Orange #FF9B63, teks #FFF8F1 / #D0C2B7,
+     border rgba(255,255,255,0.13) — kartu SELALU lebih terang dari kanvas,
+     tanpa hitam pekat, hangat dan bervariasi. */
+  --color-tk-ink: #fff8f1;
+  --color-tk-muted: #d0c2b7;
+  --color-tk-deep: #a79585;
+  --color-tk-violet: #ff650a; /* BRAND FILL — Primary Orange Soft Warm Dark v19 */
+  --color-tk-lavender: #4a3527; /* permukaan hangat (soft brand block) */
+  --color-tk-lav-deco: #5e4530; /* lapisan hangat lebih pekat */
+  --color-tk-line: rgba(255, 255, 255, 0.13);
+  --color-tk-accent: #ff9b63; /* Soft Orange untuk teks/ikon kecil di dark */
   /* Aksen modul 3.9: copper & amber — variasi warna antar modul di dark */
   --color-tk-copper: #d9a05b;
   --color-tk-amber: #ffb35c;
-  --color-tk-cream: #2c241d;
+  --color-tk-cream: #44392f;
   --color-tk-peach: #ffc99e;
-  --color-tk-frame: #191411;
-  --color-tk-stage: #191411;
-  --color-tk-panel: #26201b;
-  --color-tk-panel-soft: #201a16;
-  --color-tk-panel-strong: #3e332b; /* input & pil tak-aktif */
-  --color-tk-line-soft: #2c241f;
-  --color-tk-line-strong: #4a3d33;
-  --color-tk-track: #3e332b;
+  --color-tk-frame: #292522;
+  --color-tk-stage: #292522;
+  --color-tk-panel: #3b342f;
+  --color-tk-panel-soft: #302b27;
+  --color-tk-panel-strong: #51463d; /* input & pil tak-aktif */
+  --color-tk-line-soft: rgba(255, 255, 255, 0.09);
+  --color-tk-line-strong: rgba(255, 255, 255, 0.22);
+  --color-tk-track: #51463d;
   --color-tk-aurora-a: transparent;
   --color-tk-aurora-b: transparent;
-  --color-tk-orb-deep: #2b1d15;
-  /* Permukaan trio referensi: kartu PUTIH + kartu tugas abu terang */
-  --color-tk-white-card: #2a2624;
-  --color-tk-light-card: #2e2926;
+  --color-tk-orb-deep: #3d3128;
+  /* Permukaan trio referensi: kartu sekunder + kartu tugas (lebih terang dari panel) */
+  --color-tk-white-card: #463d36;
+  --color-tk-light-card: #403831;
   /* Aksen fungsional — muted, tidak neon */
-  --color-tk-lime: #1f4230; /* chip sukses (bg) */
-  --color-tk-lime-ink: #93dcb2; /* teks di atas chip sukses */
-  --color-tk-lime-soft: #1b2d24;
+  --color-tk-lime: #2c5a40; /* chip sukses (bg) */
+  --color-tk-lime-ink: #a9e8c4; /* teks di atas chip sukses */
+  --color-tk-lime-soft: #243830;
   --color-tk-blue: #6e9fe8;
-  --color-tk-blue-soft: #1d2838;
-  --color-tk-mint: #2b1b10;
-  --color-tk-forest: #33333a;
+  --color-tk-blue-soft: #2a3748;
+  --color-tk-mint: #4a3527;
+  --color-tk-forest: #3d3833;
   --color-tk-amber: #e0a458;
-  --color-tk-amber-soft: #362a16;
+  --color-tk-amber-soft: #4a3818;
   --color-tk-teal: #52b8a9;
   --color-tk-green: #58b877;
-  --color-tk-green-soft: #1d2b22;
+  --color-tk-green-soft: #26382c;
   --color-tk-rose: #e5484d;
-  --color-tk-sky-soft: #1d2838;
+  --color-tk-sky-soft: #2a3748;
 }
 
 :root {
@@ -216,75 +217,77 @@
   --color-tk-sky-soft: #ecf2fd;
 }
 
-/* ---------- Mode gelap — PENGALAMAN UTAMA v18 ----------
-   Palet hangat dari palet referensi pengguna: kanvas Deep Charcoal #1C1A1A,
-   kartu Surface #24211F, input/pil Elevated #39312D, blok brand
-   Muted Brown, aksen Primary Orange #FF5A00 + Soft Orange #FF9A52. */
+/* ---------- Mode gelap — SOFT WARM DARK v19 ----------
+   Palet referensi pengguna: kanvas #292522, alternatif #302B27, kartu
+   utama #3B342F, kartu sekunder #463D36, elevated #51463D, panel
+   interaktif #5A4B40, aksen #FF650A + #FF9B63, teks #FFF8F1/#D0C2B7,
+   border rgba(255,255,255,0.13). Kartu selalu lebih terang dari kanvas
+   agar langsung terlihat — tanpa hitam pekat, hangat dan bervariasi. */
 html[data-theme="dark"] {
-  --background: #191411;
-  --foreground: #f7f3ef;
-  --card: #26201b;
-  --card-foreground: #f7f3ef;
-  --popover: #322a24;
-  --popover-foreground: #f7f3ef;
-  --primary: #ff5a00;
+  --background: #292522;
+  --foreground: #fff8f1;
+  --card: #3b342f;
+  --card-foreground: #fff8f1;
+  --popover: #463d36;
+  --popover-foreground: #fff8f1;
+  --primary: #ff650a;
   --primary-foreground: #ffffff;
-  --secondary: #322a24;
-  --secondary-foreground: #ff9a52;
-  --muted: #201a16;
-  --muted-foreground: #b5aaa3;
-  --accent: #322a24;
-  --accent-foreground: #ff9a52;
+  --secondary: #463d36;
+  --secondary-foreground: #ff9b63;
+  --muted: #302b27;
+  --muted-foreground: #d0c2b7;
+  --accent: #463d36;
+  --accent-foreground: #ff9b63;
   --destructive: #ff6369;
-  --border: #342b25;
-  --input: #4a3d33;
-  --ring: #ff5a00;
-  --chart-1: #ff5a00;
+  --border: rgba(255, 255, 255, 0.13);
+  --input: #51463d;
+  --ring: #ff650a;
+  --chart-1: #ff650a;
   --chart-2: #58b877;
   --chart-3: #6e9fe8;
   --chart-4: #e0a458;
   --chart-5: #c97b4a;
-  --sidebar: #141312;
-  --sidebar-foreground: #f7f3ef;
-  --sidebar-primary: #ff5a00;
+  --sidebar: #302b27;
+  --sidebar-foreground: #fff8f1;
+  --sidebar-primary: #ff650a;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #322a24;
-  --sidebar-accent-foreground: #ff9a52;
-  --sidebar-border: #322c28;
-  --sidebar-ring: #ff5a00;
+  --sidebar-accent: #463d36;
+  --sidebar-accent-foreground: #ff9b63;
+  --sidebar-border: #463d36;
+  --sidebar-ring: #ff650a;
   /* Token Tazkiya versi gelap — nilai utama di @theme atas sudah dark;
      ulangi di sini agar selalu menang atas :root. */
-  --color-tk-ink: #f7f3ef;
-  --color-tk-muted: #b5aaa3;
-  --color-tk-deep: #8c827b;
-  --color-tk-violet: #ff5a00;
-  --color-tk-lavender: #32231a;
-  --color-tk-lav-deco: #41301f;
-  --color-tk-line: #322c28;
-  --color-tk-accent: #ff9a52;
-  --color-tk-frame: #191411;
-  --color-tk-stage: #191411;
-  --color-tk-panel: #26201b;
-  --color-tk-panel-soft: #201a16;
-  --color-tk-panel-strong: #3e332b;
-  --color-tk-line-soft: #2c241f;
-  --color-tk-line-strong: #4a3d33;
-  --color-tk-track: #3e332b;
-  --color-tk-white-card: #2a2624;
-  --color-tk-light-card: #2e2926;
-  --tk-inset: rgba(0, 0, 0, 0.28);
-  --tk-ring-soft: rgba(255, 90, 0, 0.22);
-  --tk-chart-grid: #372e29;
-  --tk-chart-axis: #8a7e76;
-  --tk-empty-cell: #221e1c;
-  --tk-float-shadow: 0 24px 64px -24px rgba(12, 6, 2, 0.8);
-  --color-tk-lime: #1f4230;
-  --color-tk-lime-ink: #93dcb2;
-  --color-tk-lime-soft: #1b2d24;
-  --color-tk-blue-soft: #1d2838;
-  --color-tk-amber-soft: #362a16;
-  --color-tk-green-soft: #1d2b22;
-  --color-tk-sky-soft: #1d2838;
+  --color-tk-ink: #fff8f1;
+  --color-tk-muted: #d0c2b7;
+  --color-tk-deep: #a79585;
+  --color-tk-violet: #ff650a;
+  --color-tk-lavender: #4a3527;
+  --color-tk-lav-deco: #5e4530;
+  --color-tk-line: rgba(255, 255, 255, 0.13);
+  --color-tk-accent: #ff9b63;
+  --color-tk-frame: #292522;
+  --color-tk-stage: #292522;
+  --color-tk-panel: #3b342f;
+  --color-tk-panel-soft: #302b27;
+  --color-tk-panel-strong: #51463d;
+  --color-tk-line-soft: rgba(255, 255, 255, 0.09);
+  --color-tk-line-strong: rgba(255, 255, 255, 0.22);
+  --color-tk-track: #51463d;
+  --color-tk-white-card: #463d36;
+  --color-tk-light-card: #403831;
+  --tk-inset: rgba(0, 0, 0, 0.18);
+  --tk-ring-soft: rgba(255, 101, 10, 0.24);
+  --tk-chart-grid: #443c35;
+  --tk-chart-axis: #c7b7a8;
+  --tk-empty-cell: #302b27;
+  --tk-float-shadow: 0 24px 64px -24px rgba(10, 5, 2, 0.65);
+  --color-tk-lime: #2c5a40;
+  --color-tk-lime-ink: #a9e8c4;
+  --color-tk-lime-soft: #243830;
+  --color-tk-blue-soft: #2a3748;
+  --color-tk-amber-soft: #4a3818;
+  --color-tk-green-soft: #26382c;
+  --color-tk-sky-soft: #2a3748;
 }
 
 @layer base {
@@ -296,7 +299,7 @@ html[data-theme="dark"] {
     background-color: #f2f2f4;
   }
   html[data-theme="dark"] {
-    background-color: #1c1a1a;
+    background-color: #292522;
   }
   /* General Sans sebagai font default seluruh aplikasi. Variabel --font-gs
      dipasang next/font pada <body>, jadi font-family HARUS diterapkan di
@@ -331,7 +334,7 @@ html[data-theme="dark"] {
   --su-a2: 0.5;
   --su-ad: 0.86;
   --su-border: rgba(255, 255, 255, 0.6);
-  --su-border-d: rgba(255, 143, 92, 0.16);
+  --su-border-d: rgba(255, 158, 104, 0.2);
   --su-spec: 0.26;
   --su-spec-d: 0.09;
   --su-inner: 0.75;
@@ -361,10 +364,10 @@ html[data-glass-level="subtle"] {
 }
 html[data-theme="dark"][data-glass-level="subtle"] {
   --su-ad: 0.97;
-  --su-border-d: rgba(255, 143, 92, 0.07);
-  --su-inner-d: 0.1;
+  --su-border-d: rgba(255, 158, 104, 0.11);
+  --su-inner-d: 0.12;
   --su-glow: 0.03;
-  --su-spec-d: 0.03;
+  --su-spec-d: 0.04;
   --su-float-ad: 0.98;
 }
 /* --- Preset STRONG: blur & transparansi terasa, highlight kuat, depth jelas --- */
@@ -383,12 +386,12 @@ html[data-glass-level="strong"] {
   --su-float-a2: 0.5;
 }
 html[data-theme="dark"][data-glass-level="strong"] {
-  --su-ad: 0.52;
-  --su-border-d: rgba(255, 143, 92, 0.34);
+  --su-ad: 0.54;
+  --su-border-d: rgba(255, 158, 104, 0.36);
   --su-inner-d: 0.26;
   --su-glow: 0.3;
   --su-spec-d: 0.2;
-  --su-float-ad: 0.68;
+  --su-float-ad: 0.7;
 }
 @layer utilities {
   /* ---------- Permukaan dasar v7: kartu #242429, hairline halus ---------- */
@@ -439,33 +442,34 @@ html[data-theme="dark"][data-glass-level="strong"] {
      Dark tidak lagi datar satu warna: kartu mengkilap sedikit ke atas,
      lapisan mengambang lebih terang, kartu hero mengalir Primary → Burnt. */
   html[data-theme="dark"] .glass {
-    /* Dark Luminous Glass: charcoal translusen berlapis, pantulan diagonal,
-       inner highlight, border luminous tipis, dan glow ambient oranye SUIO
-       yang terkontrol (aksen, bukan permukaan oranye penuh). */
-    background: linear-gradient(160deg, rgba(58, 46, 38, var(--su-ad)) 0%, rgba(43, 34, 28, calc(var(--su-ad) - 0.1)) 52%, rgba(52, 41, 34, var(--su-ad)) 100%);
+    /* Dark Luminous Glass v19 — Soft Warm Dark: permukaan warm brown/taupe
+       TRANSLUSEN yang lebih terang dari kanvas, pantulan diagonal, inner
+       highlight, border luminous tipis, dan glow ambient oranye SUIO lembut
+       (aksen, bukan permukaan oranye penuh). Tanpa abu-abu kusam. */
+    background: linear-gradient(160deg, rgba(96, 80, 67, var(--su-ad)) 0%, rgba(73, 62, 53, calc(var(--su-ad) - 0.1)) 52%, rgba(88, 74, 63, var(--su-ad)) 100%);
     border: 1px solid var(--su-border-d);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d)),
-      inset 0 -1px 0 rgba(255, 106, 40, calc(var(--su-glow) * 0.9)),
-      inset 0 18px 28px -22px rgba(255, 122, 61, calc(var(--su-glow) * 0.55)),
-      0 0 28px -12px rgba(255, 106, 40, var(--su-glow)),
+      inset 0 -1px 0 rgba(255, 140, 60, calc(var(--su-glow) * 0.9)),
+      inset 0 18px 28px -22px rgba(255, 155, 99, calc(var(--su-glow) * 0.55)),
+      0 0 28px -12px rgba(255, 130, 50, var(--su-glow)),
       var(--su-shadow-d);
   }
   html[data-theme="dark"] .glass-strong {
-    background: linear-gradient(160deg, rgba(63, 51, 42, var(--su-float-ad)) 0%, rgba(46, 37, 31, calc(var(--su-float-ad) - 0.06)) 100%);
+    background: linear-gradient(160deg, rgba(106, 88, 73, var(--su-float-ad)) 0%, rgba(76, 64, 54, calc(var(--su-float-ad) - 0.06)) 100%);
     border: 1px solid var(--su-border-d);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, calc(var(--su-inner-d) + 0.06)),
-      inset 0 -1px 0 rgba(255, 106, 40, calc(var(--su-glow) * 0.9)),
-      0 0 32px -12px rgba(255, 106, 40, var(--su-glow)),
-      0 28px 64px -26px rgba(0, 0, 0, 0.6);
+      inset 0 -1px 0 rgba(255, 140, 60, calc(var(--su-glow) * 0.9)),
+      0 0 32px -12px rgba(255, 130, 50, var(--su-glow)),
+      0 28px 64px -26px rgba(0, 0, 0, 0.5);
   }
   html[data-theme="dark"] .glass-violet {
-    background: linear-gradient(180deg, #3a2a1e 0%, #32241a 100%);
+    background: linear-gradient(180deg, #4c3826 0%, #43301f 100%);
   }
   html[data-theme="dark"] .glass-hero {
-    background: linear-gradient(168deg, #ff5a00 0%, #ef5203 55%, #e14d08 100%);
-    box-shadow: 0 20px 48px -22px rgba(217, 75, 10, 0.55);
+    background: linear-gradient(168deg, #ff650a 0%, #f25f06 55%, #e55704 100%);
+    box-shadow: 0 20px 48px -22px rgba(224, 88, 10, 0.55);
   }
   /* Blok hangat lembut — permukaan brand yang tidak menabrak */
   .glass-violet {
@@ -498,12 +502,12 @@ html[data-theme="dark"][data-glass-level="strong"] {
       var(--su-shadow);
   }
   html[data-theme="dark"] .tk-card-white {
-    background: linear-gradient(155deg, rgba(58, 46, 38, var(--su-ad)) 0%, rgba(36, 32, 29, calc(var(--su-ad) - 0.08)) 100%);
-    color: #f2efe9;
+    background: linear-gradient(155deg, rgba(88, 74, 62, var(--su-ad)) 0%, rgba(66, 57, 49, calc(var(--su-ad) - 0.08)) 100%);
+    color: #fff8f1;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d)),
-      inset 0 -1px 0 rgba(255, 106, 40, calc(var(--su-glow) * 0.8)),
-      0 0 24px -12px rgba(255, 106, 40, calc(var(--su-glow) * 0.8)),
+      inset 0 -1px 0 rgba(255, 140, 60, calc(var(--su-glow) * 0.8)),
+      0 0 24px -12px rgba(255, 130, 50, calc(var(--su-glow) * 0.8)),
       var(--su-shadow-d);
   }
   /* Kartu tugas abu terang referensi ("Today's Task") */
@@ -1593,13 +1597,13 @@ html[data-anim="off"] .tk-cloud {
     0 16px 40px -22px rgba(64, 48, 38, 0.3);
 }
 html[data-theme="dark"] .su-glass {
-  background: linear-gradient(155deg, rgba(80, 66, 55, var(--su-ad)) 0%, rgba(48, 39, 32, calc(var(--su-ad) - 0.08)) 52%, rgba(58, 50, 45, var(--su-ad)) 100%);
+  background: linear-gradient(155deg, rgba(98, 82, 68, var(--su-ad)) 0%, rgba(66, 56, 48, calc(var(--su-ad) - 0.08)) 52%, rgba(82, 69, 58, var(--su-ad)) 100%);
   border: 1px solid var(--su-border-d);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d)),
-    inset 0 -1px 0 rgba(255, 106, 40, calc(var(--su-glow) * 0.8)),
-    0 0 26px -12px rgba(255, 106, 40, calc(var(--su-glow) * 0.9)),
-    0 18px 44px -22px rgba(0, 0, 0, 0.55);
+    inset 0 -1px 0 rgba(255, 140, 60, calc(var(--su-glow) * 0.8)),
+    0 0 26px -12px rgba(255, 130, 50, calc(var(--su-glow) * 0.9)),
+    0 18px 44px -22px rgba(0, 0, 0, 0.45);
 }
 .su-glass::before {
   content: "";
@@ -1632,6 +1636,17 @@ html[data-theme="dark"] .su-glass::before {
   border-radius: inherit;
   pointer-events: none;
   background: linear-gradient(115deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 38%, transparent 60%);
+}
+/* Dock versi SOFT WARM DARK v19: kapsul tetap gelap sebagai identitas,
+   tetapi warm brown yang lebih terang — tidak lagi nyaris hitam. Rule
+   light di atas tidak disentuh (Light Mode beku). */
+html[data-theme="dark"] .su-dock {
+  background: linear-gradient(165deg, rgba(82, 68, 57, var(--su-float-ad)) 0%, rgba(50, 42, 35, calc(var(--su-float-ad) - 0.06)) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(255, 140, 60, 0.1),
+    0 18px 44px -14px rgba(12, 6, 2, 0.7);
 }
 /* ================= SUIO 3.8 — Karakter animasi idle per mood =================
    Hanya transform (GPU-friendly), amplitudo kecil sehingga gerakan selalu
@@ -1777,6 +1792,7 @@ html[data-glass="off"] .tk-card-white { background: var(--color-tk-white-card); 
 html[data-glass="off"] .glass-strong { background: var(--color-tk-panel); border-color: var(--color-tk-line); }
 html[data-glass="off"] .su-glass { background: var(--color-tk-panel); border-color: var(--color-tk-line); }
 html[data-glass="off"] .su-dock { background: #241e19; border-color: rgba(255, 255, 255, 0.06); }
+html[data-theme="dark"][data-glass="off"] .su-dock { background: #4a3e33; border-color: rgba(255, 255, 255, 0.14); }
 html[data-glass="off"] .glass-strong::before,
 html[data-glass="off"] .su-glass::before,
 html[data-glass="off"] .su-dock::before,
@@ -1815,8 +1831,8 @@ body,
 }
 html[data-theme="dark"] .su-card-shadow {
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.3),
-    0 14px 36px -18px rgba(0, 0, 0, 0.5);
+    0 1px 2px rgba(0, 0, 0, 0.22),
+    0 14px 36px -18px rgba(0, 0, 0, 0.42);
 }
 /* Keadaan interaktif (di-toggle TiltCard/DragCard via data-attr):
    bayangan tumbuh saat kartu dimiringkan/di-drag — terasa angkat. */
@@ -1889,8 +1905,8 @@ html[data-anim="off"] .su-float {
   color: var(--color-tk-accent);
 }
 html[data-theme="dark"] .fr-badge {
-  background: rgba(255, 107, 38, 0.13);
-  color: #FF8A50;
+  background: rgba(255, 138, 80, 0.16);
+  color: #ff9b63;
 }
 /* Countdown kecil pada baris status (Belum masuk waktu · 05:12:40). */
 .fr-cd {
@@ -2020,7 +2036,7 @@ html[data-theme="dark"] .fr-panel { box-shadow: 0 14px 30px -22px rgba(0, 0, 0, 
   border-color: rgba(250, 82, 0, 0.35);
   background: rgba(250, 82, 0, 0.07);
 }
-html[data-theme="dark"] .fr-check-on { border-color: rgba(255, 107, 38, 0.35); background: rgba(255, 107, 38, 0.1); }
+html[data-theme="dark"] .fr-check-on { border-color: rgba(255, 101, 10, 0.4); background: rgba(255, 101, 10, 0.14); }
 
 /* Partikel cahaya & sinar matahari fullscreen Jumat — sangat lambat, berhenti
    pada reduced-motion / setelan animasi mati. */

@@ -256,7 +256,7 @@ export function AreaChartLite({
         <div
           className={cn(
             "pointer-events-none absolute z-10 rounded-xl border px-2.5 py-1.5 text-[11px] leading-snug shadow-lg",
-            isLight ? "border-[rgba(255,90,0,0.3)] bg-white/95 text-[#1A1A1E]" : "border-[rgba(255,90,0,0.35)] bg-[rgba(30,30,30,0.95)] text-white"
+            isLight ? "border-[rgba(255,90,0,0.3)] bg-white/95 text-[#1A1A1E]" : "border-[rgba(255,90,0,0.35)] bg-[rgba(59,52,47,0.95)] text-white"
           )}
           style={{ left: tipLeft, top: Math.max(-6, tipY - 58) }}
         >

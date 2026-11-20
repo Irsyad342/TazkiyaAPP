@@ -59,7 +59,7 @@ import { useWorshipStore } from "@/lib/tazkiya/store";
    nilai identik dengan konstanta lokal sebelumnya, preset kini tunggal. */
 
 /** Warna kanvas per tema — sinkron dengan CANVAS di app/onboarding/page.tsx. */
-const CANVAS = { dark: "#191411", light: "#F6F2EB" } as const;
+const CANVAS = { dark: "#292522", light: "#F6F2EB" } as const;
 
 /** Segmen judul editorial: a = kata beraksen oranye. */
 type Seg = { t: string; a?: boolean };
@@ -310,7 +310,7 @@ export function OnboardingFlow({
     <MotionConfig reducedMotion="user">
       <LazyMotion features={domAnimation} strict>
         <main
-          className="relative h-dvh w-full overflow-hidden bg-[#F6F2EB] transition-colors duration-500 dark:bg-[#191411]"
+          className="relative h-dvh w-full overflow-hidden bg-[#F6F2EB] transition-colors duration-500 dark:bg-[#292522]"
           aria-label="Perkenalan SUIO"
         >
           <div className="relative mx-auto flex h-full w-full max-w-[430px] flex-col overflow-hidden transition-colors duration-500 min-[900px]:h-full min-[900px]:max-w-[1180px]">

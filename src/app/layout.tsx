@@ -66,7 +66,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1B1B1E",
+  themeColor: "#292522",
   width: "device-width",
   initialScale: 1,
   /* PWA ter-install: pinch dua jari adalah gesture aplikasi (tumpukan kartu),
@@ -81,7 +81,7 @@ export const viewport: Viewport = {
  * tema yang salah. Membaca langsung dari localStorage yang sama dengan
  * store Tazkiya; tanpa preferensi tersimpan → DARK (identitas v7).
  */
-const themeInitScript = `(function(){try{var r=localStorage.getItem("tazkiya-store-v1");if(!r)return;var s=JSON.parse(r).state&&JSON.parse(r).state.settings;if(!s)return;var t=s.theme||"dark";if(t==="system"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.dataset.theme=t;document.documentElement.dataset.anim=s.animations===false?"off":"on";document.documentElement.dataset.glass=s.glassEffects===false?"off":"on";var gl=s.glassLevel||(typeof s.glassIntensity==="number"?(s.glassIntensity<34?"subtle":s.glassIntensity<67?"balanced":"strong"):"balanced");document.documentElement.dataset.glassLevel=gl;var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#F6F2EB":"#1B1B1E");}catch(e){}})();`;
+const themeInitScript = `(function(){try{var r=localStorage.getItem("tazkiya-store-v1");if(!r)return;var s=JSON.parse(r).state&&JSON.parse(r).state.settings;if(!s)return;var t=s.theme||"dark";if(t==="system"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.dataset.theme=t;document.documentElement.dataset.anim=s.animations===false?"off":"on";document.documentElement.dataset.glass=s.glassEffects===false?"off":"on";var gl=s.glassLevel||(typeof s.glassIntensity==="number"?(s.glassIntensity<34?"subtle":s.glassIntensity<67?"balanced":"strong"):"balanced");document.documentElement.dataset.glassLevel=gl;var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#F6F2EB":"#292522");}catch(e){}})();`;
 
 export default function RootLayout({
   children,

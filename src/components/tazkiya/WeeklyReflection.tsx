@@ -90,7 +90,7 @@ export function WeeklyReflectionCard({ onOpen }: { onOpen: () => void }) {
       style={{ borderColor: "rgba(255,122,40,0.25)" }}
     >
       {/* Dasar warm ivory / warm charcoal */}
-      <div className="absolute inset-0 bg-[#FFF8EE] dark:bg-[#2B2521]" aria-hidden />
+      <div className="absolute inset-0 bg-[#FFF8EE] dark:bg-[#3F3830]" aria-hidden />
       {/* Polesan hangat + ornamen geometris minimalis */}
       <div
         aria-hidden
@@ -362,7 +362,7 @@ export function WeeklyReflectionSheet({
             animate={{ rotateY: motionOK ? -108 : 0, opacity: motionOK ? [1, 1, 0.9, 0] : 0 }}
             transition={motionOK ? { duration: 1.0, times: [0, 0.55, 0.85, 1], ease: [0.45, 0, 0.2, 1] } : { duration: 0.01 }}
             onAnimationComplete={() => setCoverGone(true)}
-            className="absolute inset-0 z-20 origin-left bg-[#FFF8EE] dark:bg-[#2B2521]"
+            className="absolute inset-0 z-20 origin-left bg-[#FFF8EE] dark:bg-[#3F3830]"
             style={{ backfaceVisibility: "hidden" }}
             aria-hidden
           >

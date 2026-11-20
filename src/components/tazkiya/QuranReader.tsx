@@ -287,7 +287,7 @@ function TranslationView({
             <button
               type="button"
               onClick={() => void reload(true)}
-              className="tap mt-1 flex min-h-[42px] items-center gap-2 rounded-full bg-[#171717] px-5 text-sm font-bold text-white"
+              className="tap mt-1 flex min-h-[42px] items-center gap-2 rounded-full bg-[#171717] px-5 text-sm font-bold text-white dark:bg-[#463D36]"
             >
               <RotateCcw size={15} /> Coba lagi
             </button>

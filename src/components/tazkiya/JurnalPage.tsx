@@ -130,7 +130,7 @@ const CAT_META_EXT: Record<
     short: "Refleksi Diri",
     desc: "Lihat kembali perjalananmu dan temukan pelajaran dari setiap pengalaman.",
     icon: Compass,
-    tint: "#FF5A00",
+    tint: "#FF650A",
     ring: "rgba(255,90,0,0.18)",
   },
   emosi: {

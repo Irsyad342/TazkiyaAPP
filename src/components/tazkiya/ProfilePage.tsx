@@ -143,8 +143,8 @@ const GLASS_PREVIEW: Record<string, string>[] = [
 
 const THEME_OPTIONS: { id: ThemeMode; label: string; hint: string; bg: string; dot: string }[] = [
   { id: "light", label: "Terang", hint: "Kanvas putih", bg: "linear-gradient(140deg,#ffffff,#f0eeea)", dot: "#FF5A00" },
-  { id: "dark", label: "Gelap", hint: "Arang hangat", bg: "linear-gradient(140deg,#3e332b,#191411)", dot: "#FF5A00" },
-  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#191411 50%,#F6F2EB 50%)", dot: "#FF5A00" },
+  { id: "dark", label: "Gelap", hint: "Arang hangat", bg: "linear-gradient(140deg,#51463D,#292522)", dot: "#FF650A" },
+  { id: "system", label: "Sistem", hint: "Ikuti perangkat", bg: "linear-gradient(115deg,#292522 50%,#F6F2EB 50%)", dot: "#FF650A" },
 ];
 
 /** Jam perangkat HH:mm — aksen kanan-atas kepala profil. */

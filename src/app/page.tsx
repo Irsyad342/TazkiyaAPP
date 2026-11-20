@@ -168,7 +168,7 @@ export default function Page() {
       // Warna bilah status/URL browser mengikuti tema aktif.
       document
         .querySelector('meta[name="theme-color"]')
-        ?.setAttribute("content", resolved === "light" ? "#F2F2F4" : "#1C1A1A");
+        ?.setAttribute("content", resolved === "light" ? "#F2F2F4" : "#292522");
     };
     apply();
     if (theme === "system") {
@@ -313,7 +313,7 @@ export default function Page() {
 
   if (!hydrated || !onboarded) {
     return (
-      <main className="flex min-h-dvh items-center justify-center bg-[#141414] light:bg-[#edebe7]" aria-label="Memuat SUIO">
+      <main className="flex min-h-dvh items-center justify-center bg-[#292522] light:bg-[#edebe7]" aria-label="Memuat SUIO">
         <div className="flex flex-col items-center gap-4">
           <SuioMark size={56} glow className="animate-tk-pulse" />
           <div className="text-center">
@@ -329,7 +329,7 @@ export default function Page() {
       <LazyMotion features={domMax} strict>
       {/* Panggung luar (terlihat hanya di layar lebar): rona lebih pekat dari
           kanvas aplikasi agar kolom HP terbingkai jelas, bukan tampak salah. */}
-      <main className="relative min-h-dvh w-full bg-[#141414] light:bg-[#edebe7]" aria-label="Aplikasi SUIO">
+      <main className="relative min-h-dvh w-full bg-[#292522] light:bg-[#edebe7]" aria-label="Aplikasi SUIO">
         {/* Kolom aplikasi, selalu selebar HP, di tengah, semua viewport. */}
         <div className="relative mx-auto min-h-dvh w-full max-w-[430px] bg-tk-stage desktop:shadow-[0_0_0_1px_var(--color-tk-line),0_40px_90px_-40px_rgba(0,0,0,0.6)]">
           <div

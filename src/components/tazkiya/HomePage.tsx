@@ -671,7 +671,7 @@ function QuoteCard({ today }: { today: string }) {
   const quote = useMemo(() => quoteForDate(today), [today]);
   return (
     <div
-      className="su-card-shadow relative flex h-full min-h-[172px] flex-col overflow-hidden rounded-[1.4rem] border border-tk-line-soft bg-tk-panel light:bg-[linear-gradient(150deg,#FFFDFB_0%,#FFF6EC_58%,#FFEFDF_100%)] dark:bg-[linear-gradient(150deg,#2C241D_0%,#26201B_55%,#201A16_100%)]"
+      className="su-card-shadow relative flex h-full min-h-[172px] flex-col overflow-hidden rounded-[1.4rem] border border-tk-line-soft bg-tk-panel light:bg-[linear-gradient(150deg,#FFFDFB_0%,#FFF6EC_58%,#FFEFDF_100%)] dark:bg-[linear-gradient(150deg,#463D36_0%,#3B342F_55%,#342D28_100%)]"
     >
       {/* Kilau hangat di dua pojok — peach (light) / copper (dark) */}
       <span aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-[#FFE3C9]/60 blur-2xl dark:bg-[#FF9A52]/10" />
