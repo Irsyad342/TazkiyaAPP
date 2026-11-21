@@ -50,18 +50,20 @@ export function BottomNav({
               onClick={() => onChange(id)}
               className={cn(
                 "tap relative flex h-[46px] shrink-0 items-center justify-center rounded-full transition-colors duration-200 active:scale-95",
-                isActive ? "gap-2 px-5" : "w-[46px] text-tk-muted hover:text-tk-ink"
+                /* Ikon tidak aktif: Lavender Gray di atas dock navy (electric) */
+                isActive ? "gap-2 px-5" : "w-[46px] text-[var(--tk-dock-idle)] hover:text-tk-ink"
               )}
             >
               {isActive ? (
-                /* Pil oranye MELUNCUR antar slot: satu elemen layar penuh
+                /* Pil aktif MELUNCUR antar slot: satu elemen layar penuh
                    dipindahkan via layout animation (hanya transform+width,
                    dijalankan rAF — hemat CPU), persis bahasa motion
-                   referensi. Konten ikon+label pop singkat saat tiba. */
+                   referensi. Electric: gradasi Turquoise → Electric Blue;
+                   klasik: pil brand asli. */
                 <m.span
                   layoutId="tk-nav-pill"
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  className="absolute inset-0 rounded-full bg-tk-violet shadow-[0_8px_20px_-6px_rgba(var(--tk-brand-rgb),0.6)]"
+                  className="tk-nav-pill-active absolute inset-0 rounded-full shadow-[0_8px_20px_-6px_rgba(var(--tk-brand-rgb),0.6)]"
                 />
               ) : null}
               <Icon

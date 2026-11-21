@@ -424,7 +424,7 @@ function PrayerScreen({ live }: { live: boolean }) {
             transition={{ duration: 0.45, ease: EASE, delay: live ? 0.35 + i * 0.11 : 0 }}
             className={`relative rounded-t-[11px] ${i > 0 ? "-mt-[8px]" : ""} ${
               s.active
-                ? "z-10 bg-gradient-to-br from-[var(--tk-brand)] to-[#E04E00] text-white"
+                ? "z-10 bg-gradient-to-br from-[var(--tk-brand)] to-[var(--tk-brand-deep)] text-white"
                 : `${CARD} ${BORDER} border light:shadow-[0_4px_14px_-8px_rgba(50,38,28,0.3)]`
             }`}
             style={s.active ? { boxShadow: "0 12px 26px -12px rgba(var(--tk-brand-rgb),0.6)" } : undefined}
@@ -454,7 +454,7 @@ function PrayerScreen({ live }: { live: boolean }) {
               />
               <span className={`text-[5px] font-semibold ${s.active ? "text-white" : INK2}`}>{s.status}</span>
               {s.active && (
-                <span className="ml-auto rounded-full bg-white px-[4.5px] py-[1.5px] text-[4.8px] font-bold text-[#E04E00]">Sedang Berlangsung</span>
+                <span className="ml-auto rounded-full bg-white px-[4.5px] py-[1.5px] text-[4.8px] font-bold text-[var(--tk-brand-deep)]">Sedang Berlangsung</span>
               )}
               {s.done && (
                 <span className="ml-auto flex h-[8px] w-[8px] items-center justify-center rounded-full bg-[#E1F4E9] dark:bg-[var(--color-tk-lime)]">
@@ -689,7 +689,7 @@ function CardActivities({ live, delay, pos }: { live: boolean; delay: number; po
     <FloatCard live={live} delay={delay} style={pos} floatY={7} floatDur={6} className={`w-[116px] rounded-[14px] border p-[9px] ${CARD} ${BORDER}`}>
       <div className="flex items-center justify-between">
         <Overline>Aktivitas Hari Ini</Overline>
-        <span className="rounded-full bg-[var(--tk-tint-a)] px-[4px] py-[1px] text-[5px] font-bold text-[#E04E00] dark:bg-[var(--color-tk-panel-strong)] dark:text-[var(--tk-brand-soft)]">3/4</span>
+        <span className="rounded-full bg-[var(--tk-tint-a)] px-[4px] py-[1px] text-[5px] font-bold text-[var(--tk-brand-deep)] dark:bg-[var(--color-tk-panel-strong)] dark:text-[var(--tk-brand-soft)]">3/4</span>
       </div>
       <div className="mt-[5px] flex flex-col gap-[4px]">
         {[
@@ -733,10 +733,10 @@ function CardPrayerDone({ live, delay, pos }: { live: boolean; delay: number; po
 /** Kartu salat aktif "Sedang Berlangsung". */
 function CardPrayerActive({ live, delay, pos }: { live: boolean; delay: number; pos?: CSSProperties }) {
   return (
-    <FloatCard live={live} delay={delay} style={pos} floatY={10} floatDur={7.5} className="w-[140px] rounded-[14px] bg-gradient-to-br from-[var(--tk-brand)] to-[#E04E00] p-[9px] text-white">
+    <FloatCard live={live} delay={delay} style={pos} floatY={10} floatDur={7.5} className="w-[140px] rounded-[14px] bg-gradient-to-br from-[var(--tk-brand)] to-[var(--tk-brand-deep)] p-[9px] text-white">
       <div className="flex items-center justify-between">
         <span className="text-[5.5px] font-bold uppercase tracking-[0.14em] text-white/85">Zuhur · 11.58</span>
-        <span className="rounded-full bg-white px-[5px] py-[1.5px] text-[5px] font-bold text-[#E04E00]">Sedang Berlangsung</span>
+        <span className="rounded-full bg-white px-[5px] py-[1.5px] text-[5px] font-bold text-[var(--tk-brand-deep)]">Sedang Berlangsung</span>
       </div>
       <p className="mt-[4px] text-[6.5px] font-semibold text-white/90">Berakhir dalam 1 j 42 m</p>
       <div className="mt-[4px] h-[4px] overflow-hidden rounded-full bg-white/25">
@@ -893,7 +893,7 @@ function CardBarakah({ live, delay, pos }: { live: boolean; delay: number; pos?:
       <div className="mt-[5px] flex flex-col gap-[3.5px]">
         {["Niat hari ini", "Setelah Subuh", "Motivasi", "Target kecil"].map((n, i) => (
           <span key={n} className="flex items-center gap-[5px]">
-            <span className="tk-octagram flex h-[10px] w-[10px] items-center justify-center bg-[var(--tk-tint-a)] text-[5px] font-bold text-[#E04E00] dark:bg-[var(--color-tk-panel-strong)] dark:text-[var(--tk-brand-soft)]">
+            <span className="tk-octagram flex h-[10px] w-[10px] items-center justify-center bg-[var(--tk-tint-a)] text-[5px] font-bold text-[var(--tk-brand-deep)] dark:bg-[var(--color-tk-panel-strong)] dark:text-[var(--tk-brand-soft)]">
               {i + 1}
             </span>
             <span className={`text-[6.5px] font-semibold ${INK}`}>{n}</span>

@@ -22,13 +22,13 @@ import { journalCatMeta, type JournalCat } from "@/lib/tazkiya/types";
 import { DUR, EASE, SPRING } from "@/lib/motion/system";
 import { cn } from "@/lib/utils";
 
-/* ---------- Identitas warna kategori (selaras aksen SUIO) ---------- */
+/* ---------- Identitas warna kategori (selaras token --jk-* per tema) ---------- */
 
 export const CAT_DOT: Record<JournalCat | "syukur", string> = {
-  refleksi: "var(--tk-brand)", // orange — Refleksi Diri
-  emosi: "#FFB38A", // peach — Emosi & Penerimaan
-  syukur: "#E19A3C", // warm amber — Syukur
-  harapan: "#C2410C", // burnt orange — Harapan & Ikhtiar
+  refleksi: "var(--jk-refleksi)",
+  emosi: "var(--jk-emosi)",
+  syukur: "var(--jk-syukur)",
+  harapan: "var(--jk-harapan)",
 };
 
 export type NoteCat = JournalCat | "syukur";

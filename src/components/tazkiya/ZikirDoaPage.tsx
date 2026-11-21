@@ -304,7 +304,7 @@ function ZikirPresetPicker() {
 function ZikirSetCard({ set }: { set: ZikirSet }) {
   const [open, setOpen] = useState(set.id === "zikir-pagi");
   return (
-    <div className="glass overflow-hidden rounded-[1.4rem]">
+    <div className="glass tk-surf-soft-teal overflow-hidden rounded-[1.4rem]">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

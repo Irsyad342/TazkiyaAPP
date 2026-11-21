@@ -111,7 +111,7 @@ function statusForOf(
 
 /* ---------------- Piringan kartu v8 ---------------- */
 
-type IconTone = "brand" | "blue" | "lime" | "green" | "amber";
+type IconTone = "brand" | "blue" | "lime" | "green" | "amber" | "teal";
 
 const TONE_CLS: Record<IconTone, string> = {
   brand: "bg-tk-lavender text-tk-violet dark:bg-tk-accent/15 dark:text-tk-accent",
@@ -119,6 +119,7 @@ const TONE_CLS: Record<IconTone, string> = {
   lime: "bg-tk-lime/40 text-tk-lime-ink dark:bg-tk-lime/15 dark:text-tk-lime",
   green: "bg-tk-green-soft text-tk-green",
   amber: "bg-tk-amber-soft text-tk-amber",
+  teal: "bg-[var(--tk-tone-teal-bg)] text-[var(--tk-tone-teal-ink)]",
 };
 
 /** Kepala kartu: chip ikon berwarna + label tebal. */
@@ -349,10 +350,11 @@ export function ProgressPage({ deferredForReminder = false }: { deferredForRemin
       {/* ================= HARI INI ================= */}
       {period === "harian" ? (
         <div key="harian" className="tk-stagger space-y-4">
-          {/* Kartu utama: cincin + tiga statistik bersekat (elevasi 3.0) */}
-          <GlassCard className="su-card-shadow p-5">
+          {/* Kartu utama: cincin + tiga statistik bersekat — permukaan Lavender
+              Gray (electric); track ring lavender via token. */}
+          <GlassCard className="tk-surf-lavender su-card-shadow p-5">
             <div className="flex items-center gap-5">
-              <ProgressRing value={barsIn ? todayPct : 0} size={116} stroke={10} className="shrink-0">
+              <ProgressRing value={barsIn ? todayPct : 0} size={116} stroke={10} className="shrink-0" trackClass="stroke-[var(--tk-ring-track)]">
                 <span className="tnum gs-display text-[27px] font-bold leading-none text-tk-ink">{todayPct}%</span>
                 <span className="mt-0.5 text-[8.5px] font-bold uppercase tracking-[0.16em] text-tk-muted">terlaksana</span>
               </ProgressRing>
@@ -368,7 +370,15 @@ export function ProgressPage({ deferredForReminder = false }: { deferredForRemin
                     { value: goalsDone, label: "target ok" },
                   ].map(({ value, label }, i) => (
                     <div key={label} className={cn("px-2 text-center", i === 0 && "pl-0")}>
-                      <p className="tnum gs-display text-[21px] font-bold leading-none text-tk-ink">{value}</p>
+                      {/* Highlight pencapaian: angka "target ok" > 0 memakai Neon Lime */}
+                      <p
+                        className={cn(
+                          "tnum gs-display text-[21px] font-bold leading-none",
+                          i === 2 && value > 0 ? "text-tk-lime-ink dark:text-tk-lime" : "text-tk-ink"
+                        )}
+                      >
+                        {value}
+                      </p>
                       <p className="mt-1 text-[8.5px] font-semibold uppercase tracking-[0.08em] text-tk-muted">{label}</p>
                     </div>
                   ))}
@@ -417,7 +427,7 @@ export function ProgressPage({ deferredForReminder = false }: { deferredForRemin
               </p>
             </StatCard>
 
-            <StatCard icon={CircleDot} tone="lime" label="Zikir">
+            <StatCard icon={CircleDot} tone="teal" label="Zikir">
               <p className="tnum gs-display text-[26px] font-bold leading-none text-tk-ink">
                 {(todayLog?.zikirCount ?? 0).toLocaleString("id-ID")}
               </p>
@@ -492,7 +502,7 @@ export function ProgressPage({ deferredForReminder = false }: { deferredForRemin
                               style={{ height: barsIn ? `${Math.max(6, totalH)}%` : "0%", transitionDelay: `${idx * 55}ms` }}
                             >
                               {jamaahH > 0.5 ? <span className="w-full shrink-0 bg-tk-violet" style={{ height: `${(jamaahH / totalH) * 100}%` }} /> : null}
-                              {mandiriH > 0.5 ? <span className="w-full shrink-0 bg-tk-violet/45" style={{ height: `${(mandiriH / totalH) * 100}%` }} /> : null}
+                              {mandiriH > 0.5 ? <span className="w-full shrink-0 bg-[var(--tk-mandiri-bar)]" style={{ height: `${(mandiriH / totalH) * 100}%` }} /> : null}
                               {missedH > 0.5 ? <span className="w-full shrink-0 bg-tk-amber/60" style={{ height: `${(missedH / totalH) * 100}%` }} /> : null}
                               {unrecH > 0.5 ? <span className="w-full shrink-0 border-t border-dashed border-tk-line-strong bg-tk-track" style={{ height: `${(unrecH / totalH) * 100}%` }} /> : null}
                             </div>
@@ -514,7 +524,7 @@ export function ProgressPage({ deferredForReminder = false }: { deferredForRemin
                   <span aria-hidden className="h-2 w-2 rounded-full bg-tk-violet" /> Berjamaah
                 </span>
                 <span className="flex items-center gap-1">
-                  <span aria-hidden className="h-2 w-2 rounded-full bg-tk-violet/45" /> Mandiri
+                  <span aria-hidden className="h-2 w-2 rounded-full bg-[var(--tk-mandiri)]" /> Mandiri
                 </span>
                 <span className="flex items-center gap-1">
                   <span aria-hidden className="h-2 w-2 rounded-full bg-tk-amber/60" /> Tidak dilaksanakan
@@ -561,7 +571,7 @@ export function ProgressPage({ deferredForReminder = false }: { deferredForRemin
                     : d.jamaah > 0
                       ? "bg-tk-violet"
                       : d.mandiri > 0
-                        ? "bg-tk-violet/45"
+                        ? "bg-[var(--tk-mandiri)]"
                         : "bg-tk-amber";
                   return (
                     <button
@@ -680,7 +690,7 @@ export function ProgressPage({ deferredForReminder = false }: { deferredForRemin
                   let tint: string | undefined;
                   if (!cell.isFuture && cell.hasData) {
                     if (cell.jamaah > 0) tint = `color-mix(in srgb, var(--color-tk-violet) ${Math.round(16 + intensity * 66)}%, transparent)`;
-                    else if (cell.mandiri > 0) tint = `color-mix(in srgb, var(--color-tk-violet) ${Math.round(10 + intensity * 40)}%, transparent)`;
+                    else if (cell.mandiri > 0) tint = `color-mix(in srgb, var(--tk-mandiri) ${Math.round(14 + intensity * 46)}%, transparent)`;
                     else tint = `color-mix(in srgb, var(--color-tk-amber) ${Math.round(12 + (cell.missed / 5) * 30)}%, transparent)`;
                   } else if (!cell.isFuture) {
                     tint = "var(--tk-empty-cell)";

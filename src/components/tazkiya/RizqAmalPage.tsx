@@ -211,7 +211,7 @@ export function RizqAmalPage({ onBack }: { onBack: () => void }) {
           {/* ---------- Catat amal ---------- */}
           <Reveal><section aria-label="Catat amal kebaikan">
             <SectionHeader title="Catat Amal Hari Ini" caption="Sedekah, bantuan, silaturahmi, semua sama berharganya" />
-            <GlassCard className="su-card-shadow space-y-3 p-4 sm:p-5">
+            <GlassCard className="tk-surf-soft-lime su-card-shadow space-y-3 p-4 sm:p-5">
               <div>
                 <p className="gs-overline mb-1.5 block">Jenis kebaikan</p>
                 <div className="flex flex-wrap gap-1.5">

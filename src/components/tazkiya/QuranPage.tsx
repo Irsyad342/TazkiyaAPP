@@ -1076,7 +1076,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
         {/* ---------- Jelajah: pencarian + filter + tab + daftar baris ---------- */}
         <section aria-label="Daftar surah dan juz" className="animate-tk-fade-up mt-6 lg:col-span-12">
           <SectionHeader title="Jelajah" caption="Cari surah atau juz, filter tempat turunnya" />
-          <GlassCard className="p-4 sm:p-5">
+          <GlassCard className="tk-surf-soft-blue p-4 sm:p-5">
             {/* Pencarian pil modern */}
             <div className="relative">
               <span

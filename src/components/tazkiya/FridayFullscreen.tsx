@@ -64,6 +64,46 @@ const SCENE = {
   },
 } as const;
 
+/* Scene Electric Dream — langit lavender-cyan, siluet masjid deep navy,
+   jendela menyala neon lime. Klasik tetap memakai scene senja emas di atas. */
+const SCENE_ELECTRIC = {
+  light: {
+    sky: "linear-gradient(180deg,#FBFCFF 0%,#E7EBFA 40%,#D9F0F6 68%,#CFE8FF 100%)",
+    glow: "radial-gradient(ellipse 90% 55% at 50% 38%, rgba(51,164,250,0.35), rgba(51,164,250,0) 70%)",
+    ink: "#252943",
+    sub: "rgba(37,41,67,0.72)",
+    chipBg: "rgba(255,255,255,0.55)",
+    mosque: "#252943",
+    mosqueSoft: "#343B63",
+    windows: "#E3FF3B",
+    hillFar: "rgba(58,78,251,0.3)",
+    hillMid: "rgba(37,41,67,0.6)",
+    ornament: "rgba(51,164,250,0.45)",
+    mote: "rgba(163,230,255,0.9)",
+    ray: "rgba(51,164,250,0.7)",
+    ring: "rgba(32,199,183,0.55)",
+  },
+  dark: {
+    sky: "linear-gradient(180deg,#14172A 0%,#1A1E36 42%,#20264A 70%,#262D5C 100%)",
+    glow: "radial-gradient(ellipse 90% 55% at 50% 40%, rgba(91,120,255,0.18), rgba(91,120,255,0) 72%)",
+    ink: "#EEF0FC",
+    sub: "rgba(238,240,252,0.66)",
+    chipBg: "rgba(37,41,67,0.5)",
+    mosque: "#10131F",
+    mosqueSoft: "#1A1F3C",
+    windows: "#E3FF3B",
+    hillFar: "rgba(26,30,54,0.85)",
+    hillMid: "rgba(18,21,40,0.95)",
+    ornament: "rgba(91,120,255,0.3)",
+    mote: "rgba(163,214,255,0.7)",
+    ray: "rgba(91,120,255,0.5)",
+    ring: "rgba(43,217,199,0.4)",
+  },
+} as const;
+
+const sceneFor = (colorTheme: string | undefined, isLight: boolean) =>
+  colorTheme === "electric" ? (isLight ? SCENE_ELECTRIC.light : SCENE_ELECTRIC.dark) : isLight ? SCENE.light : SCENE.dark;
+
 /** Posisi partikel deterministik (tanpa Math.random saat render). */
 const MOTES = [
   { x: 12, y: 58, d: 0 },
@@ -179,8 +219,9 @@ export function FridayFullscreen({
   const animationsOn = useWorshipStore((s) => s.settings.animations);
   const motionOK = animationsOn && !reduceMotion;
   const theme = useWorshipStore((s) => s.settings.theme);
+  const colorTheme = useWorshipStore((s) => s.settings.colorTheme);
   const isLight = theme === "light";
-  const t = isLight ? SCENE.light : SCENE.dark;
+  const t = sceneFor(colorTheme, isLight);
 
   const now0 = useMemo(() => new Date(), []);
   const hijri = useMemo(() => formatHijri(keyToDate(date)), [date]);

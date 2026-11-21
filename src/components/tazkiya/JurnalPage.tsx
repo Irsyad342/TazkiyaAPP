@@ -123,39 +123,43 @@ function writeDrafts(map: DraftMap): void {
 
 const CAT_META_EXT: Record<
   NoteCat,
-  { label: string; short: string; desc: string; icon: typeof Compass; tint: string; ring: string }
+  { label: string; short: string; desc: string; icon: typeof Compass; ink: string; soft: string; card: string }
 > = {
   refleksi: {
     label: "Jurnal Refleksi Diri",
     short: "Refleksi Diri",
     desc: "Lihat kembali perjalananmu dan temukan pelajaran dari setiap pengalaman.",
     icon: Compass,
-    tint: "var(--tk-brand)",
-    ring: "rgba(var(--tk-brand-rgb),0.18)",
+    ink: "var(--jk-refleksi)",
+    soft: "var(--jk-refleksi-soft)",
+    card: "tk-jn-refleksi",
   },
   emosi: {
     label: "Jurnal Emosi & Penerimaan Diri",
     short: "Emosi & Penerimaan",
     desc: "Kenali perasaanmu dan beri ruang bagi dirimu untuk bertumbuh.",
     icon: HeartHandshake,
-    tint: "#FFB38A",
-    ring: "rgba(255,179,138,0.22)",
+    ink: "var(--jk-emosi)",
+    soft: "var(--jk-emosi-soft)",
+    card: "tk-jn-emosi",
   },
   syukur: {
     label: "Jurnal Syukur",
     short: "Syukur",
     desc: "Catat hal-hal sederhana yang membuatmu bersyukur setiap hari.",
     icon: BookHeart,
-    tint: "#E19A3C",
-    ring: "rgba(225,154,60,0.2)",
+    ink: "var(--jk-syukur)",
+    soft: "var(--jk-syukur-soft)",
+    card: "tk-jn-syukur",
   },
   harapan: {
     label: "Jurnal Harapan & Ikhtiar",
     short: "Harapan & Ikhtiar",
     desc: "Tuliskan harapan, doa, dan mulai wujudkan dengan ikhtiar terbaik.",
     icon: Sprout,
-    tint: "#C2410C",
-    ring: "rgba(194,65,12,0.2)",
+    ink: "var(--jk-harapan)",
+    soft: "var(--jk-harapan-soft)",
+    card: "tk-jn-harapan",
   },
 };
 
@@ -499,17 +503,23 @@ function CategoryCards({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 22, delay: motionOK ? i * 0.07 : 0 }}
               whileTap={motionOK ? { y: -4, scale: 1.02 } : undefined}
-              className="tap su-card-shadow glass group relative flex flex-col overflow-hidden rounded-[1.4rem] p-4 text-left"
+              className={cn(
+                "tap su-card-shadow glass group relative flex flex-col overflow-hidden rounded-[1.4rem] p-4 text-left",
+                /* Latar per kategori (electric: Soft Blue / Soft Turquoise /
+                   Soft Lime / Deep Navy; klasik: glass asli — kelas surf
+                   tidak punya aturan klasik). */
+                meta.card
+              )}
             >
               {/* Aksen lembut berbeda per kartu (variasi terkontrol) */}
               <span
                 aria-hidden
                 className="pointer-events-none absolute -right-6 -top-8 h-20 w-20 rounded-full blur-xl"
-                style={{ background: meta.ring }}
+                style={{ background: meta.soft }}
               />
               <span
                 className="flex h-9 w-9 items-center justify-center rounded-[0.7rem]"
-                style={{ background: `${meta.tint}1A`, color: meta.tint }}
+                style={{ background: meta.soft, color: meta.ink }}
               >
                 <Icon size={16} strokeWidth={2.1} />
               </span>
@@ -519,7 +529,7 @@ function CategoryCards({
               <span className="mt-1 line-clamp-2 text-[10.5px] leading-snug text-tk-muted">{meta.desc}</span>
               <span className="mt-2.5 flex items-center justify-between border-t border-tk-line-soft pt-2">
                 <span className="tnum text-[9.5px] font-semibold text-tk-muted">{counts[cat]} catatan</span>
-                <span className="flex items-center gap-1 text-[10px] font-bold" style={{ color: meta.tint }}>
+                <span className="flex items-center gap-1 text-[10px] font-bold" style={{ color: meta.ink }}>
                   <PenLine size={10.5} /> Tulis
                 </span>
               </span>
@@ -705,7 +715,7 @@ function JournalXForm({
         onBack={onBack}
         action={
           <span className="flex items-center gap-1.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-[0.6rem]" style={{ background: `${ext.tint}1A`, color: ext.tint }}>
+            <span className="flex h-8 w-8 items-center justify-center rounded-[0.6rem]" style={{ background: ext.soft, color: ext.ink }}>
               <Icon size={14} />
             </span>
           </span>
@@ -794,10 +804,10 @@ function JournalXForm({
             className="tap flex w-full items-center justify-between gap-2 bg-tk-panel-soft px-4 py-3 text-left"
           >
             <span className="flex items-center gap-2 text-[12.5px] font-bold text-tk-ink">
-              <Sparkles size={13} style={{ color: ext.tint }} />
+              <Sparkles size={13} style={{ color: ext.ink }} />
               Pertanyaan panduan
               {answeredCount > 0 ? (
-                <span className="tnum rounded-full px-2 py-0.5 text-[9.5px] font-bold" style={{ background: `${ext.tint}1A`, color: ext.tint }}>
+                <span className="tnum rounded-full px-2 py-0.5 text-[9.5px] font-bold" style={{ background: ext.soft, color: ext.ink }}>
                   {answeredCount}/{meta.questions.length}
                 </span>
               ) : (
@@ -947,9 +957,9 @@ function JournalDetail({
           <div className="flex flex-wrap items-center gap-1.5">
             <span
               className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.06em]"
-              style={{ background: `${ext.tint}1A`, color: ext.tint }}
+              style={{ background: ext.soft, color: ext.ink }}
             >
-              <span className="block h-[6px] w-[6px] rounded-full" style={{ background: ext.tint }} aria-hidden />
+              <span className="block h-[6px] w-[6px] rounded-full" style={{ background: ext.ink }} aria-hidden />
               {ext.short}
             </span>
             <Chip className="border-tk-line tnum">{formatDayFull(date)}</Chip>

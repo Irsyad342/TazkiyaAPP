@@ -105,14 +105,14 @@ function CircleDateStrip({ today }: { today: string }) {
       const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow + i);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
       const count = Object.values(logs[key]?.prayers ?? {}).filter(Boolean).length;
-      return { key, dayNum: d.getDate(), label: DOW_LABELS[i], count, isToday: key === today, isFuture: key > today };
+      return { key, dayNum: d.getDate(), label: DOW_LABELS[i], count, isPerfect: count >= 5, isToday: key === today, isFuture: key > today };
     });
   }, [logs, today]);
 
   return (
     <section aria-label="Pilih tanggal pekan ini">
       <div className="no-scrollbar flex items-stretch justify-between gap-1 overflow-x-auto" role="group">
-        {week.map(({ key, dayNum, label, count, isToday, isFuture }) => (
+        {week.map(({ key, dayNum, label, count, isPerfect, isToday, isFuture }) => (
           <button
             key={key}
             type="button"
@@ -145,7 +145,9 @@ function CircleDateStrip({ today }: { today: string }) {
               aria-hidden
               className={cn(
                 "relative z-10 h-[4px] w-[4px] rounded-full",
-                isToday ? "bg-white/90" : count > 0 ? "bg-tk-green" : "bg-transparent"
+                /* Turquoise = ada aktivitas; Neon Lime = target 5 salat selesai.
+                   Klasik: keduanya hijau asli via token. */
+                isToday ? "bg-white/90" : isPerfect ? "bg-[var(--tk-dot-perfect)]" : count > 0 ? "bg-[var(--tk-dot-recorded)]" : "bg-transparent"
               )}
             />
           </button>
@@ -267,14 +269,14 @@ function ReminderSheet({ today, onClose }: { today: string; onClose: () => void 
                   aria-hidden
                   className={cn(
                     "h-2 w-2 rounded-full",
-                    done ? "bg-tk-green" : missed ? "bg-tk-rose" : "bg-tk-line-strong"
+                    done ? "bg-[var(--tk-dot-recorded)]" : missed ? "bg-tk-rose" : "bg-tk-line-strong"
                   )}
                 />
                 <span className={cn("text-[13.5px]", done ? "font-semibold text-tk-ink" : "font-medium text-tk-ink/85")}>
                   {label}
                 </span>
               </span>
-              <span className={cn("tnum text-[12.5px] font-semibold", done ? "text-tk-green" : missed ? "text-tk-rose" : "text-tk-muted")}>
+              <span className={cn("tnum text-[12.5px] font-semibold", done ? "text-[var(--tk-dot-recorded-ink)]" : missed ? "text-tk-rose" : "text-tk-muted")}>
                 {times[id].time}
                 {done ? " · selesai" : missed ? " · terlewat" : ""}
               </span>
@@ -569,12 +571,12 @@ function MonthSheet({
               )}
             >
               {dayNum}
-              <span aria-hidden className={cn("h-[3px] w-[3px] rounded-full", recorded ? "bg-tk-green" : "bg-transparent")} />
+              <span aria-hidden className={cn("h-[3px] w-[3px] rounded-full", recorded ? "bg-[var(--tk-dot-recorded)]" : "bg-transparent")} />
             </button>
           );
         })}
       </div>
-      <p className="mt-2 text-center text-[10.5px] text-tk-deep">Titik hijau = ada catatan ibadah · ketuk tanggal untuk rincian</p>
+      <p className="mt-2 text-center text-[10.5px] text-tk-deep">Titik warna = ada catatan ibadah · ketuk tanggal untuk rincian</p>
     </BottomSheet>
   );
 }
@@ -604,7 +606,7 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
       as="button"
       onClick={() => onNavigate("sholat")}
       ariaLabel="Salat lima waktu, buka halaman Sholat"
-      className="tap tk-card-white su-card-shadow rounded-[1.4rem] p-4"
+      className="tap tk-card-white tk-surf-salat su-card-shadow rounded-[1.4rem] p-4"
       maxTilt={3.5}
     >
       <p className="text-[13.5px] font-bold tracking-[-0.01em] text-tk-ink">Salat Lima Waktu</p>
@@ -622,10 +624,10 @@ function SalatCheckCard({ today, onNavigate }: { today: string; onNavigate: (tab
                 aria-hidden
                 className={cn(
                   "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px]",
-                  done ? "border-tk-ink bg-tk-ink" : missed ? "border-tk-accent" : "border-tk-line-strong"
+                  done ? "border-[var(--tk-salat-done)] bg-[var(--tk-salat-done)]" : missed ? "border-tk-accent" : "border-tk-line-strong"
                 )}
               >
-                {done ? <Check size={10} strokeWidth={3.2} className="text-tk-panel" /> : null}
+                {done ? <Check size={10} strokeWidth={3.2} className="text-[var(--tk-salat-done-check)]" /> : null}
               </span>
               {/* Label + status menyatu dalam SATU kolom teks (line-clamp-2 +
                   flex-1 min-w-0) sehingga tidak mungkin bertumpuk; badge Jumat
@@ -671,19 +673,19 @@ function QuoteCard({ today }: { today: string }) {
   const quote = useMemo(() => quoteForDate(today), [today]);
   return (
     <div
-      className="su-card-shadow relative flex h-full min-h-[172px] flex-col overflow-hidden rounded-[1.4rem] border border-tk-line-soft bg-tk-panel light:bg-[linear-gradient(150deg,#FFFDFB_0%,var(--tk-tint-b)_58%,var(--tk-tint-c)_100%)] dark:bg-[linear-gradient(150deg,var(--color-tk-white-card)_0%,var(--color-tk-panel)_55%,var(--color-tk-panel-soft)_100%)]"
+      className="tk-bg-quote su-card-shadow relative flex h-full min-h-[172px] flex-col overflow-hidden rounded-[1.4rem] border border-tk-line-soft"
     >
-      {/* Kilau hangat di dua pojok — peach (light) / copper (dark) */}
-      <span aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-[#FFE3C9]/60 blur-2xl dark:bg-[var(--tk-brand-soft)]/10" />
-      <span aria-hidden className="pointer-events-none absolute -bottom-14 -left-10 h-32 w-32 rounded-full bg-[#FFD9B8]/45 blur-2xl dark:bg-[#D9A05B]/10" />
+      {/* Kilau di dua pojok — tint tema (electric: cyan/lavender) */}
+      <span aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-[var(--tk-tint-c)]/60 blur-2xl dark:bg-[var(--tk-brand-soft)]/10" />
+      <span aria-hidden className="pointer-events-none absolute -bottom-14 -left-10 h-32 w-32 rounded-full bg-[var(--tk-tint-a)]/45 blur-2xl dark:bg-[var(--color-tk-copper)]/10" />
 
       {/* Overline: ornamen bintang segi-8 (geometris Islami) + kategori */}
       <div className="relative flex items-center gap-1.5 px-4 pt-3.5">
-        <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden className="shrink-0 text-tk-copper dark:text-tk-amber">
+        <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden className="shrink-0 text-[var(--tk-quote-accent)]">
           <rect x="2.4" y="2.4" width="7.2" height="7.2" fill="none" stroke="currentColor" strokeWidth="1" />
           <rect x="2.4" y="2.4" width="7.2" height="7.2" fill="none" stroke="currentColor" strokeWidth="1" transform="rotate(45 6 6)" />
         </svg>
-        <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-tk-copper dark:text-tk-amber">
+        <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-[var(--tk-quote-accent)]">
           {quote.theme}
         </span>
       </div>
@@ -701,12 +703,12 @@ function QuoteCard({ today }: { today: string }) {
         <p className="mt-2 flex min-w-0 items-center gap-1.5 text-[10px] font-semibold text-tk-deep">
           {quote.source ? (
             <>
-              <BookOpen size={11} strokeWidth={2} className="shrink-0 text-tk-copper dark:text-tk-amber" />
+              <BookOpen size={11} strokeWidth={2} className="shrink-0 text-[var(--tk-quote-footer)]" />
               <span className="truncate font-pr italic">{quote.source}</span>
             </>
           ) : (
             <>
-              <Sparkles size={11} strokeWidth={2} className="shrink-0 text-tk-copper dark:text-tk-amber" />
+              <Sparkles size={11} strokeWidth={2} className="shrink-0 text-[var(--tk-quote-footer)]" />
               <span>Refleksi hari ini</span>
             </>
           )}
@@ -742,6 +744,7 @@ function KebaikanCard({
   const rows = [
     {
       label: "Al-Qur'an",
+      accent: "quran",
       value: `${quran}/${settings.quranDailyTarget} hlm`,
       caption: `Target ${settings.quranDailyTarget} halaman/hari`,
       detail: `Target ${settings.quranDailyTarget} halaman setiap hari`,
@@ -750,6 +753,7 @@ function KebaikanCard({
     },
     {
       label: "Zikir & Doa",
+      accent: "zikir",
       value: zikir.toLocaleString("id-ID"),
       caption: `Target ${settings.zikirTarget.toLocaleString("id-ID")} hitungan`,
       detail: `Zikir harian, target ${settings.zikirTarget.toLocaleString("id-ID")} hitungan`,
@@ -758,6 +762,7 @@ function KebaikanCard({
     },
     {
       label: "Amal",
+      accent: "amal",
       value: `${amal} amal`,
       caption: "Sedekah & kebaikan kecil",
       detail: "Sedekah, bantu sesama, kebaikan kecil",
@@ -766,6 +771,7 @@ function KebaikanCard({
     },
     {
       label: "Jurnal",
+      accent: "jurnal",
       value: jurnal > 0 ? `${jurnal} syukur` : "kosong",
       caption: "Tuliskan rasa syukur hari ini",
       detail: "Tuliskan rasa syukur dan renungan hari ini",
@@ -773,6 +779,16 @@ function KebaikanCard({
       go: () => onOpenSubpage("jurnal"),
     },
   ];
+
+  /* Aksen per kategori mengikuti sistem warna Electric Dream via token
+     (--tk-cat-*): electric = 4 warna palet di atas hero biru; klasik =
+     putih sehingga tampilan klasik tidak berubah. */
+  const ACCENT: Record<string, { ring: string; fill: string; value: string }> = {
+    quran: { ring: "border-[var(--tk-cat-quran)]/60", fill: "border-[var(--tk-cat-quran)] bg-[var(--tk-cat-quran)]", value: "text-[var(--tk-cat-quran)]" },
+    zikir: { ring: "border-[var(--tk-cat-zikir)]/60", fill: "border-[var(--tk-cat-zikir)] bg-[var(--tk-cat-zikir)]", value: "text-[var(--tk-cat-zikir)]" },
+    amal: { ring: "border-[var(--tk-cat-amal)]/60", fill: "border-[var(--tk-cat-amal)] bg-[var(--tk-cat-amal)]", value: "text-[var(--tk-cat-amal)]" },
+    jurnal: { ring: "border-[var(--tk-cat-jurnal)]/60", fill: "border-[var(--tk-cat-jurnal)] bg-[var(--tk-cat-jurnal)]", value: "text-[var(--tk-cat-jurnal)]" },
+  };
 
   const doneCount = rows.filter((r) => r.done).length;
   const insight =
@@ -783,13 +799,13 @@ function KebaikanCard({
         : `${doneCount} dari ${rows.length} sudah tercatat, lanjutkan yang lain.`;
 
   return (
-    <section aria-label="Ibadah pendukung hari ini" className="glass-hero flex h-full flex-col rounded-[1.4rem] p-4">
-      {/* Butiran cahaya Liquid Glass di atas permukaan orange — dekoratif,
+    <section aria-label="Ibadah pendukung hari ini" className="glass-hero tk-surf-navy-card flex h-full flex-col rounded-[1.4rem] p-4">
+      {/* Butiran cahaya Liquid Glass di atas permukaan hero — dekoratif,
           pointer-events-none, tidak menghalangi klik tombol di dalamnya. */}
       <AmbientParticles count={6} />
       <div className="flex items-center justify-between gap-2">
         <p className="whitespace-nowrap text-[12.5px] font-bold tracking-[-0.01em] text-white">Kebaikan Hari Ini</p>
-        <span className="tnum shrink-0 rounded-full bg-white/18 px-2 py-0.5 text-[9px] font-bold text-white">
+        <span className="tnum shrink-0 rounded-full bg-[var(--tk-cat-pill-bg)] px-2 py-0.5 text-[9px] font-bold text-[var(--tk-cat-pill-ink)]">
           {doneCount}/{rows.length}
         </span>
       </div>
@@ -799,7 +815,7 @@ function KebaikanCard({
         className="mt-1 grid flex-1 grid-cols-2 gap-x-4 lg:grid-cols-1 lg:gap-x-0 lg:divide-y lg:divide-white/12"
         role="group"
       >
-        {rows.map(({ label, value, caption, detail, done, go }) => (
+        {rows.map(({ label, accent, value, caption, detail, done, go }) => (
           <li key={label}>
             <button
               type="button"
@@ -810,16 +826,18 @@ function KebaikanCard({
               <span
                 aria-hidden
                 className={cn(
-                  "flex h-[19px] w-[19px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-white/45",
-                  done && "border-white bg-white"
+                  "flex h-[19px] w-[19px] shrink-0 items-center justify-center rounded-full border-[1.5px]",
+                  done ? ACCENT[accent].fill : ACCENT[accent].ring
                 )}
               >
-                {done ? <Check size={10} strokeWidth={3.2} className="text-tk-violet" /> : null}
+                {done ? <Check size={10} strokeWidth={3.2} className="text-[var(--tk-cat-check)]" /> : null}
               </span>
               <span className="min-w-0 flex-1">
                 <span className="flex items-baseline justify-between gap-2">
                   <span className="line-clamp-1 min-w-0 flex-1 text-[12.5px] font-bold text-white">{label}</span>
-                  <span className="tnum shrink-0 whitespace-nowrap text-[10px] font-bold text-white/90">{value}</span>
+                  <span className={cn("tnum shrink-0 whitespace-nowrap text-[10px] font-bold", done ? ACCENT[accent].value : "text-white/90")}>
+                    {value}
+                  </span>
                 </span>
                 <span className="mt-px block line-clamp-2 text-[10px] leading-snug text-white/70">{caption}</span>
               </span>
@@ -1040,8 +1058,10 @@ function TodayTasks({ today }: { today: string }) {
 function DoaCompact() {
   const dua = duaOfTheDay(todayKey());
   return (
-    <section aria-label="Doa hari ini" className="glass rounded-[1.4rem] p-4.5">
-      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-tk-accent">Doa Hari Ini</p>
+    /* Electric: Deep Navy + potongan lime di sudut, label Doa = Neon Lime,
+       teks Arab putih, sumber cyan. Klasik: glass hangat asli. */
+    <section aria-label="Doa hari ini" className="glass tk-surf-navy-card tk-surf-dua rounded-[1.4rem] p-4.5">
+      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--tk-dua-label)]">Doa Hari Ini</p>
       {dua.title ? <p className="mt-2 text-[14.5px] font-bold tracking-[-0.01em] text-tk-ink">{dua.title}</p> : null}
       {dua.arabic ? <p className="quran-arabic mt-3 text-right text-[22px] leading-[2] text-tk-ink">{dua.arabic}</p> : null}
       {dua.transliteration ? (
@@ -1063,28 +1083,33 @@ function DailyBarakah() {
     { label: "Target kecil", text: b.target },
   ];
   return (
-    <section aria-label="Daily Barakah" className="animate-tk-fade-up relative">
-      <div className="relative mb-1 flex items-end justify-between gap-3 px-0.5">
+    /* Electric: kartu Lavender Gray + chip nomor Neon Lime ber-teks navy +
+       ornamen octagram turquoise; label turquoise. Klasik: daftar asli
+       tanpa kartu (chip lavender, label aksen klasik) via token. */
+    <section aria-label="Daily Barakah" className="animate-tk-fade-up tk-surf-lavender su-card-shadow relative overflow-hidden rounded-[1.4rem] p-4.5">
+      <span aria-hidden className="tk-octagram pointer-events-none absolute -right-7 -top-7 h-28 w-28 bg-[var(--tk-brand-soft)]/10" />
+      <div className="relative mb-1 flex items-end justify-between gap-3">
         <div className="flex items-baseline gap-2">
           <h2 className="text-[16.5px] font-bold tracking-[-0.015em] text-tk-ink">Daily Barakah</h2>
-          <span aria-hidden className="quran-arabic text-[14px] leading-none text-tk-accent/85">
+          <span aria-hidden className="quran-arabic text-[14px] leading-none text-[var(--tk-brk-label)] opacity-85">
             بركة
           </span>
         </div>
       </div>
       <ol className="relative">
         {rows.map(({ label, text }, i) => (
-          <li key={label} className={cn("flex items-start gap-4 py-3.5", i > 0 && "border-t border-tk-line-soft")}>
-            {/* Chip nomor khatam: lapisan bintang luar + dalam = tepi rambut */}
+          <li key={label} className={cn("flex items-start gap-4 py-3", i > 0 && "border-t border-tk-line-soft")}>
+            {/* Chip nomor khatam: lapisan octagram luar + dalam; electric =
+                turquoise tint + Neon Lime dengan angka navy, klasik asli */}
             <span aria-hidden className="relative flex h-9 w-9 shrink-0 items-center justify-center">
-              <span className="tk-octagram absolute inset-0 bg-tk-lav-deco" />
-              <span className="tk-octagram absolute inset-[1.5px] bg-tk-lavender" />
-              <span className="gs-display relative text-[11.5px] font-bold text-tk-accent">
+              <span className="tk-octagram absolute inset-0 bg-[var(--tk-brk-chip-out)]" />
+              <span className="tk-octagram absolute inset-[1.5px] bg-[var(--tk-brk-chip-in)]" />
+              <span className="gs-display relative text-[11.5px] font-bold text-[var(--tk-brk-chip-ink)]">
                 {String(i + 1).padStart(2, "0")}
               </span>
             </span>
             <span className="min-w-0">
-              <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-tk-accent">{label}</span>
+              <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--tk-brk-label)]">{label}</span>
               <span className="mt-1.5 block text-[13.5px] leading-relaxed text-tk-ink/90">{text}</span>
             </span>
           </li>
@@ -1178,7 +1203,7 @@ export function HomePage({
           type="button"
           aria-label="Buka pencarian"
           onClick={() => setSearchOpen(true)}
-          className="tap flex w-full items-center gap-3 rounded-full border border-tk-line-soft bg-tk-panel-strong px-4.5 py-3.5 text-left"
+          className="tap tk-surf-search flex w-full items-center gap-3 rounded-full border border-tk-line-soft bg-tk-panel-strong px-4.5 py-3.5 text-left"
         >
           <Search size={17} className="shrink-0 text-tk-muted" />
           <span className="text-[13.5px] text-tk-deep">Cari surah, aktivitas, catatan…</span>

@@ -53,13 +53,20 @@ export function useWeeklyLiveReport(weekStart: string, today: string): WeeklyRef
 
 /* ---------------- Kartu apresiasi (Progress) ---------------- */
 
-/** Chip ringkasan kecil di kartu. */
-function MiniStat({ icon: Icon, label, value }: { icon: typeof MoonStar; label: string; value: string }) {
+/** Chip ringkasan kecil di kartu. tone = aksen kategori (sistem warna Electric Dream). */
+const MINI_TONE = {
+  cyan: "text-[var(--tk-mini-cyan)]",
+  blue: "text-[var(--tk-mini-blue)]",
+  teal: "text-[var(--tk-mini-teal)]",
+  lime: "text-[var(--tk-mini-lime)]",
+} as const;
+
+function MiniStat({ icon: Icon, label, value, tone = "cyan" }: { icon: typeof MoonStar; label: string; value: string; tone?: keyof typeof MINI_TONE }) {
   return (
-    <div className="flex min-w-0 items-center gap-1.5 rounded-full bg-white/55 px-2.5 py-1.5 dark:bg-white/8">
-      <Icon size={12} className="shrink-0 text-tk-accent" aria-hidden />
-      <span className="tnum truncate text-[10.5px] font-bold text-[#4A3A28] dark:text-[var(--tk-d-ink-soft)]">{value}</span>
-      <span className="truncate text-[9.5px] font-medium text-[#4A3A28]/60 dark:text-[var(--tk-d-ink-soft)]/55">{label}</span>
+    <div className="flex min-w-0 items-center gap-1.5 rounded-full bg-[var(--tk-wk-chip)] px-2.5 py-1.5">
+      <Icon size={12} className={cn("shrink-0", MINI_TONE[tone])} aria-hidden />
+      <span className="tnum truncate text-[10.5px] font-bold text-[var(--color-tk-ink)] dark:text-[var(--tk-d-ink-soft)]">{value}</span>
+      <span className="truncate text-[9.5px] font-medium text-[var(--color-tk-ink)]/60 dark:text-[var(--tk-d-ink-soft)]/55">{label}</span>
     </div>
   );
 }
@@ -86,37 +93,40 @@ export function WeeklyReflectionCard({ onOpen }: { onOpen: () => void }) {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={animationsOn ? { duration: 0.5, ease: [0.22, 1, 0.36, 1] } : { duration: 0 }}
-      className="tap relative block w-full overflow-hidden rounded-[1.6rem] border text-left shadow-[0_20px_50px_-24px_rgba(120,60,10,0.35)] active:scale-[0.99] dark:shadow-[0_20px_50px_-24px_rgba(0,0,0,0.6)]"
-      style={{ borderColor: "rgba(255,122,40,0.25)" }}
+      className="tap tk-surf-weekly relative block w-full overflow-hidden rounded-[1.6rem] border text-left shadow-[var(--tk-wk-shadow)] active:scale-[0.99]"
+      style={{ borderColor: "var(--tk-wk-border)" }}
     >
-      {/* Dasar warm ivory / warm charcoal */}
-      <div className="absolute inset-0 bg-[#FFF8EE] dark:bg-[var(--color-tk-light-card)]" aria-hidden />
-      {/* Polesan hangat + ornamen geometris minimalis */}
+      {/* Dasar kartu (::before pada .tk-surf-weekly): klasik ivory hangat /
+          charcoal; electric: Deep Navy + glow turquoise-biru */}
+      {/* Polesan brand + turquoise (electric) dan ornamen geometris */}
       <div
         aria-hidden
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(120% 90% at 100% 0%, rgba(255,138,60,0.14), transparent 55%), radial-gradient(90% 70% at 0% 100%, rgba(255,170,90,0.10), transparent 60%)",
+            "radial-gradient(120% 90% at 100% 0%, rgba(var(--tk-brand-rgb),0.13), transparent 55%), radial-gradient(90% 70% at 0% 100%, var(--tk-wk-glow2), transparent 60%)",
         }}
       />
       <div aria-hidden className="tk-geo-pattern absolute -right-10 -top-10 h-44 w-44 opacity-[0.10]" />
-      <span aria-hidden className="tk-octagram absolute -bottom-7 -left-7 h-32 w-32 bg-[#FF8A3C]/10 dark:bg-[var(--tk-brand-soft)]/10" />
+      <span aria-hidden className="tk-octagram absolute -bottom-7 -left-7 h-32 w-32 bg-[var(--tk-brand-soft)]/10 dark:bg-[var(--tk-brand-soft)]/10" />
 
       <div className="relative p-5">
         {/* Kepala: lencana + status */}
         <div className="flex items-start justify-between gap-3">
           <span className="relative flex h-12 w-12 shrink-0 items-center justify-center">
-            <span aria-hidden className="tk-octagram absolute inset-0 bg-[#FF8A3C]/25 dark:bg-[var(--tk-brand-soft)]/20" />
-            <span aria-hidden className="tk-octagram absolute inset-[2px] bg-gradient-to-br from-[#FF8A3C] to-[#E04E00]" />
+            <span aria-hidden className="tk-octagram absolute inset-0 bg-[var(--tk-brand-soft)]/25 dark:bg-[var(--tk-brand-soft)]/20" />
+            <span aria-hidden className="tk-octagram absolute inset-[2px]" style={{ background: "var(--tk-wk-award)" }} />
             <Award size={20} className="relative text-white" aria-hidden />
           </span>
           <div className="flex flex-col items-end gap-1.5">
-            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#C65A10] dark:text-[var(--tk-brand-soft)]">
+            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--tk-wk-overline)]">
               Weekly Reflection
             </span>
             {isNew ? (
-              <span className="rounded-full bg-[#E04E00] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+              <span
+                className="rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide"
+                style={{ background: "var(--tk-wk-badge-bg)", color: "var(--tk-wk-badge-ink)" }}
+              >
                 {isSunday ? "Siap dievaluasi" : "Laporan minggu lalu"}
               </span>
             ) : null}
@@ -124,56 +134,67 @@ export function WeeklyReflectionCard({ onOpen }: { onOpen: () => void }) {
         </div>
 
         {/* Headline + subheadline */}
-        <h2 className="gs-display mt-3.5 text-[21px] font-bold leading-tight tracking-[-0.02em] text-[#33261A] dark:text-[var(--tk-d-ink-hi)]">
+        <h2 className="gs-display mt-3.5 text-[21px] font-bold leading-tight tracking-[-0.02em] text-[var(--color-tk-ink)] dark:text-[var(--tk-d-ink-hi)]">
           Perjalanan Baikmu Minggu Ini
         </h2>
-        <p className="mt-1.5 max-w-[300px] text-[11.5px] leading-relaxed text-[#6B5442] dark:text-[var(--tk-d-ink-mid)]">
+        <p className="mt-1.5 max-w-[300px] text-[11.5px] leading-relaxed text-[var(--color-tk-muted)] dark:text-[var(--tk-d-ink-mid)]">
           Setiap usaha kecil layak dihargai. Mari lihat perjalanan ibadahmu selama tujuh hari terakhir.
         </p>
 
-        {/* Grafik mini 7 hari + persentase */}
+        {/* Grafik mini 7 hari + persentase — 4 level warna Electric Dream:
+            rendah = Cyan, sedang = Electric Blue, penuh = Turquoise,
+            hari terbaik pekan ini = highlight Neon Lime. */}
         <div className="mt-4 flex items-end gap-2.5">
           <div className="flex h-[52px] min-w-0 flex-1 items-end gap-[5px]" aria-hidden>
-            {days.map((d) => {
-              const h = Math.round((d.done / 5) * 100);
-              const future = d.slots === 0 && d.done === 0;
-              return (
-                <span
-                  key={d.date}
-                  className="min-w-0 flex-1 overflow-hidden rounded-full bg-[#EAD9C4]/70 transition-[height] duration-500 dark:bg-white/10"
-                  style={{
-                    height: future ? "7%" : `${Math.max(8, h)}%`,
-                    background: future
-                      ? undefined
-                      : h >= 100
-                        ? "linear-gradient(180deg,#FF8A3C,#E04E00)"
-                        : "linear-gradient(180deg,#FFAF6E,#F07020)",
-                  }}
-                />
-              );
-            })}
+            {(() => {
+              const elapsed = days.filter((d) => d.slots > 0);
+              const best = elapsed.length ? Math.max(...elapsed.map((d) => d.done)) : 0;
+              const bestIdx = best > 0 ? days.findIndex((d) => d.slots > 0 && d.done === best) : -1;
+              return days.map((d, i) => {
+                const h = Math.round((d.done / 5) * 100);
+                const future = d.slots === 0 && d.done === 0;
+                return (
+                  <span
+                    key={d.date}
+                    className="min-w-0 flex-1 overflow-hidden rounded-full bg-[var(--color-tk-track)]/70 transition-[height] duration-500 dark:bg-white/10"
+                    style={{
+                      height: future ? "7%" : `${Math.max(8, h)}%`,
+                      background: future
+                        ? undefined
+                        : i === bestIdx
+                          ? "var(--tk-bar-best)"
+                          : h >= 100
+                            ? "var(--tk-bar-high)"
+                            : h >= 40
+                              ? "var(--tk-bar-med)"
+                              : "var(--tk-bar-low)",
+                    }}
+                  />
+                );
+              });
+            })()}
           </div>
           <div className="shrink-0 text-right">
-            <p className="tnum gs-display text-[24px] font-bold leading-none text-[#33261A] dark:text-[var(--tk-d-ink-hi)]">{pct}%</p>
-            <p className="text-[8.5px] font-bold uppercase tracking-[0.12em] text-[#6B5442]/70 dark:text-[var(--tk-d-ink-mid)]/70">salat terlaksana</p>
+            <p className="tnum gs-display text-[24px] font-bold leading-none text-[var(--color-tk-ink)] dark:text-[var(--tk-d-ink-hi)]">{pct}%</p>
+            <p className="text-[8.5px] font-bold uppercase tracking-[0.12em] text-[var(--color-tk-muted)]/70 dark:text-[var(--tk-d-ink-mid)]/70">salat terlaksana</p>
           </div>
         </div>
-        <p className="mt-1 text-[9.5px] font-medium text-[#6B5442]/70 dark:text-[var(--tk-d-ink-mid)]/70">
+        <p className="mt-1 text-[9.5px] font-medium text-[var(--color-tk-muted)]/70 dark:text-[var(--tk-d-ink-mid)]/70">
           {weekRangeLabel(weekStart)} · batang = salat terlaksana per hari
         </p>
 
         {/* Ringkasan metrik (hanya yang tersedia di aplikasi) */}
-        <div className="mt-3.5 flex flex-wrap gap-1.5 border-t border-[#F0DCC6]/80 pt-3.5 dark:border-white/8">
-          <MiniStat icon={MoonStar} label="salat" value={`${report.prayers.done}×`} />
-          <MiniStat icon={Target} label="berjamaah" value={`${report.prayers.jamaah}×`} />
-          <MiniStat icon={Sparkles} label="hari aktif" value={`${report.activeDays} hari`} />
-          <MiniStat icon={CircleDot} label="zikir" value={report.zikirTotal.toLocaleString("id-ID")} />
-          <MiniStat icon={BookOpen} label="qur'an" value={`${report.quranPages.toLocaleString("id-ID")} hlm`} />
-          <MiniStat icon={HandCoins} label="amal" value={`${report.amalCount}×`} />
-          <MiniStat icon={BookHeart} label="jurnal" value={`${report.journalCount} hari`} />
+        <div className="mt-3.5 flex flex-wrap gap-1.5 border-t border-[var(--color-tk-line-soft)]/80 pt-3.5 dark:border-white/8">
+          <MiniStat icon={MoonStar} label="salat" value={`${report.prayers.done}×`} tone="cyan" />
+          <MiniStat icon={Target} label="berjamaah" value={`${report.prayers.jamaah}×`} tone="blue" />
+          <MiniStat icon={Sparkles} label="hari aktif" value={`${report.activeDays} hari`} tone="teal" />
+          <MiniStat icon={CircleDot} label="zikir" value={report.zikirTotal.toLocaleString("id-ID")} tone="teal" />
+          <MiniStat icon={BookOpen} label="qur'an" value={`${report.quranPages.toLocaleString("id-ID")} hlm`} tone="blue" />
+          <MiniStat icon={HandCoins} label="amal" value={`${report.amalCount}×`} tone="lime" />
+          <MiniStat icon={BookHeart} label="jurnal" value={`${report.journalCount} hari`} tone="cyan" />
         </div>
 
-        <p className="mt-3.5 flex items-center gap-1 text-[10.5px] font-bold text-[#C65A10] dark:text-[var(--tk-brand-soft)]">
+        <p className="mt-3.5 flex items-center gap-1 text-[10.5px] font-bold text-[var(--tk-wk-footer)]">
           <ChevronRight size={12} aria-hidden />
           Ketuk untuk membuka refleksi mingguan
         </p>
@@ -362,29 +383,29 @@ export function WeeklyReflectionSheet({
             animate={{ rotateY: motionOK ? -108 : 0, opacity: motionOK ? [1, 1, 0.9, 0] : 0 }}
             transition={motionOK ? { duration: 1.0, times: [0, 0.55, 0.85, 1], ease: [0.45, 0, 0.2, 1] } : { duration: 0.01 }}
             onAnimationComplete={() => setCoverGone(true)}
-            className="absolute inset-0 z-20 origin-left bg-[#FFF8EE] dark:bg-[var(--color-tk-light-card)]"
+            className="absolute inset-0 z-20 origin-left bg-[var(--tk-tint-b)] dark:bg-[var(--color-tk-light-card)]"
             style={{ backfaceVisibility: "hidden" }}
             aria-hidden
           >
             <div aria-hidden className="tk-geo-pattern absolute inset-0 opacity-[0.08]" />
-            <span aria-hidden className="tk-octagram absolute -right-10 top-24 h-44 w-44 bg-[#FF8A3C]/15 dark:bg-[var(--tk-brand-soft)]/10" />
-            <span aria-hidden className="tk-octagram absolute -left-8 bottom-24 h-36 w-36 bg-[#FF8A3C]/10 dark:bg-[var(--tk-brand-soft)]/10" />
+            <span aria-hidden className="tk-octagram absolute -right-10 top-24 h-44 w-44 bg-[var(--tk-brand-soft)]/15 dark:bg-[var(--tk-brand-soft)]/10" />
+            <span aria-hidden className="tk-octagram absolute -left-8 bottom-24 h-36 w-36 bg-[var(--tk-brand-soft)]/10 dark:bg-[var(--tk-brand-soft)]/10" />
             <div className="flex h-full flex-col items-center justify-center gap-4 px-8 text-center">
               <span className="relative flex h-16 w-16 items-center justify-center">
-                <span aria-hidden className="tk-octagram absolute inset-0 bg-[#FF8A3C]/25 dark:bg-[var(--tk-brand-soft)]/20" />
-                <span aria-hidden className="tk-octagram absolute inset-[2.5px] bg-gradient-to-br from-[#FF8A3C] to-[#E04E00]" />
+                <span aria-hidden className="tk-octagram absolute inset-0 bg-[var(--tk-brand-soft)]/25 dark:bg-[var(--tk-brand-soft)]/20" />
+                <span aria-hidden className="tk-octagram absolute inset-[2.5px] bg-gradient-to-br from-[var(--tk-brand-soft)] to-[var(--tk-brand-deep)]" />
                 <Award size={26} className="relative text-white" />
               </span>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#C65A10] dark:text-[var(--tk-brand-soft)]">Weekly Reflection</p>
-                <p className="gs-display mt-2 text-[24px] font-bold tracking-[-0.02em] text-[#33261A] dark:text-[var(--tk-d-ink-hi)]">
+                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[var(--tk-brand-deep)] dark:text-[var(--tk-brand-soft)]">Weekly Reflection</p>
+                <p className="gs-display mt-2 text-[24px] font-bold tracking-[-0.02em] text-[var(--color-tk-ink)] dark:text-[var(--tk-d-ink-hi)]">
                   Refleksi Mingguan
                 </p>
-                <p className="mt-1.5 text-[12px] font-medium text-[#6B5442] dark:text-[var(--tk-d-ink-mid)]">
+                <p className="mt-1.5 text-[12px] font-medium text-[var(--color-tk-muted)] dark:text-[var(--tk-d-ink-mid)]">
                   {weekRangeLabel(selected)}
                 </p>
               </div>
-              <span className="mt-2 flex h-0.5 w-14 rounded-full bg-[#E04E00]/60 dark:bg-[var(--tk-brand-soft)]/50" />
+              <span className="mt-2 flex h-0.5 w-14 rounded-full bg-[var(--tk-brand-deep)]/60 dark:bg-[var(--tk-brand-soft)]/50" />
             </div>
           </m.div>
         ) : null}
@@ -506,8 +527,8 @@ export function WeeklyReflectionSheet({
             {report.bestHabit ? (
               <div className="mt-2.5 flex items-start gap-3">
                 <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
-                  <span aria-hidden className="tk-octagram absolute inset-0 bg-[#FF8A3C]/20 dark:bg-[var(--tk-brand-soft)]/15" />
-                  <span aria-hidden className="tk-octagram absolute inset-[2px] bg-gradient-to-br from-[#FF8A3C] to-[#E04E00]" />
+                  <span aria-hidden className="tk-octagram absolute inset-0 bg-[var(--tk-brand-soft)]/20 dark:bg-[var(--tk-brand-soft)]/15" />
+                  <span aria-hidden className="tk-octagram absolute inset-[2px] bg-gradient-to-br from-[var(--tk-brand-soft)] to-[var(--tk-brand-deep)]" />
                   <Award size={16} className="relative text-white" />
                 </span>
                 <div className="min-w-0">
@@ -569,7 +590,7 @@ export function WeeklyReflectionSheet({
 
           {/* 6. WEEKLY MOTIVATION */}
           <m.section variants={itemV(motionOK)} className="relative overflow-hidden rounded-[1.4rem] p-4">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FF8A3C]/12 to-transparent dark:from-[var(--tk-brand-soft)]/10" aria-hidden />
+            <div className="absolute inset-0 bg-gradient-to-br from-[var(--tk-brand-soft)]/12 to-transparent dark:from-[var(--tk-brand-soft)]/10" aria-hidden />
             <div className="relative">
               <SectionTitle>Weekly Motivation</SectionTitle>
               <p className="mt-2 text-[13px] leading-relaxed text-tk-ink/90">&ldquo;{report.motivation}&rdquo;</p>

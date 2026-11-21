@@ -49,12 +49,13 @@ if [ "$mode" = "poll" ]; then
     tok=$(echo "$res" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("access_token",""))' 2>/dev/null)
     if [ -n "$tok" ]; then
       login=$(curl -s -H "Authorization: Bearer $tok" https://api.github.com/user | python3 -c 'import json,sys; print(json.load(sys.stdin).get("login",""))')
-      if [ "$login" = "irsyadrpasha" ]; then
+      push=$(curl -s -H "Authorization: Bearer $tok" https://api.github.com/repos/Irsyad342/TazkiyaAPP | python3 -c 'import json,sys; print(json.load(sys.stdin).get("permissions",{}).get("push",False))')
+      if [ "$push" = "True" ]; then
         printf '%s' "$tok" > "$TOK"; chmod 600 "$TOK"
-        echo "TOKEN OK — login=$login (disimpan /tmp/gh_valid_token, tidak dicetak)"
+        echo "TOKEN OK — login=$login, izin push ke Irsyad342/TazkiyaAPP terverifikasi (disimpan /tmp/gh_valid_token, tidak dicetak)"
         exit 0
       else
-        echo "GAGAL: yang menyetujui bukan irsyadrpasha (login=$login) — token dibuang"
+        echo "GAGAL: login=$login tidak punya izin push ke Irsyad342/TazkiyaAPP — token dibuang"
         exit 6
       fi
     fi

@@ -9,7 +9,7 @@
  * terhubung; struktur visualnya baru.
  */
 
-import { type ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 import {
@@ -188,10 +188,11 @@ export function SegmentedTabs<T extends string>({
       role="tablist"
       aria-label={ariaLabel}
     >
-      {/* Indikator geser: lebar = satu slot, translasi = indeks × (slot + gap) */}
+      {/* Indikator geser: lebar = satu slot, translasi = indeks × (slot + gap).
+          Electric: turquoise — agar indikator tab berbeda dari elemen identitas biru. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute bottom-0 left-0 h-[2px] rounded-full bg-tk-violet transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
+        className="pointer-events-none absolute bottom-0 left-0 h-[2px] rounded-full bg-[var(--tk-tab-indicator)] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
         style={{
           width: `calc((100% - ${(items.length - 1) * gap}px) / ${items.length})`,
           transform: `translateX(calc(${activeIdx} * (100% + ${gap}px)))`,
@@ -269,8 +270,8 @@ export function ProgressRing({
   children,
   className,
   trackClass = "stroke-tk-track",
-  from = "#FA5200",
-  to = "#FF6B26",
+  from = "var(--tk-progress-a)",
+  to = "var(--tk-progress-b)",
 }: {
   value: number; // 0..100
   size?: number;
@@ -285,9 +286,18 @@ export function ProgressRing({
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const dash = (clamped / 100) * c;
+  /* Gradasi dua warna pada busur (electric: electric blue → turquoise;
+     klasik: gradasi oranye). stop memakai inline style agar var() ter-resolve. */
+  const gid = useId().replace(/[^a-zA-Z0-9]/g, "");
   return (
     <div className={cn("relative inline-flex items-center justify-center", className)} style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
+        <defs>
+          <linearGradient id={`prg-${gid}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" style={{ stopColor: from }} />
+            <stop offset="100%" style={{ stopColor: to }} />
+          </linearGradient>
+        </defs>
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} className={trackClass} />
         <circle
           cx={size / 2}
@@ -296,7 +306,7 @@ export function ProgressRing({
           fill="none"
           strokeWidth={stroke}
           strokeLinecap="round"
-          stroke={from}
+          stroke={`url(#prg-${gid})`}
           strokeDasharray={`${dash} ${c}`}
           style={{
             transition: "stroke-dasharray 0.6s cubic-bezier(0.22, 1, 0.36, 1)",

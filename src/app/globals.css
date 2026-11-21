@@ -130,6 +130,23 @@
   --color-tk-green-soft: #26382c;
   --color-tk-rose: #e5484d;
   --color-tk-sky-soft: #2a3748;
+  /* Aksen kategori card Kebaikan (di atas permukaan hero) — klasik: putih di atas oranye */
+  --tk-cat-quran: #ffffff;
+  --tk-cat-zikir: #ffffff;
+  --tk-cat-amal: #ffffff;
+  --tk-cat-jurnal: #ffffff;
+  --tk-cat-check: #ff650a;
+  --tk-cat-pill-bg: rgba(255, 255, 255, 0.18);
+  --tk-cat-pill-ink: #ffffff;
+  /* Tinta kategori jurnal (ikon chip, label Tulis, dot) — klasik: nilai asli */
+  --jk-refleksi: #ff650a;
+  --jk-emosi: #ffb38a;
+  --jk-syukur: #e19a3c;
+  --jk-harapan: #c2410c;
+  --jk-refleksi-soft: rgba(255, 101, 10, 0.14);
+  --jk-emosi-soft: rgba(255, 179, 138, 0.16);
+  --jk-syukur-soft: rgba(225, 154, 60, 0.16);
+  --jk-harapan-soft: rgba(194, 65, 12, 0.16);
 }
 
 :root {
@@ -242,6 +259,58 @@
   --tk-dock-shadow: 0 18px 44px -14px rgba(20, 10, 4, 0.85);
   --tk-hero-a: #ff650a; --tk-hero-b: #f25f06; --tk-hero-c: #e55704;
   --tk-hero-shadow: 0 20px 48px -22px rgba(217, 75, 10, 0.55);
+  --tk-progress-a: #fa5200;       /* ring progres (klasik: oranye — electric: neon lime) */
+  --tk-progress-b: #ff6b26;
+  /* Token permukaan/indikator — klasik light (nilai asli, komponen tak berubah) */
+  --color-tk-teal-ink: #0c6e64;
+  --color-tk-teal-soft: #e2efec;
+  --tk-search-bg: var(--color-tk-panel-strong);
+  --tk-dot-recorded: var(--color-tk-green);
+  --tk-dot-recorded-ink: var(--color-tk-green);
+  --tk-dot-perfect: var(--color-tk-green);
+  --tk-salat-done: var(--color-tk-ink);
+  --tk-salat-done-check: var(--color-tk-panel);
+  --tk-mandiri: var(--color-tk-violet);
+  --tk-mandiri-bar: rgba(255, 101, 10, 0.45);
+  --tk-tone-teal-bg: var(--color-tk-green-soft);
+  --tk-tone-teal-ink: var(--color-tk-green);
+  --tk-mini-cyan: var(--color-tk-accent);
+  --tk-mini-blue: var(--color-tk-violet);
+  --tk-mini-teal: var(--color-tk-accent);
+  --tk-mini-lime: var(--color-tk-accent);
+  --tk-wk-bg: var(--tk-tint-b);
+  --tk-wk-border: rgba(255, 122, 40, 0.25);
+  --tk-wk-glow2: rgba(var(--tk-brand-rgb), 0.06);
+  --tk-wk-award: linear-gradient(135deg, var(--tk-brand-soft), var(--tk-brand-deep));
+  --tk-wk-overline: var(--tk-brand-deep);
+  --tk-wk-badge-bg: var(--tk-brand-deep);
+  --tk-wk-badge-ink: #ffffff;
+  --tk-wk-chip: rgba(255, 255, 255, 0.55);
+  --tk-wk-footer: var(--tk-brand-deep);
+  --tk-wk-shadow: 0 20px 50px -24px rgba(120, 60, 10, 0.35);
+  --tk-bar-low: linear-gradient(180deg, var(--color-tk-teal), rgba(14, 138, 123, 0.7));
+  --tk-bar-med: linear-gradient(180deg, var(--tk-brand-soft), var(--tk-brand));
+  --tk-bar-high: linear-gradient(180deg, var(--tk-brand-soft), var(--tk-brand-deep));
+  --tk-bar-best: linear-gradient(180deg, var(--tk-brand-soft), var(--tk-brand-deep));
+  --tk-tab-indicator: var(--color-tk-violet);
+  --tk-dock-active: var(--color-tk-violet);
+  --tk-dock-idle: var(--color-tk-muted);
+  --tk-ring-track: var(--color-tk-track);
+  --tk-quote-accent: var(--color-tk-copper);
+  --tk-quote-footer: var(--color-tk-copper);
+  --tk-quote-bg: linear-gradient(150deg, #FFFDFB 0%, var(--tk-tint-b) 58%, var(--tk-tint-c) 100%);
+  /* Label doa & chip Daily Barakah — klasik light (asli) */
+  --tk-dua-label: var(--color-tk-accent);
+  --tk-brk-chip-out: var(--color-tk-lav-deco);
+  --tk-brk-chip-in: var(--color-tk-lavender);
+  --tk-brk-chip-ink: var(--color-tk-accent);
+  --tk-brk-label: var(--color-tk-accent);
+  /* Kartu Zikir & Doa / Rizq & Amal — klasik light (asli) */
+  --tk-zikir-num: #ffffff;
+  --tk-zikir-ring-track: rgba(255, 255, 255, 0.25);
+  --tk-zikir-ring-arc: #ffffff;
+  --tk-amal-bar: var(--color-tk-lime);
+  --tk-amal-arrow: var(--color-tk-muted);
 }
 
 /* ---------- Mode gelap — SOFT WARM DARK v19 ----------
@@ -328,6 +397,56 @@ html[data-theme="dark"] {
   --tk-dock-b: 50, 42, 35;
   --tk-dock-solid: #4a3e33;
   --tk-dock-shadow: 0 18px 44px -14px rgba(12, 6, 2, 0.7);
+  /* Token permukaan/indikator — klasik dark (nilai asli) */
+  --color-tk-teal-ink: #52b8a9;
+  --color-tk-teal-soft: #1f3330;
+  --tk-search-bg: var(--color-tk-panel-strong);
+  --tk-dot-recorded: var(--color-tk-green);
+  --tk-dot-recorded-ink: var(--color-tk-green);
+  --tk-dot-perfect: var(--color-tk-green);
+  --tk-salat-done: var(--color-tk-ink);
+  --tk-salat-done-check: var(--color-tk-panel);
+  --tk-mandiri: var(--color-tk-violet);
+  --tk-mandiri-bar: rgba(255, 101, 10, 0.45);
+  --tk-tone-teal-bg: var(--color-tk-green-soft);
+  --tk-tone-teal-ink: var(--color-tk-green);
+  --tk-mini-cyan: var(--color-tk-accent);
+  --tk-mini-blue: var(--color-tk-violet);
+  --tk-mini-teal: var(--color-tk-accent);
+  --tk-mini-lime: var(--color-tk-accent);
+  --tk-wk-bg-d: var(--color-tk-light-card);
+  --tk-wk-border: rgba(255, 122, 40, 0.25);
+  --tk-wk-glow2: rgba(var(--tk-brand-rgb), 0.06);
+  --tk-wk-award: linear-gradient(135deg, var(--tk-brand-soft), var(--tk-brand-deep));
+  --tk-wk-overline: var(--tk-brand-soft);
+  --tk-wk-badge-bg: var(--tk-brand-deep);
+  --tk-wk-badge-ink: #ffffff;
+  --tk-wk-chip: rgba(255, 255, 255, 0.08);
+  --tk-wk-footer: var(--tk-brand-soft);
+  --tk-wk-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.6);
+  --tk-bar-low: linear-gradient(180deg, var(--color-tk-teal), rgba(14, 138, 123, 0.7));
+  --tk-bar-med: linear-gradient(180deg, var(--tk-brand-soft), var(--tk-brand));
+  --tk-bar-high: linear-gradient(180deg, var(--tk-brand-soft), var(--tk-brand-deep));
+  --tk-bar-best: linear-gradient(180deg, var(--tk-brand-soft), var(--tk-brand-deep));
+  --tk-tab-indicator: var(--color-tk-violet);
+  --tk-dock-active: var(--color-tk-violet);
+  --tk-dock-idle: var(--color-tk-muted);
+  --tk-ring-track: var(--color-tk-track);
+  --tk-quote-accent: var(--color-tk-amber);
+  --tk-quote-footer: var(--color-tk-amber);
+  --tk-quote-bg-d: linear-gradient(150deg, var(--color-tk-white-card) 0%, var(--color-tk-panel) 55%, var(--color-tk-panel-soft) 100%);
+  /* Label doa & chip Daily Barakah — klasik dark (asli) */
+  --tk-dua-label: var(--color-tk-accent);
+  --tk-brk-chip-out: var(--color-tk-lav-deco);
+  --tk-brk-chip-in: var(--color-tk-lavender);
+  --tk-brk-chip-ink: var(--color-tk-accent);
+  --tk-brk-label: var(--color-tk-accent);
+  /* Kartu Zikir & Doa / Rizq & Amal — klasik dark (asli) */
+  --tk-zikir-num: #ffffff;
+  --tk-zikir-ring-track: rgba(255, 255, 255, 0.25);
+  --tk-zikir-ring-arc: #ffffff;
+  --tk-amal-bar: var(--color-tk-lime);
+  --tk-amal-arrow: var(--color-tk-muted);
 }
 
 @layer base {
@@ -595,13 +714,13 @@ html[data-theme="dark"][data-glass-level="strong"] {
   }
   .thin-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(250, 82, 0, 0.45) transparent;
+    scrollbar-color: rgba(var(--tk-brand-rgb), 0.45) transparent;
   }
   .thin-scrollbar::-webkit-scrollbar {
     width: 5px;
   }
   .thin-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(250, 82, 0, 0.45);
+    background: rgba(var(--tk-brand-rgb), 0.45);
     border-radius: 999px;
   }
   .tap {
@@ -1254,7 +1373,7 @@ section[data-live="false"] .tk-ob-card-float {
 .tk-tkt--active {
   background: var(--color-tk-violet);
   transform: scale(1.016);
-  box-shadow: 0 22px 44px -18px rgba(250, 82, 0, 0.55);
+  box-shadow: 0 22px 44px -18px rgba(var(--tk-brand-rgb), 0.55);
 }
 /* Kartu dengan tilt 3D (TiltWrap): transisi transform/box-shadow CSS
    DIMATIKAN agar tidak bertabrakan dengan update transform per-frame dari
@@ -1942,7 +2061,7 @@ html[data-anim="off"] .su-float {
   align-items: center;
   flex-shrink: 0;
   border-radius: 999px;
-  background: rgba(250, 82, 0, 0.1);
+  background: rgba(var(--tk-brand-rgb), 0.1);
   padding: 2px 7px;
   font-size: 8px;
   font-weight: 800;
@@ -2079,10 +2198,10 @@ html[data-theme="dark"] .fr-panel { box-shadow: 0 14px 30px -22px rgba(0, 0, 0, 
 .fr-check { transition: background-color 200ms, border-color 200ms; }
 .fr-check:hover { background: var(--color-tk-panel-soft); }
 .fr-check-on {
-  border-color: rgba(250, 82, 0, 0.35);
-  background: rgba(250, 82, 0, 0.07);
+  border-color: rgba(var(--tk-brand-rgb), 0.35);
+  background: rgba(var(--tk-brand-rgb), 0.07);
 }
-html[data-theme="dark"] .fr-check-on { border-color: rgba(255, 101, 10, 0.4); background: rgba(255, 101, 10, 0.14); }
+html[data-theme="dark"] .fr-check-on { border-color: rgba(var(--tk-brand-rgb), 0.4); background: rgba(var(--tk-brand-rgb), 0.14); }
 
 /* Partikel cahaya & sinar matahari fullscreen Jumat — sangat lambat, berhenti
    pada reduced-motion / setelan animasi mati. */
@@ -2163,101 +2282,177 @@ html[data-anim="off"] .pr-bird {
 /* ---------- ELECTRIC DREAM — LIGHT ---------- */
 html[data-color="electric"] {
   --background: #f3f4fb;
-  --foreground: #23273d;
+  --foreground: #252943;
   --card: #ffffff;
-  --card-foreground: #23273d;
+  --card-foreground: #252943;
   --popover: #ffffff;
-  --popover-foreground: #23273d;
+  --popover-foreground: #252943;
   --primary: #3a4efb;
   --primary-foreground: #ffffff;
-  --secondary: #e7ebfb;
-  --secondary-foreground: #2f3fd6;
-  --muted: #e9ecf7;
+  --secondary: #e7e9f4;
+  --secondary-foreground: #0770ae;
+  --muted: #e9eaf4;
   --muted-foreground: #5d6485;
-  --accent: #e7ebfb;
-  --accent-foreground: #2f3fd6;
+  --accent: #e7e9f4;
+  --accent-foreground: #0770ae;
   --destructive: #d33b40;
-  --border: #dbdfee;
-  --input: #e2e6f4;
+  --border: #d9dcea;
+  --input: #e0e3ef;
   --ring: #3a4efb;
   --chart-1: #3a4efb;
-  --chart-2: #2e8b57;
+  --chart-2: #16b3a8;
   --chart-3: #33a4fa;
-  --chart-4: #8a7a14;
-  --chart-5: #5b78ff;
+  --chart-4: #a9b70e;
+  --chart-5: #252943;
   --sidebar: #ffffff;
-  --sidebar-foreground: #23273d;
+  --sidebar-foreground: #252943;
   --sidebar-primary: #3a4efb;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e7ebfb;
-  --sidebar-accent-foreground: #2f3fd6;
-  --sidebar-border: #dbdfee;
+  --sidebar-accent: #e7e9f4;
+  --sidebar-accent-foreground: #0770ae;
+  --sidebar-border: #d9dcea;
   --sidebar-ring: #3a4efb;
   --tk-inset: rgba(37, 41, 67, 0.06);
   --tk-ring-soft: rgba(58, 78, 251, 0.16);
-  --tk-chart-grid: #e4e7f2;
+  --tk-chart-grid: #e4e6f0;
   --tk-chart-axis: #7a80a0;
-  --tk-empty-cell: #edeff8;
+  --tk-empty-cell: #ecedf6;
   --tk-float-shadow: 0 24px 64px -24px rgba(37, 41, 67, 0.22);
-  --color-tk-ink: #23273d;
+  --color-tk-ink: #252943;
   --color-tk-muted: #5d6485;
   --color-tk-deep: #8a90ac;
   --color-tk-violet: #3a4efb;
-  --color-tk-lavender: #dfe5ff;
-  --color-tk-lav-deco: #c7d2ff;
-  --color-tk-line: #dbdfee;
-  --color-tk-accent: #2f3fd6;
-  --color-tk-copper: #4f7cff;
-  --color-tk-cream: #eff2ff;
-  --color-tk-peach: #dce6ff;
+  --color-tk-lavender: #e3e6f0;
+  --color-tk-lav-deco: #ccd3e6;
+  --color-tk-line: #d9dcea;
+  --color-tk-accent: #0770ae;
+  --color-tk-copper: #33a4fa;
+  --color-tk-cream: #eef1fa;
+  --color-tk-peach: #d8ecff;
   --color-tk-frame: #f3f4fb;
   --color-tk-stage: #f3f4fb;
   --color-tk-panel: #ffffff;
-  --color-tk-panel-soft: #e9ecf7;
-  --color-tk-panel-strong: #e2e6f4;
-  --color-tk-line-soft: #e7eaf5;
-  --color-tk-line-strong: #c9cfe4;
-  --color-tk-track: #e2e6f4;
+  --color-tk-panel-soft: #e9eaf4;
+  --color-tk-panel-strong: #e0e3ef;
+  --color-tk-line-soft: #e6e8f2;
+  --color-tk-line-strong: #c8cde0;
+  --color-tk-track: #dfe2ee;
   --color-tk-white-card: #ffffff;
-  --color-tk-light-card: #eef0f9;
-  --color-tk-lime: #e1f4e9;
-  --color-tk-lime-ink: #1e6b40;
-  --color-tk-lime-soft: #eaf7ef;
+  --color-tk-light-card: #eef0f8;
+  --color-tk-lime: #eef9a6;
+  --color-tk-lime-ink: #55600e;
+  --color-tk-lime-soft: #f7fce0;
   --color-tk-blue: #3a4efb;
   --color-tk-blue-soft: #dce6ff;
-  --color-tk-mint: #dfe5ff;
-  --color-tk-forest: #2f3fd6;
-  --color-tk-amber: #8a7a14;
+  --color-tk-mint: #dbf1ff;
+  --color-tk-forest: #252943;
+  --color-tk-amber: #74690d;
   --color-tk-amber-soft: #f4f1d9;
   --color-tk-teal: #0e8a7b;
-  --color-tk-green: #2e8b57;
-  --color-tk-green-soft: #eaf6ef;
+  --color-tk-green: #55600e;
+  --color-tk-green-soft: #f2f8d8;
   --color-tk-rose: #e5484d;
   --color-tk-sky-soft: #dce6ff;
-  /* Var bantu — elektrik light */
+  /* Turquoise — aksen pendukungElectric (variasi harmonis cyan) */
+  --color-tk-teal: #20c7b7;
+  --color-tk-teal-ink: #0b7f74;
+  --color-tk-teal-soft: #ddf8f3;
+  --tk-teal-rgb: 32, 199, 183;
+  --color-tk-black: #111318;
+  /* Soft surface palette Electric Dream */
+  --color-tk-lime-soft: #f2facb;
+  --color-tk-blue-soft: #e8ecff;
+  /* Aksen kategori card Kebaikan — electric: 4 warna palet di atas hero biru */
+  --tk-cat-quran: #9bdcff;
+  --tk-cat-zikir: #4fe3d2;
+  --tk-cat-amal: #e3ff3b;
+  --tk-cat-jurnal: #dee0ed;
+  --tk-cat-check: #111318;
+  --tk-cat-pill-bg: var(--tk-neon);
+  --tk-cat-pill-ink: var(--tk-neon-ink);
+  /* Tinta kategori jurnal — electric: biru / turquoise / lime / cyan */
+  --jk-refleksi: #3a4efb;
+  --jk-emosi: #0b7f74;
+  --jk-syukur: #55600e;
+  --jk-harapan: #0770ae;
+  --jk-refleksi-soft: rgba(58, 78, 251, 0.14);
+  --jk-emosi-soft: rgba(11, 127, 116, 0.16);
+  --jk-syukur-soft: rgba(85, 96, 14, 0.16);
+  --jk-harapan-soft: rgba(7, 112, 174, 0.14);
+  /* Indikator & permukaan tematik — electric light */
+  --tk-search-bg: #ddf8f3;
+  --tk-dot-recorded: var(--color-tk-teal);
+  --tk-dot-recorded-ink: #0b7f74;
+  --tk-dot-perfect: #55600e;
+  --tk-salat-done: var(--color-tk-teal);
+  --tk-salat-done-check: var(--tk-neon-ink);
+  --tk-mandiri: var(--color-tk-teal);
+  --tk-mandiri-bar: rgba(32, 199, 183, 0.85);
+  --tk-tone-teal-bg: #ddf8f3;
+  --tk-tone-teal-ink: #0b7f74;
+  --tk-mini-cyan: #6fc9ff;
+  --tk-mini-blue: #93a4ff;
+  --tk-mini-teal: #4fe3d2;
+  --tk-mini-lime: #dce94e;
+  --tk-wk-bg: linear-gradient(165deg, #252943 0%, #2b3568 55%, #232a52 100%);
+  --tk-wk-border: rgba(150, 175, 255, 0.28);
+  --tk-wk-glow2: rgba(var(--tk-teal-rgb), 0.14);
+  --tk-wk-award: linear-gradient(135deg, #20c7b7, #3a4efb);
+  --tk-wk-overline: #4fe3d2;
+  --tk-wk-badge-bg: var(--tk-neon);
+  --tk-wk-badge-ink: var(--tk-neon-ink);
+  --tk-wk-chip: rgba(255, 255, 255, 0.1);
+  --tk-wk-footer: #dce94e;
+  --tk-wk-shadow: 0 20px 50px -24px rgba(8, 12, 38, 0.5);
+  --tk-bar-low: linear-gradient(180deg, #33a4fa, #1e7ec7);
+  --tk-bar-med: linear-gradient(180deg, var(--tk-brand), var(--tk-brand-deep));
+  --tk-bar-high: linear-gradient(180deg, #2bd9c7, #14a394);
+  --tk-bar-best: linear-gradient(180deg, #e3ff3b, #c4dc1f);
+  --tk-tab-indicator: #20c7b7;
+  --tk-dock-active: linear-gradient(135deg, #20c7b7 0%, #3a4efb 100%);
+  --tk-dock-idle: #b7bfdd;
+  --tk-ring-track: #ccd3e8;
+  --tk-quote-accent: #0b7f74;
+  --tk-quote-footer: #55600e;
+  --tk-quote-bg: linear-gradient(150deg, #ffffff 0%, #ddf8f3 48%, #e8ecff 100%);
+  /* Label doa & chip Daily Barakah — electric light (turquoise + neon lime) */
+  --tk-dua-label: var(--color-tk-lime);
+  --tk-brk-chip-out: rgba(32, 199, 183, 0.3);
+  --tk-brk-chip-in: var(--tk-neon);
+  --tk-brk-chip-ink: var(--tk-neon-ink);
+  --tk-brk-label: #0b7f74;
+  /* Kartu Zikir & Doa / Rizq & Amal — electric light */
+  --tk-zikir-num: var(--color-tk-lime);
+  --tk-zikir-ring-track: rgba(51, 164, 250, 0.35);
+  --tk-zikir-ring-arc: var(--color-tk-teal);
+  --tk-amal-bar: var(--color-tk-teal);
+  --tk-amal-arrow: var(--color-tk-violet);
+  /* Var bantu — elektrik light (biru primer · cyan sekunder · lime highlight · navy teks · lavender netral) */
   --tk-brand: #3a4efb;
   --tk-brand-rgb: 58, 78, 251;
   --tk-brand-soft: #33a4fa;
   --tk-brand-deep: #2f3fd6;
   --tk-neon: #e3ff3b;
   --tk-neon-ink: #2a2e14;
-  --tk-shell-bg: #e9ebf6;
-  --tk-shell-outer: #dfe3f2;
+  --tk-shell-bg: #e7e9f3;
+  --tk-shell-outer: #dee1ed;
   --tk-canvas-bg: #f0f2fc;
-  --tk-hint: #c9d4ff;
-  --tk-tint-a: #dce6ff;
+  --tk-hint: #c9d1e8;
+  --tk-tint-a: #e1e4f2;
   --tk-tint-b: #eff2ff;
-  --tk-tint-c: #e4ebff;
+  --tk-tint-c: #ddf1ff;
   --tk-dock-a: 42, 48, 79;
   --tk-dock-b: 23, 26, 45;
   --tk-dock-solid: #2a3050;
   --tk-dock-shadow: 0 18px 44px -14px rgba(10, 14, 34, 0.6);
-  --tk-ring-ink: #23273d;
-  --tk-tip-bg: rgba(42, 47, 78, 0.95);
-  --tk-hero-a: #3a4efb; --tk-hero-b: #3a4efb; --tk-hero-c: #2f3fd6;
+  --tk-ring-ink: #252943;
+  --tk-tip-bg: rgba(37, 41, 67, 0.95);
+  --tk-hero-a: #3a4efb; --tk-hero-b: #33a4fa; --tk-hero-c: #2f3fd6;
   --tk-hero-shadow: 0 20px 48px -22px rgba(58, 78, 251, 0.5);
-  /* Glass light elektrik: bayangan dingin, border biru lembut */
-  --su-border-d: rgba(158, 175, 255, 0.22);
+  --tk-progress-a: #3a4efb;
+  --tk-progress-b: #20c7b7;
+  /* Glass light elektrik: bayangan dingin, border lavender lembut */
+  --su-border-d: rgba(170, 180, 225, 0.24);
   --su-shadow: 0 10px 30px -14px rgba(37, 41, 67, 0.25);
 }
 
@@ -2272,26 +2467,26 @@ html[data-theme="dark"][data-color="electric"] {
   --primary: #5b78ff;
   --primary-foreground: #ffffff;
   --secondary: #333a5e;
-  --secondary-foreground: #82aeff;
+  --secondary-foreground: #4cc4ff;
   --muted: #232742;
   --muted-foreground: #b9bfdb;
   --accent: #333a5e;
-  --accent-foreground: #82aeff;
+  --accent-foreground: #4cc4ff;
   --destructive: #ff6369;
   --border: rgba(222, 224, 237, 0.14);
   --input: #333a5e;
   --ring: #5b78ff;
   --chart-1: #5b78ff;
-  --chart-2: #58b877;
+  --chart-2: #2bd9c7;
   --chart-3: #33a4fa;
-  --chart-4: #ffd34d;
-  --chart-5: #8f9fff;
+  --chart-4: #e3ff3b;
+  --chart-5: #b7c0dd;
   --sidebar: #232742;
   --sidebar-foreground: #eef0fc;
   --sidebar-primary: #5b78ff;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #333a5e;
-  --sidebar-accent-foreground: #82aeff;
+  --sidebar-accent-foreground: #4cc4ff;
   --sidebar-border: #333a5e;
   --sidebar-ring: #5b78ff;
   --tk-inset: rgba(0, 0, 0, 0.22);
@@ -2303,14 +2498,14 @@ html[data-theme="dark"][data-color="electric"] {
   --color-tk-ink: #eef0fc;
   --color-tk-muted: #b9bfdb;
   --color-tk-deep: #8c93b4;
-  --color-tk-violet: #3a4efb;
+  --color-tk-violet: #6e83ff;
   --color-tk-lavender: #2a3054;
   --color-tk-lav-deco: #3a4270;
   --color-tk-line: rgba(222, 224, 237, 0.14);
-  --color-tk-accent: #82aeff;
-  --color-tk-copper: #7fa8ff;
+  --color-tk-accent: #4cc4ff;
+  --color-tk-copper: #4cc4ff;
   --color-tk-cream: #333a5e;
-  --color-tk-peach: #a9d4ff;
+  --color-tk-peach: #56c4ff;
   --color-tk-frame: #1d2136;
   --color-tk-stage: #1d2136;
   --color-tk-panel: #2a2f4d;
@@ -2321,14 +2516,88 @@ html[data-theme="dark"][data-color="electric"] {
   --color-tk-track: #333a5e;
   --color-tk-white-card: #303656;
   --color-tk-light-card: #2b3050;
-  --color-tk-lime: #27563b;
-  --color-tk-lime-ink: #a0e8c0;
-  --color-tk-lime-soft: #233b2e;
+  --color-tk-lime: #d9f24d;
+  --color-tk-lime-ink: #353d0a;
+  --color-tk-lime-soft: #2f3a10;
+  --color-tk-blue: #33a4fa;
   --color-tk-blue-soft: #2a3160;
+  --color-tk-mint: #1f3d52;
+  --color-tk-forest: #252943;
+  --color-tk-amber: #a89f2e;
   --color-tk-amber-soft: #3a3d63;
-  --color-tk-green-soft: #233b2e;
+  --color-tk-green: #cbdf4a;
+  --color-tk-green-soft: #2e3a12;
   --color-tk-sky-soft: #2a3160;
-  /* Var bantu — elektrik dark (navy) */
+  /* Turquoise — aksen pendukung electric di dark */
+  --color-tk-teal: #2bd9c7;
+  --color-tk-teal-ink: #2bd9c7;
+  --color-tk-teal-soft: #1d3b3e;
+  --tk-teal-rgb: 43, 217, 199;
+  /* Aksen kategori card Kebaikan — sama terang di atas hero biru gelap */
+  --tk-cat-quran: #9bdcff;
+  --tk-cat-zikir: #4fe3d2;
+  --tk-cat-amal: #e3ff3b;
+  --tk-cat-jurnal: #dee0ed;
+  --tk-cat-check: #1d2136;
+  --tk-cat-pill-bg: var(--tk-neon);
+  --tk-cat-pill-ink: var(--tk-neon-ink);
+  /* Tinta kategori jurnal — electric dark */
+  --jk-refleksi: #8ea2ff;
+  --jk-emosi: #2bd9c7;
+  --jk-syukur: #d9f24d;
+  --jk-harapan: #4cc4ff;
+  --jk-refleksi-soft: rgba(58, 78, 251, 0.22);
+  --jk-emosi-soft: rgba(43, 217, 199, 0.16);
+  --jk-syukur-soft: rgba(217, 242, 77, 0.16);
+  --jk-harapan-soft: rgba(76, 196, 255, 0.16);
+  /* Indikator & permukaan tematik — electric dark */
+  --color-tk-black: #111318;
+  --tk-dot-recorded: var(--color-tk-teal);
+  --tk-dot-recorded-ink: var(--color-tk-teal);
+  --tk-dot-perfect: var(--color-tk-lime);
+  --tk-salat-done: var(--color-tk-teal);
+  --tk-salat-done-check: var(--tk-neon-ink);
+  --tk-mandiri: var(--color-tk-teal);
+  --tk-mandiri-bar: rgba(43, 217, 199, 0.85);
+  --tk-tone-teal-bg: rgba(43, 217, 199, 0.15);
+  --tk-tone-teal-ink: var(--color-tk-teal);
+  --tk-mini-cyan: #4cc4ff;
+  --tk-mini-blue: #8ea2ff;
+  --tk-mini-teal: #2bd9c7;
+  --tk-mini-lime: var(--color-tk-lime);
+  --tk-wk-bg-d: linear-gradient(165deg, #272d52 0%, #20264a 55%, #1c2242 100%);
+  --tk-wk-border: rgba(150, 175, 255, 0.22);
+  --tk-wk-glow2: rgba(var(--tk-teal-rgb), 0.12);
+  --tk-wk-award: linear-gradient(135deg, #20c7b7, #3a4efb);
+  --tk-wk-overline: #4fe3d2;
+  --tk-wk-badge-bg: var(--tk-neon);
+  --tk-wk-badge-ink: var(--tk-neon-ink);
+  --tk-wk-chip: rgba(255, 255, 255, 0.08);
+  --tk-wk-footer: var(--color-tk-lime);
+  --tk-wk-shadow: 0 20px 50px -24px rgba(4, 7, 20, 0.6);
+  --tk-bar-low: linear-gradient(180deg, #33a4fa, #1e7ec7);
+  --tk-bar-med: linear-gradient(180deg, var(--tk-brand), var(--tk-brand-deep));
+  --tk-bar-high: linear-gradient(180deg, #2bd9c7, #14a394);
+  --tk-bar-best: linear-gradient(180deg, #e3ff3b, #c4dc1f);
+  --tk-tab-indicator: #2bd9c7;
+  --tk-dock-active: linear-gradient(135deg, #20c7b7 0%, #3a4efb 100%);
+  --tk-dock-idle: #b9bfdb;
+  --tk-ring-track: rgba(222, 224, 237, 0.16);
+  --tk-quote-accent: #2bd9c7;
+  --tk-quote-footer: var(--color-tk-lime);
+  /* Label doa & chip Daily Barakah — electric dark (turquoise + neon lime) */
+  --tk-dua-label: var(--color-tk-lime);
+  --tk-brk-chip-out: rgba(43, 217, 199, 0.26);
+  --tk-brk-chip-in: var(--tk-neon);
+  --tk-brk-chip-ink: var(--tk-neon-ink);
+  --tk-brk-label: #2bd9c7;
+  /* Kartu Zikir & Doa / Rizq & Amal — electric dark */
+  --tk-zikir-num: var(--color-tk-lime);
+  --tk-zikir-ring-track: rgba(51, 164, 250, 0.35);
+  --tk-zikir-ring-arc: var(--color-tk-teal);
+  --tk-amal-bar: var(--color-tk-teal);
+  --tk-amal-arrow: var(--color-tk-violet);
+  /* Var bantu — elektrik dark (fondasi navy · biru+cyan interaktif · lime indikator aktif/progres) */
   --tk-brand: #3a4efb;
   --tk-brand-rgb: 58, 78, 251;
   --tk-brand-soft: #33a4fa;
@@ -2348,8 +2617,10 @@ html[data-theme="dark"][data-color="electric"] {
   --tk-dock-shadow: 0 18px 44px -14px rgba(5, 8, 20, 0.65);
   --tk-ring-ink: #9fa8d8;
   --tk-tip-bg: rgba(42, 47, 78, 0.95);
-  --tk-hero-a: #3a4efb; --tk-hero-b: #3a4efb; --tk-hero-c: #2f3fd6;
+  --tk-hero-a: #2a3480; --tk-hero-b: #3a4efb; --tk-hero-c: #2f3fd6;
   --tk-hero-shadow: 0 20px 48px -22px rgba(58, 78, 251, 0.5);
+  --tk-progress-a: #5b78ff;
+  --tk-progress-b: #2bd9c7;
   --tk-d-ink-hi: #eaedff;
   --tk-d-ink-mid: #9fa8d8;
   --tk-d-ink-soft: #c6cdf0;
@@ -2400,8 +2671,8 @@ html[data-theme="dark"][data-color="electric"] .glass-violet {
   background: linear-gradient(180deg, #2a3054 0%, #232845 100%);
 }
 html[data-theme="dark"][data-color="electric"] .fr-badge {
-  background: rgba(127, 168, 255, 0.16);
-  color: #82aeff;
+  background: rgba(76, 196, 255, 0.14);
+  color: #4cc4ff;
 }
 html[data-theme="dark"][data-color="electric"] .fr-check-on { border-color: rgba(58, 78, 251, 0.4); background: rgba(58, 78, 251, 0.16); }
 
@@ -2425,3 +2696,156 @@ html[data-theme="dark"][data-color="electric"][data-glass-level="strong"] {
 /* Preset glass elektrik LIGHT — border/glow mengikuti identitas biru */
 html[data-color="electric"][data-glass-level="subtle"] { --su-border-d: rgba(158, 175, 255, 0.12); }
 html[data-color="electric"][data-glass-level="strong"] { --su-border-d: rgba(158, 175, 255, 0.4); }
+/* Badge FR elektrik light — tint cyan (bukan warisan oranye klasik) */
+html[data-color="electric"] .fr-badge { background: rgba(7, 112, 174, 0.1); }
+
+/* ---------- ELECTRIC DREAM — variasi permukaan card (C) ----------
+   Setiap arketipe card punya latar sendiri di electric; klasik tidak
+   mendapat aturan ini sehingga tampilan klasik 100% asli. Urutan penting:
+   override .tk-card-white generik HARUS di atas rule arketipe spesifik. */
+/* Kartu putih electric light: tint lavender lembut — bukan putih polos */
+html[data-color="electric"]:not([data-theme="dark"]) .tk-card-white {
+  background: linear-gradient(155deg, #ffffff 0%, #edf0fa 100%);
+}
+/* Card Kebaikan Hari Ini: Deep Navy + glow turquoise/electric blue */
+html[data-color="electric"] .tk-surf-navy-card {
+  background:
+    radial-gradient(90% 80% at 100% 0%, rgba(32, 199, 183, 0.15), transparent 55%),
+    radial-gradient(80% 70% at 0% 100%, rgba(58, 78, 251, 0.22), transparent 60%),
+    linear-gradient(168deg, #252943 0%, #2b3568 55%, #232a52 100%);
+  box-shadow: 0 20px 48px -22px rgba(8, 12, 38, 0.55);
+}
+html[data-theme="dark"][data-color="electric"] .tk-surf-navy-card {
+  background:
+    radial-gradient(90% 80% at 100% 0%, rgba(32, 199, 183, 0.1), transparent 55%),
+    radial-gradient(80% 70% at 0% 100%, rgba(58, 78, 251, 0.16), transparent 60%),
+    linear-gradient(168deg, #262c52 0%, #20264a 60%, #1c2242 100%);
+  box-shadow: 0 20px 48px -22px rgba(4, 7, 20, 0.6);
+}
+/* Card Salat Lima Waktu: Deep Navy, teks putih, indikator turquoise */
+html[data-color="electric"]:not([data-theme="dark"]) .tk-surf-salat {
+  background: linear-gradient(160deg, #272c4a 0%, #222743 100%);
+  box-shadow: 0 12px 30px -16px rgba(13, 17, 42, 0.5);
+  --color-tk-ink: #eef0fc;
+  --color-tk-muted: #aeb5d6;
+  --color-tk-deep: #8c93b4;
+  --color-tk-line-soft: rgba(222, 224, 237, 0.12);
+  --color-tk-accent: #4cc4ff;
+}
+/* Card ring Progres Ibadah: Lavender Gray */
+html[data-color="electric"]:not([data-theme="dark"]) .tk-surf-lavender {
+  background: linear-gradient(155deg, #e9ebf6 0%, #dde1f0 100%);
+}
+/* Search bar: Soft Turquoise + ikon turquoise-deep */
+html[data-color="electric"]:not([data-theme="dark"]) .tk-surf-search {
+  background: var(--tk-search-bg);
+  border-color: rgba(32, 199, 183, 0.4);
+}
+html[data-color="electric"]:not([data-theme="dark"]) .tk-surf-search svg {
+  color: var(--tk-search-icon);
+}
+/* Card Perjalanan Baikmu: Deep Navy — teks & garis internal jadi terang.
+   Latar lewat ::before karena nilai token berupa gradient (bg-[var()] Tailwind
+   hanya mengisi background-color dan membuang gradient). */
+html[data-color="electric"] .tk-surf-weekly {
+  --color-tk-ink: #eef0fc;
+  --color-tk-muted: #b9bfdb;
+  --color-tk-deep: #8c93b4;
+  --color-tk-line-soft: rgba(222, 224, 237, 0.12);
+}
+.tk-surf-weekly::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--tk-wk-bg, var(--tk-tint-b));
+}
+html[data-theme="dark"] .tk-surf-weekly::before {
+  background: var(--tk-wk-bg-d, var(--color-tk-light-card));
+}
+/* Latar card kutipan Istiqamah: gradasi soft turquoise → soft blue (electric) */
+.tk-bg-quote {
+  background: var(--tk-quote-bg);
+}
+html[data-theme="dark"] .tk-bg-quote {
+  background: var(--tk-quote-bg-d);
+}
+/* Pil aktif dock: gradasi turquoise → electric blue (electric) */
+.tk-nav-pill-active {
+  background: var(--tk-dock-active);
+}
+/* Empat kartu Jurnal — latar per kategori (klasik: glass asli) */
+html[data-color="electric"]:not([data-theme="dark"]) .tk-jn-refleksi {
+  background: linear-gradient(155deg, #e8ecff 0%, #dfe5fb 100%);
+}
+html[data-color="electric"]:not([data-theme="dark"]) .tk-jn-emosi {
+  background: linear-gradient(155deg, #ddf8f3 0%, #cff0ea 100%);
+}
+html[data-color="electric"]:not([data-theme="dark"]) .tk-jn-syukur {
+  background: linear-gradient(155deg, #f2facb 0%, #e9f5b8 100%);
+}
+html[data-color="electric"]:not([data-theme="dark"]) .tk-jn-harapan {
+  background:
+    radial-gradient(100% 90% at 100% 0%, rgba(32, 199, 183, 0.18), transparent 55%),
+    linear-gradient(160deg, #272c4a 0%, #202542 100%);
+  --color-tk-ink: #eef0fc;
+  --color-tk-muted: #aeb5d6;
+  --color-tk-line-soft: rgba(222, 224, 237, 0.14);
+  --jk-harapan: #4cc4ff;
+}
+html[data-theme="dark"][data-color="electric"] .tk-jn-refleksi {
+  background: linear-gradient(155deg, #2c3358 0%, #262c4e 100%);
+}
+html[data-theme="dark"][data-color="electric"] .tk-jn-emosi {
+  background: linear-gradient(155deg, #1f3f42 0%, #1b3438 100%);
+}
+html[data-theme="dark"][data-color="electric"] .tk-jn-syukur {
+  background: linear-gradient(155deg, #333f16 0%, #2c370f 100%);
+}
+/* Kartu putih electric light: tint lavender lembut — dipindah ke atas blok */
+html[data-theme="dark"][data-color="electric"] .tk-jn-harapan {
+  background: linear-gradient(155deg, #343b66 0%, #2c3256 100%);
+}
+html[data-color="electric"]:not([data-theme="dark"]) .tk-surf-soft-teal {
+  background: linear-gradient(155deg, #ddf8f3 0%, #d0f1ea 100%);
+}
+html[data-color="electric"]:not([data-theme="dark"]) .tk-surf-soft-blue {
+  background: linear-gradient(155deg, #e8ecff 0%, #dde3fa 100%);
+}
+html[data-color="electric"]:not([data-theme="dark"]) .tk-surf-soft-lime {
+  background: linear-gradient(155deg, #f2facb 0%, #eaf5b6 100%);
+}
+html[data-theme="dark"][data-color="electric"] .tk-surf-soft-teal {
+  background: linear-gradient(155deg, #1f3f42 0%, #1b3438 100%);
+}
+html[data-theme="dark"][data-color="electric"] .tk-surf-soft-blue {
+  background: linear-gradient(155deg, #2c3358 0%, #262c4e 100%);
+}
+html[data-theme="dark"][data-color="electric"] .tk-surf-soft-lime {
+  background: linear-gradient(155deg, #333f16 0%, #2c370f 100%);
+}
+/* Potongan geometris Neon Lime di sudut kanan-atas kartu navy — aksen
+   "geometric color block" Electric Dream; klasik tidak mendapat aturan ini. */
+.tk-surf-navy-card {
+  position: relative;
+  overflow: hidden;
+}
+html[data-color="electric"] .tk-surf-navy-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(225deg, var(--tk-neon) 0%, rgba(227, 255, 59, 0) 68%);
+  border-radius: 0 1.4rem 0 0;
+  opacity: 0.9;
+  pointer-events: none;
+}
+/* Card Doa Hari Ini (light electric): Deep Navy — tinta internal terang,
+   label lime via --tk-dua-label, sumber cyan terang. Klasik: glass asli. */
+html[data-color="electric"]:not([data-theme="dark"]) .tk-surf-dua {
+  --color-tk-ink: #eef0fc;
+  --color-tk-muted: #aeb5d6;
+  --color-tk-accent: #4cc4ff;
+}
