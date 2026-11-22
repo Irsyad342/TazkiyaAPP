@@ -38,7 +38,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LazyMotion, MotionConfig, domAnimation, m } from "framer-motion";
-import { ArrowRight, ChevronLeft } from "lucide-react";
+import { ArrowRight, Check, ChevronLeft } from "lucide-react";
 import { SuioMark } from "@/components/tazkiya/brand";
 import { Star8 } from "@/components/tazkiya/ornaments";
 import { PressScale, useAnim } from "@/components/tazkiya/motion-bits";
@@ -54,7 +54,9 @@ import {
   type ThemeModeOpt,
 } from "@/components/tazkiya/onboarding-art";
 import { useWorshipStore } from "@/lib/tazkiya/store";
-import { canvasColorFor } from "@/lib/tazkiya/colorThemes";
+import { COLOR_THEMES, canvasColorFor } from "@/lib/tazkiya/colorThemes";
+import type { ColorThemeId } from "@/lib/tazkiya/types";
+import { cn } from "@/lib/utils";
 
 /* EASE diimpor dari sistem motion global (src/lib/motion/system.ts) —
    nilai identik dengan konstanta lokal sebelumnya, preset kini tunggal. */
@@ -197,6 +199,25 @@ export function OnboardingFlow({
     [resolve]
   );
 
+  /* Paket warna (Klasik Hangat / Electric Dream): flip data-color seluruh
+     halaman sehingga preview langsung berubah, persist via pengaturan
+     existing, dan sinkronkan warna bilah status. Preferensi lama tampil
+     terpilih dan tidak ditimpa sampai pengguna benar-benar memilih. */
+  const [colorTheme, setColorTheme] = useState<string>(
+    () => useWorshipStore.getState().settings.colorTheme ?? "classic"
+  );
+  const pickColorTheme = useCallback(
+    (ct: ColorThemeId) => {
+      setColorTheme(ct);
+      document.documentElement.dataset.color = ct;
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute("content", canvasColorFor(resolved, ct));
+      useWorshipStore.getState().updateSettings({ colorTheme: ct });
+    },
+    [resolved]
+  );
+
   /* Mode "system": ikuti perubahan preferensi perangkat selama di sini. */
   useEffect(() => {
     if (mode !== "system") return;
@@ -298,8 +319,9 @@ export function OnboardingFlow({
   const slideArt = (s: Slide, active: boolean) => {
     if (s.kind === "theme") {
       return (
-        <div className="flex w-full max-w-[360px] flex-col min-[900px]:max-w-[420px]">
+        <div className="flex w-full max-w-[360px] flex-col gap-3 min-[900px]:max-w-[420px]">
           <ThemePreviewArt selected={mode} onSelect={pickTheme} live={active} />
+          <ColorThemePicker current={colorTheme} onSelect={pickColorTheme} live={active} />
         </div>
       );
     }
@@ -322,7 +344,7 @@ export function OnboardingFlow({
               <div
                 className="absolute -right-[90px] -top-[90px] h-[300px] w-[300px] rounded-full will-change-transform"
                 style={{
-                  background: "radial-gradient(circle, rgba(255,154,82,0.30), transparent 66%)",
+                  background: "radial-gradient(circle, rgba(var(--tk-ob-blob-a),0.30), transparent 66%)",
                   transform: `translate(${-index * 26}px, ${index * 12}px)`,
                   transition: "transform 0.75s cubic-bezier(0.22, 1, 0.36, 1)",
                 }}
@@ -338,7 +360,7 @@ export function OnboardingFlow({
               <div
                 className="absolute left-[18%] top-[32%] h-[180px] w-[180px] rounded-full will-change-transform"
                 style={{
-                  background: "radial-gradient(circle, rgba(255,224,204,0.55), transparent 64%)",
+                  background: "radial-gradient(circle, rgba(var(--tk-ob-blob-c),0.5), transparent 64%)",
                   transform: `translateY(${-index * 18}px)`,
                   transition: "transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)",
                 }}
@@ -346,7 +368,7 @@ export function OnboardingFlow({
               <div
                 className="absolute bottom-[26%] right-[8%] hidden h-[150px] w-[150px] rounded-full will-change-transform min-[900px]:block"
                 style={{
-                  background: "radial-gradient(circle, rgba(239,196,168,0.30), transparent 64%)",
+                  background: "radial-gradient(circle, rgba(var(--tk-ob-blob-b),0.30), transparent 64%)",
                   transform: `translate(${-index * 14}px, ${index * 8}px)`,
                   transition: "transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)",
                 }}
@@ -590,5 +612,62 @@ export function OnboardingFlow({
         </main>
       </LazyMotion>
     </MotionConfig>
+  );
+}
+
+/** Pemilih paket warna — swatch dari COLOR_THEMES (satu sumber kebenaran
+    dengan galeri tema Profil, tanpa duplikasi konfigurasi). Memilih langsung
+    flip data-color halaman: preview Welcome Screen ikut berubah seketika. */
+function ColorThemePicker({
+  current,
+  onSelect,
+  live,
+}: {
+  current: string;
+  onSelect: (ct: ColorThemeId) => void;
+  live: boolean;
+}) {
+  return (
+    <div role="radiogroup" aria-label="Paket tema warna" className="flex w-full flex-col gap-[9px]">
+      {COLOR_THEMES.map((t, i) => {
+        const on = current === t.id;
+        return (
+          <button
+            key={t.id}
+            type="button"
+            role="radio"
+            aria-checked={on}
+            aria-label={`Paket warna ${t.name} — ${t.tagline}`}
+            onClick={() => onSelect(t.id)}
+            className={cn(
+              "tap flex w-full items-center gap-[10px] rounded-[16px] border p-[9px] text-left transition-shadow duration-300",
+              on ? "border-tk-violet/50 bg-tk-panel shadow-[0_14px_34px_-14px_rgba(var(--tk-brand-rgb),0.4)]" : "border-tk-line hover:border-tk-violet/40"
+            )}
+            style={{ transitionDelay: live ? `${i * 40}ms` : undefined }}
+          >
+            <span aria-hidden className="flex shrink-0 -space-x-1.5">
+              {t.swatches.map((c) => (
+                <span
+                  key={c}
+                  className="h-6 w-6 rounded-full border-2 border-white shadow-sm dark:border-white/20"
+                  style={{ background: c }}
+                />
+              ))}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[12.5px] font-bold text-tk-ink">{t.name}</span>
+              <span className="mt-[2px] block truncate text-[9px] text-tk-muted">{t.tagline}</span>
+            </span>
+            <span
+              className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
+                on ? "bg-tk-violet" : "border-[1.6px] border-current opacity-30 text-tk-ink"
+              }`}
+            >
+              {on && <Check size={11} strokeWidth={3.2} className="text-white" />}
+            </span>
+          </button>
+        );
+      })}
+    </div>
   );
 }

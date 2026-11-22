@@ -2869,3 +2869,88 @@ html[data-color="electric"] .tk-tasbih-reached { background: var(--tk-neon); col
 html[data-color="electric"] .tk-bookmark-chip { background: var(--tk-neon); color: var(--tk-neon-ink); }
 /* Pemulihan klasik-dark: busur tasbih memakai accent klasik (electric tetap lime) */
 html[data-theme="dark"]:not([data-color="electric"]) .tk-tasbih-arc { stroke: var(--color-tk-accent); }
+
+/* ---------- Palet SUIO v2.1 — permukaan baca, glow emoji, blob onboarding ----------
+   Reader Al-Qur'an: classic mempertahankan kertas hangat; electric aksen
+   turquoise/cyan; dark mode memakai surface gelap + lafaz Arab ivory
+   (spesifikasi kenyamanan membaca). Nilai :root = classic light ASLI. */
+:root {
+  --tk-read-paper: #fbf8f0;
+  --tk-read-ink: #111111;
+  --tk-read-trans: #4a4a4a;
+  --tk-read-hint: #8a8a8a;
+  --tk-read-line: #e9e1d2;
+  --tk-read-num-bg: #f8ede1;
+  --tk-read-num-ink: #c2410c;
+  --tk-read-sel-bg: #fff7ef;
+  --tk-read-sel-border: #f0b27a;
+  --tk-read-sel-num-bg: #e04a00;
+  --tk-read-bm-bg: #fdf3e7;
+  --tk-read-bm-border: #e5b380;
+  --tk-read-shadow: rgba(60, 40, 10, 0.3);
+  --tk-emoji-glow-rgb: 255, 154, 82;
+  --tk-ob-blob-a: 255, 154, 82;
+  --tk-ob-blob-b: 239, 196, 168;
+  --tk-ob-blob-c: 255, 224, 204;
+}
+html[data-theme="dark"]:not([data-color="electric"]) {
+  --tk-read-paper: #2a2521;
+  --tk-read-ink: #f5efe4;
+  --tk-read-trans: #bdb4a6;
+  --tk-read-hint: #918a7e;
+  --tk-read-line: rgba(245, 239, 228, 0.12);
+  --tk-read-num-bg: rgba(255, 154, 82, 0.16);
+  --tk-read-num-ink: #ffb37a;
+  --tk-read-sel-bg: rgba(255, 154, 82, 0.1);
+  --tk-read-sel-border: rgba(255, 154, 82, 0.4);
+  --tk-read-sel-num-bg: #ff650a;
+  --tk-read-bm-bg: rgba(255, 154, 82, 0.12);
+  --tk-read-bm-border: rgba(255, 154, 82, 0.35);
+  --tk-read-shadow: rgba(0, 0, 0, 0.4);
+}
+html[data-color="electric"]:not([data-theme="dark"]) {
+  --tk-read-line: #e5e7e0;
+  --tk-read-num-bg: #ddf8f3;
+  --tk-read-num-ink: #0b7f74;
+  --tk-read-sel-bg: #eef4ff;
+  --tk-read-sel-border: rgba(58, 78, 251, 0.45);
+  --tk-read-sel-num-bg: #3a4efb;
+  --tk-read-bm-bg: #e8f6ff;
+  --tk-read-bm-border: rgba(7, 112, 174, 0.4);
+  --tk-emoji-glow-rgb: 32, 199, 183;
+  --tk-ob-blob-a: 58, 78, 251;
+  --tk-ob-blob-b: 51, 164, 250;
+  --tk-ob-blob-c: 221, 248, 243;
+}
+html[data-theme="dark"][data-color="electric"] {
+  --tk-read-paper: #1d2025;
+  --tk-read-ink: #f2f2ea;
+  --tk-read-trans: #b4bac6;
+  --tk-read-hint: #8b93a0;
+  --tk-read-line: rgba(240, 242, 236, 0.1);
+  --tk-read-num-bg: rgba(43, 217, 199, 0.16);
+  --tk-read-num-ink: #2bd9c7;
+  --tk-read-sel-bg: rgba(91, 120, 255, 0.14);
+  --tk-read-sel-border: rgba(91, 120, 255, 0.45);
+  --tk-read-sel-num-bg: #5b78ff;
+  --tk-read-bm-bg: rgba(43, 217, 199, 0.12);
+  --tk-read-bm-border: rgba(43, 217, 199, 0.4);
+  --tk-read-shadow: rgba(0, 0, 0, 0.45);
+  --tk-emoji-glow-rgb: 43, 217, 199;
+}
+/* Nilai quran-paper kini token — nilai classic light identik dengan asli */
+.quran-paper { background: var(--tk-read-paper); color: var(--tk-read-ink); }
+.quran-paper .quran-translation { color: var(--tk-read-trans); }
+.quran-paper .quran-hint { color: var(--tk-read-hint); }
+.quran-paper .quran-hairline { border-color: var(--tk-read-line); }
+/* Area baca putih di dalam card Set Zikir (light: panel putih; dark: panel elevated) */
+.tk-set-items { background: var(--color-tk-panel); }
+/* Glow emoji terpilih — pulse halus; hormati data-anim=off & prefers-reduced-motion */
+@keyframes tk-mood-glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 2px rgba(var(--tk-emoji-glow-rgb), 0.25)); }
+  50% { filter: drop-shadow(0 0 13px rgba(var(--tk-emoji-glow-rgb), 0.6)); }
+}
+html[data-anim="on"] .tk-mood-glow { animation: tk-mood-glow-pulse 2.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .tk-mood-glow { animation: none !important; }
+}

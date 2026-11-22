@@ -97,13 +97,13 @@ function SurahRow({
           <span
             className={cn(
               "tk-octagram absolute inset-0",
-              isLastRead ? "bg-tk-violet" : "bg-tk-lav-deco"
+              isLastRead ? "bg-tk-violet" : "bg-tk-lav-deco/70"
             )}
           />
           <span
             className={cn(
               "tk-octagram absolute inset-[1.5px]",
-              isLastRead ? "bg-tk-violet" : "bg-tk-lavender"
+              isLastRead ? "bg-tk-violet" : "bg-tk-lavender/85"
             )}
           />
           <span
@@ -134,7 +134,7 @@ function SurahRow({
           </span>
         </span>
         {showArabic ? (
-          <span className="quran-arabic shrink-0 text-[20px] leading-snug text-tk-violet dark:text-tk-accent">{surah.arabic}</span>
+          <span className="quran-arabic shrink-0 text-[20px] leading-snug text-tk-ink">{surah.arabic}</span>
         ) : (
           <ChevronRight size={16} className="shrink-0 text-tk-muted/60" />
         )}
@@ -162,8 +162,8 @@ function JuzRow({ juz, index = 0, onOpen }: { juz: (typeof JUZ_RANGES)[number]; 
         aria-label={`Buka Juz ${juz.juz} dari ${start?.latin}`}
       >
         <span aria-hidden className="relative flex h-10 w-10 shrink-0 items-center justify-center">
-          <span className="tk-octagram absolute inset-0 bg-tk-lav-deco" />
-          <span className="tk-octagram absolute inset-[1.5px] bg-tk-lavender" />
+          <span className="tk-octagram absolute inset-0 bg-tk-lav-deco/70" />
+          <span className="tk-octagram absolute inset-[1.5px] bg-tk-lavender/85" />
           <span className="gs-display tnum relative text-[12.5px] font-bold text-tk-accent">{juz.juz}</span>
         </span>
         <span className="min-w-0 flex-1">
@@ -216,14 +216,14 @@ function SurahCard({
     >
       <span className="flex items-start justify-between gap-2">
         <span aria-hidden className="relative flex h-9 w-9 shrink-0 items-center justify-center">
-          <span className={cn("tk-octagram absolute inset-0", isLastRead ? "bg-tk-violet" : "bg-tk-lav-deco")} />
-          <span className={cn("tk-octagram absolute inset-[1.5px]", isLastRead ? "bg-tk-violet" : "bg-tk-lavender")} />
+          <span className={cn("tk-octagram absolute inset-0", isLastRead ? "bg-tk-violet" : "bg-tk-lav-deco/70")} />
+          <span className={cn("tk-octagram absolute inset-[1.5px]", isLastRead ? "bg-tk-violet" : "bg-tk-lavender/85")} />
           <span className={cn("gs-display tnum relative text-[11.5px] font-bold", isLastRead ? "text-white" : "text-tk-accent")}>
             {surah.number}
           </span>
         </span>
         {surah.arabic ? (
-          <span className="quran-arabic shrink-0 text-[15px] leading-snug text-tk-violet dark:text-tk-accent">{surah.arabic}</span>
+          <span className="quran-arabic shrink-0 text-[15px] leading-snug text-tk-ink">{surah.arabic}</span>
         ) : null}
       </span>
       <span className="flex items-center gap-1">
@@ -325,7 +325,7 @@ function ReadingNoteCard({
             <span className="truncate font-display text-[15px] font-bold tracking-[-0.01em] text-tk-ink">
               {meta?.latin ?? "Bacaan Al-Qur'an"}
             </span>
-            {meta ? <span className="quran-arabic shrink-0 text-[14px] leading-snug text-tk-violet dark:text-tk-accent">{meta.arabic}</span> : null}
+            {meta ? <span className="quran-arabic shrink-0 text-[14px] leading-snug text-tk-ink">{meta.arabic}</span> : null}
           </p>
           <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-tk-muted">
             <span className="tnum font-semibold text-tk-ink/80">
@@ -873,7 +873,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                   </p>
                 </div>
                 {settings.showArabic && lastSurahMeta ? (
-                  <span className="quran-arabic shrink-0 text-[26px] leading-snug text-tk-violet">
+                  <span className="quran-arabic shrink-0 text-[26px] leading-snug text-tk-ink">
                     {lastSurahMeta.arabic}
                   </span>
                 ) : null}
@@ -1013,7 +1013,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
                     <p className="flex items-baseline gap-2">
                       <span className="text-[21px] font-extrabold tracking-[-0.02em] text-tk-ink">{topMeta.latin}</span>
                       {settings.showArabic ? (
-                        <span className="quran-arabic text-[16px] text-tk-violet">{topMeta.arabic}</span>
+                        <span className="quran-arabic text-[16px] text-tk-ink">{topMeta.arabic}</span>
                       ) : null}
                     </p>
                     <p className="mt-0.5 text-[11px] font-medium text-tk-muted">
@@ -1084,7 +1084,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
         {/* ---------- Jelajah: pencarian + filter + tab + daftar baris ---------- */}
         <section aria-label="Daftar surah dan juz" className="animate-tk-fade-up mt-6 lg:col-span-12">
           <SectionHeader title="Jelajah" caption="Cari surah atau juz, filter tempat turunnya" />
-          <GlassCard className="tk-surf-soft-lime p-4 sm:p-5">
+          <GlassCard className="p-4 sm:p-5">
             {/* Pencarian pil modern */}
             <div className="relative">
               <span

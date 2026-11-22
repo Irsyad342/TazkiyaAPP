@@ -56,7 +56,7 @@ const SWAY_RIGHT = [4, 0];
 /** Glow dalam di atas permukaan tile — menyatu dengan ilustrasi emoji. */
 function InnerGlow({ motionOK }: { motionOK: boolean }) {
   const cls =
-    "pointer-events-none absolute inset-0 rounded-[25%] light:shadow-[inset_0_0_13px_rgba(var(--tk-brand-rgb),0.26),inset_0_1.5px_3px_rgba(255,224,204,0.6),inset_0_-5px_10px_-6px_rgba(var(--tk-brand-rgb),0.18)] dark:shadow-[inset_0_0_16px_rgba(255,154,82,0.5),inset_0_1.5px_3px_rgba(255,224,204,0.38),inset_0_-6px_12px_-6px_rgba(224,74,0,0.4)]";
+    "pointer-events-none absolute inset-0 rounded-[25%] light:shadow-[inset_0_0_13px_rgba(var(--tk-brand-rgb),0.26),inset_0_1.5px_3px_rgba(255,224,204,0.6),inset_0_-5px_10px_-6px_rgba(var(--tk-brand-rgb),0.18)] dark:shadow-[inset_0_0_16px_rgba(var(--tk-emoji-glow-rgb),0.5),inset_0_1.5px_3px_rgba(255,255,255,0.28),inset_0_-6px_12px_-6px_rgba(var(--tk-emoji-glow-rgb),0.4)]";
   if (!motionOK) return <span aria-hidden className={cn(cls, "opacity-100")} />;
   return (
     <m.span
@@ -138,8 +138,9 @@ export function MoodSection({
                     }
                     className={cn(
                       "relative flex rounded-[25%] transition-[box-shadow] duration-300",
+                      active && "tk-mood-glow",
                       active
-                        ? "ring-2 ring-tk-accent ring-offset-2 ring-offset-tk-stage light:shadow-[0_10px_22px_-8px_rgba(var(--tk-brand-rgb),0.45),0_3px_14px_-4px_rgba(var(--tk-brand-rgb),0.22)] dark:shadow-[0_10px_24px_-10px_rgba(var(--tk-brand-rgb),0.55),0_0_28px_-6px_rgba(255,154,82,0.5)]"
+                        ? "ring-2 ring-tk-accent ring-offset-2 ring-offset-tk-stage light:shadow-[0_10px_22px_-8px_rgba(var(--tk-brand-rgb),0.45),0_3px_14px_-4px_rgba(var(--tk-brand-rgb),0.22)] dark:shadow-[0_10px_24px_-10px_rgba(var(--tk-brand-rgb),0.55),0_0_28px_-6px_rgba(var(--tk-emoji-glow-rgb),0.55)]"
                         : "light:shadow-[0_6px_14px_-6px_rgba(119,113,109,0.42)] light:ring-1 light:ring-[var(--tk-ring-ink)]/[0.06] dark:shadow-[0_10px_22px_-12px_rgba(12,6,2,0.6)] dark:ring-1 dark:ring-[var(--tk-hint)]/[0.07]"
                     )}
                   >

@@ -304,12 +304,12 @@ function ZikirPresetPicker() {
 function ZikirSetCard({ set }: { set: ZikirSet }) {
   const [open, setOpen] = useState(set.id === "zikir-pagi");
   return (
-    <div className="glass tk-surf-soft-teal overflow-hidden rounded-[1.4rem]">
+    <div className="glass overflow-hidden rounded-[1.4rem]">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="tap flex w-full items-center gap-3 px-4 py-4 text-left"
+        className="tap flex w-full items-center gap-3 bg-[var(--tk-tone-teal-bg)] px-4 py-4 text-left"
       >
         <span className="min-w-0 flex-1">
           <span className="block text-[14.5px] font-bold text-tk-ink">{set.title}</span>
@@ -319,7 +319,7 @@ function ZikirSetCard({ set }: { set: ZikirSet }) {
       </button>
       {open ? (
         <div className="border-t border-tk-line-soft">
-          <ul className="divide-y divide-tk-line-soft">
+          <ul className="tk-set-items divide-y divide-tk-line-soft">
             {set.items.map((it) => (
               <li key={it.id} className="px-4 py-4">
                 {it.name ? <p className="gs-overline" style={{ color: "var(--color-tk-violet)" }}>{it.name}</p> : null}

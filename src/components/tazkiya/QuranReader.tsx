@@ -270,20 +270,20 @@ function TranslationView({
         initial={anim ? { opacity: 0, y: 16 } : false}
         animate={anim ? { opacity: 1, y: 0 } : undefined}
         transition={{ duration: DUR.page, ease: EASE.out }}
-        className="quran-paper mx-auto max-w-[720px] rounded-[1.5rem] border border-[#e8e2da] px-4 py-5 shadow-[0_10px_36px_-18px_rgba(60,40,10,0.3)] sm:px-6"
+        className="quran-paper mx-auto max-w-[720px] rounded-[1.5rem] border border-[var(--tk-read-line)] px-4 py-5 shadow-[0_10px_36px_-18px_var(--tk-read-shadow)] sm:px-6"
       >
         {loading ? (
           <div className="flex flex-col items-center gap-3 py-20 text-center">
-            <LoaderCircle size={30} className="animate-spin text-[#b45309]" />
-            <p className="text-sm text-[#8a8a8a]">Mengambil {meta?.latin}…</p>
+            <LoaderCircle size={30} className="animate-spin text-[var(--tk-read-num-ink)]" />
+            <p className="text-sm text-[var(--tk-read-hint)]">Mengambil {meta?.latin}…</p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center gap-3 py-16 text-center">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#fdf1e3] text-[#b45309]">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--tk-read-num-bg)] text-[var(--tk-read-num-ink)]">
               <TriangleAlert size={22} />
             </span>
-            <p className="max-w-[280px] font-display text-sm font-bold text-[#111111]">Gagal memuat surah</p>
-            <p className="max-w-[280px] text-xs leading-relaxed text-[#8a8a8a]">{error}</p>
+            <p className="max-w-[280px] font-display text-sm font-bold text-[var(--tk-read-ink)]">Gagal memuat surah</p>
+            <p className="max-w-[280px] text-xs leading-relaxed text-[var(--tk-read-hint)]">{error}</p>
             <button
               type="button"
               onClick={() => void reload(true)}
@@ -295,10 +295,10 @@ function TranslationView({
         ) : data ? (
           <>
             {/* Panel pembuka surah */}
-            <div className="quran-hairline mb-6 rounded-[1.1rem] border border-[#e8e2da] bg-[#faf6f0] px-5 py-6 text-center">
-              <p className="quran-arabic text-[26px] leading-[1.7] text-[#111111]">{data.surah.arabic}</p>
+            <div className="quran-hairline mb-6 rounded-[1.1rem] border border-[var(--tk-read-line)] bg-[var(--tk-read-paper)] px-5 py-6 text-center">
+              <p className="quran-arabic text-[26px] leading-[1.7] text-[var(--tk-read-ink)]">{data.surah.arabic}</p>
               {data.bismillah ? (
-                <p className="quran-bismillah mt-2 text-[22px] leading-[1.9] text-[#111111]">{data.bismillah}</p>
+                <p className="quran-bismillah mt-2 text-[22px] leading-[1.9] text-[var(--tk-read-ink)]">{data.bismillah}</p>
               ) : null}
               {data.fromCache ? (
                 <p className="quran-hint mt-2 text-[10px]">Dibaca dari simpanan perangkat (offline)</p>
@@ -329,21 +329,21 @@ function TranslationView({
                   className={cn(
                     "mb-3 cursor-pointer rounded-[1.4rem] border px-4 py-4 outline-none transition-colors sm:px-5",
                     selected
-                      ? "border-[#f0b27a] bg-[#fff7ef] shadow-[inset_0_0_0_1px_#f0b27a]"
-                      : "border-transparent hover:border-[#eee3d4]"
+                      ? "border-[var(--tk-read-sel-border)] bg-[var(--tk-read-sel-bg)] shadow-[inset_0_0_0_1px_var(--tk-read-sel-border)]"
+                      : "border-transparent hover:border-[var(--tk-read-line)]"
                   )}
                 >
                   <div className="mb-2.5 flex items-center justify-between gap-2">
                     <span
                       className={cn(
                         "tnum flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-[11px] font-bold",
-                        selected ? "bg-[#e04a00] text-white" : "bg-[#f8ede1] text-[#c2410c]"
+                        selected ? "bg-[var(--tk-read-sel-num-bg)] text-white" : "bg-[var(--tk-read-num-bg)] text-[var(--tk-read-num-ink)]"
                       )}
                     >
                       {ayah.number}
                     </span>
                     {selected ? (
-                      <span className="rounded-full bg-[#f8ede1] px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wide text-[#c2410c]">
+                      <span className="rounded-full bg-[var(--tk-read-num-bg)] px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wide text-[var(--tk-read-num-ink)]">
                         Dipilih
                       </span>
                     ) : null}
@@ -357,8 +357,8 @@ function TranslationView({
                       className={cn(
                         "tap flex h-8 w-8 items-center justify-center rounded-full border transition-colors",
                         bookmarkSet.has(ayah.number)
-                          ? "border-[#e5b380] bg-[#fdf3e7] text-[#c2410c]"
-                          : "border-[#e8e2da] bg-white text-[#8a8a8a] hover:text-[#c2410c]"
+                          ? "border-[var(--tk-read-bm-border)] bg-[var(--tk-read-bm-bg)] text-[var(--tk-read-num-ink)]"
+                          : "border-[var(--tk-read-line)] bg-white text-[var(--tk-read-hint)] hover:text-[var(--tk-read-num-ink)]"
                       )}
                     >
                       {/* Pop spring singkat saat penanda aktif/nonaktif berganti. */}
@@ -368,14 +368,14 @@ function TranslationView({
                     </button>
                   </div>
                   <p
-                    className="quran-arabic text-right text-[#111111]"
+                    className="quran-arabic text-right text-[var(--tk-read-ink)]"
                     style={{ fontSize: settings.readerArabicSize, lineHeight: settings.readerLineHeight }}
                   >
                     {ayah.text}
                   </p>
                   {settings.readerShowTranslation && ayah.translation ? (
                     <p
-                      className="quran-translation mt-3 rounded-xl bg-[#f7f4ef] px-3 py-2.5 leading-relaxed"
+                      className="quran-translation mt-3 rounded-xl bg-[var(--tk-read-sel-bg)] px-3 py-2.5 leading-relaxed"
                       style={{ fontSize: settings.readerTransSize }}
                     >
                       {ayah.translation}
@@ -497,7 +497,7 @@ export function QuranReader({
           <div className="min-w-0 flex-1 text-center">
             <p className="truncate font-display text-[15px] font-bold leading-tight tracking-[-0.01em] text-tk-ink">
               {meta?.latin}
-              {settings.showArabic ? <span className="quran-arabic ml-2 text-[15px] font-normal text-tk-violet dark:text-tk-accent">{meta?.arabic}</span> : null}
+              {settings.showArabic ? <span className="quran-arabic ml-2 text-[15px] font-normal text-tk-ink">{meta?.arabic}</span> : null}
             </p>
             <p className="text-[10.5px] text-tk-muted">
               Surah {activeSurah} · {meta?.verses} ayat · {meta?.place}
