@@ -2954,3 +2954,40 @@ html[data-anim="on"] .tk-mood-glow { animation: tk-mood-glow-pulse 2.8s ease-in-
 @media (prefers-reduced-motion: reduce) {
   .tk-mood-glow { animation: none !important; }
 }
+
+/* ---------- Palet SUIO v2.2 — Elemental Dream lembut + card Akun biru ----------
+   Lime neon #B7FF36 → keluarga soft/muted lime (ref #A8C978 / #B5CE8B /
+   Deep Olive) agar nyaman di mata; karakter hijau Elemental Dream tetap.
+   Nilai hanya di-scope electric — Klasik/Original Orange tak tersentuh. */
+html[data-color="electric"]:not([data-theme="dark"]) {
+  --tk-neon: #a8c978;
+  --tk-neon-ink: #26300f;
+  --color-tk-lime: #e9f0d4;
+}
+html[data-theme="dark"][data-color="electric"] {
+  --tk-neon: #b5ce8b;
+  --tk-neon-ink: #1d2410;
+  --color-tk-lime: #b5ce8b;
+}
+/* Card utama halaman Akun (Progres Sholat) — biru lembut yang selaras
+   Elemental Dream; radius, padding, shadow, dan karakter glass dipertahankan. */
+html[data-color="electric"]:not([data-theme="dark"]) .glass.tk-account-card {
+  background: linear-gradient(160deg, rgba(220, 232, 245, 0.9) 0%, rgba(203, 221, 240, 0.78) 52%, rgba(214, 229, 243, 0.9) 100%);
+  border-color: rgba(58, 78, 251, 0.18);
+}
+html[data-theme="dark"][data-color="electric"] .glass.tk-account-card {
+  background: linear-gradient(160deg, rgba(48, 75, 103, 0.92) 0%, rgba(38, 57, 78, 0.8) 52%, rgba(44, 68, 94, 0.92) 100%);
+  border-color: rgba(91, 120, 255, 0.28);
+}
+/* Pil status di dalam card Akun menyesuaikan latar biru */
+html[data-color="electric"]:not([data-theme="dark"]) .tk-account-card .bg-tk-lavender {
+  background-color: rgba(255, 255, 255, 0.78);
+}
+html[data-theme="dark"][data-color="electric"] .tk-account-card .bg-tk-lavender {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+/* CTA di dalam card Akun — biru identitas Elemental Dream */
+html[data-color="electric"] .tk-account-cta {
+  background: var(--color-tk-blue);
+  color: #ffffff;
+}

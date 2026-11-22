@@ -756,7 +756,7 @@ export function ProfilePage({
             (DragCard, sumbu-X + pan-y). Tombol "Lanjutkan Tracker" di dalamnya
             tidak diubah. */}
         <DragCard className="rounded-[1.5rem]">
-        <div className="glass su-card-shadow rounded-[1.5rem] p-5">
+        <div className="glass su-card-shadow tk-account-card rounded-[1.5rem] p-5">
           <p className="text-[13.5px] font-bold text-tk-ink">Progres Sholat Hari Ini</p>
           <p className="mt-0.5 text-[11.5px] leading-snug text-tk-muted">
             {focusRecorded === 0
@@ -843,7 +843,7 @@ export function ProfilePage({
           <button
             type="button"
             onClick={onGoTracker}
-            className="tap mt-4 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full gs-ink-btn text-[13.5px] font-bold"
+            className="tap tk-account-cta mt-4 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full gs-ink-btn text-[13.5px] font-bold"
           >
             <ListChecks size={15} aria-hidden />
             Lanjutkan Tracker

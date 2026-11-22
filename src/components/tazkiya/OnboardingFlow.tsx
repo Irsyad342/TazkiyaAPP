@@ -61,9 +61,9 @@ import { cn } from "@/lib/utils";
 /* EASE diimpor dari sistem motion global (src/lib/motion/system.ts) —
    nilai identik dengan konstanta lokal sebelumnya, preset kini tunggal. */
 
-/** Warna kanvas onboarding per (mode × paket tema) — sumber: colorThemes. */
-const canvasFor = (r: "dark" | "light") =>
-  canvasColorFor(r, useWorshipStore.getState().settings.colorTheme);
+/** Warna kanvas onboarding — SELALU identitas oranye original (classic),
+    apa pun preferensi paket warna pengguna (spesifikasi Welcome Screen). */
+const canvasFor = (r: "dark" | "light") => canvasColorFor(r, "classic");
 
 /** Segmen judul editorial: a = kata beraksen oranye. */
 type Seg = { t: string; a?: boolean };
@@ -199,24 +199,18 @@ export function OnboardingFlow({
     [resolve]
   );
 
-  /* Paket warna (Klasik Hangat / Electric Dream): flip data-color seluruh
-     halaman sehingga preview langsung berubah, persist via pengaturan
-     existing, dan sinkronkan warna bilah status. Preferensi lama tampil
-     terpilih dan tidak ditimpa sampai pengguna benar-benar memilih. */
+  /* Paket warna (Original Orange / Elemental Dream): HANYA menyimpan
+     preferensi — halaman Welcome Screen tetap identitas oranye original,
+     tema terapan berguna setelah masuk aplikasi. Tidak ada flip data-color
+     di sini; preferensi lama tampil terpilih dan tidak ditimpa sampai
+     pengguna benar-benar memilih. */
   const [colorTheme, setColorTheme] = useState<string>(
     () => useWorshipStore.getState().settings.colorTheme ?? "classic"
   );
-  const pickColorTheme = useCallback(
-    (ct: ColorThemeId) => {
-      setColorTheme(ct);
-      document.documentElement.dataset.color = ct;
-      document
-        .querySelector('meta[name="theme-color"]')
-        ?.setAttribute("content", canvasColorFor(resolved, ct));
-      useWorshipStore.getState().updateSettings({ colorTheme: ct });
-    },
-    [resolved]
-  );
+  const pickColorTheme = useCallback((ct: ColorThemeId) => {
+    setColorTheme(ct);
+    useWorshipStore.getState().updateSettings({ colorTheme: ct });
+  }, []);
 
   /* Mode "system": ikuti perubahan preferensi perangkat selama di sini. */
   useEffect(() => {
@@ -645,11 +639,27 @@ function ColorThemePicker({
             )}
             style={{ transitionDelay: live ? `${i * 40}ms` : undefined }}
           >
-            <span aria-hidden className="flex shrink-0 -space-x-1.5">
-              {t.swatches.map((c) => (
+            {/* Preview sederhana: mini-mock antarmuka memakai palet tema
+                (satu sumber dengan galeri Profil) — bukan flip halaman. */}
+            <span
+              aria-hidden
+              className="flex h-[42px] w-[64px] shrink-0 flex-col overflow-hidden rounded-[9px] border"
+              style={{ background: t.mock.shell, borderColor: t.mock.line }}
+            >
+              <span className="flex h-[16px] shrink-0 items-center px-1.5" style={{ background: t.mock.heroA }}>
+                <span className="h-[4px] w-[62%] rounded-full" style={{ background: t.mock.heroInk, opacity: 0.9 }} />
+              </span>
+              <span className="flex min-h-0 flex-1 items-center gap-1 px-1.5 py-1">
+                <span className="h-[12px] w-[18px] rounded-[3px]" style={{ background: t.mock.card }} />
+                <span className="h-[5px] min-w-0 flex-1 rounded-full" style={{ background: t.mock.cardSub, opacity: 0.45 }} />
+                <span className="h-[9px] w-[9px] shrink-0 rounded-full" style={{ background: t.mock.neon }} />
+              </span>
+            </span>
+            <span aria-hidden className="flex shrink-0 -space-x-1">
+              {t.swatches.slice(0, 4).map((c) => (
                 <span
                   key={c}
-                  className="h-6 w-6 rounded-full border-2 border-white shadow-sm dark:border-white/20"
+                  className="h-4 w-4 rounded-full border-[1.5px] border-white shadow-sm dark:border-white/20"
                   style={{ background: c }}
                 />
               ))}

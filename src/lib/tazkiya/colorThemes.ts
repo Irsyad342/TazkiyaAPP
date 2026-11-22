@@ -39,10 +39,10 @@ export const DEFAULT_COLOR_THEME: ColorThemeId = "classic";
 export const COLOR_THEMES: ColorThemeDef[] = [
   {
     id: "classic",
-    name: "Klasik Hangat",
-    tagline: "Identitas bawaan SUIO",
+    name: "Original Orange",
+    tagline: "Identitas oranye asli SUIO",
     description:
-      "Palet hangat khas SUIO: kanvas arang hangat, kartu brown yang selalu lebih terang dari latar, dan aksen Primary Orange dengan sorot Soft Orange.",
+      "Palet oranye hangat khas SUIO: kanvas arang hangat, kartu brown yang selalu lebih terang dari latar, dan aksen Primary Orange dengan sorot Soft Orange. Tema default — dipakai otomatis oleh pengguna baru dan Welcome Screen.",
     swatches: ["#FF650A", "#FF9B63", "#3B342F", "#292522", "#FFF8F1"],
     mock: {
       shell: "#EDEBE7",
@@ -53,19 +53,19 @@ export const COLOR_THEMES: ColorThemeDef[] = [
       cardInk: "#202020",
       cardSub: "#8A8A8A",
       accent: "#FF650A",
-      neon: "#FFE0CC",
-      neonInk: "#C94300",
+      neon: "#FFB35C",
+      neonInk: "#3D2A00",
       navy: "#3B342F",
       line: "#E7E2DD",
     },
   },
   {
     id: "electric",
-    name: "Electric Dream",
-    tagline: "Biru elektrik · cyan · lime neon",
+    name: "Elemental Dream",
+    tagline: "Biru elektrik · cyan · lime lembut",
     description:
-      "Electric Blue memimpin identitas, Sky Cyan memberi napas, dan Neon Lime jadi highlight yang mengelektrisasi. Dark Mode dibangun di atas Deep Navy yang bervariasi — biru tetap hidup, bukan hitam.",
-    swatches: ["#3A4EFB", "#33A4FA", "#E3FF3B", "#252943", "#DEE0ED"],
+      "Electric Blue memimpin identitas, Sky Cyan memberi napas, dan lime lembut — soft, muted, tidak menyilaukan — jadi ciri khas aksen. Dark Mode dibangun di atas charcoal bervariasi; modern, elegan, dan nyaman di mata. Hanya aktif bila dipilih secara eksplisit.",
+    swatches: ["#3A4EFB", "#33A4FA", "#B5CE8B", "#252943", "#DEE0ED"],
     mock: {
       shell: "#E9EBF6",
       heroA: "#3A4EFB",
@@ -75,8 +75,8 @@ export const COLOR_THEMES: ColorThemeDef[] = [
       cardInk: "#252943",
       cardSub: "#7A80A0",
       accent: "#3A4EFB",
-      neon: "#E3FF3B",
-      neonInk: "#252943",
+      neon: "#B5CE8B",
+      neonInk: "#26300F",
       navy: "#252943",
       line: "#DBDFEE",
     },

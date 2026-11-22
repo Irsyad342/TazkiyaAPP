@@ -19,17 +19,10 @@ import { useAuthStore } from "@/lib/auth/auth-store";
 import { initSyncBridge } from "@/lib/sync/cloud-sync";
 import { isOnboarded, markOnboarded } from "@/lib/tazkiya/onboarding";
 
-/** Kanvas onboarding per (mode × paket tema) — sinkron bg OnboardingFlow. */
+/** Kanvas onboarding — SELALU kanvas oranye original (classic): Welcome
+    Screen memakai identitas oranye asli SUIO apa pun preferensi paket
+    warna pengguna (spesifikasi restore Welcome Screen). */
 const CANVAS = { dark: "#292522", light: "#F6F2EB" } as const;
-const CANVAS_ELECTRIC = { dark: "#1D2136", light: "#F0F2FC" } as const;
-
-function resolveStoredColorTheme(): string {
-  try {
-    return JSON.parse(localStorage.getItem("tazkiya-store-v1") || "{}")?.state?.settings?.colorTheme || "classic";
-  } catch {
-    return "classic";
-  }
-}
 
 function resolveStoredTheme(): "dark" | "light" {
   try {
@@ -73,17 +66,17 @@ export default function OnboardingPage() {
     }
   }, [status, router]);
 
-  // Judul + tema onboarding: ikuti pengaturan pengguna atau sistem,
-  // lalu sinkronkan meta theme-color selama berada di halaman ini.
+  // Judul + tema onboarding: mode terang/gelap mengikuti pengaturan/sistem,
+  // tetapi paket warna SELALU classic (oranye original) di halaman ini —
+  // preferensi Elemental Dream pengguna tidak mengubah Welcome Screen.
   useEffect(() => {
     document.title = "SUIO: Selamat Datang";
     const meta = document.querySelector('meta[name="theme-color"]');
     const prev = meta?.getAttribute("content") ?? null;
     const theme = resolveStoredTheme();
     document.documentElement.dataset.theme = theme;
-    const ct = resolveStoredColorTheme();
-    if (ct === "electric") document.documentElement.dataset.color = "electric";
-    meta?.setAttribute("content", (ct === "electric" ? CANVAS_ELECTRIC : CANVAS)[theme]);
+    document.documentElement.dataset.color = "classic";
+    meta?.setAttribute("content", CANVAS[theme]);
     return () => {
       if (prev) meta?.setAttribute("content", prev);
     };
