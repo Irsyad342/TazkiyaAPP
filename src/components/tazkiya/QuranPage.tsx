@@ -118,7 +118,11 @@ function SurahRow({
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-1.5">
             <span className="truncate font-display text-[14.5px] font-bold tracking-[-0.01em] text-tk-ink">{surah.latin}</span>
-            {isBookmarked ? <BookmarkIcon size={12} className="shrink-0 text-tk-violet" aria-label="Ada penanda" /> : null}
+            {isBookmarked ? (
+              <span aria-label="Ada penanda" className="tk-bookmark-chip flex shrink-0 items-center rounded-[5px] p-1">
+                <BookmarkIcon size={11} className="shrink-0" />
+              </span>
+            ) : null}
             {isLastRead ? (
               <span className="shrink-0 rounded-full bg-tk-lime px-1.5 py-px text-[8.5px] font-bold uppercase tracking-wide text-tk-lime-ink">
                 Terakhir
@@ -224,7 +228,11 @@ function SurahCard({
       </span>
       <span className="flex items-center gap-1">
         <span className="truncate font-display text-[13.5px] font-bold tracking-[-0.01em] text-tk-ink">{surah.latin}</span>
-        {isBookmarked ? <BookmarkIcon size={11} className="shrink-0 text-tk-violet" aria-label="Ada penanda" /> : null}
+        {isBookmarked ? (
+          <span aria-label="Ada penanda" className="tk-bookmark-chip flex shrink-0 items-center rounded-[4px] p-0.5">
+            <BookmarkIcon size={10} className="shrink-0" />
+          </span>
+        ) : null}
       </span>
       <span className="flex items-center gap-1.5 text-[10px] text-tk-muted">
         <span className="tnum shrink-0 font-semibold">{surah.verses} ayat</span>
@@ -1076,7 +1084,7 @@ export function QuranPage({ onOpenReader }: { onOpenReader: (surah: number, ayah
         {/* ---------- Jelajah: pencarian + filter + tab + daftar baris ---------- */}
         <section aria-label="Daftar surah dan juz" className="animate-tk-fade-up mt-6 lg:col-span-12">
           <SectionHeader title="Jelajah" caption="Cari surah atau juz, filter tempat turunnya" />
-          <GlassCard className="tk-surf-soft-blue p-4 sm:p-5">
+          <GlassCard className="tk-surf-soft-lime p-4 sm:p-5">
             {/* Pencarian pil modern */}
             <div className="relative">
               <span

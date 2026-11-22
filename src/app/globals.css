@@ -2272,7 +2272,7 @@ html[data-anim="off"] .pr-bird {
 /* ============================================================
    THEME GALLERY — TEMA 1: ELECTRIC DREAM (SUIO)
    Palet referensi: Electric Blue #3A4EFB · Sky Cyan #33A4FA ·
-   Neon Lime #E3FF3B · Deep Navy #252943 · Lavender Gray #DEE0ED.
+   Neon Lime #B7FF36 · Charcoal #17191C · Off-White #F5F6F0 · Blue #3A4EFB.
    Light = putih bersih + tint lavender, aksen biru, lime selektif.
    Dark = Deep Navy BERVARIASI (bukan hitam): kanvas #1D2136,
    kartu #2A2F4D, elevated #333A5E — biru tetap hidup di semua lapis.
@@ -2281,75 +2281,75 @@ html[data-anim="off"] .pr-bird {
 
 /* ---------- ELECTRIC DREAM — LIGHT ---------- */
 html[data-color="electric"] {
-  --background: #f3f4fb;
-  --foreground: #252943;
+  --background: #f5f6f0;
+  --foreground: #17191c;
   --card: #ffffff;
-  --card-foreground: #252943;
+  --card-foreground: #17191c;
   --popover: #ffffff;
-  --popover-foreground: #252943;
+  --popover-foreground: #17191c;
   --primary: #3a4efb;
   --primary-foreground: #ffffff;
-  --secondary: #e7e9f4;
+  --secondary: #e9ebe4;
   --secondary-foreground: #0770ae;
-  --muted: #e9eaf4;
-  --muted-foreground: #5d6485;
-  --accent: #e7e9f4;
+  --muted: #eceee6;
+  --muted-foreground: #5d6472;
+  --accent: #e9ebe4;
   --accent-foreground: #0770ae;
   --destructive: #d33b40;
-  --border: #d9dcea;
-  --input: #e0e3ef;
+  --border: #dcdee1;
+  --input: #e2e4e0;
   --ring: #3a4efb;
   --chart-1: #3a4efb;
   --chart-2: #16b3a8;
   --chart-3: #33a4fa;
   --chart-4: #a9b70e;
-  --chart-5: #252943;
+  --chart-5: #17191c;
   --sidebar: #ffffff;
-  --sidebar-foreground: #252943;
+  --sidebar-foreground: #17191c;
   --sidebar-primary: #3a4efb;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e7e9f4;
+  --sidebar-accent: #e9ebe4;
   --sidebar-accent-foreground: #0770ae;
-  --sidebar-border: #d9dcea;
+  --sidebar-border: #dcdee1;
   --sidebar-ring: #3a4efb;
-  --tk-inset: rgba(37, 41, 67, 0.06);
+  --tk-inset: rgba(23, 25, 28, 0.06);
   --tk-ring-soft: rgba(58, 78, 251, 0.16);
-  --tk-chart-grid: #e4e6f0;
-  --tk-chart-axis: #7a80a0;
-  --tk-empty-cell: #ecedf6;
-  --tk-float-shadow: 0 24px 64px -24px rgba(37, 41, 67, 0.22);
-  --color-tk-ink: #252943;
-  --color-tk-muted: #5d6485;
-  --color-tk-deep: #8a90ac;
+  --tk-chart-grid: #e6e8e2;
+  --tk-chart-axis: #7a8088;
+  --tk-empty-cell: #edeee7;
+  --tk-float-shadow: 0 24px 64px -24px rgba(23, 25, 28, 0.22);
+  --color-tk-ink: #17191c;
+  --color-tk-muted: #5d6472;
+  --color-tk-deep: #8a90a0;
   --color-tk-violet: #3a4efb;
-  --color-tk-lavender: #e3e6f0;
-  --color-tk-lav-deco: #ccd3e6;
-  --color-tk-line: #d9dcea;
+  --color-tk-lavender: #e6e8e2;
+  --color-tk-lav-deco: #d0d3cb;
+  --color-tk-line: #dcdee1;
   --color-tk-accent: #0770ae;
   --color-tk-copper: #33a4fa;
-  --color-tk-cream: #eef1fa;
+  --color-tk-cream: #f0f1ea;
   --color-tk-peach: #d8ecff;
-  --color-tk-frame: #f3f4fb;
-  --color-tk-stage: #f3f4fb;
+  --color-tk-frame: #f5f6f0;
+  --color-tk-stage: #f5f6f0;
   --color-tk-panel: #ffffff;
-  --color-tk-panel-soft: #e9eaf4;
-  --color-tk-panel-strong: #e0e3ef;
-  --color-tk-line-soft: #e6e8f2;
-  --color-tk-line-strong: #c8cde0;
-  --color-tk-track: #dfe2ee;
+  --color-tk-panel-soft: #eceee6;
+  --color-tk-panel-strong: #e2e4e0;
+  --color-tk-line-soft: #e8eae4;
+  --color-tk-line-strong: #c9ccd2;
+  --color-tk-track: #e0e2dd;
   --color-tk-white-card: #ffffff;
-  --color-tk-light-card: #eef0f8;
-  --color-tk-lime: #eef9a6;
-  --color-tk-lime-ink: #55600e;
+  --color-tk-light-card: #eff1e9;
+  --color-tk-lime: #f1ffce;
+  --color-tk-lime-ink: #3d4a0a;
   --color-tk-lime-soft: #f7fce0;
   --color-tk-blue: #3a4efb;
   --color-tk-blue-soft: #dce6ff;
   --color-tk-mint: #dbf1ff;
-  --color-tk-forest: #252943;
+  --color-tk-forest: #17191c;
   --color-tk-amber: #74690d;
   --color-tk-amber-soft: #f4f1d9;
   --color-tk-teal: #0e8a7b;
-  --color-tk-green: #55600e;
+  --color-tk-green: #3d4a0a;
   --color-tk-green-soft: #f2f8d8;
   --color-tk-rose: #e5484d;
   --color-tk-sky-soft: #dce6ff;
@@ -2360,12 +2360,12 @@ html[data-color="electric"] {
   --tk-teal-rgb: 32, 199, 183;
   --color-tk-black: #111318;
   /* Soft surface palette Electric Dream */
-  --color-tk-lime-soft: #f2facb;
+  --color-tk-lime-soft: #f4ffdb;
   --color-tk-blue-soft: #e8ecff;
   /* Aksen kategori card Kebaikan — electric: 4 warna palet di atas hero biru */
   --tk-cat-quran: #9bdcff;
   --tk-cat-zikir: #4fe3d2;
-  --tk-cat-amal: #e3ff3b;
+  --tk-cat-amal: #b7ff36;
   --tk-cat-jurnal: #dee0ed;
   --tk-cat-check: #111318;
   --tk-cat-pill-bg: var(--tk-neon);
@@ -2373,7 +2373,7 @@ html[data-color="electric"] {
   /* Tinta kategori jurnal — electric: biru / turquoise / lime / cyan */
   --jk-refleksi: #3a4efb;
   --jk-emosi: #0b7f74;
-  --jk-syukur: #55600e;
+  --jk-syukur: #3d4a0a;
   --jk-harapan: #0770ae;
   --jk-refleksi-soft: rgba(58, 78, 251, 0.14);
   --jk-emosi-soft: rgba(11, 127, 116, 0.16);
@@ -2383,7 +2383,7 @@ html[data-color="electric"] {
   --tk-search-bg: #ddf8f3;
   --tk-dot-recorded: var(--color-tk-teal);
   --tk-dot-recorded-ink: #0b7f74;
-  --tk-dot-perfect: #55600e;
+  --tk-dot-perfect: #3d4a0a;
   --tk-salat-done: var(--color-tk-teal);
   --tk-salat-done-check: var(--tk-neon-ink);
   --tk-mandiri: var(--color-tk-teal);
@@ -2393,8 +2393,8 @@ html[data-color="electric"] {
   --tk-mini-cyan: #6fc9ff;
   --tk-mini-blue: #93a4ff;
   --tk-mini-teal: #4fe3d2;
-  --tk-mini-lime: #dce94e;
-  --tk-wk-bg: linear-gradient(165deg, #252943 0%, #2b3568 55%, #232a52 100%);
+  --tk-mini-lime: #cbf22e;
+  --tk-wk-bg: linear-gradient(165deg, #17191c 0%, #2b3568 55%, #232a52 100%);
   --tk-wk-border: rgba(150, 175, 255, 0.28);
   --tk-wk-glow2: rgba(var(--tk-teal-rgb), 0.14);
   --tk-wk-award: linear-gradient(135deg, #20c7b7, #3a4efb);
@@ -2402,27 +2402,27 @@ html[data-color="electric"] {
   --tk-wk-badge-bg: var(--tk-neon);
   --tk-wk-badge-ink: var(--tk-neon-ink);
   --tk-wk-chip: rgba(255, 255, 255, 0.1);
-  --tk-wk-footer: #dce94e;
+  --tk-wk-footer: #cbf22e;
   --tk-wk-shadow: 0 20px 50px -24px rgba(8, 12, 38, 0.5);
   --tk-bar-low: linear-gradient(180deg, #33a4fa, #1e7ec7);
   --tk-bar-med: linear-gradient(180deg, var(--tk-brand), var(--tk-brand-deep));
   --tk-bar-high: linear-gradient(180deg, #2bd9c7, #14a394);
-  --tk-bar-best: linear-gradient(180deg, #e3ff3b, #c4dc1f);
-  --tk-tab-indicator: #20c7b7;
-  --tk-dock-active: linear-gradient(135deg, #20c7b7 0%, #3a4efb 100%);
+  --tk-bar-best: linear-gradient(180deg, #b7ff36, #93e00e);
+  --tk-tab-indicator: var(--tk-neon);
+  --tk-dock-active: linear-gradient(135deg, #b7ff36 0%, #8fe212 100%);
   --tk-dock-idle: #b7bfdd;
-  --tk-ring-track: #ccd3e8;
+  --tk-ring-track: #ced1d4;
   --tk-quote-accent: #0b7f74;
-  --tk-quote-footer: #55600e;
+  --tk-quote-footer: #3d4a0a;
   --tk-quote-bg: linear-gradient(150deg, #ffffff 0%, #ddf8f3 48%, #e8ecff 100%);
   /* Label doa & chip Daily Barakah — electric light (turquoise + neon lime) */
-  --tk-dua-label: var(--color-tk-lime);
+  --tk-dua-label: var(--tk-neon);
   --tk-brk-chip-out: rgba(32, 199, 183, 0.3);
   --tk-brk-chip-in: var(--tk-neon);
   --tk-brk-chip-ink: var(--tk-neon-ink);
   --tk-brk-label: #0b7f74;
   /* Kartu Zikir & Doa / Rizq & Amal — electric light */
-  --tk-zikir-num: var(--color-tk-lime);
+  --tk-zikir-num: var(--tk-neon);
   --tk-zikir-ring-track: rgba(51, 164, 250, 0.35);
   --tk-zikir-ring-arc: var(--color-tk-teal);
   --tk-amal-bar: var(--color-tk-teal);
@@ -2432,102 +2432,102 @@ html[data-color="electric"] {
   --tk-brand-rgb: 58, 78, 251;
   --tk-brand-soft: #33a4fa;
   --tk-brand-deep: #2f3fd6;
-  --tk-neon: #e3ff3b;
-  --tk-neon-ink: #2a2e14;
-  --tk-shell-bg: #e7e9f3;
-  --tk-shell-outer: #dee1ed;
-  --tk-canvas-bg: #f0f2fc;
-  --tk-hint: #c9d1e8;
-  --tk-tint-a: #e1e4f2;
-  --tk-tint-b: #eff2ff;
-  --tk-tint-c: #ddf1ff;
+  --tk-neon: #b7ff36;
+  --tk-neon-ink: #17191c;
+  --tk-shell-bg: #eceee6;
+  --tk-shell-outer: #e1e3dc;
+  --tk-canvas-bg: #f5f6f0;
+  --tk-hint: #ccd0d2;
+  --tk-tint-a: #e6e8e0;
+  --tk-tint-b: #f2f4ea;
+  --tk-tint-c: #e0f0ec;
   --tk-dock-a: 42, 48, 79;
   --tk-dock-b: 23, 26, 45;
-  --tk-dock-solid: #2a3050;
+  --tk-dock-solid: #17191c;
   --tk-dock-shadow: 0 18px 44px -14px rgba(10, 14, 34, 0.6);
-  --tk-ring-ink: #252943;
-  --tk-tip-bg: rgba(37, 41, 67, 0.95);
+  --tk-ring-ink: #17191c;
+  --tk-tip-bg: rgba(23, 25, 28, 0.95);
   --tk-hero-a: #3a4efb; --tk-hero-b: #33a4fa; --tk-hero-c: #2f3fd6;
   --tk-hero-shadow: 0 20px 48px -22px rgba(58, 78, 251, 0.5);
   --tk-progress-a: #3a4efb;
   --tk-progress-b: #20c7b7;
   /* Glass light elektrik: bayangan dingin, border lavender lembut */
   --su-border-d: rgba(170, 180, 225, 0.24);
-  --su-shadow: 0 10px 30px -14px rgba(37, 41, 67, 0.25);
+  --su-shadow: 0 10px 30px -14px rgba(23, 25, 28, 0.25);
 }
 
 /* ---------- ELECTRIC DREAM — DARK (Deep Navy bervariasi) ---------- */
 html[data-theme="dark"][data-color="electric"] {
-  --background: #1d2136;
-  --foreground: #eef0fc;
-  --card: #2a2f4d;
-  --card-foreground: #eef0fc;
-  --popover: #333a5e;
-  --popover-foreground: #eef0fc;
+  --background: #0c0d10;
+  --foreground: #f5f6f0;
+  --card: #17191c;
+  --card-foreground: #f5f6f0;
+  --popover: #1f2228;
+  --popover-foreground: #f5f6f0;
   --primary: #5b78ff;
   --primary-foreground: #ffffff;
-  --secondary: #333a5e;
+  --secondary: #1f2228;
   --secondary-foreground: #4cc4ff;
-  --muted: #232742;
-  --muted-foreground: #b9bfdb;
-  --accent: #333a5e;
+  --muted: #14161a;
+  --muted-foreground: #bcc1c9;
+  --accent: #1f2228;
   --accent-foreground: #4cc4ff;
   --destructive: #ff6369;
   --border: rgba(222, 224, 237, 0.14);
-  --input: #333a5e;
+  --input: #1f2228;
   --ring: #5b78ff;
   --chart-1: #5b78ff;
   --chart-2: #2bd9c7;
   --chart-3: #33a4fa;
-  --chart-4: #e3ff3b;
+  --chart-4: #b7ff36;
   --chart-5: #b7c0dd;
-  --sidebar: #232742;
-  --sidebar-foreground: #eef0fc;
+  --sidebar: #14161a;
+  --sidebar-foreground: #f5f6f0;
   --sidebar-primary: #5b78ff;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #333a5e;
+  --sidebar-accent: #1f2228;
   --sidebar-accent-foreground: #4cc4ff;
-  --sidebar-border: #333a5e;
+  --sidebar-border: #1f2228;
   --sidebar-ring: #5b78ff;
   --tk-inset: rgba(0, 0, 0, 0.22);
   --tk-ring-soft: rgba(91, 120, 255, 0.26);
-  --tk-chart-grid: #3a4064;
-  --tk-chart-axis: #9ba2c4;
-  --tk-empty-cell: #262b47;
+  --tk-chart-grid: #26292f;
+  --tk-chart-axis: #9ba2ab;
+  --tk-empty-cell: #181a1f;
   --tk-float-shadow: 0 24px 64px -24px rgba(5, 8, 20, 0.6);
-  --color-tk-ink: #eef0fc;
-  --color-tk-muted: #b9bfdb;
-  --color-tk-deep: #8c93b4;
+  --color-tk-ink: #f5f6f0;
+  --color-tk-muted: #bcc1c9;
+  --color-tk-deep: #8c93a0;
   --color-tk-violet: #6e83ff;
-  --color-tk-lavender: #2a3054;
-  --color-tk-lav-deco: #3a4270;
+  --color-tk-lavender: #202329;
+  --color-tk-lav-deco: #33373f;
   --color-tk-line: rgba(222, 224, 237, 0.14);
   --color-tk-accent: #4cc4ff;
   --color-tk-copper: #4cc4ff;
-  --color-tk-cream: #333a5e;
+  --color-tk-cream: #1f2228;
   --color-tk-peach: #56c4ff;
-  --color-tk-frame: #1d2136;
-  --color-tk-stage: #1d2136;
-  --color-tk-panel: #2a2f4d;
-  --color-tk-panel-soft: #232742;
-  --color-tk-panel-strong: #333a5e;
+  --color-tk-frame: #0c0d10;
+  --color-tk-stage: #0c0d10;
+  --color-tk-panel: #17191c;
+  --color-tk-panel-soft: #14161a;
+  --color-tk-panel-strong: #1f2228;
   --color-tk-line-soft: rgba(222, 224, 237, 0.09);
   --color-tk-line-strong: rgba(222, 224, 237, 0.24);
-  --color-tk-track: #333a5e;
-  --color-tk-white-card: #303656;
-  --color-tk-light-card: #2b3050;
-  --color-tk-lime: #d9f24d;
-  --color-tk-lime-ink: #353d0a;
-  --color-tk-lime-soft: #2f3a10;
+  --color-tk-track: #1f2228;
+  --color-tk-white-card: #17191c;
+  --color-tk-light-card: #1a1d22;
+  --color-tk-lime: #b7ff36;
+  --color-tk-lime-ink: #1c2405;
+  --color-tk-lime-soft: #232b08;
   --color-tk-blue: #33a4fa;
-  --color-tk-blue-soft: #2a3160;
+  --color-tk-blue-soft: #1a1e33;
   --color-tk-mint: #1f3d52;
-  --color-tk-forest: #252943;
+  --color-tk-forest: #17191c;
   --color-tk-amber: #a89f2e;
-  --color-tk-amber-soft: #3a3d63;
+  --color-tk-amber-soft: #26281e;
   --color-tk-green: #cbdf4a;
   --color-tk-green-soft: #2e3a12;
-  --color-tk-sky-soft: #2a3160;
+  --color-tk-sky-soft: #1a1e33;
   /* Turquoise — aksen pendukung electric di dark */
   --color-tk-teal: #2bd9c7;
   --color-tk-teal-ink: #2bd9c7;
@@ -2536,19 +2536,19 @@ html[data-theme="dark"][data-color="electric"] {
   /* Aksen kategori card Kebaikan — sama terang di atas hero biru gelap */
   --tk-cat-quran: #9bdcff;
   --tk-cat-zikir: #4fe3d2;
-  --tk-cat-amal: #e3ff3b;
+  --tk-cat-amal: #b7ff36;
   --tk-cat-jurnal: #dee0ed;
-  --tk-cat-check: #1d2136;
+  --tk-cat-check: #0c0d10;
   --tk-cat-pill-bg: var(--tk-neon);
   --tk-cat-pill-ink: var(--tk-neon-ink);
   /* Tinta kategori jurnal — electric dark */
   --jk-refleksi: #8ea2ff;
   --jk-emosi: #2bd9c7;
-  --jk-syukur: #d9f24d;
+  --jk-syukur: #b7ff36;
   --jk-harapan: #4cc4ff;
   --jk-refleksi-soft: rgba(58, 78, 251, 0.22);
   --jk-emosi-soft: rgba(43, 217, 199, 0.16);
-  --jk-syukur-soft: rgba(217, 242, 77, 0.16);
+  --jk-syukur-soft: rgba(183, 255, 54, 0.16);
   --jk-harapan-soft: rgba(76, 196, 255, 0.16);
   /* Indikator & permukaan tematik — electric dark */
   --color-tk-black: #111318;
@@ -2578,10 +2578,10 @@ html[data-theme="dark"][data-color="electric"] {
   --tk-bar-low: linear-gradient(180deg, #33a4fa, #1e7ec7);
   --tk-bar-med: linear-gradient(180deg, var(--tk-brand), var(--tk-brand-deep));
   --tk-bar-high: linear-gradient(180deg, #2bd9c7, #14a394);
-  --tk-bar-best: linear-gradient(180deg, #e3ff3b, #c4dc1f);
-  --tk-tab-indicator: #2bd9c7;
-  --tk-dock-active: linear-gradient(135deg, #20c7b7 0%, #3a4efb 100%);
-  --tk-dock-idle: #b9bfdb;
+  --tk-bar-best: linear-gradient(180deg, #b7ff36, #93e00e);
+  --tk-tab-indicator: var(--tk-neon);
+  --tk-dock-active: linear-gradient(135deg, #b7ff36 0%, #8fe212 100%);
+  --tk-dock-idle: #bcc1c9;
   --tk-ring-track: rgba(222, 224, 237, 0.16);
   --tk-quote-accent: #2bd9c7;
   --tk-quote-footer: var(--color-tk-lime);
@@ -2602,21 +2602,21 @@ html[data-theme="dark"][data-color="electric"] {
   --tk-brand-rgb: 58, 78, 251;
   --tk-brand-soft: #33a4fa;
   --tk-brand-deep: #2f3fd6;
-  --tk-neon: #e3ff3b;
-  --tk-neon-ink: #252943;
-  --tk-shell-bg: #1d2136;
-  --tk-shell-outer: #171a2c;
-  --tk-canvas-bg: #1d2136;
+  --tk-neon: #b7ff36;
+  --tk-neon-ink: #17191c;
+  --tk-shell-bg: #0c0d10;
+  --tk-shell-outer: #090a0c;
+  --tk-canvas-bg: #0c0d10;
   --tk-hint: #9fb0ff;
-  --tk-tint-a: #2a3054;
-  --tk-tint-b: #333a5e;
+  --tk-tint-a: #202329;
+  --tk-tint-b: #1f2228;
   --tk-tint-c: #2e3456;
   --tk-dock-a: 46, 52, 86;
   --tk-dock-b: 26, 30, 52;
-  --tk-dock-solid: #2a3050;
+  --tk-dock-solid: #191c21;
   --tk-dock-shadow: 0 18px 44px -14px rgba(5, 8, 20, 0.65);
   --tk-ring-ink: #9fa8d8;
-  --tk-tip-bg: rgba(42, 47, 78, 0.95);
+  --tk-tip-bg: rgba(23, 25, 28, 0.95);
   --tk-hero-a: #2a3480; --tk-hero-b: #3a4efb; --tk-hero-c: #2f3fd6;
   --tk-hero-shadow: 0 20px 48px -22px rgba(58, 78, 251, 0.5);
   --tk-progress-a: #5b78ff;
@@ -2631,7 +2631,7 @@ html[data-theme="dark"][data-color="electric"] {
 
 /* ---------- Liquid Glass ELECTRIC DARK — navy luminous ---------- */
 html[data-theme="dark"][data-color="electric"] .glass {
-  background: linear-gradient(160deg, rgba(54, 60, 98, var(--su-ad)) 0%, rgba(40, 45, 76, calc(var(--su-ad) - 0.1)) 52%, rgba(50, 56, 90, var(--su-ad)) 100%);
+  background: linear-gradient(160deg, rgba(30, 33, 39, var(--su-ad)) 0%, rgba(23, 25, 29, calc(var(--su-ad) - 0.1)) 52%, rgba(27, 30, 35, var(--su-ad)) 100%);
   border: 1px solid var(--su-border-d);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d)),
@@ -2641,7 +2641,7 @@ html[data-theme="dark"][data-color="electric"] .glass {
     var(--su-shadow-d);
 }
 html[data-theme="dark"][data-color="electric"] .glass-strong {
-  background: linear-gradient(160deg, rgba(60, 67, 108, var(--su-float-ad)) 0%, rgba(44, 50, 84, calc(var(--su-float-ad) - 0.06)) 100%);
+  background: linear-gradient(160deg, rgba(34, 37, 43, var(--su-float-ad)) 0%, rgba(25, 27, 32, calc(var(--su-float-ad) - 0.06)) 100%);
   border: 1px solid var(--su-border-d);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, calc(var(--su-inner-d) + 0.06)),
@@ -2650,7 +2650,7 @@ html[data-theme="dark"][data-color="electric"] .glass-strong {
     0 28px 64px -26px rgba(5, 8, 20, 0.55);
 }
 html[data-theme="dark"][data-color="electric"] .su-glass {
-  background: linear-gradient(155deg, rgba(56, 62, 102, var(--su-ad)) 0%, rgba(42, 47, 78, calc(var(--su-ad) - 0.08)) 52%, rgba(52, 58, 94, var(--su-ad)) 100%);
+  background: linear-gradient(155deg, rgba(31, 34, 40, var(--su-ad)) 0%, rgba(24, 26, 31, calc(var(--su-ad) - 0.08)) 52%, rgba(28, 31, 37, var(--su-ad)) 100%);
   border: 1px solid var(--su-border-d);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d)),
@@ -2659,7 +2659,7 @@ html[data-theme="dark"][data-color="electric"] .su-glass {
     0 18px 44px -22px rgba(5, 8, 20, 0.5);
 }
 html[data-theme="dark"][data-color="electric"] .tk-card-white {
-  background: linear-gradient(155deg, rgba(56, 62, 100, var(--su-ad)) 0%, rgba(42, 47, 78, calc(var(--su-ad) - 0.08)) 100%);
+  background: linear-gradient(155deg, rgba(31, 34, 40, var(--su-ad)) 0%, rgba(24, 26, 31, calc(var(--su-ad) - 0.08)) 100%);
   color: #eef0fc;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, var(--su-inner-d)),
@@ -2668,7 +2668,7 @@ html[data-theme="dark"][data-color="electric"] .tk-card-white {
     var(--su-shadow-d);
 }
 html[data-theme="dark"][data-color="electric"] .glass-violet {
-  background: linear-gradient(180deg, #2a3054 0%, #232845 100%);
+  background: linear-gradient(180deg, #1e2128 0%, #181a20 100%);
 }
 html[data-theme="dark"][data-color="electric"] .fr-badge {
   background: rgba(76, 196, 255, 0.14);
@@ -2705,7 +2705,7 @@ html[data-color="electric"] .fr-badge { background: rgba(7, 112, 174, 0.1); }
    override .tk-card-white generik HARUS di atas rule arketipe spesifik. */
 /* Kartu putih electric light: tint lavender lembut — bukan putih polos */
 html[data-color="electric"]:not([data-theme="dark"]) .tk-card-white {
-  background: linear-gradient(155deg, #ffffff 0%, #edf0fa 100%);
+  background: linear-gradient(155deg, #ffffff 0%, #f2f4ec 100%);
 }
 /* Card Kebaikan Hari Ini: Deep Navy + glow turquoise/electric blue */
 html[data-color="electric"] .tk-surf-navy-card {
@@ -2849,3 +2849,23 @@ html[data-color="electric"]:not([data-theme="dark"]) .tk-surf-dua {
   --color-tk-muted: #aeb5d6;
   --color-tk-accent: #4cc4ff;
 }
+
+/* ---------- Palet SUIO v2 (charcoal · off-white · neon lime · biru sekunder) ----------
+   Tombol aksi utama & indikator aktif jadi Neon Lime HANYA di electric;
+   Soft Warm Dark/Classic tetap memakai violet/lime klasik (tidak bergeser). */
+html[data-color="electric"] .gs-ink-btn {
+  background: var(--tk-neon);
+  color: var(--tk-neon-ink);
+}
+/* Tasbih: busur progres, titik ujung busur, chip target tercapai */
+.tk-tasbih-arc { stroke: var(--color-tk-violet); }
+html[data-color="electric"] .tk-tasbih-arc { stroke: var(--tk-neon); }
+.tk-tasbih-dot { background: var(--color-tk-lime); box-shadow: 0 0 0 4px rgba(184, 220, 60, 0.25); }
+html[data-color="electric"] .tk-tasbih-dot { background: var(--tk-neon); box-shadow: 0 0 0 4px rgba(183, 255, 54, 0.25); }
+.tk-tasbih-reached { background: var(--color-tk-lime); color: var(--color-tk-lime-ink); }
+html[data-color="electric"] .tk-tasbih-reached { background: var(--tk-neon); color: var(--tk-neon-ink); }
+/* Bookmark chip halaman Al-Qur'an — electric: chip Neon Lime; klasik: ikon violet asli */
+.tk-bookmark-chip { color: var(--color-tk-violet); }
+html[data-color="electric"] .tk-bookmark-chip { background: var(--tk-neon); color: var(--tk-neon-ink); }
+/* Pemulihan klasik-dark: busur tasbih memakai accent klasik (electric tetap lime) */
+html[data-theme="dark"]:not([data-color="electric"]) .tk-tasbih-arc { stroke: var(--color-tk-accent); }

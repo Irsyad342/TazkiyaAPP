@@ -117,7 +117,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
             fill="none"
             strokeWidth="7"
             strokeLinecap="round"
-            className="stroke-tk-violet"
+            className="tk-tasbih-arc"
             strokeDasharray={`${dash} ${CIRC}`}
             /* linecap round pada busur nol persen merender titik — sembunyikan */
             style={{ transition: "stroke-dasharray 0.5s cubic-bezier(0.22, 1, 0.36, 1)", opacity: pct > 0 ? 1 : 0 }}
@@ -127,7 +127,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
         {pct > 2 && pct < 100 ? (
           <span
             aria-hidden
-            className="absolute h-3 w-3 rounded-full bg-tk-lime ring-4 ring-tk-lime/25"
+            className="tk-tasbih-dot absolute h-3 w-3 rounded-full"
             style={{
               left: `calc(${(tipX / 280) * 100}% - 6px)`,
               top: `calc(${(tipY / 280) * 100}% - 6px)`,
@@ -146,7 +146,7 @@ function TasbihCounter({ onOpenFull }: { onOpenFull: () => void }) {
           <span
             className={cn(
               "mt-2.5 rounded-full px-3 py-1 text-[10px] font-bold",
-              reached ? "bg-tk-lime text-tk-lime-ink" : "bg-tk-lavender text-tk-violet"
+              reached ? "tk-tasbih-reached" : "bg-tk-lavender text-tk-violet"
             )}
           >
             {reached ? "Target tercapai" : `${pct}%`}
