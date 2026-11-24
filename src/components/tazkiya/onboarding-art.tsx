@@ -1171,24 +1171,6 @@ function ThemeMiniPreview({ mode }: { mode: ThemeModeOpt }) {
           </div>
         </div>
       )}
-      {mode === "system" && (
-        <div className="absolute inset-0">
-          <div className="absolute inset-y-0 left-0 w-1/2 bg-[#F7F5F2] p-[6px]">
-            <div className="h-[8px] w-[8px] rounded-full bg-gradient-to-br from-[var(--tk-brand-soft)] to-[var(--tk-brand)]" />
-            <div className="mt-[4px] rounded-[6px] bg-white p-[4px] shadow-[0_2px_8px_-3px_rgba(50,38,28,0.25)]">
-              <div className="h-[3px] w-2/3 rounded-full bg-[#202020]/25" />
-              <div className="mt-[3px] h-[8px] w-[20px] rounded-full bg-[var(--tk-brand)]" />
-            </div>
-          </div>
-          <div className="absolute inset-y-0 right-0 w-1/2 bg-[var(--color-tk-panel-soft)] p-[6px]">
-            <div className="ml-auto h-[8px] w-[8px] rounded-full bg-gradient-to-br from-[var(--tk-brand-soft)] to-[var(--tk-brand)]" />
-            <div className="mt-[4px] rounded-[6px] bg-[#24211F] p-[4px] ring-1 ring-white/[0.06]">
-              <div className="h-[3px] w-2/3 rounded-full bg-[#F7F3EF]/40" />
-              <div className="mt-[3px] h-[8px] w-[20px] rounded-full bg-[var(--tk-brand)]" />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -1202,10 +1184,20 @@ export function ThemePreviewArt({
   onSelect: (mode: ThemeModeOpt) => void;
   live: boolean;
 }) {
-  const opts: { id: ThemeModeOpt; label: string; desc: string }[] = [
-    { id: "light", label: "Terang", desc: "Hangat & bersih" },
-    { id: "dark", label: "Gelap", desc: "Kalem & nyaman" },
-    { id: "system", label: "Sistem", desc: "Ikuti perangkat" },
+  /* Dua pilihan saja — Terang & Gelap. Mode "system" tidak ditawarkan di
+     Welcome Screen, tetapi preferensi tersimpan "system" tetap dihormati:
+     kartu yang menyala mengikuti resolusi perangkat saat ini. */
+  const eff: "light" | "dark" = (() => {
+    if (selected !== "system") return selected;
+    try {
+      return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+    } catch {
+      return "dark";
+    }
+  })();
+  const opts: { id: ThemeModeOpt; label: string; desc: string; Icon: typeof Sun }[] = [
+    { id: "light", label: "Tema Terang", desc: "Hangat & bersih", Icon: Sun },
+    { id: "dark", label: "Tema Gelap", desc: "Kalem & nyaman", Icon: Moon },
   ];
   return (
     <div role="radiogroup" aria-label="Pilih tema tampilan" className="flex w-full flex-col gap-[9px]">
@@ -1217,7 +1209,7 @@ export function ThemePreviewArt({
             type="button"
             role="radio"
             aria-checked={on}
-            aria-label={`Tema ${o.label} — ${o.desc}`}
+            aria-label={`${o.label} — ${o.desc}`}
             onClick={() => onSelect(o.id)}
             initial={{ opacity: 0, y: 16 }}
             animate={live ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
@@ -1231,8 +1223,18 @@ export function ThemePreviewArt({
             <span className={`w-[96px] shrink-0 ${on ? "" : "opacity-90"}`}>
               <ThemeMiniPreview mode={o.id} />
             </span>
-            <span className="flex-1">
-              <span className={`block text-[12.5px] font-bold ${INK}`}>{o.label}</span>
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center gap-[6px]">
+                {/* Ikon mode: matahari (Terang) / bulan (Gelap) dalam badge bulat. */}
+                <span
+                  className={`flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-full transition-colors duration-200 ${
+                    on ? "bg-[var(--tk-brand)] text-white" : "bg-[var(--tk-brand)]/15 text-[var(--tk-brand)]"
+                  }`}
+                >
+                  <o.Icon size={10.5} strokeWidth={2.6} />
+                </span>
+                <span className={`block text-[12.5px] font-bold ${INK}`}>{o.label}</span>
+              </span>
               <span className={`mt-[2px] block text-[9px] ${INK2}`}>{o.desc}</span>
             </span>
             <span

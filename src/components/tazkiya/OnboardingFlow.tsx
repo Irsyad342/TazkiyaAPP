@@ -38,7 +38,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LazyMotion, MotionConfig, domAnimation, m } from "framer-motion";
-import { ArrowRight, Check, ChevronLeft } from "lucide-react";
+import { ArrowRight, ChevronLeft } from "lucide-react";
 import { SuioMark } from "@/components/tazkiya/brand";
 import { Star8 } from "@/components/tazkiya/ornaments";
 import { PressScale, useAnim } from "@/components/tazkiya/motion-bits";
@@ -54,9 +54,7 @@ import {
   type ThemeModeOpt,
 } from "@/components/tazkiya/onboarding-art";
 import { useWorshipStore } from "@/lib/tazkiya/store";
-import { COLOR_THEMES, canvasColorFor } from "@/lib/tazkiya/colorThemes";
-import type { ColorThemeId } from "@/lib/tazkiya/types";
-import { cn } from "@/lib/utils";
+import { canvasColorFor } from "@/lib/tazkiya/colorThemes";
 
 /* EASE diimpor dari sistem motion global (src/lib/motion/system.ts) —
    nilai identik dengan konstanta lokal sebelumnya, preset kini tunggal. */
@@ -199,18 +197,10 @@ export function OnboardingFlow({
     [resolve]
   );
 
-  /* Paket warna (Original Orange / Elemental Dream): HANYA menyimpan
-     preferensi — halaman Welcome Screen tetap identitas oranye original,
-     tema terapan berguna setelah masuk aplikasi. Tidak ada flip data-color
-     di sini; preferensi lama tampil terpilih dan tidak ditimpa sampai
-     pengguna benar-benar memilih. */
-  const [colorTheme, setColorTheme] = useState<string>(
-    () => useWorshipStore.getState().settings.colorTheme ?? "classic"
-  );
-  const pickColorTheme = useCallback((ct: ColorThemeId) => {
-    setColorTheme(ct);
-    useWorshipStore.getState().updateSettings({ colorTheme: ct });
-  }, []);
+  /* Pemilihan paket warna (Original Orange / Elemental Dream) tidak lagi
+     ditawarkan di Welcome Screen — pengguna hanya memilih mode Terang/Gelap
+     di sini. Preferensi paket warna tersimpan tetap dihormati dan dapat
+     diubah dari Galeri Tema di halaman Profil. */
 
   /* Mode "system": ikuti perubahan preferensi perangkat selama di sini. */
   useEffect(() => {
@@ -315,7 +305,6 @@ export function OnboardingFlow({
       return (
         <div className="flex w-full max-w-[360px] flex-col gap-3 min-[900px]:max-w-[420px]">
           <ThemePreviewArt selected={mode} onSelect={pickTheme} live={active} />
-          <ColorThemePicker current={colorTheme} onSelect={pickColorTheme} live={active} />
         </div>
       );
     }
@@ -609,75 +598,3 @@ export function OnboardingFlow({
   );
 }
 
-/** Pemilih paket warna — swatch dari COLOR_THEMES (satu sumber kebenaran
-    dengan galeri tema Profil, tanpa duplikasi konfigurasi). Memilih langsung
-    flip data-color halaman: preview Welcome Screen ikut berubah seketika. */
-function ColorThemePicker({
-  current,
-  onSelect,
-  live,
-}: {
-  current: string;
-  onSelect: (ct: ColorThemeId) => void;
-  live: boolean;
-}) {
-  return (
-    <div role="radiogroup" aria-label="Paket tema warna" className="flex w-full flex-col gap-[9px]">
-      {COLOR_THEMES.map((t, i) => {
-        const on = current === t.id;
-        return (
-          <button
-            key={t.id}
-            type="button"
-            role="radio"
-            aria-checked={on}
-            aria-label={`Paket warna ${t.name} — ${t.tagline}`}
-            onClick={() => onSelect(t.id)}
-            className={cn(
-              "tap flex w-full items-center gap-[10px] rounded-[16px] border p-[9px] text-left transition-shadow duration-300",
-              on ? "border-tk-violet/50 bg-tk-panel shadow-[0_14px_34px_-14px_rgba(var(--tk-brand-rgb),0.4)]" : "border-tk-line hover:border-tk-violet/40"
-            )}
-            style={{ transitionDelay: live ? `${i * 40}ms` : undefined }}
-          >
-            {/* Preview sederhana: mini-mock antarmuka memakai palet tema
-                (satu sumber dengan galeri Profil) — bukan flip halaman. */}
-            <span
-              aria-hidden
-              className="flex h-[42px] w-[64px] shrink-0 flex-col overflow-hidden rounded-[9px] border"
-              style={{ background: t.mock.shell, borderColor: t.mock.line }}
-            >
-              <span className="flex h-[16px] shrink-0 items-center px-1.5" style={{ background: t.mock.heroA }}>
-                <span className="h-[4px] w-[62%] rounded-full" style={{ background: t.mock.heroInk, opacity: 0.9 }} />
-              </span>
-              <span className="flex min-h-0 flex-1 items-center gap-1 px-1.5 py-1">
-                <span className="h-[12px] w-[18px] rounded-[3px]" style={{ background: t.mock.card }} />
-                <span className="h-[5px] min-w-0 flex-1 rounded-full" style={{ background: t.mock.cardSub, opacity: 0.45 }} />
-                <span className="h-[9px] w-[9px] shrink-0 rounded-full" style={{ background: t.mock.neon }} />
-              </span>
-            </span>
-            <span aria-hidden className="flex shrink-0 -space-x-1">
-              {t.swatches.slice(0, 4).map((c) => (
-                <span
-                  key={c}
-                  className="h-4 w-4 rounded-full border-[1.5px] border-white shadow-sm dark:border-white/20"
-                  style={{ background: c }}
-                />
-              ))}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[12.5px] font-bold text-tk-ink">{t.name}</span>
-              <span className="mt-[2px] block truncate text-[9px] text-tk-muted">{t.tagline}</span>
-            </span>
-            <span
-              className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
-                on ? "bg-tk-violet" : "border-[1.6px] border-current opacity-30 text-tk-ink"
-              }`}
-            >
-              {on && <Check size={11} strokeWidth={3.2} className="text-white" />}
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
