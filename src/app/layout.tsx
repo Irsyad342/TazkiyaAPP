@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Amiri_Quran, Fraunces } from "next/font/google";
+import { GlobalMotionGuard } from "@/components/tazkiya/GlobalMotionGuard";
 import "./globals.css";
 
 /*
@@ -97,6 +98,9 @@ export default function RootLayout({
       <body
         className={`${generalSans.variable} ${amiriQuran.variable} ${fraunces.variable} antialiased bg-background text-foreground`}
       >
+        {/* Pause semua animasi CSS saat tab tersembunyi (hemat baterai,
+            lanjut dari posisi terakhir — lihat GlobalMotionGuard). */}
+        <GlobalMotionGuard />
         {children}
       </body>
     </html>

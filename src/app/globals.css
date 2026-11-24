@@ -2991,3 +2991,32 @@ html[data-color="electric"] .tk-account-cta {
   background: var(--color-tk-blue);
   color: #ffffff;
 }
+
+/* ---------- Motion v2.2 — smart pause (hemat CPU/GPU tanpa menyentuh karakter) ----------
+   1) Tab tersembunyi → SEMUA animasi CSS di-pause; lanjut persis dari posisi
+      terakhir saat kembali (bukan diulang dari awal). Dipasang GlobalMotionGuard.
+   2) .tk-anim-paused → pause berbasis visibilitas (IntersectionObserver):
+      dekorasi di luar viewport berhenti, langsung hidup lagi saat terlihat.
+   3) prefers-reduced-motion → animasi dekoratif tak berujung dihentikan total;
+      animasi fungsional (entrance, feedback, transisi) tetap berjalan. */
+html.tk-tab-hidden *,
+html.tk-tab-hidden *::before,
+html.tk-tab-hidden *::after {
+  animation-play-state: paused !important;
+}
+.tk-anim-paused,
+.tk-anim-paused * {
+  animation-play-state: paused !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-tk-pulse, .tk-sparkle, .tk-ob-float, .tk-ob-spin, .tk-ob-card-float,
+  .tk-star, .tk-float-slow, .tk-cloud, .tk-mood-glow,
+  .su-breathe, .su-ambient, .su-float,
+  .su-mood-idle-bahagia, .su-mood-idle-tenang, .su-mood-idle-bersyukur,
+  .su-mood-idle-lelah, .su-mood-idle-sedih, .su-mood-idle-cemas,
+  .su-mood-idle-campur-aduk,
+  .pr-breathe, .pr-rays, .pr-drift, .pr-mote, .pr-glint, .pr-bird, .pr-float-soft,
+  .fr-mote, .fr-rays-slow {
+    animation: none !important;
+  }
+}

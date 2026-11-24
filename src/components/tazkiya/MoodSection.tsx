@@ -21,10 +21,10 @@
  * susunan 4+3, warna dasar, dan mekanisme simpan mood tidak berubah.
  */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { BookHeart, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
-import { m, type Transition } from "framer-motion";
+import { m, useInView, type Transition } from "framer-motion";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { SPRING } from "@/lib/motion/system";
 import { PressScale, useAnim } from "./motion-bits";
@@ -84,6 +84,14 @@ export function MoodSection({
   /** Emoji terakhir yang ditekan + penghitung, agar pop & ripple diputar ulang pada setiap tekan. */
   const [pulse, setPulse] = useState<{ id: MoodId; n: number } | null>(null);
 
+  /* Smart pause: idle-bounce + glow emot adalah animasi composited
+     (will-change) — saat strip mood tergulir keluar viewport, animasinya
+     di-pause via .tk-anim-paused dan lanjut persis saat terlihat kembali.
+     Karakter animasi tidak berubah; hanya tidak menghabiskan GPU
+     di luar pandangan. */
+  const stripRef = useRef<HTMLDivElement>(null);
+  const stripInView = useInView(stripRef, { amount: 0.2 });
+
   const select = (id: MoodId, label: string) => {
     setMood(today, id);
     if (motionOK) setPulse((p) => ({ id, n: p && p.id === id ? p.n + 1 : 1 }));
@@ -97,7 +105,12 @@ export function MoodSection({
         <p className="mt-1 text-[12px] text-tk-muted">Luangkan waktu sejenak untuk memahami dirimu.</p>
       </div>
 
-      <div role="radiogroup" aria-label="Pilih mood hari ini" className="flex flex-col gap-2.5">
+      <div
+        ref={stripRef}
+        role="radiogroup"
+        aria-label="Pilih mood hari ini"
+        className={cn("flex flex-col gap-2.5", !stripInView && "tk-anim-paused")}
+      >
         {/* Baris 4 + 3 simetris, semua ekspresi terlihat tanpa menggulir */}
         {[MOODS.slice(0, 4), MOODS.slice(4)].map((row, r) => (
           <div key={r} className="flex items-start justify-center gap-1">
