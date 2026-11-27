@@ -351,6 +351,8 @@ export interface Settings {
   /** Lokasi perangkat (GPS) — terisi setelah izin lokasi diberikan; pembaruan
    *  otomatis selalu aktif (lokasi otomatis penuh). */
   geo?: DeviceGeo;
+  /** Nomor Asmaul Husna (1..99) yang ditandai hafal. */
+  asmaulHafalan?: number[];
   remindersEnabled: boolean;
   reminderTimes: Record<PrayerId, ReminderTime>;
   animations: boolean;

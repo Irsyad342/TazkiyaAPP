@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 export type TabId = "beranda" | "quran" | "sholat" | "progress" | "profil";
 
 /** Sub-halaman penuh yang dibuka dari Beranda (bukan modal). */
-export type SubPageId = "jurnal" | "zikir-doa" | "rizq-amal";
+export type SubPageId = "jurnal" | "zikir-doa" | "rizq-amal" | "masjid-virtual";
 
 const TABS: { id: TabId; label: string; icon: typeof House }[] = [
   { id: "beranda", label: "Beranda", icon: House },

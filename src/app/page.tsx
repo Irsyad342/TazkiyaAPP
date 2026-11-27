@@ -77,7 +77,17 @@ const SUBPAGE_TITLES: Record<SubPageId, string> = {
   jurnal: "SUIO: Jurnal Syukur",
   "zikir-doa": "SUIO: Zikir & Doa",
   "rizq-amal": "SUIO: Rizq & Amal",
+  "masjid-virtual": "SUIO: Masjid Virtual",
 };
+
+/*
+ * Tur masjid virtual dimuat terpisah (lazy) — pustaka 3D (three.js) TIDAK
+ * pernah membebani bundle awal Beranda; scene baru diunduh saat tur dibuka.
+ */
+const MasjidVirtualPage = dynamic(
+  () => import("@/components/tazkiya/MasjidVirtualPage").then((m) => ({ default: m.MasjidVirtualPage })),
+  { ssr: false }
+);
 
 /* Deteksi runtime Capacitor (APK) tanpa dependensi langsung. */
 function capacitorNative(): boolean {
@@ -382,6 +392,7 @@ export default function Page() {
                   <ZikirDoaPage onBack={() => setSubpage(null)} onOpenTasbihFull={() => setTasbihFullOpen(true)} />
                 )}
                 {subpage === "rizq-amal" && <RizqAmalPage onBack={() => setSubpage(null)} />}
+                {subpage === "masjid-virtual" && <MasjidVirtualPage onBack={() => setSubpage(null)} />}
               </m.div>
             </AnimatePresence>
           </div>

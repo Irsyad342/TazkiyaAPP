@@ -25,6 +25,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  MapPin,
   Plus,
   Search,
   Settings2,
@@ -52,6 +53,10 @@ import { DayDetailSheet } from "./DayDetailSheet";
 import { OrnamentDivider } from "./ornaments";
 import type { SubPageId, TabId } from "./BottomNav";
 import { AmbientParticles, DragCard, PinchStack, RiseIn, TiltCard } from "./motion-bits";
+import { WaktuPentingCard } from "./WaktuPentingCard";
+import { AsmaulHusnaCard } from "./AsmaulHusnaCard";
+import { MasjidVirtualCard } from "./MasjidVirtualCard";
+import { autoGeoStatusText, ensureAutoGeo, type AutoGeoState } from "@/lib/tazkiya/autoGeo";
 import { cn } from "@/lib/utils";
 
 const PRAYER_ORDER: { id: PrayerId; label: string }[] = [
@@ -1134,6 +1139,41 @@ export function HomePage({
   const [searchOpen, setSearchOpen] = useState(false);
   const [monthOpen, setMonthOpen] = useState(false);
   const [pickedDay, setPickedDay] = useState<string | null>(null);
+  const [geoState, setGeoState] = useState<AutoGeoState | null>(null);
+
+  /* ---------- Lokasi otomatis untuk jadwal salat (tanpa watch GPS) ----------
+     Sekali saat Beranda muncul + saat tab kembali terlihat: minta izin pada
+     pemakaian pertama (dengan cooldown 24 jam), segarkan cache bila tua,
+     dan hitung ulang jadwal bila pengguna berpindah kota (toleransi jarak).
+     Kegagalan izin TIDAK memblokir Beranda — jadwal tetap tampil. */
+  useEffect(() => {
+    let alive = true;
+    const run = () => {
+      ensureAutoGeo("mount").then((s) => {
+        if (alive) setGeoState(s);
+      });
+    };
+    run();
+    const onVis = () => {
+      if (document.visibilityState === "visible") run();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      alive = false;
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, []);
+
+  /* Ketukan indikator lokasi = percobaan pembaruan dengan niat pengguna. */
+  const refreshGeo = () => {
+    ensureAutoGeo("retry").then((s) => {
+      setGeoState(s);
+      if (s.kind === "ok") toast.success("Lokasi jadwal salat diperbarui");
+      else if (s.kind === "cached") toast.info("Jadwal memakai lokasi terakhir yang tersimpan");
+      else if (s.kind === "denied") toast.info("Izin lokasi ditolak — aktifkan di pengaturan perangkat");
+      else if (s.kind === "unsupported") toast.info("Perangkat ini tidak mendukung pencarian lokasi");
+    });
+  };
 
   const greeting = (() => {
     const h = new Date().getHours();
@@ -1251,28 +1291,59 @@ export function HomePage({
         </div>
       </RiseIn>
 
+      {/* ---------- Indikator lokasi otomatis (mungil, di sekitar jadwal) ---------- */}
+      <RiseIn i={4} className="mt-3 lg:col-span-12">
+        <button
+          type="button"
+          onClick={refreshGeo}
+          aria-label="Status lokasi jadwal salat — ketuk untuk memperbarui lokasi"
+          className="tap flex w-full items-center gap-1.5 px-1 text-[10.5px] font-semibold text-tk-muted transition-colors hover:text-tk-ink"
+        >
+          <MapPin size={11} className="shrink-0 text-[var(--tk-brand)]" aria-hidden />
+          <span className="min-w-0 flex-1 truncate text-left">
+            {geoState ? autoGeoStatusText(geoState) : "Lokasi otomatis · memeriksa…"}
+          </span>
+          <ChevronRight size={11} className="shrink-0 opacity-60" aria-hidden />
+        </button>
+      </RiseIn>
+
+      {/* ---------- Waktu-Waktu Penting: Imsak · Terbit · Duha · Tahajud ---------- */}
+      <RiseIn i={5} className="mt-4 lg:col-span-12">
+        <WaktuPentingCard today={today} />
+      </RiseIn>
+
       {/* ---------- E. Tugas Hari Ini ---------- */}
-      <RiseIn i={4} className="mt-8 lg:col-span-12">
+      <RiseIn i={6} className="mt-8 lg:col-span-12">
         <TodayTasks today={today} />
       </RiseIn>
 
+      {/* ---------- Asmaul Husna Hari Ini ---------- */}
+      <RiseIn i={7} className="mt-8 lg:col-span-12">
+        <AsmaulHusnaCard today={today} />
+      </RiseIn>
+
+      {/* ---------- Jelajahi Masjid Virtual ---------- */}
+      <RiseIn i={8} className="mt-8 lg:col-span-12">
+        <MasjidVirtualCard onOpen={onOpenSubpage} />
+      </RiseIn>
+
       {/* ---------- F. Mood check-in ---------- */}
-      <RiseIn i={5} className="mt-8 lg:col-span-12">
+      <RiseIn i={9} className="mt-8 lg:col-span-12">
         <MoodSection today={today} onOpenSubpage={onOpenSubpage} />
       </RiseIn>
 
       {/* ---------- G. Jelajahi aktivitas ---------- */}
-      <RiseIn i={6} className="mt-8 lg:col-span-12">
+      <RiseIn i={10} className="mt-8 lg:col-span-12">
         <JelajahiAktivitas today={today} onOpen={onOpenSubpage} />
       </RiseIn>
 
       {/* ---------- H. Doa hari ini ---------- */}
-      <RiseIn i={7} className="mt-8 lg:col-span-12">
+      <RiseIn i={11} className="mt-8 lg:col-span-12">
         <DoaCompact />
       </RiseIn>
 
       {/* ---------- I. Daily Barakah ---------- */}
-      <RiseIn i={8} className="mt-8 lg:col-span-12">
+      <RiseIn i={12} className="mt-8 lg:col-span-12">
         <DailyBarakah />
       </RiseIn>
 
