@@ -3064,6 +3064,40 @@ html.tk-tab-hidden *::after {
 .wp-time-missing { font-size: 15px; font-weight: 700; padding-top: 7px; }
 .wp-desc { margin-top: 4px; font-size: 10.5px; font-weight: 500; line-height: 1.35; color: rgba(255, 255, 255, 0.8); }
 
+/* ---- panggung carousel 3D berlapis ---- */
+.wp-stage {
+  position: relative;
+  overflow: hidden;
+  height: 322px;
+  touch-action: pan-y; /* scroll vertikal halaman tetap jalan */
+  border-radius: 1.8rem;
+  outline: none;
+}
+.wp-stage:focus-visible { box-shadow: 0 0 0 2px var(--tk-brand); }
+.wp-stage .wp-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 330px;
+  height: 272px;
+  margin: -136px 0 0 -165px;
+  will-change: transform, opacity, filter;
+}
+/* transisi hanya saat settle — saat drag posisi mengikuti jari tanpa lag */
+.wp-anim .wp-card {
+  transition:
+    transform 560ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 500ms ease,
+    filter 500ms ease;
+}
+/* kartu aktif: naik + shadow melayang + rim light tipis */
+.wp-front {
+  box-shadow:
+    0 26px 52px -18px rgba(10, 14, 38, 0.55),
+    0 8px 20px -12px rgba(10, 14, 38, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
 /* scrim pembaca teks di bagian bawah — warna tetap per suasana */
 .wp-card::after {
   content: ""; position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; height: 62%;
@@ -3080,15 +3114,24 @@ html.tk-tab-hidden *::after {
 .wp-terbit .wp-ico { background: rgba(255, 255, 255, 0.5); color: #d0653f; }
 .wp-duha .wp-ico { background: rgba(255, 255, 255, 0.5); color: #b3762a; }
 
-/* dots + hint + counter — chrome UI di luar kartu, boleh mengikuti tema */
+/* dots + counter + tombol nav — chrome UI di luar kartu, boleh mengikuti tema */
 .wp-dot {
   height: 6px; width: 6px; border-radius: 9999px; padding: 0;
   background: var(--color-tk-line-strong);
   transition: width 0.25s ease, background-color 0.25s ease;
 }
 .wp-dot-on { width: 18px; background: var(--tk-brand); }
-.wp-hint { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; color: var(--color-tk-muted); }
+.wp-hint { font-size: 10px; font-weight: 600; color: var(--color-tk-muted); }
 .wp-count { font-size: 10.5px; font-weight: 700; color: var(--color-tk-muted); font-variant-numeric: tabular-nums; }
+.wp-nav {
+  display: flex; height: 28px; width: 28px; align-items: center; justify-content: center;
+  border-radius: 9999px; padding: 0;
+  background: var(--color-tk-panel);
+  border: 1px solid var(--color-tk-line-soft);
+  color: var(--color-tk-muted);
+  transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.wp-nav:active { transform: scale(0.9); color: var(--tk-brand); border-color: var(--tk-brand); }
 
 /* animasi halus: maks satu per kartu, hanya opacity — hemat GPU */
 .wp-tw { animation: wpTwinkle 5s ease-in-out infinite; }
@@ -3096,9 +3139,9 @@ html.tk-tab-hidden *::after {
 @keyframes wpTwinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
 @keyframes wpBreathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.72; } }
 
-/* Tablet/desktop: grid 2 kolom besar (proyek mematok breakpoint Tailwind jauh
-   di atas — mobile-only — sehingga varian lg:* tidak pernah aktif; layout
-   desktop untuk section ini diatur di sini saja, di luar config global). */
+/* Tablet/desktop: carousel tetap, kartu lebih besar (proyek mematok breakpoint
+   Tailwind jauh di atas — mobile-only — sehingga varian lg:* tidak pernah aktif;
+   layout desktop untuk section ini diatur di sini saja, di luar config global). */
 @media (min-width: 1024px) {
   /* breakout: lepas dari kolom konten (±430px) agar kartu benar-benar besar */
   .wp-section {
@@ -3107,15 +3150,15 @@ html.tk-tab-hidden *::after {
     translate: -50% 0;
     width: min(1100px, 92vw);
   }
-  .wp-rail {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    overflow: visible;
-    margin: 0;
-    padding: 0;
-    scroll-snap-type: none;
+  .wp-stage { height: 348px; }
+  .wp-stage .wp-card {
+    width: 480px;
+    height: 300px;
+    margin: -150px 0 0 -240px;
   }
-  .wp-rail .wp-card { width: auto; max-width: none; height: 300px; }
-  .wp-dotbar { display: none; }
+}
+
+/* pengguna memilih gerak minimal: transisi carousel instan */
+@media (prefers-reduced-motion: reduce) {
+  .wp-anim .wp-card { transition-duration: 0.01ms !important; }
 }

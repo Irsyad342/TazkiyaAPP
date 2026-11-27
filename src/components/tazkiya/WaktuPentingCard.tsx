@@ -2,27 +2,27 @@
 
 /**
  * Tazkiya — "Waktu-Waktu Penting" (pelengkap jadwal salat utama, bukan pengganti):
- * Imsak · Terbit · Duha · Tahajud sebagai KARTU PEMANDANGAN full-bleed.
- * - Mobile: carousel horizontal scroll-snap (kartu ±88vw, kartu berikutnya mengintip,
- *   dots + hitungan 1/4 + petunjuk geser). lg (desktop/tablet): grid 2 kolom besar.
- * - Seluruh angka dari sumber hitung yang SAMA dengan jadwal utama
- *   (lib/tazkiya/sunnahTimes → computeSunnahTimes) — logika waktu TIDAK diubah.
- * - Terbit & Duha butuh koordinat GPS: bila tidak ada, tampil "butuh lokasi"
- *   (jujur, bukan angka karangan) dan kartu bisa diketuk untuk mengaktifkan lokasi.
- * - Identitas visual TETAP per suasana waktu: ilustrasi SVG inline (WaktuScenes.tsx)
- *   + kelas .wp-* di globals.css, sengaja di luar token tema agar identik di semua tema.
+ * Imsak · Terbit · Duha · Tahajud sebagai CAROUSEL 3D BERLAPIS (layered/coverflow).
+ * - Kartu aktif selalu di tengah: paling besar, paling depan, tanpa blur, tanpa terpotong.
+ * - Kartu samping: lebih kecil, lebih transparan, blur halus, sedikit turun — preview
+ *   sebagian di tepi (efek kedalaman seperti slider premium).
+ * - Interaksi: swipe/drag (pointer events, maks 1 kartu per gesture, scroll vertikal
+ *   halaman tetap jalan via touch-action: pan-y), dots, tombol ‹ ›, panah keyboard.
+ * - Animasi: transform + opacity + filter blur saja, ±560 ms cubic-bezier lembut;
+ *   posisi saat drag di-update langsung via DOM (tanpa re-render React per frame).
+ * - Data & logika waktu TIDAK berubah: computeSunnahTimes, perilaku "butuh lokasi",
+ *   sumber angka sama dengan jadwal salat utama.
+ * - Ilustrasi SVG inline (WaktuScenes.tsx) + kelas .wp-* di globals.css: palet TETAP,
+ *   identik di semua tema aplikasi.
  */
 
-import { useMemo, useRef, useState } from "react";
-import { MoonStar, Moon, Sun, Sunrise, MoveHorizontal } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { MoonStar, Moon, Sun, Sunrise, ChevronLeft, ChevronRight } from "lucide-react";
 import { useWorshipStore } from "@/lib/tazkiya/store";
 import { computeSunnahTimes } from "@/lib/tazkiya/sunnahTimes";
 import { ensureAutoGeo } from "@/lib/tazkiya/autoGeo";
 import { cn } from "@/lib/utils";
 import { SceneImsak, SceneTerbit, SceneDuha, SceneTahajud } from "./WaktuScenes";
-
-/** Jarak antarkartu carousel (harus = gap-3 pada rail). */
-const GAP = 12;
 
 type Row = {
   id: string;
@@ -38,12 +38,23 @@ type Row = {
   needsGeo: boolean;
 };
 
+/** Jarak antar pusat kartu (px) per breakpoint — sinkron dengan CSS .wp-item. */
+const STEP_MOBILE = 190;
+const STEP_DESKTOP = 306;
+const DUR_SETTLE_MS = 560;
+
 export function WaktuPentingCard({ today }: { today: string }) {
   const settings = useWorshipStore((s) => s.settings);
   const [busy, setBusy] = useState(false);
   const [idx, setIdx] = useState(0);
   const [nudged, setNudged] = useState(false);
-  const railRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLElement | null)[]>([]);
+  const posRef = useRef(0);
+  const idxRef = useRef(0);
+  const animRef = useRef(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dragRef = useRef({ on: false, startX: 0, startY: 0, axis: "" as "" | "x" | "y", moved: false, lastX: 0, lastT: 0, vx: 0 });
 
   const t = useMemo(() => computeSunnahTimes(settings, today), [settings, today]);
 
@@ -71,26 +82,118 @@ export function WaktuPentingCard({ today }: { today: string }) {
   ];
 
   const activateGeo = async () => {
-    if (busy) return;
+    if (busy || dragRef.current.moved) return;
     setBusy(true);
     await ensureAutoGeo("retry");
     setBusy(false);
   };
 
-  const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const el = e.currentTarget;
-    const first = el.firstElementChild as HTMLElement | null;
-    if (!first) return;
-    const next = Math.max(0, Math.min(rows.length - 1, Math.round(el.scrollLeft / (first.offsetWidth + GAP))));
-    setIdx(next);
-    if (el.scrollLeft > 8) setNudged(true);
+  const step = () => (typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches ? STEP_DESKTOP : STEP_MOBILE);
+
+  /** Posisikan semua kartu untuk nilai pos (float). animate → transisi CSS aktif. */
+  const layout = (pos: number, animate: boolean) => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    stage.classList.toggle("wp-anim", animate);
+    const st = step();
+    for (let i = 0; i < rows.length; i++) {
+      const el = cardRefs.current[i];
+      if (!el) continue;
+      const o = i - pos;
+      const ao = Math.min(Math.abs(o), 1.7);
+      const scale = 1 - Math.min(ao, 1.45) * 0.115;
+      const opacity = ao < 0.03 ? 1 : 1 - Math.min(ao, 1.35) * 0.42;
+      const blur = ao < 0.03 ? 0 : Math.min(ao * 2.6, 4.6);
+      const y = -6 + Math.min(ao, 1) * 16;
+      el.style.transform = `translate3d(${(o * st).toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
+      el.style.opacity = opacity.toFixed(3);
+      el.style.filter = blur < 0.2 ? "none" : `blur(${blur.toFixed(1)}px)`;
+      el.style.zIndex = String(100 - Math.round(ao * 40));
+      el.classList.toggle("wp-front", ao < 0.5);
+    }
   };
 
-  const goTo = (i: number) => {
-    const rail = railRef.current;
-    const first = rail?.firstElementChild as HTMLElement | null;
-    if (!rail || !first) return;
-    rail.scrollTo({ left: i * (first.offsetWidth + GAP), behavior: "smooth" });
+  const animateTo = (target: number) => {
+    const next = Math.max(0, Math.min(rows.length - 1, target));
+    animRef.current = true;
+    posRef.current = next;
+    layout(next, true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      animRef.current = false;
+      idxRef.current = next;
+      setIdx(next);
+    }, DUR_SETTLE_MS);
+  };
+
+  const goRel = (dir: 1 | -1) => {
+    // tombol/dots: wrap penuh agar "kembali ke kartu pertama" natural
+    animateTo((idxRef.current + dir + rows.length) % rows.length);
+  };
+
+  // posisi awal + re-layout saat resize (breakpoint mengubah step/ukuran)
+  useEffect(() => {
+    layout(posRef.current, false);
+    const onResize = () => layout(posRef.current, false);
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  /* ---- drag / swipe (pointer events; scroll vertikal tidak diblokir) ---- */
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (animRef.current) return;
+    const d = dragRef.current;
+    d.on = true; d.moved = false; d.axis = "";
+    d.startX = d.lastX = e.clientX; d.startY = e.clientY;
+    d.lastT = performance.now(); d.vx = 0;
+    try { stageRef.current?.setPointerCapture(e.pointerId); } catch { /* pointer sintetis/UAEA */ }
+    stageRef.current?.classList.remove("wp-anim");
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = dragRef.current;
+    if (!d.on) return;
+    const dx = e.clientX - d.startX;
+    const dy = e.clientY - d.startY;
+    if (!d.axis) {
+      if (Math.abs(dx) < 7 && Math.abs(dy) < 7) return;
+      d.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+    }
+    if (d.axis !== "x") return;
+    d.moved = true;
+    const now = performance.now();
+    const dt = Math.max(1, now - d.lastT);
+    d.vx = (e.clientX - d.lastX) / dt; // px per ms
+    d.lastX = e.clientX; d.lastT = now;
+    let pos = idxRef.current - dx / step();
+    // rubber-band di ujung
+    const min = -0.42, max = rows.length - 1 + 0.42;
+    if (pos < min) pos = min + (pos - min) / 3;
+    if (pos > max) pos = max + (pos - max) / 3;
+    posRef.current = pos;
+    if (!nudged) setNudged(true);
+    layout(pos, false);
+  };
+
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = dragRef.current;
+    if (!d.on) return;
+    d.on = false;
+    try { stageRef.current?.releasePointerCapture?.(e.pointerId); } catch { /* abaikan */ }
+    if (!d.moved) return;
+    // flick (jari cepat): mempercepat ke kartu terdekat — maks 1 kartu per gesture
+    const fl = Math.max(-0.6, Math.min(0.6, (-d.vx * 80) / step()));
+    const raw = Math.round(posRef.current + (Math.abs(d.vx) > 0.35 ? fl : 0));
+    const target = Math.max(idxRef.current - 1, Math.min(idxRef.current + 1, raw));
+    animateTo(target);
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowRight") { e.preventDefault(); goRel(1); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); goRel(-1); }
   };
 
   return (
@@ -101,11 +204,19 @@ export function WaktuPentingCard({ today }: { today: string }) {
       </div>
 
       <div
-        ref={railRef}
-        onScroll={onScroll}
-        className="wp-rail no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-4 pb-1 [scroll-padding-left:1rem]"
+        ref={stageRef}
+        className="wp-stage"
+        role="group"
+        aria-roledescription="carousel"
+        aria-label="Kartu waktu ibadah — geser, ketuk panah, atau dot untuk berpindah"
+        tabIndex={0}
+        onKeyDown={onKeyDown}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
       >
-        {rows.map(({ id, label, arab, caption, desc, Scene, Icon, time, range }) => {
+        {rows.map(({ id, label, arab, caption, desc, Scene, Icon, time, range }, i) => {
           const missing = time == null && range[0] == null;
           const inner = (
             <>
@@ -132,24 +243,39 @@ export function WaktuPentingCard({ today }: { today: string }) {
               </div>
             </>
           );
-          const cls = cn("wp-card wp-" + id + " w-[88vw] max-w-[430px] shrink-0 snap-start", missing && "wp-tap tap");
+          const cls = cn("wp-card wp-" + id, missing && "wp-tap tap");
           const aria = missing
             ? `${label}: membutuhkan lokasi. Ketuk untuk mengaktifkan lokasi otomatis.`
             : `${label}: ${time ?? `${range[0]} hingga ${range[1]}`}`;
           return missing ? (
-            <button key={id} type="button" onClick={activateGeo} aria-label={aria} className={cls}>
+            <button
+              key={id}
+              ref={(el) => { cardRefs.current[i] = el; }}
+              type="button"
+              onClick={activateGeo}
+              aria-label={aria}
+              className={cls}
+            >
               {inner}
             </button>
           ) : (
-            <article key={id} aria-label={aria} className={cls}>
+            <article key={id} ref={(el) => { cardRefs.current[i] = el; }} aria-label={aria} className={cls}>
               {inner}
             </article>
           );
         })}
       </div>
 
-      {/* indikator carousel (mobile saja — desktop memakai grid 2 kolom) */}
-      <div className="wp-dotbar mt-2 flex items-center justify-between gap-3 px-0.5">
+      {/* navigasi: ‹ dots 1/4 › */}
+      <div className="wp-dotbar mt-2.5 flex items-center justify-between gap-3 px-0.5">
+        <div className="flex items-center gap-1">
+          <button type="button" aria-label="Kartu sebelumnya" onClick={() => goRel(-1)} className="wp-nav">
+            <ChevronLeft size={14} strokeWidth={2.4} />
+          </button>
+          <button type="button" aria-label="Kartu berikutnya" onClick={() => goRel(1)} className="wp-nav">
+            <ChevronRight size={14} strokeWidth={2.4} />
+          </button>
+        </div>
         <div className="flex items-center gap-1.5">
           {rows.map((r, i) => (
             <button
@@ -157,7 +283,7 @@ export function WaktuPentingCard({ today }: { today: string }) {
               type="button"
               aria-label={`Ke kartu ${i + 1}: ${r.label}`}
               aria-current={i === idx}
-              onClick={() => goTo(i)}
+              onClick={() => animateTo(i)}
               className={cn("wp-dot", i === idx && "wp-dot-on")}
             />
           ))}
@@ -167,9 +293,7 @@ export function WaktuPentingCard({ today }: { today: string }) {
             {idx + 1}/{rows.length}
           </span>
         ) : (
-          <span className="wp-hint" aria-hidden>
-            <MoveHorizontal size={12} /> Geser
-          </span>
+          <span className="wp-hint" aria-hidden>Geser</span>
         )}
       </div>
 
