@@ -7,8 +7,9 @@
  *   (lib/tazkiya/sunnahTimes → resolvePrayerSchedule + computePrayerTimes).
  * - Terbit & Duha butuh koordinat GPS: bila tidak ada, tampil "—· butuh lokasi"
  *   (jujur, bukan angka karangan) dan item bisa diketuk untuk mengaktifkan lokasi.
- * - Gaya SUIO: token tema (tk-panel, tk-line, tk-brand), ikon garis kecil,
- *   label Arab sekunder seperti kartu lain di Beranda. Ringkas — tidak menjulang.
+ * - Gaya SUIO: wadah & judul memakai token tema, tetapi KEEMPAT tile warnanya
+ *   TETAP (kelas .wp-* di globals.css — palet dedicated di luar token tema):
+ *   identik pada semua tema sesuai suasana waktunya (malam/terbit/siang/malam dalam).
  */
 
 import { useMemo, useState } from "react";
@@ -71,26 +72,28 @@ export function WaktuPentingCard({ today }: { today: string }) {
                     : `${label}: ${time ?? `${range[0]} hingga ${range[1]}`}`
                 }
                 className={cn(
-                  "tap flex items-center gap-2.5 rounded-[1.05rem] bg-tk-panel-soft px-3 py-2.5 text-left",
+                  // Palet tetap per suasana waktu (wp-imsak/terbit/duha/tahajud)
+                  // — sengaja TIDAK memakai token tema agar identik di semua tema.
+                  "wp-tile tap wp-" + id + " flex items-center gap-2.5 rounded-[1.05rem] px-3 py-2.5 text-left",
                   missing ? "cursor-pointer" : "cursor-default"
                 )}
               >
-                <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--tk-brand)]/12 text-[var(--tk-brand)]">
+                <span aria-hidden className="wp-ico flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
                   <Icon size={15} strokeWidth={2.1} />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="flex items-baseline gap-1.5">
-                    <span className="truncate text-[12px] font-bold text-tk-ink">{label}</span>
-                    <span aria-hidden className="quran-arabic shrink-0 text-[10px] leading-none text-tk-muted">{arab}</span>
+                    <span className="wp-name truncate text-[12px] font-bold">{label}</span>
+                    <span aria-hidden className="wp-arab quran-arabic shrink-0 text-[10px] leading-none">{arab}</span>
                   </span>
                   {missing ? (
-                    <span className="mt-0.5 block text-[10px] font-semibold text-tk-deep">butuh lokasi</span>
+                    <span className="wp-note mt-0.5 block text-[10px] font-semibold">butuh lokasi</span>
                   ) : range[0] != null && range[1] != null ? (
-                    <span className="tnum mt-0.5 block text-[11.5px] font-semibold text-tk-ink/85">
+                    <span className="wp-time tnum mt-0.5 block text-[11.5px] font-semibold">
                       {range[0]} – {range[1]}
                     </span>
                   ) : (
-                    <span className="tnum mt-0.5 block text-[11.5px] font-semibold text-tk-ink/85">{time}</span>
+                    <span className="wp-time tnum mt-0.5 block text-[11.5px] font-semibold">{time}</span>
                   )}
                 </span>
               </button>

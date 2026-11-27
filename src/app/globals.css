@@ -3020,3 +3020,90 @@ html.tk-tab-hidden *::after {
     animation: none !important;
   }
 }
+
+/* ========== Waktu-Waktu Penting — palet TETAP (independen tema) ==========
+   Keempat kartu sengaja TIDAK memakai token tema (--tk-*) sehingga warnanya
+   identik pada SEMUA tema (Original Orange, Electric Dream, Soft Warm Dark,
+   dan tema lain). Kelas di sini tidak disentuh selector tema mana pun.
+   Suasana: Imsak = tengah malam, Terbit = matahari terbit, Duha = siang emas,
+   Tahajud = malam dalam. */
+.wp-tile {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.wp-tile .wp-ico { background: rgba(255, 255, 255, 0.22); color: #ffffff; }
+.wp-tile .wp-name { color: #ffffff; }
+.wp-tile .wp-time { color: rgba(255, 255, 255, 0.94); }
+.wp-tile .wp-arab { color: rgba(255, 255, 255, 0.72); }
+.wp-tile .wp-note { color: rgba(255, 255, 255, 0.78); }
+
+/* 1) IMSAK — atmosfer tengah malam: biru malam → indigo */
+.wp-imsak {
+  background: linear-gradient(135deg, #1b2450 0%, #26336e 52%, #39398c 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.wp-imsak::before { /* glow bulan halus */
+  content: ""; position: absolute; z-index: -1; top: -26px; right: -14px;
+  width: 78px; height: 78px; border-radius: 9999px;
+  background: radial-gradient(circle, rgba(222, 221, 255, 0.32) 0%, rgba(222, 221, 255, 0) 66%);
+}
+.wp-imsak::after { /* bintang kecil */
+  content: ""; position: absolute; z-index: -1; top: 10px; left: 34%;
+  width: 2px; height: 2px; border-radius: 9999px; background: #e7e6ff;
+  box-shadow: 14px 8px 0 -0.5px rgba(231, 230, 255, 0.8), 34px -2px 0 0 rgba(231, 230, 255, 0.55),
+    52px 14px 0 -0.5px rgba(231, 230, 255, 0.7), 8px 26px 0 0 rgba(231, 230, 255, 0.4),
+    66px 2px 0 0.5px rgba(231, 230, 255, 0.5);
+}
+
+/* 2) TERBIT — atmosfer matahari terbit: peach → coral hangat */
+.wp-terbit {
+  background: linear-gradient(135deg, #ffd9b0 0%, #fbba8f 55%, #f79d7e 100%);
+}
+.wp-terbit .wp-name { color: #6b2f2a; }
+.wp-terbit .wp-time { color: rgba(107, 47, 42, 0.92); }
+.wp-terbit .wp-arab { color: rgba(107, 47, 42, 0.66); }
+.wp-terbit .wp-note { color: rgba(107, 47, 42, 0.8); }
+.wp-terbit .wp-ico { background: rgba(255, 255, 255, 0.55); color: #c25b3d; }
+.wp-terbit::before { /* matahari + cahaya di bawah */
+  content: ""; position: absolute; z-index: -1; bottom: -34px; right: -20px;
+  width: 84px; height: 84px; border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.12) 46%, rgba(255, 255, 255, 0) 68%);
+}
+.wp-terbit::after { /* garis horizon */
+  content: ""; position: absolute; z-index: -1; left: 12%; right: 36%; bottom: 9px;
+  height: 2px; border-radius: 9999px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.55) 50%, rgba(255, 255, 255, 0) 100%);
+}
+
+/* 3) DUHA — atmosfer siang: kuning hangat → emas */
+.wp-duha {
+  background: linear-gradient(135deg, #ffdf8f 0%, #f8c963 55%, #f0b44b 100%);
+}
+.wp-duha .wp-name { color: #2f3567; }
+.wp-duha .wp-time { color: rgba(47, 53, 103, 0.92); }
+.wp-duha .wp-arab { color: rgba(47, 53, 103, 0.62); }
+.wp-duha .wp-note { color: rgba(47, 53, 103, 0.78); }
+.wp-duha .wp-ico { background: rgba(255, 255, 255, 0.5); color: #b3762a; }
+.wp-duha::before { /* radial sunlight lembut */
+  content: ""; position: absolute; z-index: -1; top: -30px; right: -24px;
+  width: 92px; height: 92px; border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.16) 44%, rgba(255, 255, 255, 0) 66%);
+}
+
+/* 4) TAHAJUD — atmosfer malam dalam: indigo → violet */
+.wp-tahajud {
+  background: linear-gradient(135deg, #251f47 0%, #32265e 55%, #46306e 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.wp-tahajud::before { /* glow bulan */
+  content: ""; position: absolute; z-index: -1; top: -22px; right: -16px;
+  width: 72px; height: 72px; border-radius: 9999px;
+  background: radial-gradient(circle, rgba(206, 190, 255, 0.3) 0%, rgba(206, 190, 255, 0) 64%);
+}
+.wp-tahajud::after { /* bintang minimalis */
+  content: ""; position: absolute; z-index: -1; top: 12px; left: 38%;
+  width: 2px; height: 2px; border-radius: 9999px; background: #ded4ff;
+  box-shadow: 16px 10px 0 -0.5px rgba(222, 212, 255, 0.75), 38px 0 0 0 rgba(222, 212, 255, 0.5),
+    58px 12px 0 -0.5px rgba(222, 212, 255, 0.65), 10px 24px 0 0 rgba(222, 212, 255, 0.35);
+}
