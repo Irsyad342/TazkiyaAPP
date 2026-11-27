@@ -3016,94 +3016,106 @@ html.tk-tab-hidden *::after {
   .su-mood-idle-lelah, .su-mood-idle-sedih, .su-mood-idle-cemas,
   .su-mood-idle-campur-aduk,
   .pr-breathe, .pr-rays, .pr-drift, .pr-mote, .pr-glint, .pr-bird, .pr-float-soft,
-  .fr-mote, .fr-rays-slow {
+  .fr-mote, .fr-rays-slow, .wp-tw, .wp-glow {
     animation: none !important;
   }
 }
-
-/* ========== Waktu-Waktu Penting — palet TETAP (independen tema) ==========
-   Keempat kartu sengaja TIDAK memakai token tema (--tk-*) sehingga warnanya
-   identik pada SEMUA tema (Original Orange, Electric Dream, Soft Warm Dark,
-   dan tema lain). Kelas di sini tidak disentuh selector tema mana pun.
-   Suasana: Imsak = tengah malam, Terbit = matahari terbit, Duha = siang emas,
-   Tahajud = malam dalam. */
-.wp-tile {
+/* ========== Waktu-Waktu Penting — kartu pemandangan full-bleed ==========
+   Ilustrasi SVG inline (WaktuScenes.tsx) + palet TETAP per suasana waktu.
+   Semua kelas wp-* sengaja DI LUAR selector tema (html[data-theme]/[data-color])
+   dan tanpa token tema — keempat kartu identik di semua tema aplikasi.
+   Elemen chrome (dots/hint memakai --tk-brand/--color-tk-*) sengaja boleh
+   mengikuti tema karena berada di luar keempat kartu. */
+.wp-card {
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  height: 272px;
+  border-radius: 1.55rem;
+  color: #ffffff;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  box-shadow: 0 12px 34px -16px rgba(10, 14, 38, 0.55);
 }
-.wp-tile .wp-ico { background: rgba(255, 255, 255, 0.22); color: #ffffff; }
-.wp-tile .wp-name { color: #ffffff; }
-.wp-tile .wp-time { color: rgba(255, 255, 255, 0.94); }
-.wp-tile .wp-arab { color: rgba(255, 255, 255, 0.72); }
-.wp-tile .wp-note { color: rgba(255, 255, 255, 0.78); }
+.wp-card.wp-tap { cursor: pointer; }
+.wp-scene { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; }
+.wp-topbar {
+  position: absolute; z-index: 2; top: 13px; left: 13px; right: 13px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.wp-chip {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 5px 10px; border-radius: 9999px;
+  background: rgba(10, 14, 34, 0.4); color: rgba(255, 255, 255, 0.92);
+}
+.wp-ico {
+  display: flex; height: 30px; width: 30px; align-items: center; justify-content: center;
+  border-radius: 9999px; background: rgba(255, 255, 255, 0.18); color: #ffffff;
+}
+.wp-body {
+  position: absolute; z-index: 2; left: 16px; right: 16px; bottom: 14px;
+  display: flex; flex-direction: column;
+}
+.wp-name { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.15; color: #ffffff; }
+.wp-arab { font-size: 14px; line-height: 1; color: rgba(255, 255, 255, 0.85); }
+.wp-time { font-size: 30px; font-weight: 800; line-height: 1.12; letter-spacing: -0.01em; color: #ffffff; font-variant-numeric: tabular-nums; }
+.wp-time-missing { font-size: 15px; font-weight: 700; padding-top: 7px; }
+.wp-desc { margin-top: 4px; font-size: 10.5px; font-weight: 500; line-height: 1.35; color: rgba(255, 255, 255, 0.8); }
 
-/* 1) IMSAK — atmosfer tengah malam: biru malam → indigo */
-.wp-imsak {
-  background: linear-gradient(135deg, #1b2450 0%, #26336e 52%, #39398c 100%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+/* scrim pembaca teks di bagian bawah — warna tetap per suasana */
+.wp-card::after {
+  content: ""; position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; height: 62%;
+  border-radius: 0 0 1.55rem 1.55rem; pointer-events: none;
 }
-.wp-imsak::before { /* glow bulan halus */
-  content: ""; position: absolute; z-index: -1; top: -26px; right: -14px;
-  width: 78px; height: 78px; border-radius: 9999px;
-  background: radial-gradient(circle, rgba(222, 221, 255, 0.32) 0%, rgba(222, 221, 255, 0) 66%);
-}
-.wp-imsak::after { /* bintang kecil */
-  content: ""; position: absolute; z-index: -1; top: 10px; left: 34%;
-  width: 2px; height: 2px; border-radius: 9999px; background: #e7e6ff;
-  box-shadow: 14px 8px 0 -0.5px rgba(231, 230, 255, 0.8), 34px -2px 0 0 rgba(231, 230, 255, 0.55),
-    52px 14px 0 -0.5px rgba(231, 230, 255, 0.7), 8px 26px 0 0 rgba(231, 230, 255, 0.4),
-    66px 2px 0 0.5px rgba(231, 230, 255, 0.5);
-}
+.wp-imsak::after { background: linear-gradient(180deg, rgba(10, 14, 40, 0) 0%, rgba(10, 14, 40, 0.4) 55%, rgba(10, 14, 40, 0.6) 100%); }
+.wp-terbit::after { background: linear-gradient(180deg, rgba(36, 22, 48, 0) 0%, rgba(36, 22, 48, 0.34) 55%, rgba(36, 22, 48, 0.56) 100%); }
+.wp-duha::after { background: linear-gradient(180deg, rgba(14, 42, 58, 0) 0%, rgba(14, 42, 58, 0.36) 55%, rgba(14, 42, 58, 0.58) 100%); }
+.wp-tahajud::after { background: linear-gradient(180deg, rgba(8, 6, 26, 0) 0%, rgba(8, 6, 26, 0.4) 55%, rgba(8, 6, 26, 0.62) 100%); }
 
-/* 2) TERBIT — atmosfer matahari terbit: peach → coral hangat */
-.wp-terbit {
-  background: linear-gradient(135deg, #ffd9b0 0%, #fbba8f 55%, #f79d7e 100%);
-}
-.wp-terbit .wp-name { color: #6b2f2a; }
-.wp-terbit .wp-time { color: rgba(107, 47, 42, 0.92); }
-.wp-terbit .wp-arab { color: rgba(107, 47, 42, 0.66); }
-.wp-terbit .wp-note { color: rgba(107, 47, 42, 0.8); }
-.wp-terbit .wp-ico { background: rgba(255, 255, 255, 0.55); color: #c25b3d; }
-.wp-terbit::before { /* matahari + cahaya di bawah */
-  content: ""; position: absolute; z-index: -1; bottom: -34px; right: -20px;
-  width: 84px; height: 84px; border-radius: 9999px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.12) 46%, rgba(255, 255, 255, 0) 68%);
-}
-.wp-terbit::after { /* garis horizon */
-  content: ""; position: absolute; z-index: -1; left: 12%; right: 36%; bottom: 9px;
-  height: 2px; border-radius: 9999px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.55) 50%, rgba(255, 255, 255, 0) 100%);
-}
-
-/* 3) DUHA — atmosfer siang: kuning hangat → emas */
-.wp-duha {
-  background: linear-gradient(135deg, #ffdf8f 0%, #f8c963 55%, #f0b44b 100%);
-}
-.wp-duha .wp-name { color: #2f3567; }
-.wp-duha .wp-time { color: rgba(47, 53, 103, 0.92); }
-.wp-duha .wp-arab { color: rgba(47, 53, 103, 0.62); }
-.wp-duha .wp-note { color: rgba(47, 53, 103, 0.78); }
+/* chip & ikon bernuansa terang untuk kartu siang (terbit/duha) */
+.wp-terbit .wp-chip { background: rgba(255, 255, 255, 0.44); color: #6b2f2a; }
+.wp-duha .wp-chip { background: rgba(255, 255, 255, 0.44); color: #274a56; }
+.wp-terbit .wp-ico { background: rgba(255, 255, 255, 0.5); color: #d0653f; }
 .wp-duha .wp-ico { background: rgba(255, 255, 255, 0.5); color: #b3762a; }
-.wp-duha::before { /* radial sunlight lembut */
-  content: ""; position: absolute; z-index: -1; top: -30px; right: -24px;
-  width: 92px; height: 92px; border-radius: 9999px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.16) 44%, rgba(255, 255, 255, 0) 66%);
-}
 
-/* 4) TAHAJUD — atmosfer malam dalam: indigo → violet */
-.wp-tahajud {
-  background: linear-gradient(135deg, #251f47 0%, #32265e 55%, #46306e 100%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+/* dots + hint + counter — chrome UI di luar kartu, boleh mengikuti tema */
+.wp-dot {
+  height: 6px; width: 6px; border-radius: 9999px; padding: 0;
+  background: var(--color-tk-line-strong);
+  transition: width 0.25s ease, background-color 0.25s ease;
 }
-.wp-tahajud::before { /* glow bulan */
-  content: ""; position: absolute; z-index: -1; top: -22px; right: -16px;
-  width: 72px; height: 72px; border-radius: 9999px;
-  background: radial-gradient(circle, rgba(206, 190, 255, 0.3) 0%, rgba(206, 190, 255, 0) 64%);
-}
-.wp-tahajud::after { /* bintang minimalis */
-  content: ""; position: absolute; z-index: -1; top: 12px; left: 38%;
-  width: 2px; height: 2px; border-radius: 9999px; background: #ded4ff;
-  box-shadow: 16px 10px 0 -0.5px rgba(222, 212, 255, 0.75), 38px 0 0 0 rgba(222, 212, 255, 0.5),
-    58px 12px 0 -0.5px rgba(222, 212, 255, 0.65), 10px 24px 0 0 rgba(222, 212, 255, 0.35);
+.wp-dot-on { width: 18px; background: var(--tk-brand); }
+.wp-hint { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; color: var(--color-tk-muted); }
+.wp-count { font-size: 10.5px; font-weight: 700; color: var(--color-tk-muted); font-variant-numeric: tabular-nums; }
+
+/* animasi halus: maks satu per kartu, hanya opacity — hemat GPU */
+.wp-tw { animation: wpTwinkle 5s ease-in-out infinite; }
+.wp-glow { animation: wpBreathe 7s ease-in-out infinite; }
+@keyframes wpTwinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+@keyframes wpBreathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.72; } }
+
+/* Tablet/desktop: grid 2 kolom besar (proyek mematok breakpoint Tailwind jauh
+   di atas — mobile-only — sehingga varian lg:* tidak pernah aktif; layout
+   desktop untuk section ini diatur di sini saja, di luar config global). */
+@media (min-width: 1024px) {
+  /* breakout: lepas dari kolom konten (±430px) agar kartu benar-benar besar */
+  .wp-section {
+    position: relative;
+    left: 50%;
+    translate: -50% 0;
+    width: min(1100px, 92vw);
+  }
+  .wp-rail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+    scroll-snap-type: none;
+  }
+  .wp-rail .wp-card { width: auto; max-width: none; height: 300px; }
+  .wp-dotbar { display: none; }
 }
