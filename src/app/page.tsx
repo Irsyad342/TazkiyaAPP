@@ -392,7 +392,7 @@ export default function Page() {
                   <ZikirDoaPage onBack={() => setSubpage(null)} onOpenTasbihFull={() => setTasbihFullOpen(true)} />
                 )}
                 {subpage === "rizq-amal" && <RizqAmalPage onBack={() => setSubpage(null)} />}
-                {subpage === "masjid-virtual" && <MasjidVirtualPage onBack={() => setSubpage(null)} />}
+                {subpage === "masjid-virtual" && <MasjidVirtualPage onBack={() => setSubpage(null)} onOpenZikir={() => setSubpage("zikir-doa")} />}
               </m.div>
             </AnimatePresence>
           </div>
