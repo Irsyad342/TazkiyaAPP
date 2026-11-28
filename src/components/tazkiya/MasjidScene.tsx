@@ -278,7 +278,7 @@ const MasjidScene = forwardRef<
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(atmos0.skyMid);
-    scene.fog = new THREE.Fog(atmos0.fogColor, 9, 30);
+    scene.fog = new THREE.Fog(atmos0.fogColor, 12, 38);
 
     const camera = new THREE.PerspectiveCamera(62, host.clientWidth / host.clientHeight, 0.1, 80);
     camera.rotation.order = "YXZ";
@@ -392,28 +392,28 @@ const MasjidScene = forwardRef<
     /* ---------- Fasad eksterior: kubah, menara, pilar pintu ---------- */
     // volume bangunan (terlihat dari luar)
     addBox(10.4, 1.1, 13.6, 0, H + 0.55, 0, lambert(0xd2c4a4)); // parapet massa atap
-    const extDome = new THREE.Mesh(new THREE.SphereGeometry(2.5, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), lambert(0x2e4a78));
+    const extDome = new THREE.Mesh(new THREE.SphereGeometry(3.0, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), lambert(0x2e4a78));
     extDome.position.set(0, H + 1.1, -1);
     scene.add(extDome);
     const finialBase = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.5, 8), basic(C.gold));
-    finialBase.position.set(0, H + 3.6, -1);
+    finialBase.position.set(0, H + 4.15, -1);
     scene.add(finialBase);
     const finialBall = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8), basic(C.gold));
-    finialBall.position.set(0, H + 3.95, -1);
+    finialBall.position.set(0, H + 4.5, -1);
     scene.add(finialBall);
     // dua menara
     for (const side of [-1, 1] as const) {
       const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.7, 7.4, 12), lambert(0xdccfb2));
-      shaft.position.set(side * 4.9, 3.7, 6.6);
+      shaft.position.set(side * 3.5, 3.7, 6.6);
       scene.add(shaft);
       const balcony = new THREE.Mesh(new THREE.CylinderGeometry(0.82, 0.82, 0.22, 12), lambert(0xc9b894));
-      balcony.position.set(side * 4.9, 6.1, 6.6);
+      balcony.position.set(side * 3.5, 6.1, 6.6);
       scene.add(balcony);
       const cap = new THREE.Mesh(new THREE.SphereGeometry(0.66, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2), lambert(0x2e4a78));
-      cap.position.set(side * 4.9, 7.4, 6.6);
+      cap.position.set(side * 3.5, 7.4, 6.6);
       scene.add(cap);
       const spire = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), basic(C.gold));
-      spire.position.set(side * 4.9, 8.15, 6.6);
+      spire.position.set(side * 3.5, 8.15, 6.6);
       scene.add(spire);
     }
     // pilar pintu + lintel arch fasad
@@ -789,20 +789,31 @@ const MasjidScene = forwardRef<
       }
     })();
     // durasi: versi singkat bila pengguna pernah menonton intro
-    const D = seen ? { approach: 1.1, threshold: 0.8, reveal: 1.0, settle: 0.35 } : { approach: 2.6, threshold: 1.3, reveal: 1.7, settle: 0.5 };
-    const P_EXT = { x: 0, y: 1.6, z: 13.5, fov: 62, yaw: 0, pitch: -0.02 };
-    const P_DOOR = { x: 0, y: 1.56, z: 5.35, fov: 67, yaw: 0, pitch: -0.01 };
-    const P_IN = { x: 0, y: 1.52, z: 3.0, fov: 70, yaw: -0.04, pitch: 0 };
+    const D = seen ? { approach: 1.2, threshold: 0.9, reveal: 1.1, settle: 1.2 } : { approach: 2.6, threshold: 1.3, reveal: 1.5, settle: 1.6 };
+    // posisi eksterior adaptif: portrait membutuhkan jarak lebih jauh agar kubah
+    // dan kedua menara masuk frame (FOV three.js = vertikal). Di-mutasi via
+    // Object.assign saat resize agar referensi phases tetap sah.
+    const P_DOOR = { x: 0, y: 1.62, z: 5.35, fov: 67, yaw: 0, pitch: -0.015 };
+    const P_IN = { x: 0, y: 1.54, z: 2.9, fov: 70, yaw: -0.05, pitch: 0.012 };
+    const P_PRE = { x: 0, y: 1.51, z: 2.5, fov: 72, yaw: -0.15, pitch: 0.03 };
     const P_HOME = { x: 0, y: 1.5, z: 2.3, fov: 72, yaw: 0, pitch: 0 };
+    const extCam = () => {
+      const aspect = host.clientWidth / Math.max(1, host.clientHeight);
+      if (aspect < 0.75) return { x: 0, y: 2.35, z: 20.8, fov: 58, yaw: 0, pitch: -0.09 };
+      return { x: 0, y: 2.0, z: 17.2, fov: 58, yaw: 0, pitch: -0.07 };
+    };
+    const P_EXT = extCam();
     type Stage = "exterior" | "intro" | "explore";
     let stage: Stage = "exterior";
     let t0 = 0;
-    const phases: Array<{ dur: number; from: typeof P_EXT; to: typeof P_EXT; kIn: [number, number] }> = [
+    // tahap akhir "settle": kamera menoleh pelan ke mihrab lalu perlahan stabil (ease-out)
+    const phases: Array<{ dur: number; from: typeof P_EXT; to: typeof P_EXT; kIn: [number, number]; easeOut?: boolean }> = [
       { dur: D.approach, from: P_EXT, to: P_DOOR, kIn: [0, 0.06] },
       { dur: D.threshold, from: P_DOOR, to: P_IN, kIn: [0, 1] },
-      { dur: D.reveal, from: P_IN, to: P_HOME, kIn: [1, 1] },
-      { dur: D.settle, from: P_HOME, to: P_HOME, kIn: [1, 1] },
+      { dur: D.reveal, from: P_IN, to: P_PRE, kIn: [1, 1] },
+      { dur: D.settle, from: P_PRE, to: P_HOME, kIn: [1, 1], easeOut: true },
     ];
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
     let phaseIdx = 0;
     let phaseStart = 0;
     const camTmp = { x: 0, y: 0, z: 0, fov: 62, yaw: 0, pitch: 0 };
@@ -824,7 +835,7 @@ const MasjidScene = forwardRef<
     let indoorK = 0;
 
     const playIntro = () => {
-      if (stage === "intro") return;
+      if (stage !== "exterior") return; // satu kali per transisi — tak bisa dobel
       stage = "intro";
       onStageRef.current?.("intro");
       phaseIdx = 0;
@@ -903,10 +914,15 @@ const MasjidScene = forwardRef<
       if (pointers.size < 2) pinchBase = 0;
       if (!dragging) return;
       dragging = false;
-      if (moved < 8 && interactive()) {
-        const now = Date.now();
-        if (now - lastTap < 320) yawT.current = qiblaRef.current;
-        lastTap = now;
+      if (moved < 8) {
+        if (stage === "exterior") {
+          // ketuk pintu dari luar = masuk (menyatu dengan tombol Masuk Masjid)
+          playIntro();
+        } else if (stage === "explore") {
+          const now = Date.now();
+          if (now - lastTap < 320) yawT.current = qiblaRef.current;
+          lastTap = now;
+        }
       }
     };
     const onWheel = (e: WheelEvent) => {
@@ -936,8 +952,9 @@ const MasjidScene = forwardRef<
         if (phaseIdx < phases.length) {
           const ph = phases[phaseIdx];
           const t = Math.min(1, (nowMs - phaseStart) / (ph.dur * 1000));
-          lerpCam(ph.from, ph.to, easeInOut(t));
-          const kk = mix(ph.kIn[0], ph.kIn[1], easeInOut(t));
+          const et = ph.easeOut ? easeOutCubic(t) : easeInOut(t);
+          lerpCam(ph.from, ph.to, et);
+          const kk = mix(ph.kIn[0], ph.kIn[1], et);
           applyCam(kk);
           // transisi cahaya eksterior→interor mengikuti tiap frame intro
           applyAtmos(curAtmos, indoorK);
@@ -1021,6 +1038,14 @@ const MasjidScene = forwardRef<
       camera.aspect = host.clientWidth / host.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(host.clientWidth, host.clientHeight);
+      // komposisi eksterior mengikuti orientasi; reposisi bila masih di luar
+      Object.assign(P_EXT, extCam());
+      if (stage === "exterior") {
+        camera.position.set(P_EXT.x, P_EXT.y, P_EXT.z);
+        camera.rotation.set(P_EXT.pitch, P_EXT.yaw, 0);
+        camera.fov = P_EXT.fov;
+        camera.updateProjectionMatrix();
+      }
     });
     ro.observe(host);
 

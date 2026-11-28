@@ -1,18 +1,20 @@
 "use client";
 
 /**
- * Tazkiya — Halaman "Masjid Virtual" (subpage layar penuh) v2 sinematik.
- * Alur: EKSTERIOR (tombol "Masuk Masjid") → animasi dolly masuk (dapat
- * dilewati via "Lewati") → INTERIOR eksplorasi (geser/zoom/ketuk 2× kibla).
- * Chrome: Keluar, pill salat berikutnya, petunjuk per tahap, kontrol bawah
- * Reset + Hadap Kibla + Zikir (membuka halaman Zikir & Doa aplikasi).
- * Scene three.js di-dynamic-import (ssr:false) — TIDAK pernah dimuat dari
- * Beranda; WebGL gagal → panel fallback jujur. Query ?qa-time=HH hanya untuk
- * uji atmosfer (produksi memakai jam lokal sungguhan).
+ * Tazkiya — Halaman "Masjid Virtual" (subpage layar penuh) v2.1.
+ * DIRENDER via createPortal(document.body) — di luar motion-div induk yang
+ * ber-transform, agar `fixed inset-0 z-50` benar-benar fullscreen dan menutupi
+ * BottomNav (z-30) — sebelumnya nav menutupi tombol Masuk Masjid.
+ *
+ * Tiga tahap: EKSTERIOR (tombol "Masuk Masjid" menempel di area pintu, tanpa
+ * teks instruksi; ketuk pintu pun masuk) → INTRO sinematik (indikator
+ * "Memasuki masjid…" + Lewati) → EKSPLORASI (kontrol minimalis Reset · Kibla ·
+ * Zikir). Panel Sholat Berikutnya compact di kanan-atas, seimbang dgn Keluar.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
+import { createPortal } from "react-dom";
 import { ArrowLeft, RotateCcw, Compass, ImageOff, DoorOpen, FastForward, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { useWorshipStore } from "@/lib/tazkiya/store";
@@ -44,12 +46,17 @@ const MasjidScene = dynamic(() => import("./MasjidScene").then((m) => m.default)
   ),
 });
 
+const subscribeNoop = () => () => {};
+
 export function MasjidVirtualPage({ onBack, onOpenZikir }: { onBack: () => void; onOpenZikir?: () => void }) {
   const settings = useWorshipStore((s) => s.settings);
   const sceneRef = useRef<SceneHandle>(null);
   const [webglFailed, setWebglFailed] = useState(false);
   const [stage, setStage] = useState<TourStage>("exterior");
   const [now, setNow] = useState(() => new Date());
+
+  /** false saat SSR/hidrasi pertama — portal hanya setelah dokumen siap. */
+  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
 
   useEffect(() => {
     const iv = window.setInterval(() => setNow(new Date()), 30_000);
@@ -91,14 +98,9 @@ export function MasjidVirtualPage({ onBack, onOpenZikir }: { onBack: () => void;
     toast.success("Menghadap kibla");
   };
 
-  const hint =
-    stage === "exterior"
-      ? "Masjid terlihat dari luar — tekan Masuk Masjid untuk memasuki tur"
-      : stage === "intro"
-        ? "Memasuki masjid…"
-        : "Geser untuk melihat sekeliling · cubit untuk zoom · ketuk dua kali menghadap kibla";
+  if (!mounted) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 bg-[#0e1533]" role="dialog" aria-label="Tur masjid virtual">
       {/* Scene — memenuhi layar */}
       <div className="absolute inset-0">
@@ -130,83 +132,100 @@ export function MasjidVirtualPage({ onBack, onOpenZikir }: { onBack: () => void;
         style={{ background: "radial-gradient(ellipse at center, transparent 62%, rgba(8,10,22,0.42) 100%)" }}
       />
 
-      {/* Header: Keluar + salat berikutnya */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-4 pt-[max(1rem,env(safe-area-inset-top))]">
+      {/* Header: Keluar (compact) + panel salat berikutnya (compact) */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <button
           type="button"
           onClick={onBack}
           aria-label="Keluar dari tur masjid virtual"
-          className="tap pointer-events-auto flex items-center gap-1.5 rounded-full bg-black/55 px-3.5 py-2 text-[12.5px] font-bold text-white backdrop-blur-sm transition-colors hover:bg-black/70"
+          className="tap pointer-events-auto flex h-9 items-center gap-1.5 rounded-full bg-black/50 px-3.5 text-[12px] font-bold text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/65 active:scale-95"
         >
           <ArrowLeft size={14} /> Keluar
         </button>
-        <div className="pointer-events-auto rounded-2xl bg-black/55 px-3.5 py-2 text-right text-white backdrop-blur-sm">
-          <p className="text-[8.5px] font-bold uppercase tracking-[0.14em] text-white/70">Sholat Berikutnya</p>
-          <p className="tnum text-[13px] font-bold leading-tight">
+        <div className="pointer-events-auto rounded-2xl bg-black/50 px-3 py-1.5 text-right shadow-lg backdrop-blur-md">
+          <p className="text-[8px] font-bold uppercase tracking-[0.16em] text-white/55">Sholat Berikutnya</p>
+          <p className="tnum text-[13px] font-bold leading-snug text-white">
             {nextLabel} <span className="text-[var(--tk-brand-soft)]">{state.nextTime}</span>
           </p>
-          <p className="tnum text-[9.5px] text-white/70">{formatCountdown(state.secondsLeft)} lagi</p>
+          <p className="tnum text-[9px] leading-tight text-white/55">{formatCountdown(state.secondsLeft)} lagi</p>
         </div>
       </div>
 
-      {/* Petunjuk per tahap */}
-      <p className="pointer-events-none absolute inset-x-0 top-[68px] mx-auto w-fit max-w-[86%] rounded-full bg-black/45 px-3.5 py-1.5 text-center text-[10px] font-semibold text-white/90 backdrop-blur-sm">
-        {hint}
-      </p>
-
-      {/* Tombol Lewati saat animasi masuk */}
+      {/* Indikator intro kecil + Lewati (hanya saat animasi berjalan) */}
       {stage === "intro" ? (
-        <button
-          type="button"
-          onClick={() => sceneRef.current?.skipIntro()}
-          className="tap absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 translate-y-[86px] items-center gap-1.5 rounded-full bg-black/60 px-4 py-2 text-[11.5px] font-bold text-white backdrop-blur-sm transition-colors hover:bg-black/75"
-        >
-          <FastForward size={13} /> Lewati
-        </button>
+        <>
+          <p className="pointer-events-none absolute inset-x-0 top-[64px] mx-auto w-fit rounded-full bg-black/45 px-3 py-1 text-center text-[10px] font-semibold text-white/85 backdrop-blur-sm">
+            Memasuki masjid…
+          </p>
+          <button
+            type="button"
+            onClick={() => sceneRef.current?.skipIntro()}
+            className="tap absolute bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+5.5rem))] left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/55 px-4 py-2 text-[11.5px] font-bold text-white backdrop-blur-md transition-colors hover:bg-black/70 active:scale-95"
+          >
+            <FastForward size={13} /> Lewati
+          </button>
+        </>
       ) : null}
 
-      {/* Tombol Masuk Masjid (eksterior) / Kontrol bawah (eksplorasi) */}
+      {/* Hint singkat hanya di eksplorasi */}
+      {stage === "explore" ? (
+        <p className="pointer-events-none absolute inset-x-0 top-[60px] mx-auto w-fit max-w-[78%] rounded-full bg-black/40 px-3 py-1 text-center text-[9.5px] font-semibold text-white/80 backdrop-blur-sm">
+          Geser untuk melihat · cubit untuk zoom · ketuk 2× menghadap kibla
+        </p>
+      ) : null}
+
+      {/* Tombol Masuk Masjid — menempel di area pintu (bawah tengah komposisi pintu) */}
       {stage === "exterior" ? (
-        <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-2.5 p-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+        <div className="absolute inset-x-0 top-[61%] z-10 flex flex-col items-center">
           <button
             type="button"
             onClick={() => sceneRef.current?.playIntro()}
-            className="tap flex items-center gap-2 rounded-full bg-[var(--tk-brand)] px-6 py-3 text-[13.5px] font-bold text-white shadow-lg transition-transform hover:brightness-105 active:scale-97"
+            className="tap group relative flex items-center gap-2 rounded-full bg-[var(--tk-brand)] px-7 py-3.5 text-[14px] font-bold text-white shadow-2xl ring-1 ring-white/25 transition-transform hover:brightness-105 active:scale-95"
           >
-            <DoorOpen size={16} /> Masuk Masjid
+            <span aria-hidden className="absolute inset-0 -z-10 animate-pulse rounded-full bg-[var(--tk-brand)] opacity-30 blur-md" />
+            <DoorOpen size={17} /> Masuk Masjid
           </button>
+          <p className="mt-2 text-[10px] font-semibold text-white/85 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
+            atau ketuk pintunya langsung
+          </p>
         </div>
-      ) : (
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-3 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-          <button
-            type="button"
-            onClick={() => sceneRef.current?.reset()}
-            aria-label="Kembalikan sudut pandang ke arah mihrab"
-            className="tap flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/70"
-          >
-            <RotateCcw size={17} />
-          </button>
-          <button
-            type="button"
-            onClick={faceQibla}
-            aria-label="Menghadap kibla"
-            className={cn(
-              "tap flex items-center gap-1.5 rounded-full px-4.5 py-2.5 text-[12.5px] font-bold backdrop-blur-sm transition-colors",
-              hasGeo ? "bg-[var(--tk-brand)] text-white hover:brightness-105" : "bg-black/55 text-white/85 hover:bg-black/70"
-            )}
-          >
-            <Compass size={15} /> Hadap Kibla
-          </button>
-          <button
-            type="button"
-            onClick={onOpenZikir}
-            aria-label="Buka Zikir dan Doa"
-            className="tap flex items-center gap-1.5 rounded-full bg-black/55 px-4 py-2.5 text-[12.5px] font-bold text-white backdrop-blur-sm transition-colors hover:bg-black/70"
-          >
-            <BookOpen size={15} /> Zikir
-          </button>
+      ) : null}
+
+      {/* Kontrol eksplorasi — panel mengambang minimalis (muncul hanya di interior) */}
+      {stage === "explore" ? (
+        <div className="absolute inset-x-0 bottom-0 flex justify-center p-4 pb-[max(1.1rem,env(safe-area-inset-bottom))]">
+          <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/50 p-1.5 shadow-2xl backdrop-blur-md">
+            <button
+              type="button"
+              onClick={() => sceneRef.current?.reset()}
+              aria-label="Kembalikan sudut pandang ke arah mihrab"
+              className="tap flex h-10 w-10 items-center justify-center rounded-full text-white transition-colors hover:bg-white/15 active:scale-90"
+            >
+              <RotateCcw size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={faceQibla}
+              aria-label="Menghadap kibla"
+              className={cn(
+                "tap flex items-center gap-1.5 rounded-full px-4 py-2.5 text-[12px] font-bold transition-colors active:scale-95",
+                hasGeo ? "bg-[var(--tk-brand)] text-white hover:brightness-105" : "bg-white/10 text-white/85 hover:bg-white/20"
+              )}
+            >
+              <Compass size={14} /> Kiblat
+            </button>
+            <button
+              type="button"
+              onClick={onOpenZikir}
+              aria-label="Buka Zikir dan Doa"
+              className="tap flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2.5 text-[12px] font-bold text-white transition-colors hover:bg-white/20 active:scale-95"
+            >
+              <BookOpen size={14} /> Zikir
+            </button>
+          </div>
         </div>
-      )}
-    </div>
+      ) : null}
+    </div>,
+    document.body
   );
 }
